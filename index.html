@@ -507,7 +507,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">Danh Sách Bệnh Nhân Chi Tiết Trong Khoảng Thời Gian:</h4>
+                    <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">Danh Sách Bệnh Nhân Chi Tiết Trong Khoảng Thời Gian (Bấm vào Mã BN để xem thông tin cụ thể):</h4>
                     <div class="overflow-x-auto rounded-xl border border-slate-200">
                         <table class="w-full text-left text-xs text-slate-700">
                             <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
@@ -1527,6 +1527,7 @@
                     matchedPatientsCount++;
                     totalCyclesInPeriod += validCycles.length;
                     results.push({
+                        docId: p.id,
                         patientId: p.patientId || '-',
                         name: p.name || '-',
                         gender: p.gender || '-',
@@ -1549,7 +1550,11 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">${item.patientId}</td>
+                    <td class="p-3 font-bold text-teal-800">
+                        <button onclick="window.viewPatientDetail('${item.docId}')" class="hover:underline text-teal-700 flex items-center gap-1.5 cursor-pointer text-left font-bold bg-teal-50 hover:bg-teal-100 px-2 py-1 rounded-md transition" title="Bấm để xem chi tiết bệnh nhân">
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-teal-600"></i> ${item.patientId}
+                        </button>
+                    </td>
                     <td class="p-3 font-semibold text-slate-900">${item.name}</td>
                     <td class="p-3">${item.gender}</td>
                     <td class="p-3">${item.diagnosis}</td>
