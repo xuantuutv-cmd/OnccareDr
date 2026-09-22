@@ -589,8 +589,8 @@
         let currentUser = null;
         let isAdmin = false;
         let cachedPatientsList = [];
-        window.tempCurrentCycles = []; // Biến tạm lưu trữ danh sách chu kỳ để chỉnh sửa trực tiếp trong modal
-        window.tempCurrentNotes = [];  // Biến tạm lưu trữ danh sách ghi chú lâm sàng để chỉnh sửa trực tiếp trong modal
+        window.tempCurrentCycles = []; 
+        window.tempCurrentNotes = [];  
 
         window.loginWithGoogle = async function() {
             try {
@@ -834,18 +834,15 @@
             document.getElementById('npCycleNote').value = '';
             document.getElementById('npGeneralNote').value = '';
 
-            // Sao chép danh sách chu kỳ vào biến tạm để có thể xóa/sửa trực tiếp
             window.tempCurrentCycles = JSON.parse(JSON.stringify(p.cycles || []));
             window.renderTempCyclesList();
 
-            // Sao chép danh sách ghi chú lâm sàng vào biến tạm để có thể xóa/sửa trực tiếp
             window.tempCurrentNotes = JSON.parse(JSON.stringify(p.notes || []));
             window.renderTempNotesList();
 
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
-        // Render danh sách chu kỳ tạm thời trong modal chỉnh sửa kèm nút Xóa / Sửa
         window.renderTempCyclesList = function() {
             const cyclesListDiv = document.getElementById('existingCyclesList');
             cyclesListDiv.innerHTML = "";
@@ -874,7 +871,6 @@
             }
         };
 
-        // Render danh sách ghi chú lâm sàng tạm thời trong modal chỉnh sửa kèm nút Xóa / Sửa
         window.renderTempNotesList = function() {
             const notesListDiv = document.getElementById('existingNotesList');
             notesListDiv.innerHTML = "";
@@ -903,7 +899,6 @@
             }
         };
 
-        // Xóa một chu kỳ cụ thể khỏi danh sách tạm nếu nhập nhầm
         window.deleteCycleItem = function(idx) {
             if (confirm(`Bạn có chắc chắn muốn xóa Chu kỳ ${idx + 1} này không?`)) {
                 window.tempCurrentCycles.splice(idx, 1);
@@ -911,7 +906,6 @@
             }
         };
 
-        // Đưa thông tin của chu kỳ cũ lên form phía trên để chỉnh sửa nội dung
         window.editCycleItem = function(idx) {
             const c = window.tempCurrentCycles[idx];
             document.getElementById('npCycleDate').value = c.date || '';
@@ -925,7 +919,6 @@
             alert(`Đã nạp thông tin Chu kỳ ${idx + 1} lên form phía trên. Bạn có thể chỉnh sửa lại và bấm Lưu.`);
         };
 
-        // Xóa một ghi chú lâm sàng cụ thể khỏi danh sách tạm
         window.deleteNoteItem = function(idx) {
             if (confirm(`Bạn có chắc chắn muốn xóa ghi chú này không?`)) {
                 window.tempCurrentNotes.splice(idx, 1);
@@ -933,7 +926,6 @@
             }
         };
 
-        // Đưa nội dung ghi chú lâm sàng cũ lên ô nhập phía trên để chỉnh sửa
         window.editNoteItem = function(idx) {
             const n = window.tempCurrentNotes[idx];
             document.getElementById('npGeneralNote').value = n.content || '';
@@ -965,10 +957,18 @@
             const todayStr = new Date().toISOString().split('T')[0];
 
             try {
+                // Kiểm tra nếu là tạo mới (docId trống) và mã BN đã tồn tại trong danh sách
+                if (!docId) {
+                    const isDuplicate = cachedPatientsList.some(p => p.patientId && p.patientId.toUpperCase() === patientId);
+                    if (isDuplicate) {
+                        alert(`Lỗi: Mã bệnh nhân "${patientId}" đã tồn tại trong hệ thống! Vui lòng sử dụng mã khác hoặc tra cứu hồ sơ cũ để cập nhật.`);
+                        return; // Ngăn không cho tạo mới
+                    }
+                }
+
                 let finalCycles = [...window.tempCurrentCycles];
                 let finalNotes = [...window.tempCurrentNotes];
 
-                // Nếu người dùng có nhập thông tin ở form chu kỳ mới phía trên thì push vào danh sách
                 if (height > 0 && weight > 0) {
                     finalCycles.push({
                         date: cycleDate || todayStr,
@@ -980,7 +980,6 @@
                     });
                 }
 
-                // Nếu người dùng có nhập thêm ghi chú mới ở ô nhập thì push vào danh sách
                 if (generalNote) {
                     finalNotes.push({
                         content: generalNote,
