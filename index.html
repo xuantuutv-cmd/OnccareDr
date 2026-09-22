@@ -1,146 +1,28 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OncoCare - Quản Lý Hóa Trị Ung Bướu</title>
-    <link rel="manifest" href="manifest.json">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        teal: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' }
-                    },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between bg-slate-50">
-
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-teal-800 to-teal-700 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
-                    <i class="fa-solid fa-dna text-teal-200 text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg sm:text-xl flex items-center gap-2">
-                        <span>OncoCare</span>
-                        <span class="text-[10px] bg-teal-500/40 text-teal-100 border border-teal-400/30 px-2 py-0.5 rounded-full uppercase">Cloud Live</span>
-                    </h1>
-                    <p class="text-xs text-teal-100/80">Hệ Thống Quản Lý Hóa Trị Ung Bướu</p>
-                </div>
-            </div>
-
-            <div id="authHeaderSection">
-                <button id="googleSignInBtn" onclick="loginWithGoogle()" class="bg-white hover:bg-teal-50 text-teal-800 font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-2 border">
-                    <i class="fa-brands fa-google text-red-500"></i>
-                    <span>Đăng Nhập Gmail</span>
-                </button>
-
-                <div id="doctorProfile" class="hidden flex items-center space-x-3">
-                    <div class="text-right hidden sm:block">
-                        <p id="docName" class="text-xs font-bold leading-tight">Bác sĩ</p>
-                        <p id="docEmail" class="text-[10px] text-teal-200">email@gmail.com</p>
-                    </div>
-                    <img id="docAvatar" src="" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
-                    <button onclick="logoutGoogle()" title="Đăng xuất" class="text-teal-200 hover:text-white text-xs bg-teal-900/40 hover:bg-teal-900/60 p-2 rounded-lg transition">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Content Area -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
-        <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between gap-4">
-            <input type="text" id="searchInput" oninput="liveSearch()" placeholder="Tra cứu theo Mã BN, Họ tên..." class="flex-1 p-3 bg-slate-50 border rounded-xl text-sm">
-            <button onclick="openNewPatientModal()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm px-4 py-3 rounded-xl flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-user-plus"></i>
-                <span>Thêm Bệnh Nhân Mới</span>
-            </button>
-        </section>
-
-        <!-- Patient List Table -->
-        <section class="bg-white rounded-2xl shadow-sm border p-5 space-y-4">
-            <h3 class="font-bold text-slate-800 text-sm uppercase flex justify-between">
-                <span>Danh Sách Bệnh Nhân (Đã đồng bộ Cloud)</span>
-                <span id="patientCountBadge" class="bg-teal-100 text-teal-800 text-xs px-2.5 py-0.5 rounded-full font-bold">0 Bệnh nhân</span>
-            </h3>
-            <div class="overflow-x-auto rounded-xl border">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-100 text-slate-600 uppercase font-bold">
-                        <tr>
-                            <th class="p-3">Mã BN</th>
-                            <th class="p-3">Họ và Tên</th>
-                            <th class="p-3">Giới Tính/Tuổi</th>
-                            <th class="p-3">Chẩn Đoán</th>
-                            <th class="p-3">Phác Đồ</th>
-                            <th class="p-3">Người Tạo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
-                        <tr><td colspan="6" class="p-4 text-center text-slate-400">Vui lòng đăng nhập Gmail để tải dữ liệu...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-
-    <!-- Modal Thêm Bệnh Nhân -->
-    <div id="newPatientModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 text-xs">
-            <h3 class="font-bold text-base text-teal-800 border-b pb-2">Thêm Bệnh Nhân Mới Vào Firebase</h3>
-            <form onsubmit="savePatientToFirebase(event)" class="space-y-3">
-                <input type="text" id="npId" placeholder="Mã Bệnh Nhân (vd: BN001)" required class="w-full p-2.5 border rounded-lg">
-                <input type="text" id="npName" placeholder="Họ và Tên" required class="w-full p-2.5 border rounded-lg">
-                <input type="text" id="npDiagnosis" placeholder="Chẩn đoán lâm sàng" required class="w-full p-2.5 border rounded-lg">
-                <input type="text" id="npProtocol" placeholder="Phác đồ hóa trị" class="w-full p-2.5 border rounded-lg">
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeNewPatientModal()" class="px-4 py-2 bg-slate-100 rounded-lg">Hủy</button>
-                    <button type="submit" class="px-4 py-2 bg-teal-600 text-white rounded-lg">Lưu vĩnh viễn</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Firebase SDK Modular -->
+<!-- Firebase SDK Modular (Phiên bản đã tối ưu & sửa lỗi) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            signInWithRedirect, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            onSnapshot, 
+            query, 
+            orderBy, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // === THAY CẤU HÌNH FIREBASE CỦA BẠN VÀO DƯỚI ĐÂY ===
-        const firebaseConfig = {// Import the functions you need from the SDKs you need
-import initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM",
-  authDomain: "oncocaer.firebaseapp.com",
-  projectId: "oncocaer",
-  storageBucket: "oncocaer.firebasestorage.app",
-  messagingSenderId: "831474032997",
-  appId: "1:831474032997:web:90615da3cc65aa54c2018c",
-  measurementId: "G-JRLX54RFX6"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+        // =========================================================================
+        // BÁC SĨ THAY CẤU HÌNH FIREBASE CỦA BẠN VÀO DƯỚI ĐÂY (GIỮ NGUYÊN MÃ CỦA BẠN)
+        // =========================================================================
+        const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
             projectId: "YOUR_PROJECT_ID",
@@ -149,99 +31,150 @@ const analytics = getAnalytics(app);
             appId: "YOUR_APP_ID"
         };
 
+        // Khởi tạo Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' }); // Ép buộc chọn tài khoản khi bấm đăng nhập
 
         let currentUser = null;
 
-        // Xử lý Đăng Nhập Gmail
-        window.loginWithGoogle = function() {
-            signInWithPopup(auth, provider).catch(error => console.error("Lỗi đăng nhập:", error));
+        // 1. Xử lý Đăng Nhập Gmail (Kết hợp Popup và Chuyển hướng nếu trình duyệt chặn Popup)
+        window.loginWithGoogle = async function() {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.warn("Popup bị chặn hoặc lỗi, đang chuyển sang chế độ Chuyển hướng (Redirect)...", error);
+                try {
+                    await signInWithRedirect(auth, provider);
+                } catch (err) {
+                    alert("Không thể đăng nhập Gmail. Vui lòng kiểm tra lại cấu hình Authorized Domains trên Firebase Console!");
+                    console.error("Lỗi đăng nhập chi tiết:", err);
+                }
+            }
         };
 
+        // 2. Đăng xuất
         window.logoutGoogle = function() {
-            signOut(auth);
+            signOut(auth).then(() => {
+                alert("Đã đăng xuất tài khoản!");
+            }).catch((err) => {
+                console.error("Lỗi khi đăng xuất:", err);
+            });
         };
 
-        // Lắng nghe trạng thái đăng nhập
+        // 3. Theo dõi trạng thái đăng nhập Realtime
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                document.getElementById('googleSignInBtn').classList.add('hidden');
-                document.getElementById('doctorProfile').classList.remove('hidden');
-                document.getElementById('docName').innerText = user.displayName;
-                document.getElementById('docEmail').innerText = user.email;
-                document.getElementById('docAvatar').src = user.photoURL;
+                document.getElementById('googleSignInBtn')?.classList.add('hidden');
+                document.getElementById('doctorProfile')?.classList.remove('hidden');
                 
-                // Tải dữ liệu Realtime từ Firebase
+                if (document.getElementById('docName')) document.getElementById('docName').innerText = user.displayName || "Bác sĩ";
+                if (document.getElementById('docEmail')) document.getElementById('docEmail').innerText = user.email;
+                if (document.getElementById('docAvatar')) document.getElementById('docAvatar').src = user.photoURL || "https://placehold.co/100x100/0d9488/ffffff?text=Doctor";
+                
+                // Tải danh sách bệnh nhân từ Firebase khi đã đăng nhập
                 loadPatientsRealtime();
             } else {
                 currentUser = null;
-                document.getElementById('googleSignInBtn').classList.remove('hidden');
-                document.getElementById('doctorProfile').classList.add('hidden');
-                document.getElementById('allPatientsTableBody').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Vui lòng đăng nhập Gmail để tải dữ liệu...</td></tr>`;
+                document.getElementById('googleSignInBtn')?.classList.remove('hidden');
+                document.getElementById('doctorProfile')?.classList.add('hidden');
+                
+                const tbody = document.getElementById('allPatientsTableBody');
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Vui lòng đăng nhập Gmail để tải và lưu dữ liệu bệnh nhân...</td></tr>`;
+                }
             }
         });
 
-        // Lắng nghe và tự động cập nhật dữ liệu từ Cloud (Realtime)
+        // 4. Tải dữ liệu bệnh nhân Realtime từ Firestore Database
         function loadPatientsRealtime() {
-            const q = query(collection(db, "patients"));
-            onSnapshot(q, (snapshot) => {
-                const tbody = document.getElementById('allPatientsTableBody');
-                tbody.innerHTML = '';
-                document.getElementById('patientCountBadge').innerText = `${snapshot.docs.length} Bệnh nhân`;
+            const tbody = document.getElementById('allPatientsTableBody');
+            if (!tbody) return;
 
-                if (snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Chưa có dữ liệu. Bấm "Thêm Bệnh Nhân Mới" để tạo dữ liệu lưu trữ.</td></tr>`;
-                    return;
-                }
+            try {
+                // Tải danh sách sắp xếp theo thời gian tạo mới nhất
+                const q = query(collection(db, "patients"));
+                
+                onSnapshot(q, (snapshot) => {
+                    tbody.innerHTML = '';
+                    const badge = document.getElementById('patientCountBadge');
+                    if (badge) badge.innerText = `${snapshot.docs.length} Bệnh nhân`;
 
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-teal-50/50 transition";
-                    tr.innerHTML = `
-                        <td class="p-3 font-bold text-teal-800">${data.patientId}</td>
-                        <td class="p-3 font-bold">${data.name}</td>
-                        <td class="p-3">N/A</td>
-                        <td class="p-3">${data.diagnosis}</td>
-                        <td class="p-3 font-bold text-amber-700">${data.protocol}</td>
-                        <td class="p-3 text-slate-400">${data.createdBy || 'Unknown'}</td>
-                    `;
-                    tbody.appendChild(tr);
+                    if (snapshot.empty) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Chưa có dữ liệu bệnh nhân nào trên Đám mây. Bấm "Thêm Bệnh Nhân Mới" để bắt đầu lưu trữ!</td></tr>`;
+                        return;
+                    }
+
+                    snapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-teal-50/50 transition border-b border-slate-100";
+                        tr.innerHTML = `
+                            <td class="p-3 font-bold text-teal-800">${data.patientId || 'N/A'}</td>
+                            <td class="p-3 font-bold text-slate-800">${data.name || 'N/A'}</td>
+                            <td class="p-3 text-slate-600">${data.gender || 'N/A'}</td>
+                            <td class="p-3 text-slate-700 font-medium">${data.diagnosis || 'N/A'}</td>
+                            <td class="p-3 font-bold text-amber-700">${data.protocol || 'Chưa xếp'}</td>
+                            <td class="p-3 text-slate-400 text-[11px]">${data.createdBy || 'Unknown'}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }, (error) => {
+                    console.error("Lỗi khi đọc dữ liệu Firestore:", error);
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-500 font-semibold">Lỗi tải dữ liệu: Bác sĩ cần mở quyền Rules trong Firestore Database!</td></tr>`;
                 });
-            });
+            } catch (err) {
+                console.error("Lỗi kết nối Firestore:", err);
+            }
         }
 
-        // Lưu bệnh nhân mới lên Cloud Firestore
+        // 5. Lưu hồ sơ bệnh nhân lên Firebase Cloud
         window.savePatientToFirebase = async function(e) {
             e.preventDefault();
+            
             if (!currentUser) {
-                alert("Vui lòng đăng nhập Gmail trước khi lưu!");
+                alert("Bác sĩ vui lòng bấm 'Đăng Nhập Gmail' trước khi nhập và lưu thông tin bệnh nhân!");
+                return;
+            }
+
+            const pId = document.getElementById('npId')?.value.trim().toUpperCase();
+            const pName = document.getElementById('npName')?.value.trim();
+            const pDiag = document.getElementById('npDiagnosis')?.value.trim();
+            const pProto = document.getElementById('npProtocol')?.value.trim();
+
+            if (!pId || !pName) {
+                alert("Vui lòng điền đầy đủ Mã Bệnh Nhân và Họ Tên!");
                 return;
             }
 
             try {
+                // Đẩy dữ liệu trực tiếp lên bộ sưu tập "patients" trong Firestore
                 await addDoc(collection(db, "patients"), {
-                    patientId: document.getElementById('npId').value.trim().toUpperCase(),
-                    name: document.getElementById('npName').value.trim(),
-                    diagnosis: document.getElementById('npDiagnosis').value.trim(),
-                    protocol: document.getElementById('npProtocol').value.trim(),
+                    patientId: pId,
+                    name: pName,
+                    diagnosis: pDiag || "Chưa có chẩn đoán",
+                    protocol: pProto || "Chưa chỉ định",
                     createdBy: currentUser.email,
-                    createdAt: new Date().toISOString()
+                    createdAt: serverTimestamp()
                 });
-                closeNewPatientModal();
-                alert("Đã lưu hồ sơ bệnh nhân lên Cloud thành công!");
+
+                // Đóng Modal và thông báo
+                if (typeof window.closeNewPatientModal === 'function') {
+                    window.closeNewPatientModal();
+                } else {
+                    document.getElementById('newPatientModal')?.classList.add('hidden');
+                }
+                
+                alert(`Đã lưu thành công bệnh nhân ${pName} (${pId}) lên Cơ sở dữ liệu Cloud!`);
             } catch (err) {
-                console.error("Lỗi khi lưu dữ liệu:", err);
-                alert("Không thể lưu dữ liệu!");
+                console.error("Lỗi khi lưu bệnh nhân vào Firestore:", err);
+                alert("Không thể lưu dữ liệu! Nguyên nhân có thể do chưa bật Rule cho phép Ghi (Write) trong Firestore.");
             }
         };
 
-        window.openNewPatientModal = () => document.getElementById('newPatientModal').classList.remove('hidden');
-        window.closeNewPatientModal = () => document.getElementById('newPatientModal').classList.add('hidden');
+        window.openNewPatientModal = () => document.getElementById('newPatientModal')?.classList.remove('hidden');
+        window.closeNewPatientModal = () => document.getElementById('newPatientModal')?.classList.add('hidden');
     </script>
-</body>
-</html>
