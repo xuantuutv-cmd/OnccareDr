@@ -325,7 +325,7 @@
 
                 <div id="existingCyclesListSection" class="hidden space-y-2">
                     <h5 class="font-bold text-slate-700 uppercase text-[10px] tracking-wider flex items-center justify-between">
-                        <span>Lịch Sử Các Chu Kỳ Đã Ghi Nhận (Có thể Sửa/Xóa nếu nhập nhầm):</span>
+                        <span>Lịch Sử Các Chu Kỳ Đã Ghi Nhận (Chỉ sửa/xóa trong ngày đăng nhập hoặc quyền Admin):</span>
                     </h5>
                     <div id="existingCyclesList" class="space-y-2 max-h-44 overflow-y-auto custom-scrollbar pr-1"></div>
                 </div>
@@ -341,7 +341,7 @@
                     
                     <div id="existingNotesListSection" class="hidden space-y-2">
                         <p class="text-[10px] font-bold text-slate-500 uppercase flex items-center justify-between">
-                            <span>Nhật ký ghi chú trước đây (Có thể Sửa/Xóa):</span>
+                            <span>Nhật ký ghi chú trước đây (Chỉ sửa/xóa trong ngày đăng nhập hoặc quyền Admin):</span>
                             <span id="existingNotesCount" class="text-[10px] bg-sky-200/80 text-sky-900 px-2 py-0.5 rounded-full font-bold">0 ghi chú</span>
                         </p>
                         <div id="existingNotesList" class="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1"></div>
@@ -1241,6 +1241,7 @@
             const cyclesListDiv = document.getElementById('existingCyclesList');
             cyclesListDiv.innerHTML = "";
             document.getElementById('existingCyclesCount').innerText = `${window.tempCurrentCycles.length} chu kỳ đã lưu`;
+            const todayStr = new Date().toISOString().split('T')[0];
 
             if (window.tempCurrentCycles.length > 0) {
                 document.getElementById('existingCyclesListSection').classList.remove('hidden');
@@ -1249,14 +1250,18 @@
                     const isProto = c.isProtocolChange;
                     d.className = `p-2.5 bg-white border ${isProto ? 'border-rose-300 bg-rose-50/30' : 'border-amber-200'} rounded-xl text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-sm`;
                     
+                    // Chỉ hiển thị nút Sửa/Xóa nếu là Admin HOẶC item được tạo/ghi nhận trong cùng ngày hôm nay
+                    const canEditDelete = isAdmin || (c.date === todayStr);
+
                     if (isProto) {
                         d.innerHTML = `
                             <div class="flex-1">
                                 <strong class="text-rose-700">Đổi phác đồ (${c.date || 'N/A'}):</strong> Phác đồ mới: ${c.newProtocol}
                             </div>
+                            ${canEditDelete ? `
                             <div class="flex items-center space-x-1 shrink-0">
                                 <button type="button" onclick="window.deleteCycleItem(${idx})" title="Xóa" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
-                            </div>
+                            </div>` : ''}
                         `;
                     } else {
                         d.innerHTML = `
@@ -1265,10 +1270,11 @@
                                 BSA: ${c.bsa || '-'}m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)
                                 <div class="text-slate-500 mt-0.5">${c.note ? `Ghi chú: ${c.note}` : 'Không có ghi chú'}</div>
                             </div>
+                            ${canEditDelete ? `
                             <div class="flex items-center space-x-1 shrink-0">
                                 <button type="button" onclick="window.editCycleItem(${idx})" title="Sửa" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-pen"></i> Sửa</button>
                                 <button type="button" onclick="window.deleteCycleItem(${idx})" title="Xóa" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
-                            </div>
+                            </div>` : ''}
                         `;
                     }
                     cyclesListDiv.appendChild(d);
@@ -1283,21 +1289,27 @@
             notesListDiv.innerHTML = "";
             const notesCountSpan = document.getElementById('existingNotesCount');
             if (notesCountSpan) notesCountSpan.innerText = `${window.tempCurrentNotes.length} ghi chú`;
+            const todayStr = new Date().toISOString().split('T')[0];
 
             if (window.tempCurrentNotes.length > 0) {
                 document.getElementById('existingNotesListSection').classList.remove('hidden');
                 window.tempCurrentNotes.forEach((n, idx) => {
                     const d = document.createElement('div');
                     d.className = "p-2.5 bg-white border border-sky-200 rounded-xl text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-sm";
+                    
+                    // Chỉ hiển thị nút Sửa/Xóa nếu là Admin HOẶC ghi chú được tạo trong cùng ngày hôm nay
+                    const canEditDelete = isAdmin || (n.date === todayStr);
+
                     d.innerHTML = `
                         <div class="flex-1">
                             <p>${n.content}</p>
                             <p class="text-[9px] text-slate-400 mt-0.5">${n.date || ''} - Cập nhật bởi: ${n.author || ''}</p>
                         </div>
+                        ${canEditDelete ? `
                         <div class="flex items-center space-x-1 shrink-0">
                             <button type="button" onclick="window.editNoteItem(${idx})" class="px-2 py-1 bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-pen"></i> Sửa</button>
                             <button type="button" onclick="window.deleteNoteItem(${idx})" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
-                        </div>
+                        </div>` : ''}
                     `;
                     notesListDiv.appendChild(d);
                 });
