@@ -1,940 +1,365 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OncoCare Pro - Quản Lý Hóa Trị Ung Bướu</title>
-    <link rel="manifest" href="manifest.json">
-    <!-- Tailwind CSS Engine -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết bệnh nhân</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Main Modal Card */
+    .modal-card {
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .modal-header {
+      background-color: #235850;
+      color: #ffffff;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .patient-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .patient-meta {
+      font-size: 0.88rem;
+      opacity: 0.9;
+      margin-top: 3px;
+    }
+
+    .close-icon-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+    .close-icon-btn:hover {
+      opacity: 1;
+    }
+
+    /* Body Body Content */
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #5f6368;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .info-box {
+      background-color: #f1f3f9;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      color: #202124;
+      font-weight: 500;
+    }
+
+    .protocol-box {
+      background-color: #fef8ec;
+      border: 1px solid #fce8cc;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #8c5310;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .empty-state {
+      color: #9aa0a6;
+      font-size: 0.9rem;
+      padding-left: 12px;
+      border-left: 3px solid #dadce0;
+      margin-top: 4px;
+    }
+
+    .cycle-item {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    .meta-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #70757a;
+      padding-top: 10px;
+      border-top: 1px solid #f1f3f4;
+      margin-top: 6px;
+    }
+
+    /* Modal Footer Controls */
+    .modal-footer {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #ffffff;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+
+    .btn-add {
+      background-color: #235850;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-add:hover {
+      background-color: #1a433d;
+    }
+
+    .btn-close {
+      background-color: #e8eaed;
+      color: #3c4043;
+    }
+
+    .btn-close:hover {
+      background-color: #dadce0;
+    }
+
+    /* Popup Form Thêm Chu Kỳ */
+    .form-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .form-card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #404040;
+    }
+
+    .form-group input, .form-group select {
+      padding: 10px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+<body>
 
-    <!-- Navigation Header -->
-    <header class="bg-gradient-to-r from-teal-800 to-teal-700 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
-                    <i class="fa-solid fa-dna text-teal-200 text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg sm:text-xl tracking-tight leading-none flex items-center gap-2">
-                        <span>OncoCare</span>
-                        <span id="roleBadge" class="text-[10px] bg-slate-500/80 text-slate-100 border border-slate-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-user text-[9px]"></i> User
-                        </span>
-                    </h1>
-                    <p class="text-xs text-teal-100/80 font-medium">Hệ Thống Quản Lý Hóa Trị Ung Bướu</p>
-                </div>
-            </div>
-
-            <!-- Doctor Auth Status / Actions -->
-            <div id="authHeaderSection" class="flex items-center space-x-3">
-                <button id="googleSignInBtn" onclick="window.loginWithGoogle()" class="bg-white hover:bg-teal-50 text-teal-800 font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-2 border border-teal-100">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
-                    <span>Đăng Nhập Gmail</span>
-                </button>
-
-                <div id="doctorProfile" class="hidden flex items-center space-x-3">
-                    <button id="btnUserMgmt" onclick="window.openUserManagementModal()" class="hidden bg-teal-900/50 hover:bg-teal-900/80 border border-teal-500/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-users-gear text-amber-300"></i>
-                        <span class="hidden md:inline">Quản Lý Thành Viên</span>
-                    </button>
-                    <div class="text-right hidden sm:block">
-                        <p id="docName" class="text-xs font-bold leading-tight">Bác sĩ</p>
-                        <p id="docEmail" class="text-[10px] text-teal-200">email@gmail.com</p>
-                    </div>
-                    <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
-                    <button onclick="window.logoutGoogle()" title="Đăng xuất" class="text-teal-200 hover:text-white text-xs bg-teal-900/40 hover:bg-teal-900/60 p-2 rounded-lg transition">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </button>
-                </div>
-            </div>
+  <!-- Modal Chính -->
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="header-info">
+        <div class="avatar-icon">🪪</div>
+        <div>
+          <div class="patient-name">NGUYỄN HOÀNG SOL</div>
+          <div class="patient-meta">Mã BN: 26050163 | Giới tính: Nam</div>
         </div>
-    </header>
-
-    <!-- Main Content Area -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
-
-        <!-- Search & Quick Action Toolbar -->
-        <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="relative flex-1">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                    </div>
-                    <input type="text" id="searchInput" oninput="window.filterPatients()" placeholder="Tra cứu theo Mã BN, Họ tên, Chẩn đoán, Phác đồ, Ghi chú..." class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 transition font-medium">
-                    <button onclick="document.getElementById('searchInput').value=''; window.filterPatients();" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                        <i class="fa-solid fa-xmark text-sm"></i>
-                    </button>
-                </div>
-
-                <div class="flex items-center space-x-2">
-                    <button onclick="window.openNewPatientModal()" class="flex-1 sm:flex-none bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs sm:text-sm px-4 py-3 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span>Thêm BN Mới</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- All Patients List Overview -->
-        <section id="patientListSection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center justify-between">
-                <span class="flex items-center gap-2">
-                    <i class="fa-solid fa-users text-teal-600"></i>
-                    Danh Sách Bệnh Nhân (Đồng Bộ Cloud Firestore)
-                </span>
-                <span id="patientCountBadge" class="bg-teal-100 text-teal-800 text-xs px-2.5 py-0.5 rounded-full font-bold">0 Bệnh nhân</span>
-            </h3>
-
-            <div class="overflow-x-auto rounded-xl border border-slate-200">
-                <table class="w-full text-left text-xs text-slate-700">
-                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
-                        <tr>
-                            <th class="p-3">Mã BN</th>
-                            <th class="p-3">Họ và Tên</th>
-                            <th class="p-3">Giới Tính</th>
-                            <th class="p-3">Thông Số Mới Nhất</th>
-                            <th class="p-3">Chẩn Đoán Lâm Sàng</th>
-                            <th class="p-3">Số Chu Kỳ</th>
-                            <th class="p-3">Người Cập Nhật</th>
-                            <th class="p-3 text-center">Thao Tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
-                        <tr><td colspan="8" class="p-4 text-center text-slate-400 font-medium">Đang kết nối Cloud... Vui lòng bấm "Đăng Nhập Gmail" để sử dụng.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL: Add / Edit Patient -->
-    <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
-            <div class="bg-teal-700 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
-                <h3 id="patientFormModalTitle" class="font-bold text-base flex items-center gap-2">
-                    <i class="fa-solid fa-user-plus text-teal-200"></i>
-                    Thêm Hồ Sơ Bệnh Nhân Mới
-                </h3>
-                <button onclick="window.closePatientFormModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form id="patientForm" onsubmit="window.handlePatientFormSubmit(event)" class="p-6 space-y-5 text-xs">
-                <input type="hidden" id="editDocId" value="">
-                
-                <!-- Thông tin cơ bản -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                    <h4 class="font-bold text-teal-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-address-card"></i> Thông Tin Hành Chính & Chẩn Đoán
-                    </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Mã BN <span class="text-rose-500">*</span></label>
-                            <input type="text" id="npId" placeholder="vd: BN001" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 uppercase focus:outline-none focus:ring-2 focus:ring-teal-500">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Họ và Tên <span class="text-rose-500">*</span></label>
-                            <input type="text" id="npName" placeholder="vd: Nguyễn Văn A" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Giới Tính</label>
-                            <select id="npGender" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                                <option value="Nữ">Nữ</option>
-                                <option value="Nam">Nam</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Chẩn Đoán Lâm Sàng <span class="text-rose-500">*</span></label>
-                            <input type="text" id="npDiagnosis" placeholder="vd: Ung thư Vú Phải (T2N1M0)" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Phác Đồ Hóa Trị Tổng Thể</label>
-                            <input type="text" id="npProtocol" placeholder="vd: AC-T / CAPOX / Pembrolizumab" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Thêm Chu Kỳ Mới (Chế độ chỉnh sửa sẽ tự động nối tiếp) -->
-                <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 space-y-3">
-                    <h4 class="font-bold text-amber-900 uppercase text-[11px] tracking-wider flex items-center justify-between">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-notes-medical text-amber-600"></i> 
-                            <span id="cycleSectionTitle">Cập Nhật Chu Kỳ Hóa Trị Ban Đầu (Chu Kỳ 1)</span>
-                        </span>
-                        <span id="existingCyclesCount" class="text-[10px] bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full font-bold">0 chu kỳ đã nhập</span>
-                    </h4>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Ngày Tiêm/Điều Trị</label>
-                            <input type="date" id="npCycleDate" class="w-full p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Chiều Cao (cm)</label>
-                            <input type="number" id="npHeight" step="0.1" oninput="window.calcBaselineBSA()" placeholder="160" class="w-full p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Cân Nặng (kg)</label>
-                            <input type="number" id="npWeight" step="0.1" oninput="window.calcBaselineBSA()" placeholder="55" class="w-full p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">BSA (Mosteller)</label>
-                            <div id="npBsaDisplay" class="p-2 bg-teal-100/70 border border-teal-300 font-bold text-teal-800 rounded-lg text-center">0.00 m²</div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Ghi Chú Chi Tiết Cho Chu Kỳ Này (Nối tiếp nhật ký)</label>
-                        <textarea id="npCycleNote" rows="2" placeholder="Ví dụ: Bạch cầu hạt bình thường, độc tính độ 1 Tê bì đầu chi..." class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
-                    </div>
-                </div>
-
-                <!-- Danh sách chu kỳ cũ (Chỉ xuất hiện khi chỉnh sửa) -->
-                <div id="existingCyclesListSection" class="hidden space-y-2">
-                    <h5 class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">Lịch Sử Các Chu Kỳ Đã Ghi Nhận:</h5>
-                    <div id="existingCyclesList" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
-                        <!-- Render bởi JS -->
-                    </div>
-                </div>
-
-                <!-- Thêm Ghi Chú Tự Do / Diễn Tiến Lâm Sàng -->
-                <div class="bg-sky-50/70 p-4 rounded-xl border border-sky-200 space-y-3">
-                    <h4 class="font-bold text-sky-900 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-comment-medical text-sky-600"></i> Ghi Chú / Theo Dõi Lâm Sàng
-                    </h4>
-                    <div>
-                        <textarea id="npGeneralNote" rows="2" placeholder="Nhập thêm ghi chú mới về tình trạng BN, hẹn tái khám, xét nghiệm cận lâm sàng mới..." class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
-                    </div>
-                    
-                    <div id="existingNotesListSection" class="hidden space-y-1">
-                        <p class="text-[10px] font-bold text-slate-500 uppercase">Nhật ký ghi chú trước đây:</p>
-                        <div id="existingNotesList" class="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1">
-                            <!-- Render bởi JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-200 flex justify-end space-x-2">
-                    <button type="button" onclick="window.closePatientFormModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition">Hủy</button>
-                    <button type="submit" id="saveBtn" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition flex items-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span id="saveBtnText">Lưu Trực Tiếp Lên Cloud</span>
-                    </button>
-                </div>
-            </form>
-        </div>
+      </div>
+      <button class="close-icon-btn">&times;</button>
     </div>
 
-    <!-- MODAL: View Patient Detail & Full History -->
-    <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
-            <div class="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-5 px-6 flex items-center justify-between sticky top-0 z-10">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
-                        <i class="fa-solid fa-id-card text-teal-200 text-lg"></i>
-                    </div>
-                    <div>
-                        <h3 id="detName" class="font-bold text-base leading-tight">Họ và Tên Bệnh Nhân</h3>
-                        <p id="detPatientId" class="text-xs text-teal-200 font-semibold">Mã BN: -</p>
-                    </div>
-                </div>
-                <button onclick="window.closePatientDetailModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
+    <div class="modal-body">
+      <div>
+        <div class="section-title">CHẨN ĐOÁN LÂM SÀNG</div>
+        <div class="info-box">K đại tràng sigma pT4N1M0</div>
+      </div>
 
-            <div class="p-6 space-y-5 text-xs">
-                <!-- Chẩn đoán & Phác đồ tổng thể -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-1">Chẩn Đoán Lâm Sàng</label>
-                        <div id="detDiagnosis" class="p-3 bg-slate-100 rounded-xl font-semibold text-slate-800 text-xs border border-slate-200/60">
-                            -
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-1">Phác Đồ Hóa Trị Tổng Thể</label>
-                        <div id="detProtocol" class="p-3 bg-amber-50 rounded-xl font-bold text-amber-800 text-xs border border-amber-200/80 flex items-center gap-2">
-                            <i class="fa-solid fa-vial text-amber-600"></i>
-                            <span>-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Lịch sử Chu Kỳ Hóa Trị -->
-                <div class="space-y-2">
-                    <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-timeline text-teal-600"></i> Lịch Sử Chu Kỳ Hóa Trị (Nối Tiếp)
-                    </h4>
-                    <div id="detCyclesTimeline" class="space-y-2.5 border-l-2 border-teal-500 pl-4 ml-2">
-                        <!-- Render bởi JS -->
-                    </div>
-                </div>
-
-                <!-- Lịch sử Nhật ký Ghi chú -->
-                <div class="space-y-2">
-                    <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-notes-medical text-sky-600"></i> Nhật Ký Diễn Tiến Lâm Sàng
-                    </h4>
-                    <div id="detNotesTimeline" class="space-y-2">
-                        <!-- Render bởi JS -->
-                    </div>
-                </div>
-
-                <!-- Người tạo -->
-                <div class="pt-3 border-t border-slate-200 flex justify-between items-center text-slate-400 text-[11px]">
-                    <span>Cập nhật lần cuối bởi:</span>
-                    <span id="detCreatedBy" class="font-semibold text-slate-600">-</span>
-                </div>
-            </div>
-
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-                <button onclick="window.closePatientDetailModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl transition">Đóng</button>
-            </div>
+      <div>
+        <div class="section-title">PHÁC ĐỒ HÓA TRỊ TỔNG THỂ</div>
+        <div class="protocol-box">
+          ✏️ Hóa trị hỗ trợ CapEOX CK.1, N1-8
         </div>
+      </div>
+
+      <div>
+        <div class="section-title">⚖️ LỊCH SỬ CHU KỲ HÓA TRỊ (NỐI TIẾP)</div>
+        <div id="cycle-list">
+          <div class="empty-state" id="empty-msg">Chưa ghi nhận chu kỳ hóa trị nào.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">📝 NHẬT KÝ DIỄN TIẾN LÂM SÀNG</div>
+        <div class="empty-state">Chưa có ghi chú diễn tiến lâm sàng.</div>
+      </div>
+
+      <div class="meta-footer">
+        <span>Cập nhật lần cuối bởi:</span>
+        <b>xuantuutv@gmail.com</b>
+      </div>
     </div>
 
-    <!-- MODAL: Admin User Management (Dành riêng cho xuantuutv@gmail.com) -->
-    <div id="userManagementModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
-            <div class="bg-slate-800 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
-                <h3 class="font-bold text-base flex items-center gap-2">
-                    <i class="fa-solid fa-users-gear text-amber-400"></i>
-                    Quản Lý Thành Viên Đăng Nhập (Admin Exclusive)
-                </h3>
-                <button onclick="window.closeUserManagementModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="p-6 space-y-4 text-xs">
-                <p class="text-slate-500">Danh sách tài khoản Bác sĩ/Nhân viên y tế đã truy cập vào hệ thống:</p>
-                
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table class="w-full text-left text-xs text-slate-700">
-                        <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
-                            <tr>
-                                <th class="p-3">Thành Viên</th>
-                                <th class="p-3">Email</th>
-                                <th class="p-3">Vai Trò</th>
-                                <th class="p-3">Truy Cập Cuối</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody" class="divide-y divide-slate-200">
-                            <tr><td colspan="4" class="p-4 text-center text-slate-400">Đang tải danh sách thành viên...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-                <button onclick="window.closeUserManagementModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl transition">Đóng</button>
-            </div>
-        </div>
+    <!-- Footer với Nút "+" góc dưới bên trái -->
+    <div class="modal-footer">
+      <button class="btn btn-add" onclick="openAddModal()">
+        <span>+</span> Thêm chu kỳ
+      </button>
+      <button class="btn btn-close">Đóng</button>
     </div>
-
-    <!-- UI Helpers Script -->
-    <script>
-        window.calculateBSA = function(heightCm, weightKg) {
-            if (!heightCm || !weightKg || heightCm <= 0 || weightKg <= 0) return 0;
-            return Math.sqrt((heightCm * weightKg) / 3600);
-        };
-
-        window.calcBaselineBSA = function() {
-            const h = parseFloat(document.getElementById('npHeight').value);
-            const w = parseFloat(document.getElementById('npWeight').value);
-            const bsa = window.calculateBSA(h, w);
-            document.getElementById('npBsaDisplay').innerText = bsa ? bsa.toFixed(2) + " m²" : "0.00 m²";
-        };
-
-        window.openNewPatientModal = function() {
-            document.getElementById('editDocId').value = "";
-            document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-user-plus text-teal-200"></i> Thêm Hồ Sơ Bệnh Nhân Mới`;
-            document.getElementById('cycleSectionTitle').innerText = "Cập Nhật Chu Kỳ Hóa Trị Ban Đầu (Chu Kỳ 1)";
-            document.getElementById('existingCyclesCount').innerText = "0 chu kỳ đã nhập";
-            document.getElementById('saveBtnText').innerText = "Lưu Trực Tiếp Lên Cloud";
-            document.getElementById('patientForm').reset();
-            document.getElementById('npBsaDisplay').innerText = "0.00 m²";
-            
-            // Đặt mặc định ngày hôm nay cho chu kỳ
-            document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
-
-            document.getElementById('existingCyclesListSection').classList.add('hidden');
-            document.getElementById('existingNotesListSection').classList.add('hidden');
-
-            document.getElementById('patientFormModal').classList.remove('hidden');
-        };
-
-        window.closePatientFormModal = function() {
-            document.getElementById('patientFormModal').classList.add('hidden');
-            document.getElementById('patientForm').reset();
-            document.getElementById('npBsaDisplay').innerText = "0.00 m²";
-            document.getElementById('editDocId').value = "";
-        };
-
-        window.closePatientDetailModal = function() {
-            document.getElementById('patientDetailModal').classList.add('hidden');
-        };
-
-        window.openUserManagementModal = function() {
-            document.getElementById('userManagementModal').classList.remove('hidden');
-        };
-
-        window.closeUserManagementModal = function() {
-            document.getElementById('userManagementModal').classList.add('hidden');
-        };
-    </script>
-
-    <!-- Firebase SDK Single Module -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { 
-            getAuth, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            signInWithRedirect, 
-            signOut, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            doc, 
-            updateDoc, 
-            deleteDoc, 
-            setDoc,
-            onSnapshot, 
-            query, 
-            serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // =========================================================================
-        // EMAIL CÓ QUYỀN ADMIN DUY NHẤT
-        // =========================================================================
-        const ADMIN_EMAIL = "xuantuutv@gmail.com";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM",
-            authDomain: "oncocaer.firebaseapp.com",
-            projectId: "oncocaer",
-            storageBucket: "oncocaer.firebasestorage.app",
-            messagingSenderId: "831474032997",
-            appId: "1:831474032997:web:90615da3cc65aa54c2018c",
-            measurementId: "G-JRLX54RFQ6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-
-        let currentUser = null;
-        let isAdmin = false;
-        let localPatientsCache = [];
-
-        // Auth Handlers
-        window.loginWithGoogle = async function() {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.warn("Popup bị chặn, chuyển sang Redirect...", error);
-                try {
-                    await signInWithRedirect(auth, provider);
-                } catch (err) {
-                    alert("Vui lòng kiểm tra lại cấu hình Firebase Authorized Domain!");
-                    console.error("Lỗi đăng nhập:", err);
-                }
-            }
-        };
-
-        window.logoutGoogle = function() {
-            signOut(auth).then(() => {
-                alert("Đã đăng xuất tài khoản!");
-            });
-        };
-
-        // Lắng nghe trạng thái đăng nhập & Phân quyền
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                // Kiểm tra chính xác email xuantuutv@gmail.com
-                isAdmin = (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
-
-                document.getElementById('googleSignInBtn')?.classList.add('hidden');
-                document.getElementById('doctorProfile')?.classList.remove('hidden');
-                
-                if (document.getElementById('docName')) document.getElementById('docName').innerText = user.displayName || "Bác sĩ";
-                if (document.getElementById('docEmail')) document.getElementById('docEmail').innerText = user.email;
-                if (document.getElementById('docAvatar')) document.getElementById('docAvatar').src = user.photoURL || "https://placehold.co/100x100/0d9488/ffffff?text=Doctor";
-
-                // Cập nhật UI theo vai trò
-                const roleBadge = document.getElementById('roleBadge');
-                const btnUserMgmt = document.getElementById('btnUserMgmt');
-
-                if (isAdmin) {
-                    roleBadge.className = "text-[10px] bg-amber-500/90 text-amber-100 border border-amber-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
-                    roleBadge.innerHTML = `<i class="fa-solid fa-shield-halved text-[9px]"></i> Admin`;
-                    btnUserMgmt?.classList.remove('hidden');
-                } else {
-                    roleBadge.className = "text-[10px] bg-slate-500/80 text-slate-100 border border-slate-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
-                    roleBadge.innerHTML = `<i class="fa-solid fa-user text-[9px]"></i> User`;
-                    btnUserMgmt?.classList.add('hidden');
-                }
-                
-                await recordUserSession(user, isAdmin);
-                loadPatientsRealtime();
-                if (isAdmin) loadUsersRealtime();
-
-            } else {
-                currentUser = null;
-                isAdmin = false;
-                localPatientsCache = [];
-                document.getElementById('googleSignInBtn')?.classList.remove('hidden');
-                document.getElementById('doctorProfile')?.classList.add('hidden');
-                document.getElementById('btnUserMgmt')?.classList.add('hidden');
-                
-                const tbody = document.getElementById('allPatientsTableBody');
-                if (tbody) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-medium">Vui lòng đăng nhập Gmail để tải và lưu dữ liệu bệnh nhân...</td></tr>`;
-                }
-                const badge = document.getElementById('patientCountBadge');
-                if (badge) badge.innerText = `0 Bệnh nhân`;
-            }
-        });
-
-        // Ghi nhận User/Admin lên Firestore
-        async function recordUserSession(user, isUserAdmin) {
-            try {
-                const userRef = doc(db, "users", user.uid);
-                await setDoc(userRef, {
-                    uid: user.uid,
-                    displayName: user.displayName || "Bác sĩ",
-                    email: user.email,
-                    photoURL: user.photoURL || "",
-                    role: isUserAdmin ? "Admin" : "User",
-                    lastLogin: serverTimestamp()
-                }, { merge: true });
-            } catch (err) {
-                console.error("Lỗi cập nhật user:", err);
-            }
-        }
-
-        // Tải danh sách thành viên (Chỉ Admin thấy)
-        function loadUsersRealtime() {
-            const utbody = document.getElementById('userTableBody');
-            if (!utbody) return;
-
-            try {
-                const q = query(collection(db, "users"));
-                onSnapshot(q, (snapshot) => {
-                    utbody.innerHTML = '';
-                    if (snapshot.empty) {
-                        utbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Chưa có thành viên nào khác.</td></tr>`;
-                        return;
-                    }
-                    snapshot.forEach((docSnap) => {
-                        const u = docSnap.data();
-                        const isUserAdminRole = (u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
-                        const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-                        tr.innerHTML = `
-                            <td class="p-3 font-bold text-slate-800 flex items-center gap-2">
-                                <img src="${u.photoURL || 'https://placehold.co/100x100'}" class="w-6 h-6 rounded-full border border-slate-300">
-                                <span>${u.displayName || 'Bác sĩ'}</span>
-                            </td>
-                            <td class="p-3 text-slate-600">${u.email}</td>
-                            <td class="p-3">
-                                ${isUserAdminRole 
-                                    ? `<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Admin</span>`
-                                    : `<span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-semibold">User</span>`}
-                            </td>
-                            <td class="p-3 text-slate-400 text-[11px]">${u.lastLogin ? new Date(u.lastLogin.toDate()).toLocaleString('vi-VN') : 'Mới đăng nhập'}</td>
-                        `;
-                        utbody.appendChild(tr);
-                    });
-                });
-            } catch (err) {
-                console.error("Lỗi tải thành viên:", err);
-            }
-        }
-
-        // Tải dữ liệu bệnh nhân Realtime
-        function loadPatientsRealtime() {
-            const tbody = document.getElementById('allPatientsTableBody');
-            if (!tbody) return;
-
-            try {
-                const q = query(collection(db, "patients"));
-                
-                onSnapshot(q, (snapshot) => {
-                    localPatientsCache = [];
-                    snapshot.forEach((docSnap) => {
-                        localPatientsCache.push({
-                            id: docSnap.id,
-                            ...docSnap.data()
-                        });
-                    });
-
-                    renderPatientsTable(localPatientsCache);
-                }, (error) => {
-                    console.error("Lỗi Firestore:", error);
-                    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-500 font-semibold">Không thể truy cập dữ liệu. Vui lòng kiểm tra lại kết nối Cloud!</td></tr>`;
-                });
-            } catch (err) {
-                console.error("Lỗi kết nối:", err);
-            }
-        }
-
-        // Hiển thị danh sách Bệnh nhân
-        function renderPatientsTable(patients) {
-            const tbody = document.getElementById('allPatientsTableBody');
-            const badge = document.getElementById('patientCountBadge');
-            if (!tbody) return;
-
-            tbody.innerHTML = '';
-            if (badge) badge.innerText = `${patients.length} Bệnh nhân`;
-
-            if (patients.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">Không tìm thấy dữ liệu bệnh nhân phù hợp.</td></tr>`;
-                return;
-            }
-
-            patients.forEach((data) => {
-                const cycles = data.cycles || [];
-                const latestCycle = cycles.length > 0 ? cycles[cycles.length - 1] : null;
-
-                const heightStr = latestCycle && latestCycle.height ? `${latestCycle.height} cm` : '-';
-                const weightStr = latestCycle && latestCycle.weight ? `${latestCycle.weight} kg` : '-';
-                const bsaStr = latestCycle && latestCycle.bsa ? `${latestCycle.bsa} m²` : '-';
-                
-                const bioInfo = latestCycle ? `${heightStr} / ${weightStr} (${bsaStr})` : 'Chưa cập nhật';
-                const cyclesCountBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">${cycles.length} Chu kỳ</span>`;
-
-                // Chỉ hiển thị nút Xóa đối với Admin (xuantuutv@gmail.com)
-                const deleteBtnHtml = isAdmin 
-                    ? `<button onclick="window.deletePatientConfirm('${data.id}', '${data.name}')" title="Xóa hồ sơ (Chỉ Admin)" class="p-1.5 bg-rose-100 text-rose-700 hover:bg-rose-200 rounded-lg transition">
-                        <i class="fa-solid fa-trash-can"></i>
-                       </button>`
-                    : ``;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-teal-50/50 transition border-b border-slate-100";
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">${data.patientId || 'N/A'}</td>
-                    <td class="p-3 font-bold text-slate-800 cursor-pointer hover:text-teal-600 transition underline decoration-dotted" onclick="window.showPatientDetail('${data.id}')">
-                        ${data.name || 'N/A'}
-                    </td>
-                    <td class="p-3 text-slate-600">${data.gender || 'N/A'}</td>
-                    <td class="p-3 text-slate-600 font-medium">${bioInfo}</td>
-                    <td class="p-3 text-slate-700 font-medium">${data.diagnosis || 'N/A'}</td>
-                    <td class="p-3 font-bold">${cyclesCountBadge}</td>
-                    <td class="p-3 text-slate-400 text-[11px]">${data.updatedBy || data.createdBy || 'Unknown'}</td>
-                    <td class="p-3 text-center">
-                        <div class="flex items-center justify-center space-x-1.5">
-                            <button onclick="window.editPatientModal('${data.id}')" title="Sửa & Thêm Chu Kỳ Mới" class="p-1.5 bg-sky-100 text-sky-700 hover:bg-sky-200 rounded-lg transition">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            ${deleteBtnHtml}
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // Tìm kiếm Bệnh nhân
-        window.filterPatients = function() {
-            const term = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
-            if (!term) {
-                renderPatientsTable(localPatientsCache);
-                return;
-            }
-
-            const filtered = localPatientsCache.filter(p => {
-                const pid = (p.patientId || '').toLowerCase();
-                const name = (p.name || '').toLowerCase();
-                const diag = (p.diagnosis || '').toLowerCase();
-                const proto = (p.protocol || '').toLowerCase();
-                
-                // Lọc thêm theo ghi chú
-                const notesStr = (p.notes || []).map(n => n.text).join(' ').toLowerCase();
-                const cyclesStr = (p.cycles || []).map(c => c.note).join(' ').toLowerCase();
-
-                return pid.includes(term) || name.includes(term) || diag.includes(term) || proto.includes(term) || notesStr.includes(term) || cyclesStr.includes(term);
-            });
-
-            renderPatientsTable(filtered);
-        };
-
-        // Xem chi tiết & Lịch sử đầy đủ
-        window.showPatientDetail = function(docId) {
-            const patient = localPatientsCache.find(p => p.id === docId);
-            if (!patient) return;
-
-            document.getElementById('detName').innerText = patient.name || 'N/A';
-            document.getElementById('detPatientId').innerText = `Mã BN: ${patient.patientId || 'N/A'} | Giới tính: ${patient.gender || 'N/A'}`;
-            document.getElementById('detDiagnosis').innerText = patient.diagnosis || 'Chưa có thông tin chẩn đoán.';
-            document.getElementById('detProtocol').querySelector('span').innerText = patient.protocol || 'Chưa xếp phác đồ.';
-            document.getElementById('detCreatedBy').innerText = patient.updatedBy || patient.createdBy || 'N/A';
-
-            // Timeline các Chu Kỳ
-            const timeline = document.getElementById('detCyclesTimeline');
-            timeline.innerHTML = '';
-            const cycles = patient.cycles || [];
-
-            if (cycles.length === 0) {
-                timeline.innerHTML = `<p class="text-slate-400 font-medium">Chưa ghi nhận chu kỳ hóa trị nào.</p>`;
-            } else {
-                cycles.forEach((c, idx) => {
-                    const div = document.createElement('div');
-                    div.className = "bg-slate-50 p-3 rounded-xl border border-slate-200 relative";
-                    div.innerHTML = `
-                        <div class="flex items-center justify-between font-bold text-slate-800 text-xs mb-1">
-                            <span class="text-teal-700">Chu kỳ ${c.cycleNum || (idx + 1)} (${c.date || 'N/A'})</span>
-                            <span class="text-slate-500 font-medium">${c.height || '-'} cm / ${c.weight || '-'} kg - <strong class="text-teal-700">BSA: ${c.bsa || '-'} m²</strong></span>
-                        </div>
-                        ${c.note ? `<p class="text-slate-600 bg-white p-2 rounded-lg border border-slate-100 mt-1.5 text-xs"><i class="fa-solid fa-comment-dots text-teal-600 mr-1"></i>${c.note}</p>` : ''}
-                        <p class="text-[10px] text-slate-400 mt-1 text-right">Ghi nhận bởi: ${c.createdBy || 'Bác sĩ'}</p>
-                    `;
-                    timeline.appendChild(div);
-                });
-            }
-
-            // Timeline Ghi Chú / Theo Dõi Lâm Sàng
-            const notesContainer = document.getElementById('detNotesTimeline');
-            notesContainer.innerHTML = '';
-            const notes = patient.notes || [];
-
-            if (notes.length === 0) {
-                notesContainer.innerHTML = `<p class="text-slate-400 font-medium">Chưa có ghi chú diễn tiến lâm sàng.</p>`;
-            } else {
-                notes.forEach(n => {
-                    const div = document.createElement('div');
-                    div.className = "bg-sky-50/70 p-2.5 rounded-xl border border-sky-100 space-y-1";
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center text-[10px] text-sky-800 font-semibold">
-                            <span><i class="fa-regular fa-clock"></i> ${n.createdAt ? new Date(n.createdAt).toLocaleString('vi-VN') : 'Vừa xong'}</span>
-                            <span>bởi ${n.createdBy || 'Bác sĩ'}</span>
-                        </div>
-                        <p class="text-slate-700 text-xs font-medium">${n.text}</p>
-                    `;
-                    notesContainer.appendChild(div);
-                });
-            }
-
-            document.getElementById('patientDetailModal').classList.remove('hidden');
-        };
-
-        // Chỉnh sửa & Thêm chu kỳ mới
-        window.editPatientModal = function(docId) {
-            const patient = localPatientsCache.find(p => p.id === docId);
-            if (!patient) return;
-
-            document.getElementById('editDocId').value = patient.id;
-            document.getElementById('npId').value = patient.patientId || '';
-            document.getElementById('npName').value = patient.name || '';
-            document.getElementById('npGender').value = patient.gender || 'Nữ';
-            document.getElementById('npDiagnosis').value = patient.diagnosis || '';
-            document.getElementById('npProtocol').value = patient.protocol || '';
-
-            const cycles = patient.cycles || [];
-            const nextCycleNum = cycles.length + 1;
-
-            document.getElementById('cycleSectionTitle').innerText = `Nhập Chu Kỳ Mới (Chu Kỳ ${nextCycleNum})`;
-            document.getElementById('existingCyclesCount').innerText = `${cycles.length} chu kỳ cũ đã lưu`;
-
-            // Reset ô chu kỳ mới
-            document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('npHeight').value = cycles.length > 0 ? cycles[cycles.length - 1].height : '';
-            document.getElementById('npWeight').value = cycles.length > 0 ? cycles[cycles.length - 1].weight : '';
-            document.getElementById('npCycleNote').value = '';
-            document.getElementById('npGeneralNote').value = '';
-            window.calcBaselineBSA();
-
-            // Hiển thị danh sách chu kỳ cũ
-            const cyclesList = document.getElementById('existingCyclesList');
-            const cyclesSection = document.getElementById('existingCyclesListSection');
-            cyclesList.innerHTML = '';
-            
-            if (cycles.length > 0) {
-                cyclesSection.classList.remove('hidden');
-                cycles.forEach((c, i) => {
-                    const item = document.createElement('div');
-                    item.className = "bg-slate-100 p-2 rounded-lg text-slate-700 flex justify-between items-center text-[11px]";
-                    item.innerHTML = `
-                        <span><strong>Chu kỳ ${c.cycleNum || (i+1)}</strong> (${c.date || '-'}): ${c.weight || '-'}kg / BSA: ${c.bsa || '-'}m²</span>
-                        <span class="text-slate-400 text-[10px]">${c.note ? c.note.substring(0, 30) + '...' : 'Không ghi chú'}</span>
-                    `;
-                    cyclesList.appendChild(item);
-                });
-            } else {
-                cyclesSection.classList.add('hidden');
-            }
-
-            // Hiển thị danh sách ghi chú cũ
-            const notesList = document.getElementById('existingNotesList');
-            const notesSection = document.getElementById('existingNotesListSection');
-            notesList.innerHTML = '';
-            const notes = patient.notes || [];
-
-            if (notes.length > 0) {
-                notesSection.classList.remove('hidden');
-                notes.slice().reverse().forEach(n => {
-                    const item = document.createElement('div');
-                    item.className = "bg-white p-2 rounded-lg text-slate-700 text-[11px] border border-slate-200";
-                    item.innerHTML = `
-                        <p class="font-medium text-slate-800">${n.text}</p>
-                        <p class="text-[9px] text-slate-400 mt-0.5">${n.createdBy || 'Bác sĩ'} - ${n.createdAt ? new Date(n.createdAt).toLocaleDateString('vi-VN') : ''}</p>
-                    `;
-                    notesList.appendChild(item);
-                });
-            } else {
-                notesSection.classList.add('hidden');
-            }
-
-            document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-user-pen text-amber-200"></i> Cập Nhật Hồ Sơ & Thêm Chu Kỳ Hóa Trị`;
-            document.getElementById('saveBtnText').innerText = "Cập Nhật & Thêm Vào Lịch Sử";
-            document.getElementById('patientFormModal').classList.remove('hidden');
-        };
-
-        // Lưu thông tin Bệnh Nhân & Nối tiếp dữ liệu
-        window.handlePatientFormSubmit = async function(e) {
-            e.preventDefault();
-            
-            if (!currentUser) {
-                alert("Vui lòng bấm 'Đăng Nhập Gmail' trước khi lưu!");
-                return;
-            }
-
-            const docId = document.getElementById('editDocId').value;
-            const pId = document.getElementById('npId')?.value.trim().toUpperCase();
-            const pName = document.getElementById('npName')?.value.trim();
-            const pGender = document.getElementById('npGender')?.value;
-            const pDiag = document.getElementById('npDiagnosis')?.value.trim();
-            const pProto = document.getElementById('npProtocol')?.value.trim();
-
-            if (!pId || !pName) {
-                alert("Vui lòng nhập Mã Bệnh Nhân và Họ Tên!");
-                return;
-            }
-
-            // Thông tin chu kỳ mới
-            const cDate = document.getElementById('npCycleDate')?.value;
-            const cHeight = parseFloat(document.getElementById('npHeight')?.value) || 0;
-            const cWeight = parseFloat(document.getElementById('npWeight')?.value) || 0;
-            const cBsa = window.calculateBSA(cHeight, cWeight);
-            const cNote = document.getElementById('npCycleNote')?.value.trim();
-
-            // Ghi chú diễn tiến tự do mới
-            const generalNoteText = document.getElementById('npGeneralNote')?.value.trim();
-
-            const saveBtn = document.getElementById('saveBtn');
-            if (saveBtn) saveBtn.disabled = true;
-
-            try {
-                let patientObj = localPatientsCache.find(p => p.id === docId);
-                let existingCycles = patientObj && patientObj.cycles ? [...patientObj.cycles] : [];
-                let existingNotes = patientObj && patientObj.notes ? [...patientObj.notes] : [];
-
-                // Nếu có nhập cân nặng/chiều cao/ngày -> Thêm chu kỳ nối tiếp
-                if (cDate && (cHeight > 0 || cWeight > 0 || cNote)) {
-                    existingCycles.push({
-                        cycleNum: existingCycles.length + 1,
-                        date: cDate,
-                        height: cHeight,
-                        weight: cWeight,
-                        bsa: cBsa ? cBsa.toFixed(2) : "0.00",
-                        note: cNote || "",
-                        createdAt: new Date().toISOString(),
-                        createdBy: currentUser.email
-                    });
-                }
-
-                // Nếu có nhập ghi chú diễn tiến -> Thêm ghi chú nối tiếp
-                if (generalNoteText) {
-                    existingNotes.push({
-                        text: generalNoteText,
-                        createdAt: new Date().toISOString(),
-                        createdBy: currentUser.email
-                    });
-                }
-
-                const patientData = {
-                    patientId: pId,
-                    name: pName,
-                    gender: pGender || "Nữ",
-                    diagnosis: pDiag || "Chưa có chẩn đoán",
-                    protocol: pProto || "Chưa chỉ định",
-                    cycles: existingCycles,
-                    notes: existingNotes,
-                    updatedBy: currentUser.email,
-                    updatedAt: serverTimestamp()
-                };
-
-                if (docId) {
-                    await updateDoc(doc(db, "patients", docId), patientData);
-                    alert(`Đã cập nhật thành công hồ sơ bệnh nhân ${pName}!`);
-                } else {
-                    patientData.createdBy = currentUser.email;
-                    patientData.createdAt = serverTimestamp();
-                    await addDoc(collection(db, "patients"), patientData);
-                    alert(`Đã thêm thành công bệnh nhân mới ${pName} (${pId})!`);
-                }
-
-                window.closePatientFormModal();
-            } catch (err) {
-                console.error("Lỗi lưu Cloud:", err);
-                alert("Không thể lưu dữ liệu! Vui lòng kiểm tra lại quyền truy cập.");
-            } finally {
-                if (saveBtn) saveBtn.disabled = false;
-            }
-        };
-
-        // Chức năng XÓA - CHỈ DÀNH CHO ADMIN (xuantuutv@gmail.com)
-        window.deletePatientConfirm = async function(docId, patientName) {
-            if (!currentUser) {
-                alert("Vui lòng đăng nhập!");
-                return;
-            }
-
-            // Kiểm tra phân quyền trực tiếp
-            if (!isAdmin) {
-                alert("Bạn không có quyền xóa dữ liệu bệnh nhân! Chỉ Admin (xuantuutv@gmail.com) mới có quyền xóa.");
-                return;
-            }
-
-            if (confirm(`Bác sĩ Admin có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân "${patientName}"?`)) {
-                try {
-                    await deleteDoc(doc(db, "patients", docId));
-                    alert(`Đã xóa vĩnh viễn hồ sơ bệnh nhân ${patientName}!`);
-                } catch (err) {
-                    console.error("Lỗi xóa hồ sơ:", err);
-                    alert("Không thể xóa hồ sơ! Vui lòng kiểm tra lại quyền trên Firestore.");
-                }
-            }
-        };
-    </script>
+  </div>
+
+  <!-- Modal Form Nhập Chu Kỳ Mới -->
+  <div class="form-overlay" id="addCycleModal">
+    <div class="form-card">
+      <h3 style="color:#235850;">Thêm Chu Kỳ Hóa Trị</h3>
+      
+      <div class="form-group">
+        <label>Phác đồ hóa trị</label>
+        <input type="text" id="inputProtocol" value="CapEOX" placeholder="Nhập phác đồ...">
+      </div>
+
+      <div class="form-group">
+        <label>Chu kỳ số</label>
+        <input type="number" id="inputCycleNum" min="1" max="12" value="1">
+      </div>
+
+      <div class="form-group">
+        <label>Ngày thực hiện</label>
+        <input type="date" id="inputDate">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-close" onclick="closeAddModal()">Hủy</button>
+        <button class="btn btn-add" onclick="saveCycle()">Lưu chu kỳ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Đặt ngày mặc định là hôm nay
+    document.getElementById('inputDate').valueAsDate = new Date();
+
+    function openAddModal() {
+      document.getElementById('addCycleModal').style.display = 'flex';
+    }
+
+    function closeAddModal() {
+      document.getElementById('addCycleModal').style.display = 'none';
+    }
+
+    function saveCycle() {
+      const protocol = document.getElementById('inputProtocol').value;
+      const cycleNum = document.getElementById('inputCycleNum').value;
+      const dateVal = document.getElementById('inputDate').value;
+
+      if (!protocol || !cycleNum || !dateVal) {
+        alert('Vui lòng nhập đầy đủ thông tin!');
+        return;
+      }
+
+      // Ẩn thông báo trống
+      const emptyMsg = document.getElementById('empty-msg');
+      if (emptyMsg) emptyMsg.style.display = 'none';
+
+      // Thêm chu kỳ mới vào danh sách
+      const cycleList = document.getElementById('cycle-list');
+      const newCycle = document.createElement('div');
+      newCycle.className = 'cycle-item';
+      newCycle.innerHTML = `<b>Chu kỳ ${cycleNum}</b> (${protocol}) - Ngày: ${dateVal}`;
+      
+      cycleList.appendChild(newCycle);
+
+      // Tăng số chu kỳ cho lần nhập sau & đóng modal
+      document.getElementById('inputCycleNum').value = parseInt(cycleNum) + 1;
+      closeAddModal();
+    }
+  </script>
 </body>
 </html>
