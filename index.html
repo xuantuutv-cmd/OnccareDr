@@ -35,10 +35,10 @@
                     <h1 class="font-bold text-lg sm:text-xl tracking-tight leading-none flex items-center gap-2">
                         <span>OncoCare Pro</span>
                         <span id="roleBadge" class="text-[10px] bg-slate-500/80 text-slate-100 border border-slate-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-user text-[9px]"></i> User
+                            <i class="fa-solid fa-user text-[9px]"></i> Khách
                         </span>
                     </h1>
-                    <p class="text-xs text-teal-100/80 font-medium">Hệ Thống Quản Lý Hóa Trị & Mã QR Bệnh Nhân</p>
+                    <p class="text-xs text-teal-100/80 font-medium">Hệ Thống Tra Cứu & Quản Lý Hóa Trị Bệnh Nhân</p>
                 </div>
             </div>
 
@@ -73,39 +73,53 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
 
-        <!-- Search Toolbar -->
-        <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="relative flex-1">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                    </div>
-                    <input type="text" id="searchInput" oninput="window.filterPatients()" placeholder="Tra cứu theo Mã BN, Họ tên, Chẩn đoán, Phác đồ, Ghi chú..." class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 transition font-medium">
-                    <button onclick="document.getElementById('searchInput').value=''; window.filterPatients();" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                        <i class="fa-solid fa-xmark text-sm"></i>
-                    </button>
-                </div>
-
-                <div class="flex items-center space-x-2">
-                    <button onclick="window.openNewPatientModal()" class="flex-1 sm:flex-none bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs sm:text-sm px-4 py-3 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span>Thêm BN Mới</span>
-                    </button>
-                </div>
+        <!-- Banner Thông Báo Bảo Bật -->
+        <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 flex items-start space-x-3 text-amber-900 text-xs shadow-sm">
+            <i class="fa-solid fa-shield-halved text-amber-600 text-lg mt-0.5"></i>
+            <div>
+                <p class="font-bold">Chế Độ Bảo Mật Thông Tin Bệnh Nhân Bắt Buộc (HIPAA/Bảo Mật Y Tế)</p>
+                <p class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân đã được ẩn toàn bộ khỏi màn hình chính. Vui lòng nhập chính xác **Mã số Bệnh nhân** để tra cứu thông tin chi tiết.</p>
             </div>
+        </div>
+
+        <!-- Search Toolbar - Tra cứu bảo mật -->
+        <section class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <form onsubmit="window.searchPatientByCode(event)" class="flex flex-col sm:flex-row items-center gap-3">
+                <div class="relative flex-1 w-full">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-key text-slate-400"></i>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Nhập chính xác Mã BN (VD: BN001, BN002...)" class="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold uppercase tracking-wide transition">
+                    <button type="button" onclick="window.clearSearchResult()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-circle-xmark text-sm"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <button type="submit" class="flex-1 sm:flex-none bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm px-6 py-3.5 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>Tra Cứu Mã BN</span>
+                    </button>
+                    
+                    <button type="button" onclick="window.openNewPatientModal()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm px-4 py-3.5 rounded-xl shadow-sm transition flex items-center space-x-2">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span class="hidden sm:inline">Thêm BN Mới</span>
+                    </button>
+                </div>
+            </form>
         </section>
 
-        <!-- All Patients Table Overview -->
+        <!-- Dynamic Search Result Area (Default Hidden) -->
         <section id="patientListSection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center justify-between">
-                <span class="flex items-center gap-2">
-                    <i class="fa-solid fa-users text-teal-600"></i>
-                    Danh Sách Bệnh Nhân (Cập Nhật Realtime)
-                </span>
-                <span id="patientCountBadge" class="bg-teal-100 text-teal-800 text-xs px-2.5 py-0.5 rounded-full font-bold">0 Bệnh nhân</span>
-            </h3>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-square-poll-vertical text-teal-600"></i>
+                    Kết Quả Tra Cứu Hồ Sơ
+                </h3>
+                <span id="patientCountBadge" class="bg-slate-100 text-slate-600 text-xs px-2.5 py-0.5 rounded-full font-bold">Chưa chọn tra cứu</span>
+            </div>
 
             <div class="overflow-x-auto rounded-xl border border-slate-200">
                 <table class="w-full text-left text-xs text-slate-700">
@@ -114,7 +128,7 @@
                             <th class="p-3">Mã BN</th>
                             <th class="p-3">Họ và Tên</th>
                             <th class="p-3">Giới Tính</th>
-                            <th class="p-3">Thông Số Mới Nhất</th>
+                            <th class="p-3">Thông Số Gần Nhất</th>
                             <th class="p-3">Chẩn Đoán Lâm Sàng</th>
                             <th class="p-3">Chu Kỳ</th>
                             <th class="p-3">Cập Nhật Bởi</th>
@@ -122,7 +136,12 @@
                         </tr>
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
-                        <tr><td colspan="8" class="p-4 text-center text-slate-400 font-medium">Đang kết nối Firestore... Vui lòng bấm "Đăng Nhập Gmail" để xem dữ liệu.</td></tr>
+                        <tr>
+                            <td colspan="8" class="p-8 text-center text-slate-400 font-medium">
+                                <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
+                                Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -179,7 +198,7 @@
                     </div>
                 </div>
 
-                <!-- Cập nhật chu kỳ mới (Nối tiếp) -->
+                <!-- Cập nhật chu kỳ mới -->
                 <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 space-y-3">
                     <h4 class="font-bold text-amber-900 uppercase text-[11px] tracking-wider flex items-center justify-between">
                         <span class="flex items-center gap-2">
@@ -264,12 +283,10 @@
                 <button onclick="window.closePatientDetailModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Content Area với MÃ QR Ở BÊN GÓC PHẢI -->
+            <!-- Content Area với MÃ QR BÊN GÓC PHẢI -->
             <div class="p-6 space-y-6 text-xs">
                 
-                <!-- Bố cục Top: Thông tin bên trái - MÃ QR BÊN GÓC PHẢI -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                    <!-- Thông tin chính (Chiếm 2 phần) -->
                     <div class="md:col-span-2 space-y-3">
                         <div>
                             <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-1">Chẩn Đoán Lâm Sàng</label>
@@ -287,7 +304,7 @@
                         </div>
                     </div>
 
-                    <!-- KHU VỰC MÃ QR CODE BÊN GÓC PHẢI -->
+                    <!-- MÃ QR CODE BÊN PHẢI -->
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col items-center justify-center space-y-2 text-center shadow-inner">
                         <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                             <div id="patientQrCodeContainer" class="flex justify-center"></div>
@@ -315,7 +332,6 @@
                     <div id="detNotesTimeline" class="space-y-2"></div>
                 </div>
 
-                <!-- Người tạo/Cập nhật cuối -->
                 <div class="pt-3 border-t border-slate-200 flex justify-between items-center text-slate-400 text-[11px]">
                     <span>Cập nhật gần nhất bởi:</span>
                     <span id="detCreatedBy" class="font-semibold text-slate-600">-</span>
@@ -328,19 +344,19 @@
         </div>
     </div>
 
-    <!-- MODAL: Admin User Management -->
+    <!-- MODAL: Admin User Management WITH BLOCK / UNBLOCK ACTION -->
     <div id="userManagementModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-slate-800 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-users-gear text-amber-400"></i>
-                    Quản Lý Thành Viên Đăng Nhập (Admin Only)
+                    Quản Lý Thành Viên & Quản Lý Truy Cập (Admin Only)
                 </h3>
                 <button onclick="window.closeUserManagementModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div class="p-6 space-y-4 text-xs">
-                <p class="text-slate-500">Danh sách tài khoản Bác sĩ/Nhân viên y tế đã truy cập vào hệ thống:</p>
+                <p class="text-slate-500">Danh sách tài khoản Bác sĩ/Nhân viên y tế. Admin có quyền **Chặn (Block)** các tài khoản không còn nhiệm vụ:</p>
                 <div class="overflow-x-auto rounded-xl border border-slate-200">
                     <table class="w-full text-left text-xs text-slate-700">
                         <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
@@ -348,11 +364,12 @@
                                 <th class="p-3">Thành Viên</th>
                                 <th class="p-3">Email</th>
                                 <th class="p-3">Vai Trò</th>
-                                <th class="p-3">Truy Cập Cuối</th>
+                                <th class="p-3">Trạng Thái</th>
+                                <th class="p-3 text-center">Thao Tác Chặn</th>
                             </tr>
                         </thead>
                         <tbody id="userTableBody" class="divide-y divide-slate-200">
-                            <tr><td colspan="4" class="p-4 text-center text-slate-400">Đang tải danh sách thành viên...</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center text-slate-400">Đang tải danh sách thành viên...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -433,12 +450,13 @@
             updateDoc, 
             deleteDoc, 
             setDoc,
+            getDoc,
             onSnapshot, 
             query, 
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Admin Email Duy Nhất
+        // Email Admin Tối Cao
         const ADMIN_EMAIL = "xuantuutv@gmail.com";
 
         const firebaseConfig = {
@@ -463,6 +481,7 @@
         let activeDetailPatientId = null;
         let tempEditCycles = [];
         let tempEditNotes = [];
+        let currentSearchedPatient = null;
 
         // Login / Logout
         window.loginWithGoogle = async function() {
@@ -479,12 +498,25 @@
         };
 
         window.logoutGoogle = function() {
-            signOut(auth).then(() => alert("Đã đăng xuất!"));
+            signOut(auth).then(() => {
+                alert("Đã đăng xuất!");
+                window.location.reload();
+            });
         };
 
-        // Trạng thái Đăng Nhập & Phân Quyền
+        // Lắng nghe trạng thái Đăng Nhập & Phân Quyền + Kiểm tra Block Status
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // Kiểm tra xem tài khoản có bị Admin CHẶN không
+                const userDocRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userDocRef);
+
+                if (userSnap.exists() && userSnap.data().status === 'blocked') {
+                    alert("Tài khoản của bạn đã bị Admin chặn quyền truy cập hệ thống!");
+                    await signOut(auth);
+                    return;
+                }
+
                 currentUser = user;
                 isAdmin = (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
 
@@ -512,20 +544,16 @@
                 loadPatientsRealtime();
                 if (isAdmin) loadUsersRealtime();
 
-                // Kiểm tra URL xem có chứa parameter id/patientId (Trường hợp quét QR code)
                 checkUrlParameters();
             } else {
                 currentUser = null;
                 isAdmin = false;
                 document.getElementById('googleSignInBtn')?.classList.remove('hidden');
                 document.getElementById('doctorProfile')?.classList.add('hidden');
-                document.getElementById('allPatientsTableBody').innerHTML = `
-                    <tr><td colspan="8" class="p-4 text-center text-slate-400 font-medium">Vui lòng bấm "Đăng Nhập Gmail" để xem và quản lý dữ liệu bệnh nhân.</td></tr>
-                `;
             }
         });
 
-        // Ghi nhận nhật ký đăng nhập tài khoản Bác sĩ
+        // Ghi nhận nhật ký người dùng
         async function recordUserSession(user, isAdminRole) {
             try {
                 const userRef = doc(db, "users", user.uid);
@@ -535,6 +563,7 @@
                     email: user.email,
                     photoURL: user.photoURL || "",
                     role: isAdminRole ? "admin" : "doctor",
+                    status: "active",
                     lastLogin: serverTimestamp()
                 }, { merge: true });
             } catch (err) {
@@ -542,7 +571,7 @@
             }
         }
 
-        // Tải danh sách bệnh nhân thời gian thực
+        // Tải toàn bộ dữ liệu về bộ nhớ đệm ngầm (Không hiển thị ra bảng chính)
         function loadPatientsRealtime() {
             const q = query(collection(db, "patients"));
             onSnapshot(q, (snapshot) => {
@@ -554,35 +583,77 @@
                     });
                 });
 
-                // Sắp xếp bệnh nhân theo thời gian cập nhật mới nhất
-                localPatientsCache.sort((a, b) => {
-                    const tA = a.updatedAt?.seconds || 0;
-                    const tB = b.updatedAt?.seconds || 0;
-                    return tB - tA;
-                });
+                // Nếu đang có bệnh nhân tra cứu trên màn hình, đồng bộ lại dữ liệu mới nhất
+                if (currentSearchedPatient) {
+                    const updated = localPatientsCache.find(p => p.patientId === currentSearchedPatient.patientId);
+                    if (updated) {
+                        currentSearchedPatient = updated;
+                        renderPatientsTable([updated]);
+                    }
+                }
 
-                renderPatientsTable(localPatientsCache);
-
-                // Nếu đang mở Modal chi tiết, cập nhật realtime ngay lập tức
+                // Nếu đang xem chi tiết, cập nhật Modal
                 if (activeDetailPatientId && !document.getElementById('patientDetailModal').classList.contains('hidden')) {
                     const p = localPatientsCache.find(item => item.docId === activeDetailPatientId || item.patientId === activeDetailPatientId);
                     if (p) window.openPatientDetailModal(p.docId);
                 }
-            }, (err) => {
-                console.error("Lỗi nạp danh sách bệnh nhân:", err);
             });
         }
 
-        // Render Bảng Bệnh Nhân
+        // TRA CỨU BỆNH NHÂN THEO MÃ SỐ CHÍNH XÁC (TĂNG BẢO MẬT)
+        window.searchPatientByCode = function(e) {
+            if (e) e.preventDefault();
+
+            const queryText = document.getElementById('searchInput').value.trim().toUpperCase();
+            if (!queryText) {
+                alert("Vui lòng nhập Mã BN để tìm kiếm!");
+                window.clearSearchResult();
+                return;
+            }
+
+            // Tìm chính xác mã BN hoặc khớp họ tên / chẩn đoán
+            const found = localPatientsCache.filter(p => 
+                (p.patientId || '').toUpperCase() === queryText ||
+                (p.name || '').toUpperCase().includes(queryText)
+            );
+
+            if (found.length === 0) {
+                document.getElementById('allPatientsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-8 text-center text-rose-500 font-medium">
+                            <i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i>
+                            Không tìm thấy hồ sơ bệnh nhân tương ứng với mã/tên "<b>${queryText}</b>".
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('patientCountBadge').innerText = "0 Kết quả";
+                currentSearchedPatient = null;
+            } else {
+                currentSearchedPatient = found[0];
+                renderPatientsTable(found);
+            }
+        };
+
+        // XÓA KẾT QUẢ TRA CỨU (ẨN BỆNH NHÂN KHỎI MÀN HÌNH)
+        window.clearSearchResult = function() {
+            document.getElementById('searchInput').value = '';
+            currentSearchedPatient = null;
+            document.getElementById('allPatientsTableBody').innerHTML = `
+                <tr>
+                    <td colspan="8" class="p-8 text-center text-slate-400 font-medium">
+                        <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
+                        Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
+                    </td>
+                </tr>
+            `;
+            document.getElementById('patientCountBadge').innerText = "Chưa chọn tra cứu";
+        };
+
+        // Render Bảng Bệnh Nhân Được Tra Cứu
         function renderPatientsTable(list) {
             const tbody = document.getElementById('allPatientsTableBody');
             const badge = document.getElementById('patientCountBadge');
-            if (badge) badge.innerText = `${list.length} Bệnh nhân`;
-
-            if (!list || list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-medium">Chưa có dữ liệu bệnh nhân. Bấm "Thêm BN Mới" để bắt đầu.</td></tr>`;
-                return;
-            }
+            if (badge) badge.innerText = `Tìm thấy ${list.length} Bệnh nhân`;
 
             tbody.innerHTML = list.map(p => {
                 const cycles = p.cycles || [];
@@ -629,29 +700,6 @@
             }).join('');
         }
 
-        // Tra cứu theo ô tìm kiếm
-        window.filterPatients = function() {
-            const queryText = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!queryText) {
-                renderPatientsTable(localPatientsCache);
-                return;
-            }
-
-            const filtered = localPatientsCache.filter(p => {
-                const pId = (p.patientId || '').toLowerCase();
-                const name = (p.name || '').toLowerCase();
-                const diag = (p.diagnosis || '').toLowerCase();
-                const prot = (p.protocol || '').toLowerCase();
-                
-                const hasCycleNote = (p.cycles || []).some(c => (c.note || '').toLowerCase().includes(queryText));
-                const hasGenNote = (p.generalNotes || []).some(g => (g.text || '').toLowerCase().includes(queryText));
-
-                return pId.includes(queryText) || name.includes(queryText) || diag.includes(queryText) || prot.includes(queryText) || hasCycleNote || hasGenNote;
-            });
-
-            renderPatientsTable(filtered);
-        };
-
         // Submit Form Hồ Sơ Bệnh Nhân
         window.handlePatientFormSubmit = async function(e) {
             e.preventDefault();
@@ -667,21 +715,17 @@
             const diagnosis = document.getElementById('npDiagnosis').value.trim();
             const protocol = document.getElementById('npProtocol').value.trim();
 
-            // Lấy dữ liệu chu kỳ mới bổ sung
             const cycleDate = document.getElementById('npCycleDate').value;
             const height = parseFloat(document.getElementById('npHeight').value);
             const weight = parseFloat(document.getElementById('npWeight').value);
-            const cycleNote = document.getElementById('npCycleNote').value.trim(); // Ghi chú của Chu Kỳ
-
-            // Lấy dữ liệu ghi chú diễn tiến lâm sàng
-            const generalNoteText = document.getElementById('npGeneralNote').value.trim(); // Ghi chú Lâm Sàng
+            const cycleNote = document.getElementById('npCycleNote').value.trim();
+            const generalNoteText = document.getElementById('npGeneralNote').value.trim();
 
             const bsa = window.calculateBSA(height, weight);
 
             let updatedCycles = docId ? [...tempEditCycles] : [];
             let updatedNotes = docId ? [...tempEditNotes] : [];
 
-            // Nếu nhập đủ thông số chu kỳ mới -> Push vào danh sách chu kỳ
             if (cycleDate && !isNaN(height) && !isNaN(weight) && height > 0 && weight > 0) {
                 updatedCycles.push({
                     cycleNumber: updatedCycles.length + 1,
@@ -689,12 +733,11 @@
                     height: height,
                     weight: weight,
                     bsa: bsa,
-                    note: cycleNote, // CHỈ LƯU VÀO CẶP CHU KỲ NÀY, KHÔNG ĐƯỢC CHÉP SANG GENERAL NOTES
+                    note: cycleNote,
                     createdBy: currentUser.displayName || currentUser.email
                 });
             }
 
-            // Nếu nhập ghi chú diễn tiến mới -> Push riêng vào danh sách ghi chú
             if (generalNoteText) {
                 updatedNotes.push({
                     id: Date.now().toString(),
@@ -725,6 +768,11 @@
                     await addDoc(collection(db, "patients"), payload);
                     alert("Thêm bệnh nhân mới thành công!");
                 }
+                
+                // Tự động tìm lại đúng bệnh nhân vừa thêm/sửa để hiển thị
+                document.getElementById('searchInput').value = patientId;
+                window.searchPatientByCode();
+
                 window.closePatientFormModal();
             } catch (error) {
                 console.error("Lỗi khi lưu dữ liệu bệnh nhân:", error);
@@ -747,7 +795,6 @@
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
             document.getElementById('npProtocol').value = p.protocol || '';
 
-            // Reset ô nhập chu kỳ mới
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npHeight').value = '';
             document.getElementById('npWeight').value = '';
@@ -766,7 +813,6 @@
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
-        // Render danh sách chu kỳ và ghi chú lịch sử ngay trong Modal Edit (cho phép xóa bớt nếu ghi nhầm)
         function renderFormExistingLists() {
             const cyclesListSection = document.getElementById('existingCyclesListSection');
             const cyclesList = document.getElementById('existingCyclesList');
@@ -806,7 +852,6 @@
         window.removeCycleFromEdit = function(index) {
             if (confirm("Bạn có chắc chắn muốn xóa chu kỳ lịch sử này?")) {
                 tempEditCycles.splice(index, 1);
-                // Đánh lại số thứ tự chu kỳ
                 tempEditCycles.forEach((c, i) => c.cycleNumber = i + 1);
                 document.getElementById('cycleSectionTitle').innerText = `Cập Nhật Chu Kỳ Hóa Trị Tiếp Theo (Chu Kỳ ${tempEditCycles.length + 1})`;
                 document.getElementById('existingCyclesCount').innerText = `${tempEditCycles.length} chu kỳ đã lưu`;
@@ -834,7 +879,6 @@
             document.getElementById('detProtocol').innerHTML = `<i class="fa-solid fa-vial text-amber-600"></i> <span>${p.protocol || 'Chưa thiết lập phác đồ'}</span>`;
             document.getElementById('detCreatedBy').innerText = p.updatedBy || 'Hệ thống';
 
-            // Hiển thị Lịch sử Chu Kỳ
             const timeline = document.getElementById('detCyclesTimeline');
             const cycles = p.cycles || [];
             if (cycles.length === 0) {
@@ -855,7 +899,6 @@
                 `).join('');
             }
 
-            // Hiển thị Nhật ký ghi chú
             const notesTimeline = document.getElementById('detNotesTimeline');
             const notes = p.generalNotes || [];
             if (notes.length === 0) {
@@ -872,7 +915,6 @@
                 `).join('');
             }
 
-            // Tạo Mã QR Tra Cứu Trực Tiếp Cho Bệnh Nhân
             const qrContainer = document.getElementById('patientQrCodeContainer');
             qrContainer.innerHTML = "";
             const directUrl = `${window.location.origin}${window.location.pathname}?id=${p.patientId}`;
@@ -889,7 +931,6 @@
             document.getElementById('patientDetailModal').classList.remove('hidden');
         };
 
-        // Tải QR Code về máy dạng file ảnh
         window.downloadPatientQR = function() {
             const img = document.querySelector('#patientQrCodeContainer img');
             const canvas = document.querySelector('#patientQrCodeContainer canvas');
@@ -912,7 +953,6 @@
             document.body.removeChild(link);
         };
 
-        // Xóa Bệnh Nhân (Quyền Admin)
         window.deletePatientRecord = async function(docId, name) {
             if (!isAdmin) {
                 alert("Chỉ tài khoản Admin mới có quyền xóa bệnh nhân!");
@@ -922,6 +962,7 @@
                 try {
                     await deleteDoc(doc(db, "patients", docId));
                     alert("Đã xóa hồ sơ bệnh nhân!");
+                    window.clearSearchResult();
                 } catch (err) {
                     console.error("Lỗi khi xóa bệnh nhân:", err);
                     alert("Lỗi khi xóa khỏi dữ liệu cloud!");
@@ -929,7 +970,7 @@
             }
         };
 
-        // Tải danh sách tài khoản thành viên cho Admin
+        // Tải danh sách tài khoản thành viên & TÍNH NĂNG CHẶN TRUY CẬP DÀNH CHO ADMIN
         function loadUsersRealtime() {
             const q = query(collection(db, "users"));
             onSnapshot(q, (snapshot) => {
@@ -937,20 +978,30 @@
                 if (!userTbody) return;
 
                 let usersList = [];
-                snapshot.forEach((uDoc) => usersList.push(uDoc.data()));
+                snapshot.forEach((uDoc) => usersList.push({ uid: uDoc.id, ...uDoc.data() }));
 
                 if (usersList.length === 0) {
-                    userTbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Chưa ghi nhận thành viên nào khác.</td></tr>`;
+                    userTbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Chưa ghi nhận thành viên nào khác.</td></tr>`;
                     return;
                 }
 
                 userTbody.innerHTML = usersList.map(u => {
-                    const lastLoginDate = u.lastLogin?.seconds 
-                        ? new Date(u.lastLogin.seconds * 1000).toLocaleString('vi-VN') 
-                        : 'Chưa xác định';
-                    const roleTag = u.role === 'admin' 
+                    const isUserAdmin = (u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+                    const isBlocked = u.status === 'blocked';
+
+                    const roleTag = isUserAdmin
                         ? `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">Admin</span>`
                         : `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">Bác sĩ / NVYT</span>`;
+
+                    const statusTag = isBlocked
+                        ? `<span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="fa-solid fa-lock text-[9px]"></i> Đã Chặn</span>`
+                        : `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="fa-solid fa-check text-[9px]"></i> Hoạt Động</span>`;
+
+                    const actionBtn = isUserAdmin ? `<span class="text-slate-400 italic">Không thể khóa</span>` : (
+                        isBlocked
+                        ? `<button onclick="window.toggleBlockUser('${u.uid}', false)" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition text-[10px] flex items-center gap-1 mx-auto"><i class="fa-solid fa-lock-open"></i> Bỏ Chặn</button>`
+                        : `<button onclick="window.toggleBlockUser('${u.uid}', true)" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg transition text-[10px] flex items-center gap-1 mx-auto"><i class="fa-solid fa-user-slash"></i> Chặn User</button>`
+                    );
 
                     return `
                         <tr class="hover:bg-slate-50 border-b border-slate-100">
@@ -960,24 +1011,43 @@
                             </td>
                             <td class="p-3 text-slate-600">${u.email || '-'}</td>
                             <td class="p-3">${roleTag}</td>
-                            <td class="p-3 text-[11px] text-slate-500">${lastLoginDate}</td>
+                            <td class="p-3">${statusTag}</td>
+                            <td class="p-3 text-center">${actionBtn}</td>
                         </tr>
                     `;
                 }).join('');
             });
         }
 
-        // Tự động kiểm tra URL khi ứng dụng khởi chạy từ việc Quét Mã QR
+        // HÀM BẬT/TẮT CHẶN TRUY CẬP USER (ADMIN ACTION)
+        window.toggleBlockUser = async function(targetUid, shouldBlock) {
+            if (!isAdmin) {
+                alert("Chỉ tài khoản Admin tối cao mới có quyền chặn người dùng!");
+                return;
+            }
+
+            const actionText = shouldBlock ? "CHẶN truy cập của" : "BỎ CHẶN cho";
+            if (confirm(`Bạn có chắc chắn muốn ${actionText} tài khoản này?`)) {
+                try {
+                    await updateDoc(doc(db, "users", targetUid), {
+                        status: shouldBlock ? "blocked" : "active",
+                        updatedAt: serverTimestamp()
+                    });
+                    alert(`Đã ${actionText} thành công!`);
+                } catch (err) {
+                    console.error("Lỗi khi thay đổi trạng thái user:", err);
+                    alert("Không thể cập nhật trạng thái người dùng!");
+                }
+            }
+        };
+
+        // Tự động kiểm tra URL khi quét Mã QR
         function checkUrlParameters() {
             const urlParams = new URLSearchParams(window.location.search);
             const targetPatientId = urlParams.get('id') || urlParams.get('patientId');
             if (targetPatientId) {
-                const p = localPatientsCache.find(item => 
-                    item.patientId === targetPatientId.toUpperCase() || item.docId === targetPatientId
-                );
-                if (p) {
-                    window.openPatientDetailModal(p.docId);
-                }
+                document.getElementById('searchInput').value = targetPatientId;
+                window.searchPatientByCode();
             }
         }
     </script>
