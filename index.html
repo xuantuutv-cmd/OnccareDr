@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- QRCode.js Generator Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Chart.js for Marker Tracking Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -134,7 +136,7 @@
                             <th class="p-3">Giới Tính</th>
                             <th class="p-3">Thông Số Gần Nhất</th>
                             <th class="p-3">Chẩn Đoán Lâm Sàng</th>
-                            <th class="p-3">Chu Kỳ</th>
+                            <th class="p-3">Phác Đồ Hiện Tại</th>
                             <th class="p-3">Cập Nhật Bởi</th>
                             <th class="p-3 text-center">Thao Tác</th>
                         </tr>
@@ -184,9 +186,13 @@
             <form id="patientForm" onsubmit="window.handlePatientFormSubmit(event)" class="p-6 space-y-5 text-xs">
                 <input type="hidden" id="editDocId" value="">
                 
+                <!-- Phần Thông Tin Hành Chính -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                    <h4 class="font-bold text-teal-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-address-card"></i> Thông Tin Hành Chính & Chẩn Đoán
+                    <h4 class="font-bold text-teal-800 uppercase text-[11px] tracking-wider flex items-center justify-between">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-address-card"></i> Thông Tin Hành Chính & Chẩn Đoán
+                        </span>
+                        <span id="adminOnlyNotice" class="text-[10px] text-rose-600 font-bold hidden">(Chỉ Admin mới được sửa phần này)</span>
                     </h4>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
@@ -212,12 +218,54 @@
                             <input type="text" id="npDiagnosis" placeholder="vd: Ung thư Vú Phải (T2N1M0)" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Phác Đồ Hóa Trị Tổng Thể</label>
+                            <label class="block font-semibold text-slate-700 mb-1">Đổi Phác Đồ Tổng Thể Mới</label>
                             <input type="text" id="npProtocol" placeholder="vd: AC-T / CAPOX / Pembrolizumab" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <p class="text-[10px] text-slate-400 mt-0.5">Nếu thay đổi phác đồ này so với cũ, hệ thống sẽ ghi nhận lịch sử và tô màu đỏ.</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Phần Nhập Chỉ Số Marker Ung Thư -->
+                <div class="bg-teal-50/70 p-4 rounded-xl border border-teal-200 space-y-3">
+                    <h4 class="font-bold text-teal-900 uppercase text-[11px] tracking-wider flex items-center justify-between">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-teal-600"></i> Nhập Chỉ Số Marker Ung Thư
+                        </span>
+                        <span id="existingMarkersCount" class="text-[10px] bg-teal-200/80 text-teal-900 px-2 py-0.5 rounded-full font-bold">0 marker đã lưu</span>
+                    </h4>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Loại Marker</label>
+                            <select id="npMarkerType" class="w-full p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                                <option value="CEA">CEA</option>
+                                <option value="CA 19-9">CA 19-9</option>
+                                <option value="CA 15-3">CA 15-3</option>
+                                <option value="CA 72-4">CA 72-4</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Giá Trị</label>
+                            <input type="number" step="0.01" id="npMarkerValue" placeholder="vd: 4.5" class="w-full p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Ngày Xét Nghiệm</label>
+                            <input type="date" id="npMarkerDate" class="w-full p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="button" onclick="window.addTempMarker()" class="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg transition shadow-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-plus"></i> Thêm Marker
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="existingMarkersListSection" class="hidden space-y-1.5 pt-2">
+                        <p class="text-[10px] font-bold text-teal-800 uppercase">Danh sách Marker đã nhập tạm:</p>
+                        <div id="existingMarkersList" class="space-y-1.5 max-h-28 overflow-y-auto custom-scrollbar pr-1"></div>
+                    </div>
+                </div>
+
+                <!-- Phần Cập Nhật Chu Kỳ Hóa Trị -->
                 <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 space-y-3">
                     <h4 class="font-bold text-amber-900 uppercase text-[11px] tracking-wider flex items-center justify-between">
                         <span class="flex items-center gap-2">
@@ -259,6 +307,7 @@
                     <div id="existingCyclesList" class="space-y-2 max-h-44 overflow-y-auto custom-scrollbar pr-1"></div>
                 </div>
 
+                <!-- Phần Ghi Chú Lâm Sàng -->
                 <div class="bg-sky-50/70 p-4 rounded-xl border border-sky-200 space-y-3">
                     <h4 class="font-bold text-sky-900 uppercase text-[11px] tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-comment-medical text-sky-600"></i> Ghi Chú / Theo Dõi Lâm Sàng Mới
@@ -287,9 +336,9 @@
         </div>
     </div>
 
-    <!-- MODAL: Xem Chi Tiết Bệnh Nhân & QR Code -->
+    <!-- MODAL: Xem Chi Tiết Bệnh Nhân, Biểu Đồ Marker & QR Code -->
     <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-5 px-6 flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
@@ -330,9 +379,27 @@
                     </div>
                 </div>
 
+                <!-- Biểu đồ theo dõi Marker -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-teal-600"></i> Biểu Đồ Theo Dõi Marker Ung Thư (CEA, CA 19-9, CA 15-3, CA 72-4)
+                        </h4>
+                        <select id="chartMarkerSelect" onchange="window.renderMarkerChart()" class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none">
+                            <option value="CEA">CEA</option>
+                            <option value="CA 19-9">CA 19-9</option>
+                            <option value="CA 15-3">CA 15-3</option>
+                            <option value="CA 72-4">CA 72-4</option>
+                        </select>
+                    </div>
+                    <div class="w-full h-64 relative">
+                        <canvas id="markerCanvas"></canvas>
+                    </div>
+                </div>
+
                 <div class="space-y-2">
                     <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-timeline text-teal-600"></i> Lịch Sử Chu Kỳ Hóa Trị (Nối Tiếp Realtime)
+                        <i class="fa-solid fa-timeline text-teal-600"></i> Lịch Sử Chu Kỳ Hóa Trị & Thay Đổi Phác Đồ (Realtime)
                     </h4>
                     <div id="detCyclesTimeline" class="space-y-2.5 border-l-2 border-teal-500 pl-4 ml-2"></div>
                 </div>
@@ -368,7 +435,6 @@
             </div>
 
             <div class="p-6 space-y-5 text-xs">
-                <!-- Thanh chọn khoảng thời gian -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-end gap-3">
                     <div class="flex-1 w-full">
                         <label class="block font-semibold text-slate-700 mb-1">Từ Ngày (Chu kỳ điều trị)</label>
@@ -383,7 +449,6 @@
                     </button>
                 </div>
 
-                <!-- Tổng quan kết quả thống kê -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl flex items-center justify-between">
                         <div>
@@ -405,7 +470,6 @@
                     </div>
                 </div>
 
-                <!-- Bảng danh sách chi tiết bệnh nhân thống kê -->
                 <div class="space-y-2">
                     <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">Danh Sách Bệnh Nhân Chi Tiết Trong Khoảng Thời Gian:</h4>
                     <div class="overflow-x-auto rounded-xl border border-slate-200">
@@ -498,11 +562,22 @@
             document.getElementById('patientForm').reset();
             document.getElementById('npBsaDisplay').innerText = "0.00 m²";
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
+
+            // Mở khóa các trường hành chính cho form thêm mới
+            ['npId', 'npName', 'npGender', 'npDiagnosis', 'npProtocol'].forEach(id => {
+                const el = document.getElementById(id);
+                el.disabled = false;
+                el.classList.remove('bg-slate-100', 'cursor-not-allowed');
+            });
+            document.getElementById('adminOnlyNotice').classList.add('hidden');
 
             window.tempCurrentCycles = [];
             window.tempCurrentNotes = [];
+            window.tempCurrentMarkers = [];
             document.getElementById('existingCyclesListSection').classList.add('hidden');
             document.getElementById('existingNotesListSection').classList.add('hidden');
+            document.getElementById('existingMarkersListSection').classList.add('hidden');
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
@@ -513,10 +588,15 @@
             document.getElementById('editDocId').value = "";
             window.tempCurrentCycles = [];
             window.tempCurrentNotes = [];
+            window.tempCurrentMarkers = [];
         };
 
         window.closePatientDetailModal = function() {
             document.getElementById('patientDetailModal').classList.add('hidden');
+            if (window.activeMarkerChart) {
+                window.activeMarkerChart.destroy();
+                window.activeMarkerChart = null;
+            }
         };
 
         window.openUserManagementModal = function() {
@@ -591,6 +671,9 @@
         let cachedPatientsList = [];
         window.tempCurrentCycles = []; 
         window.tempCurrentNotes = [];  
+        window.tempCurrentMarkers = [];
+        window.activeMarkerChart = null;
+        window.currentViewingPatient = null;
 
         window.loginWithGoogle = async function() {
             try {
@@ -710,7 +793,7 @@
                     <td class="p-3">${p.gender || '-'}</td>
                     <td class="p-3 text-[11px]">${lastCycle.date ? `Ngày: ${lastCycle.date}<br>BSA:${lastCycle.bsa || '-'} m²` : 'Chưa có chu kỳ'}</td>
                     <td class="p-3 font-medium text-slate-800">${p.diagnosis || '-'}</td>
-                    <td class="p-3"><span class="bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">${cycles.length} chu kỳ</span></td>
+                    <td class="p-3 font-bold text-amber-800">${p.protocol || 'Chưa cập nhật'}</td>
                     <td class="p-3 text-slate-500">${p.createdByEmail || '-'}</td>
                     <td class="p-3 text-center space-x-1">
                         <button onclick="window.viewPatientDetail('${p.id}')" title="Xem chi tiết & QR" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
@@ -739,6 +822,7 @@
         window.viewPatientDetail = function(docId) {
             const p = cachedPatientsList.find(item => item.id === docId);
             if (!p) return;
+            window.currentViewingPatient = p;
 
             document.getElementById('detName').innerText = p.name;
             document.getElementById('detPatientId').innerText = `Mã BN: ${p.patientId}`;
@@ -757,22 +841,35 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
+            // Render Timeline (Chu kỳ + Thay đổi phác đồ màu đỏ)
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
             const cycles = p.cycles || [];
             if (cycles.length === 0) {
-                cyclesContainer.innerHTML = `<p class="text-slate-400 italic text-xs">Chưa có lịch sử chu kỳ hóa trị.</p>`;
+                cyclesContainer.innerHTML = `<p class="text-slate-400 italic text-xs">Chưa có lịch sử chu kỳ hóa trị hoặc thay đổi phác đồ.</p>`;
             } else {
                 cycles.forEach((c, idx) => {
                     const div = document.createElement('div');
-                    div.className = "relative bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1";
-                    div.innerHTML = `
-                        <div class="flex items-center justify-between font-bold text-teal-800">
-                            <span>Chu Kỳ ${idx + 1} (${c.date || 'Không rõ ngày'})</span>
-                            <span class="text-[10px] bg-teal-100 text-teal-800 px-2 py-0.5 rounded-md">BSA: ${c.bsa || '-'} m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)</span>
-                        </div>
-                        <p class="text-slate-600 text-xs">${c.note || 'Không có ghi chú độc tính.'}</p>
-                    `;
+                    if (c.isProtocolChange) {
+                        div.className = "relative bg-rose-50 p-3 rounded-xl border border-rose-300 space-y-1";
+                        div.innerHTML = `
+                            <div class="flex items-center justify-between font-bold text-rose-700">
+                                <span class="flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> ĐỔI PHÁC ĐỒ MỚI (${c.date || 'N/A'})</span>
+                                <span class="text-[10px] bg-rose-200 text-rose-800 px-2 py-0.5 rounded-md">Bởi: ${c.updatedBy || 'Admin'}</span>
+                            </div>
+                            <p class="text-rose-900 font-semibold text-xs">Phác đồ mới: ${c.newProtocol}</p>
+                            <p class="text-slate-600 text-xs">${c.note || ''}</p>
+                        `;
+                    } else {
+                        div.className = "relative bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1";
+                        div.innerHTML = `
+                            <div class="flex items-center justify-between font-bold text-teal-800">
+                                <span>Chu Kỳ ${idx + 1} (${c.date || 'Không rõ ngày'})</span>
+                                <span class="text-[10px] bg-teal-100 text-teal-800 px-2 py-0.5 rounded-md">BSA: ${c.bsa || '-'} m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)</span>
+                            </div>
+                            <p class="text-slate-600 text-xs">${c.note || 'Không có ghi chú độc tính.'}</p>
+                        `;
+                    }
                     cyclesContainer.appendChild(div);
                 });
             }
@@ -792,6 +889,57 @@
             }
 
             document.getElementById('patientDetailModal').classList.remove('hidden');
+            window.renderMarkerChart();
+        };
+
+        window.renderMarkerChart = function() {
+            const p = window.currentViewingPatient;
+            if (!p) return;
+            const markerType = document.getElementById('chartMarkerSelect').value;
+            const markers = (p.markers || []).filter(m => m.type === markerType);
+            markers.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const labels = markers.map(m => m.date);
+            const dataValues = markers.map(m => m.value);
+
+            const ctx = document.getElementById('markerCanvas').getContext('2d');
+            if (window.activeMarkerChart) {
+                window.activeMarkerChart.destroy();
+            }
+
+            window.activeMarkerChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Chỉ số ${markerType}`,
+                        data: dataValues,
+                        borderColor: '#0d9488',
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#0f766e'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: true, position: 'top' }
+                    }
+                }
+            });
         };
 
         window.downloadPatientQR = function() {
@@ -817,7 +965,7 @@
             if (!p) return;
 
             document.getElementById('editDocId').value = p.id;
-            document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-teal-200"></i> Cập Nhật Chu Kỳ Cho: ${p.name} (${p.patientId})`;
+            document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-teal-200"></i> Cập Nhật Cho: ${p.name} (${p.patientId})`;
             document.getElementById('cycleSectionTitle').innerText = "Thêm Chu Kỳ Hóa Trị Mới Nối Tiếp";
             document.getElementById('saveBtnText').innerText = "Cập Nhật Hồ Sơ & Lưu Lịch Sử";
 
@@ -827,12 +975,29 @@
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
             document.getElementById('npProtocol').value = p.protocol || '';
 
+            // Phân quyền: Nếu không phải Admin, khóa phần hành chính
+            const adminNotice = document.getElementById('adminOnlyNotice');
+            ['npId', 'npName', 'npGender', 'npDiagnosis'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!isAdmin) {
+                    el.disabled = true;
+                    el.classList.add('bg-slate-100', 'cursor-not-allowed');
+                    adminNotice.classList.remove('hidden');
+                } else {
+                    el.disabled = false;
+                    el.classList.remove('bg-slate-100', 'cursor-not-allowed');
+                    adminNotice.classList.add('hidden');
+                }
+            });
+
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npHeight').value = '';
             document.getElementById('npWeight').value = '';
             document.getElementById('npBsaDisplay').innerText = "0.00 m²";
             document.getElementById('npCycleNote').value = '';
             document.getElementById('npGeneralNote').value = '';
+            document.getElementById('npMarkerValue').value = '';
 
             window.tempCurrentCycles = JSON.parse(JSON.stringify(p.cycles || []));
             window.renderTempCyclesList();
@@ -840,7 +1005,51 @@
             window.tempCurrentNotes = JSON.parse(JSON.stringify(p.notes || []));
             window.renderTempNotesList();
 
+            window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
+            window.renderTempMarkersList();
+
             document.getElementById('patientFormModal').classList.remove('hidden');
+        };
+
+        window.addTempMarker = function() {
+            const type = document.getElementById('npMarkerType').value;
+            const value = parseFloat(document.getElementById('npMarkerValue').value);
+            const date = document.getElementById('npMarkerDate').value;
+
+            if (isNaN(value) || !date) {
+                alert("Vui lòng nhập đầy đủ giá trị marker và ngày xét nghiệm!");
+                return;
+            }
+
+            window.tempCurrentMarkers.push({ type, value, date });
+            document.getElementById('npMarkerValue').value = "";
+            window.renderTempMarkersList();
+        };
+
+        window.renderTempMarkersList = function() {
+            const listDiv = document.getElementById('existingMarkersList');
+            listDiv.innerHTML = "";
+            document.getElementById('existingMarkersCount').innerText = `${window.tempCurrentMarkers.length} marker đã lưu`;
+
+            if (window.tempCurrentMarkers.length > 0) {
+                document.getElementById('existingMarkersListSection').classList.remove('hidden');
+                window.tempCurrentMarkers.forEach((m, idx) => {
+                    const d = document.createElement('div');
+                    d.className = "p-2 bg-white border border-teal-200 rounded-xl text-[11px] text-slate-700 flex items-center justify-between shadow-sm";
+                    d.innerHTML = `
+                        <span><strong>${m.type}:</strong> ${m.value} (Ngày: ${m.date})</span>
+                        <button type="button" onclick="window.deleteMarkerItem(${idx})" class="text-rose-600 hover:text-rose-800 font-bold px-2 py-0.5"><i class="fa-solid fa-trash"></i></button>
+                    `;
+                    listDiv.appendChild(d);
+                });
+            } else {
+                document.getElementById('existingMarkersListSection').classList.add('hidden');
+            }
+        };
+
+        window.deleteMarkerItem = function(idx) {
+            window.tempCurrentMarkers.splice(idx, 1);
+            window.renderTempMarkersList();
         };
 
         window.renderTempCyclesList = function() {
@@ -852,18 +1061,31 @@
                 document.getElementById('existingCyclesListSection').classList.remove('hidden');
                 window.tempCurrentCycles.forEach((c, idx) => {
                     const d = document.createElement('div');
-                    d.className = "p-2.5 bg-white border border-amber-200 rounded-xl text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-sm";
-                    d.innerHTML = `
-                        <div class="flex-1">
-                            <strong class="text-amber-900">Chu kỳ ${idx+1} (${c.date || 'N/A'}):</strong> 
-                            BSA: ${c.bsa || '-'}m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)
-                            <div class="text-slate-500 mt-0.5">${c.note ? `Ghi chú: ${c.note}` : 'Không có ghi chú'}</div>
-                        </div>
-                        <div class="flex items-center space-x-1 shrink-0">
-                            <button type="button" onclick="window.editCycleItem(${idx})" title="Điền lại thông số để sửa" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-pen"></i> Sửa</button>
-                            <button type="button" onclick="window.deleteCycleItem(${idx})" title="Xóa chu kỳ này" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
-                        </div>
-                    `;
+                    const isProto = c.isProtocolChange;
+                    d.className = `p-2.5 bg-white border ${isProto ? 'border-rose-300 bg-rose-50/30' : 'border-amber-200'} rounded-xl text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-sm`;
+                    
+                    if (isProto) {
+                        d.innerHTML = `
+                            <div class="flex-1">
+                                <strong class="text-rose-700">Đổi phác đồ (${c.date || 'N/A'}):</strong> Phác đồ mới: ${c.newProtocol}
+                            </div>
+                            <div class="flex items-center space-x-1 shrink-0">
+                                <button type="button" onclick="window.deleteCycleItem(${idx})" title="Xóa" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
+                            </div>
+                        `;
+                    } else {
+                        d.innerHTML = `
+                            <div class="flex-1">
+                                <strong class="text-amber-900">Chu kỳ ${idx+1} (${c.date || 'N/A'}):</strong> 
+                                BSA: ${c.bsa || '-'}m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)
+                                <div class="text-slate-500 mt-0.5">${c.note ? `Ghi chú: ${c.note}` : 'Không có ghi chú'}</div>
+                            </div>
+                            <div class="flex items-center space-x-1 shrink-0">
+                                <button type="button" onclick="window.editCycleItem(${idx})" title="Sửa" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-pen"></i> Sửa</button>
+                                <button type="button" onclick="window.deleteCycleItem(${idx})" title="Xóa" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
+                            </div>
+                        `;
+                    }
                     cyclesListDiv.appendChild(d);
                 });
             } else {
@@ -888,8 +1110,8 @@
                             <p class="text-[9px] text-slate-400 mt-0.5">${n.date || ''} - Cập nhật bởi: ${n.author || ''}</p>
                         </div>
                         <div class="flex items-center space-x-1 shrink-0">
-                            <button type="button" onclick="window.editNoteItem(${idx})" title="Điền lại ghi chú để sửa" class="px-2 py-1 bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-pen"></i> Sửa</button>
-                            <button type="button" onclick="window.deleteNoteItem(${idx})" title="Xóa ghi chú này" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
+                            <button type="button" onclick="window.editNoteItem(${idx})" class="px-2 py-1 bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-pen"></i> Sửa</button>
+                            <button type="button" onclick="window.deleteNoteItem(${idx})" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
                         </div>
                     `;
                     notesListDiv.appendChild(d);
@@ -900,7 +1122,7 @@
         };
 
         window.deleteCycleItem = function(idx) {
-            if (confirm(`Bạn có chắc chắn muốn xóa Chu kỳ ${idx + 1} này không?`)) {
+            if (confirm(`Bạn có chắc chắn muốn xóa mục này không?`)) {
                 window.tempCurrentCycles.splice(idx, 1);
                 window.renderTempCyclesList();
             }
@@ -908,6 +1130,7 @@
 
         window.editCycleItem = function(idx) {
             const c = window.tempCurrentCycles[idx];
+            if (c.isProtocolChange) return;
             document.getElementById('npCycleDate').value = c.date || '';
             document.getElementById('npHeight').value = c.height || '';
             document.getElementById('npWeight').value = c.weight || '';
@@ -916,7 +1139,7 @@
 
             window.tempCurrentCycles.splice(idx, 1);
             window.renderTempCyclesList();
-            alert(`Đã nạp thông tin Chu kỳ ${idx + 1} lên form phía trên. Bạn có thể chỉnh sửa lại và bấm Lưu.`);
+            alert(`Đã nạp thông tin chu kỳ lên form phía trên.`);
         };
 
         window.deleteNoteItem = function(idx) {
@@ -931,7 +1154,7 @@
             document.getElementById('npGeneralNote').value = n.content || '';
             window.tempCurrentNotes.splice(idx, 1);
             window.renderTempNotesList();
-            alert(`Đã nạp nội dung ghi chú lên ô nhập phía trên. Bạn có thể chỉnh sửa lại và bấm Lưu.`);
+            alert(`Đã nạp nội dung ghi chú lên ô nhập phía trên.`);
         };
 
         window.handlePatientFormSubmit = async function(e) {
@@ -946,7 +1169,7 @@
             const name = document.getElementById('npName').value.trim();
             const gender = document.getElementById('npGender').value;
             const diagnosis = document.getElementById('npDiagnosis').value.trim();
-            const protocol = document.getElementById('npProtocol').value.trim();
+            const newProtocol = document.getElementById('npProtocol').value.trim();
 
             const cycleDate = document.getElementById('npCycleDate').value;
             const height = parseFloat(document.getElementById('npHeight').value) || 0;
@@ -957,17 +1180,38 @@
             const todayStr = new Date().toISOString().split('T')[0];
 
             try {
-                // Kiểm tra nếu là tạo mới (docId trống) và mã BN đã tồn tại trong danh sách
-                if (!docId) {
-                    const isDuplicate = cachedPatientsList.some(p => p.patientId && p.patientId.toUpperCase() === patientId);
-                    if (isDuplicate) {
-                        alert(`Lỗi: Mã bệnh nhân "${patientId}" đã tồn tại trong hệ thống! Vui lòng sử dụng mã khác hoặc tra cứu hồ sơ cũ để cập nhật.`);
-                        return; // Ngăn không cho tạo mới
-                    }
-                }
-
                 let finalCycles = [...window.tempCurrentCycles];
                 let finalNotes = [...window.tempCurrentNotes];
+                let finalMarkers = [...window.tempCurrentMarkers];
+
+                if (docId) {
+                    const pRef = doc(db, "patients", docId);
+                    const pSnap = await getDoc(pRef);
+                    if (!pSnap.exists()) {
+                        alert("Không tìm thấy hồ sơ trên Cloud!");
+                        return;
+                    }
+                    const oldData = pSnap.data();
+
+                    // Kiểm tra đổi phác đồ
+                    const oldProtocol = oldData.protocol || "";
+                    if (newProtocol && newProtocol !== oldProtocol) {
+                        finalCycles.push({
+                            isProtocolChange: true,
+                            oldProtocol: oldProtocol,
+                            newProtocol: newProtocol,
+                            date: todayStr,
+                            updatedBy: currentUser.email,
+                            note: `Đổi phác đồ tổng thể từ [${oldProtocol}] sang [${newProtocol}]`
+                        });
+                    }
+                } else {
+                    const isDuplicate = cachedPatientsList.some(p => p.patientId && p.patientId.toUpperCase() === patientId);
+                    if (isDuplicate) {
+                        alert(`Lỗi: Mã bệnh nhân "${patientId}" đã tồn tại trong hệ thống!`);
+                        return;
+                    }
+                }
 
                 if (height > 0 && weight > 0) {
                     finalCycles.push({
@@ -990,20 +1234,22 @@
 
                 if (docId) {
                     const pRef = doc(db, "patients", docId);
-                    const pSnap = await getDoc(pRef);
-                    if (!pSnap.exists()) {
-                        alert("Không tìm thấy hồ sơ trên Cloud!");
-                        return;
-                    }
-
-                    await updateDoc(pRef, {
-                        name, gender, diagnosis, protocol,
+                    const updatePayload = {
+                        protocol: newProtocol,
                         cycles: finalCycles,
                         notes: finalNotes,
-                        createdByEmail: currentUser.email,
+                        markers: finalMarkers,
                         updatedAt: serverTimestamp()
-                    });
+                    };
 
+                    // Nếu là Admin, cho phép cập nhật thông tin hành chính
+                    if (isAdmin) {
+                        updatePayload.name = name;
+                        updatePayload.gender = gender;
+                        updatePayload.diagnosis = diagnosis;
+                    }
+
+                    await updateDoc(pRef, updatePayload);
                     alert("Cập nhật hồ sơ bệnh nhân thành công!");
                 } else {
                     await addDoc(collection(db, "patients"), {
@@ -1011,9 +1257,10 @@
                         name,
                         gender,
                         diagnosis,
-                        protocol,
+                        protocol: newProtocol,
                         cycles: finalCycles,
                         notes: finalNotes,
+                        markers: finalMarkers,
                         createdByEmail: currentUser.email,
                         createdAt: serverTimestamp()
                     });
@@ -1071,7 +1318,7 @@
             cachedPatientsList.forEach(p => {
                 const cycles = p.cycles || [];
                 const validCycles = cycles.filter(c => {
-                    if (!c.date) return false;
+                    if (!c.date || c.isProtocolChange) return false;
                     const cDate = new Date(c.date);
                     return cDate >= startDate && cDate <= endDate;
                 });
@@ -1106,7 +1353,7 @@
                     <td class="p-3 font-semibold text-slate-900">${item.name}</td>
                     <td class="p-3">${item.gender}</td>
                     <td class="p-3">${item.diagnosis}</td>
-                    <td class="p-3">${item.protocol}</td>
+                    <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
                     <td class="p-3 text-center"><span class="bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">${item.count} chu kỳ</span></td>
                 `;
                 statsTableBody.appendChild(tr);
