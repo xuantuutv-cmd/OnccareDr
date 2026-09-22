@@ -3,363 +3,398 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chi tiết bệnh nhân</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background-color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    /* Main Modal Card */
-    .modal-card {
-      width: 100%;
-      max-width: 440px;
-      background: #ffffff;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Header */
-    .modal-header {
-      background-color: #235850;
-      color: #ffffff;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .header-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .avatar-icon {
-      width: 44px;
-      height: 44px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-
-    .patient-name {
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .patient-meta {
-      font-size: 0.88rem;
-      opacity: 0.9;
-      margin-top: 3px;
-    }
-
-    .close-icon-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 1.5rem;
-      cursor: pointer;
-      opacity: 0.8;
-    }
-
-    .close-icon-btn:hover {
-      opacity: 1;
-    }
-
-    /* Body Body Content */
-    .modal-body {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .section-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #5f6368;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-    }
-
-    .info-box {
-      background-color: #f1f3f9;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      color: #202124;
-      font-weight: 500;
-    }
-
-    .protocol-box {
-      background-color: #fef8ec;
-      border: 1px solid #fce8cc;
-      padding: 12px 16px;
-      border-radius: 12px;
-      color: #8c5310;
-      font-size: 0.95rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .empty-state {
-      color: #9aa0a6;
-      font-size: 0.9rem;
-      padding-left: 12px;
-      border-left: 3px solid #dadce0;
-      margin-top: 4px;
-    }
-
-    .cycle-item {
-      background: #f8f9fa;
-      border: 1px solid #e9ecef;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-top: 6px;
-      font-size: 0.9rem;
-    }
-
-    .meta-footer {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #70757a;
-      padding-top: 10px;
-      border-top: 1px solid #f1f3f4;
-      margin-top: 6px;
-    }
-
-    /* Modal Footer Controls */
-    .modal-footer {
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #ffffff;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: background 0.2s;
-    }
-
-    .btn-add {
-      background-color: #235850;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-add:hover {
-      background-color: #1a433d;
-    }
-
-    .btn-close {
-      background-color: #e8eaed;
-      color: #3c4043;
-    }
-
-    .btn-close:hover {
-      background-color: #dadce0;
-    }
-
-    /* Popup Form Thêm Chu Kỳ */
-    .form-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .form-card {
-      background: #fff;
-      padding: 24px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 380px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #404040;
-    }
-
-    .form-group input, .form-group select {
-      padding: 10px;
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 10px;
-    }
-  </style>
+  <title>OncoCare Pro - Quản Lý Bệnh Nhân Ung Thư</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-  <!-- Modal Chính -->
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="header-info">
-        <div class="avatar-icon">🪪</div>
-        <div>
-          <div class="patient-name">NGUYỄN HOÀNG SOL</div>
-          <div class="patient-meta">Mã BN: 26050163 | Giới tính: Nam</div>
+  <!-- Header / Navigation -->
+  <header class="bg-teal-800 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-notes-medical text-2xl text-teal-300"></i>
+        <h1 class="text-xl font-bold tracking-wide">OncoCare Pro</h1>
+      </div>
+      <div id="authContainer" class="flex items-center space-x-3">
+        <button id="btnLogin" class="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition flex items-center gap-2">
+          <i class="fa-brands fa-google"></i> Đăng nhập Google
+        </button>
+        <div id="userInfo" class="hidden flex items-center space-x-3">
+          <span id="userEmail" class="text-sm font-medium text-teal-100"></span>
+          <button id="btnLogout" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+            Đăng xuất
+          </button>
         </div>
-      </div>
-      <button class="close-icon-btn">&times;</button>
-    </div>
-
-    <div class="modal-body">
-      <div>
-        <div class="section-title">CHẨN ĐOÁN LÂM SÀNG</div>
-        <div class="info-box">K đại tràng sigma pT4N1M0</div>
-      </div>
-
-      <div>
-        <div class="section-title">PHÁC ĐỒ HÓA TRỊ TỔNG THỂ</div>
-        <div class="protocol-box">
-          ✏️ Hóa trị hỗ trợ CapEOX CK.1, N1-8
-        </div>
-      </div>
-
-      <div>
-        <div class="section-title">⚖️ LỊCH SỬ CHU KỲ HÓA TRỊ (NỐI TIẾP)</div>
-        <div id="cycle-list">
-          <div class="empty-state" id="empty-msg">Chưa ghi nhận chu kỳ hóa trị nào.</div>
-        </div>
-      </div>
-
-      <div>
-        <div class="section-title">📝 NHẬT KÝ DIỄN TIẾN LÂM SÀNG</div>
-        <div class="empty-state">Chưa có ghi chú diễn tiến lâm sàng.</div>
-      </div>
-
-      <div class="meta-footer">
-        <span>Cập nhật lần cuối bởi:</span>
-        <b>xuantuutv@gmail.com</b>
       </div>
     </div>
+  </header>
 
-    <!-- Footer với Nút "+" góc dưới bên trái -->
-    <div class="modal-footer">
-      <button class="btn btn-add" onclick="openAddModal()">
-        <span>+</span> Thêm chu kỳ
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Action & Search Bar -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+      <div class="relative w-full md:w-96">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input type="text" id="searchInput" placeholder="Tìm theo tên, mã BN, phác đồ..." 
+               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white shadow-sm text-sm">
+      </div>
+      <button id="btnOpenAddPatient" class="w-full md:w-auto bg-teal-800 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2">
+        <i class="fa-solid fa-user-plus"></i> Thêm Bệnh Nhân Mới
       </button>
-      <button class="btn btn-close">Đóng</button>
     </div>
-  </div>
 
-  <!-- Modal Form Nhập Chu Kỳ Mới -->
-  <div class="form-overlay" id="addCycleModal">
-    <div class="form-card">
-      <h3 style="color:#235850;">Thêm Chu Kỳ Hóa Trị</h3>
+    <!-- Patient Grid/List -->
+    <div id="patientGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- Dynamic Patient Cards Inserted Here -->
+    </div>
+  </main>
+
+  <!-- ==================== MODAL CHI TIẾT BỆNH NHÂN ==================== -->
+  <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
       
-      <div class="form-group">
-        <label>Phác đồ hóa trị</label>
-        <input type="text" id="inputProtocol" value="CapEOX" placeholder="Nhập phác đồ...">
+      <!-- Modal Header -->
+      <div class="bg-teal-800 text-white p-5 flex justify-between items-start">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-teal-700/50 rounded-xl text-teal-200">
+            <i class="fa-solid fa-id-card text-2xl"></i>
+          </div>
+          <div>
+            <h2 id="modalPatientName" class="text-xl font-bold uppercase tracking-wide"></h2>
+            <p id="modalPatientMeta" class="text-xs text-teal-100 mt-1"></p>
+          </div>
+        </div>
+        <button onclick="closeDetailModal()" class="text-teal-200 hover:text-white text-2xl font-bold transition">&times;</button>
       </div>
 
-      <div class="form-group">
-        <label>Chu kỳ số</label>
-        <input type="number" id="inputCycleNum" min="1" max="12" value="1">
+      <!-- Modal Body -->
+      <div class="p-5 overflow-y-auto space-y-5 text-sm">
+        <!-- Chẩn đoán -->
+        <div>
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Chẩn đoán lâm sàng</h3>
+          <div id="modalDiagnosis" class="bg-slate-100 p-3 rounded-xl font-medium text-slate-800"></div>
+        </div>
+
+        <!-- Phác đồ tổng thể -->
+        <div>
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phác đồ hóa trị tổng thể</h3>
+          <div id="modalProtocol" class="bg-amber-50 border border-amber-200/60 p-3 rounded-xl font-semibold text-amber-900 flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-amber-600"></i>
+            <span id="modalProtocolText"></span>
+          </div>
+        </div>
+
+        <!-- Lịch sử chu kỳ hóa trị -->
+        <div>
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-diagram-next text-teal-700"></i> Lịch sử chu kỳ hóa trị (Nối tiếp)
+          </h3>
+          <div id="modalCyclesList" class="space-y-2">
+            <!-- Render danh sách chu kỳ -->
+          </div>
+        </div>
+
+        <!-- Nhật ký diễn tiến -->
+        <div>
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-notes-medical text-teal-700"></i> Nhật ký diễn tiến lâm sàng
+          </h3>
+          <div id="modalNotesList" class="space-y-2">
+            <!-- Render ghi chú -->
+          </div>
+        </div>
+
+        <!-- QR Code Display -->
+        <div class="flex flex-col items-center pt-2 border-t border-slate-100">
+          <div id="qrcode" class="p-2 bg-white border border-slate-200 rounded-lg shadow-sm"></div>
+          <button id="btnDownloadQR" class="mt-2 text-xs font-semibold text-teal-700 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-download"></i> Tải mã QR
+          </button>
+        </div>
+
+        <!-- User tracking footer -->
+        <div class="text-xs text-slate-400 pt-3 border-t border-slate-100 flex justify-between">
+          <span>Cập nhật lần cuối bởi:</span>
+          <b id="modalUpdatedBy" class="text-slate-600"></b>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Ngày thực hiện</label>
-        <input type="date" id="inputDate">
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-close" onclick="closeAddModal()">Hủy</button>
-        <button class="btn btn-add" onclick="saveCycle()">Lưu chu kỳ</button>
+      <!-- Modal Footer: Thêm nút "+ Thêm chu kỳ" ở góc trái phía dưới -->
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+        <button onclick="openAddCycleModal()" class="bg-teal-800 hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-circle-plus"></i> Thêm chu kỳ
+        </button>
+        <button onclick="closeDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-2 rounded-xl text-xs font-semibold transition">
+          Đóng
+        </button>
       </div>
     </div>
   </div>
 
-  <script>
-    // Đặt ngày mặc định là hôm nay
-    document.getElementById('inputDate').valueAsDate = new Date();
+  <!-- ==================== MODAL THÊM CHU KỲ HÓA TRỊ MỚI ==================== -->
+  <div id="addCycleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl animate-in fade-in zoom-in duration-150">
+      <h3 class="text-base font-bold text-teal-800 mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-prescription-bottle-medical"></i> Thêm Chu Kỳ Hóa Trị Mới
+      </h3>
+      
+      <form id="addCycleForm" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Phác đồ hóa trị</label>
+          <input type="text" id="cycleProtocol" required placeholder="VD: CapeOX, FOLFIRI..." 
+                 class="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-600 focus:outline-none">
+        </div>
 
-    function openAddModal() {
-      document.getElementById('addCycleModal').style.display = 'flex';
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Chu kỳ số</label>
+            <input type="number" id="cycleNumber" min="1" max="20" required value="1"
+                   class="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Ngày thực hiện</label>
+            <input type="date" id="cycleDate" required 
+                   class="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-600 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Ghi chú chu kỳ (Tùy chọn)</label>
+          <input type="text" id="cycleNote" placeholder="VD: Giảm 10% liều, độc tính độ 1..." 
+                 class="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-600 focus:outline-none">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3">
+          <button type="button" onclick="closeAddCycleModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition">
+            Hủy
+          </button>
+          <button type="submit" class="px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold transition shadow-sm">
+            Lưu chu kỳ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FIREBASE MODULE LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Cấu hình Firebase của bạn
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "oncocare-dr.firebaseapp.com",
+      projectId: "oncocare-dr",
+      storageBucket: "oncocare-dr.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+    let activePatientId = null;
+    let patientsData = [];
+
+    // Auth Listeners
+    document.getElementById('btnLogin').addEventListener('click', () => signInWithPopup(auth, provider));
+    document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      if (user) {
+        document.getElementById('btnLogin').classList.add('hidden');
+        document.getElementById('userInfo').classList.remove('hidden');
+        document.getElementById('userEmail').innerText = user.email;
+      } else {
+        document.getElementById('btnLogin').classList.remove('hidden');
+        document.getElementById('userInfo').classList.add('hidden');
+      }
+    });
+
+    // Real-time Firestore Sync
+    onSnapshot(collection(db, "patients"), (snapshot) => {
+      patientsData = [];
+      snapshot.forEach(docSnap => {
+        patientsData.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      renderPatients(patientsData);
+
+      // Nếu đang mở modal của 1 BN, tự động cập nhật lại thông tin
+      if (activePatientId) {
+        const currentPat = patientsData.find(p => p.id === activePatientId);
+        if (currentPat) populatePatientModal(currentPat);
+      }
+    });
+
+    // Render danh sách Bệnh nhân
+    function renderPatients(list) {
+      const grid = document.getElementById('patientGrid');
+      grid.innerHTML = '';
+      
+      list.forEach(p => {
+        const bsa = (p.height && p.weight) ? Math.sqrt((p.height * p.weight) / 3600).toFixed(2) : '--';
+        const card = document.createElement('div');
+        card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer flex flex-col justify-between";
+        card.onclick = () => openDetailModal(p.id);
+        
+        card.innerHTML = `
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-bold text-slate-800 text-base uppercase">${p.name || 'N/A'}</h3>
+              <span class="text-xs bg-teal-50 text-teal-700 font-semibold px-2.5 py-1 rounded-lg border border-teal-200">
+                ${p.patientId || 'Mã BN'}
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">Giới tính: ${p.gender || 'Nam'} | BSA: <b>${bsa} m²</b> (${p.height || '--'}cm / ${p.weight || '--'}kg)</p>
+            <div class="text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-slate-700 font-medium mb-3">
+              <b>Chẩn đoán:</b> ${p.diagnosis || 'Chưa cập nhật'}
+            </div>
+            <div class="text-xs text-amber-800 bg-amber-50/80 p-2.5 rounded-xl border border-amber-200/50 font-semibold">
+              <i class="fa-solid fa-syringe text-amber-600 mr-1"></i> ${p.protocol || 'Chưa xếp phác đồ'}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
     }
 
-    function closeAddModal() {
-      document.getElementById('addCycleModal').style.display = 'none';
-    }
+    // Mở Modal Chi tiết
+    window.openDetailModal = function(id) {
+      activePatientId = id;
+      const patient = patientsData.find(p => p.id === id);
+      if (!patient) return;
 
-    function saveCycle() {
-      const protocol = document.getElementById('inputProtocol').value;
-      const cycleNum = document.getElementById('inputCycleNum').value;
-      const dateVal = document.getElementById('inputDate').value;
+      populatePatientModal(patient);
+      document.getElementById('patientDetailModal').classList.remove('hidden');
+    };
 
-      if (!protocol || !cycleNum || !dateVal) {
-        alert('Vui lòng nhập đầy đủ thông tin!');
-        return;
+    window.closeDetailModal = function() {
+      document.getElementById('patientDetailModal').classList.add('hidden');
+      activePatientId = null;
+    };
+
+    // Đưa dữ liệu vào Modal
+    function populatePatientModal(p) {
+      document.getElementById('modalPatientName').innerText = p.name || 'N/A';
+      document.getElementById('modalPatientMeta').innerText = `Mã BN: ${p.patientId || '--'} | Giới tính: ${p.gender || 'Nam'}`;
+      document.getElementById('modalDiagnosis').innerText = p.diagnosis || 'Chưa có thông tin chẩn đoán.';
+      document.getElementById('modalProtocolText').innerText = p.protocol || 'Chưa ghi nhận phác đồ tổng thể.';
+      document.getElementById('modalUpdatedBy').innerText = p.updatedBy || p.createdBy || 'Hệ thống';
+
+      // Render Chu kỳ Hóa trị
+      const cyclesList = document.getElementById('modalCyclesList');
+      cyclesList.innerHTML = '';
+      if (p.cycles && p.cycles.length > 0) {
+        p.cycles.forEach(c => {
+          const item = document.createElement('div');
+          item.className = "bg-slate-50 p-3 rounded-xl border border-slate-200/60 text-slate-700 flex justify-between items-center";
+          item.innerHTML = `
+            <div>
+              <span class="font-bold text-teal-800">Chu kỳ ${c.cycleNumber}</span> - <span class="font-semibold">${c.protocol}</span>
+              ${c.note ? `<p class="text-xs text-slate-500 mt-0.5">${c.note}</p>` : ''}
+            </div>
+            <span class="text-xs text-slate-500 font-medium bg-white px-2 py-1 rounded-lg border border-slate-200">${c.date}</span>
+          `;
+          cyclesList.appendChild(item);
+        });
+      } else {
+        cyclesList.innerHTML = `<p class="text-xs text-slate-400 italic pl-3 border-l-2 border-slate-300">Chưa ghi nhận chu kỳ hóa trị nào.</p>`;[cite: 1]
       }
 
-      // Ẩn thông báo trống
-      const emptyMsg = document.getElementById('empty-msg');
-      if (emptyMsg) emptyMsg.style.display = 'none';
+      // Render Ghi chú lâm sàng
+      const notesList = document.getElementById('modalNotesList');
+      notesList.innerHTML = '';
+      if (p.notes && p.notes.length > 0) {
+        p.notes.forEach(n => {
+          const item = document.createElement('div');
+          item.className = "bg-slate-50 p-2.5 rounded-xl text-xs text-slate-600 border border-slate-100";
+          item.innerHTML = `<span class="font-semibold text-slate-800">${n.author}:</span> ${n.text}`;
+          notesList.appendChild(item);
+        });
+      } else {
+        notesList.innerHTML = `<p class="text-xs text-slate-400 italic pl-3 border-l-2 border-slate-300">Chưa có ghi chú diễn tiến lâm sàng.</p>`;[cite: 1]
+      }
 
-      // Thêm chu kỳ mới vào danh sách
-      const cycleList = document.getElementById('cycle-list');
-      const newCycle = document.createElement('div');
-      newCycle.className = 'cycle-item';
-      newCycle.innerHTML = `<b>Chu kỳ ${cycleNum}</b> (${protocol}) - Ngày: ${dateVal}`;
-      
-      cycleList.appendChild(newCycle);
+      // Tạo QR Code
+      const qrDiv = document.getElementById('qrcode');
+      qrDiv.innerHTML = '';
+      new QRCode(qrDiv, {
+        text: `BN:${p.patientId}|NAME:${p.name}|PROTOCOL:${p.protocol}`,
+        width: 100,
+        height: 100
+      });
 
-      // Tăng số chu kỳ cho lần nhập sau & đóng modal
-      document.getElementById('inputCycleNum').value = parseInt(cycleNum) + 1;
-      closeAddModal();
+      // Mặc định điền phác đồ cho Form Thêm chu kỳ
+      document.getElementById('cycleProtocol').value = p.protocol ? p.protocol.split(' ')[0] : 'CapeOX';
+      document.getElementById('cycleNumber').value = (p.cycles ? p.cycles.length + 1 : 1);
+      document.getElementById('cycleDate').valueAsDate = new Date();
     }
+
+    // Modal điều khiển Thêm Chu Kỳ
+    window.openAddCycleModal = function() {
+      document.getElementById('addCycleModal').classList.remove('hidden');
+    };
+
+    window.closeAddCycleModal = function() {
+      document.getElementById('addCycleModal').classList.add('hidden');
+    };
+
+    // Xử lý lưu chu kỳ hóa trị mới vào Firestore
+    document.getElementById('addCycleForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!activePatientId) return;
+
+      const protocol = document.getElementById('cycleProtocol').value.trim();
+      const cycleNumber = parseInt(document.getElementById('cycleNumber').value);
+      const date = document.getElementById('cycleDate').value;
+      const note = document.getElementById('cycleNote').value.trim();
+
+      const newCycleObj = {
+        protocol,
+        cycleNumber,
+        date,
+        note,
+        addedBy: currentUser ? currentUser.email : 'Ẩn danh',
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        const patientRef = doc(db, "patients", activePatientId);
+        await updateDoc(patientRef, {
+          cycles: arrayUnion(newCycleObj),
+          updatedAt: serverTimestamp(),
+          updatedBy: currentUser ? currentUser.email : 'Ẩn danh'
+        });
+
+        closeAddCycleModal();
+        document.getElementById('cycleNote').value = '';
+      } catch (err) {
+        console.error("Lỗi thêm chu kỳ:", err);
+        alert("Không thể lưu chu kỳ. Vui lòng kiểm tra lại kết nối!");
+      }
+    });
+
+    // Tìm kiếm live
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = patientsData.filter(p => 
+        (p.name && p.name.toLowerCase().includes(term)) ||
+        (p.patientId && p.patientId.toLowerCase().includes(term)) ||
+        (p.protocol && p.protocol.toLowerCase().includes(term))
+      );
+      renderPatients(filtered);
+    });
   </script>
 </body>
 </html>
