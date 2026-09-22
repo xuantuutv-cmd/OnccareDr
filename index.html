@@ -74,7 +74,10 @@
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-magnifying-glass text-sm"></i>
                     </div>
-                    <input type="text" id="searchInput" placeholder="Tra cứu theo Mã BN, Họ tên, Chẩn đoán..." class="w-full pl-10 pr-24 py-3 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 transition font-medium">
+                    <input type="text" id="searchInput" oninput="window.filterPatients()" placeholder="Tra cứu theo Mã BN, Họ tên, Chẩn đoán, Phác đồ..." class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 transition font-medium">
+                    <button onclick="document.getElementById('searchInput').value=''; window.filterPatients();" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
                 </div>
 
                 <div class="flex items-center space-x-2">
@@ -89,7 +92,10 @@
         <!-- All Patients List Overview -->
         <section id="patientListSection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
             <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center justify-between">
-                <span>Danh Sách Bệnh Nhân (Đồng Bộ Cloud Firestore)</span>
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-users text-teal-600"></i>
+                    Danh Sách Bệnh Nhân (Đồng Bộ Cloud Firestore)
+                </span>
                 <span id="patientCountBadge" class="bg-teal-100 text-teal-800 text-xs px-2.5 py-0.5 rounded-full font-bold">0 Bệnh nhân</span>
             </h3>
 
@@ -100,13 +106,14 @@
                             <th class="p-3">Mã BN</th>
                             <th class="p-3">Họ và Tên</th>
                             <th class="p-3">Giới Tính</th>
+                            <th class="p-3">Thông Số Sinh Học</th>
                             <th class="p-3">Chẩn Đoán Lâm Sàng</th>
                             <th class="p-3">Phác Đồ Hóa Trị</th>
                             <th class="p-3">Bác Sĩ Tạo</th>
                         </tr>
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
-                        <tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Đang kết nối Cloud... Vui lòng bấm "Đăng Nhập Gmail" để sử dụng.</td></tr>
+                        <tr><td colspan="7" class="p-4 text-center text-slate-400 font-medium">Đang kết nối Cloud... Vui lòng bấm "Đăng Nhập Gmail" để sử dụng.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -116,7 +123,7 @@
 
     <!-- MODAL: Add New Patient -->
     <div id="newPatientModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-teal-700 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-user-plus text-teal-200"></i>
@@ -147,11 +154,11 @@
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Chiều Cao (cm)</label>
-                        <input type="number" id="npHeight" oninput="window.calcBaselineBSA()" placeholder="160" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <input type="number" id="npHeight" step="0.1" oninput="window.calcBaselineBSA()" placeholder="160" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Cân Nặng (kg)</label>
-                        <input type="number" id="npWeight" oninput="window.calcBaselineBSA()" placeholder="55" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <input type="number" id="npWeight" step="0.1" oninput="window.calcBaselineBSA()" placeholder="55" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">BSA (Mosteller)</label>
@@ -171,8 +178,11 @@
                 </div>
 
                 <div class="pt-4 border-t border-slate-200 flex justify-end space-x-2">
-                    <button type="button" onclick="window.closeNewPatientModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Hủy</button>
-                    <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm">Lưu Trực Tiếp Lên Cloud</button>
+                    <button type="button" onclick="window.closeNewPatientModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition">Hủy</button>
+                    <button type="submit" id="saveBtn" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Lưu Trực Tiếp Lên Cloud</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -224,10 +234,10 @@
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // =========================================================================
-        // LƯU Ý: THAY ĐOẠN FIREBASE CONFIG THẬT CỦA BÁC SĨ VÀO ĐÂY
+        // CẤU HÌNH FIREBASE ONCOCARE PRO
         // =========================================================================
         const firebaseConfig = {
-            apiKey : "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM" ,
+            apiKey: "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM",
             authDomain: "oncocaer.firebaseapp.com",
             projectId: "oncocaer",
             storageBucket: "oncocaer.firebasestorage.app",
@@ -243,8 +253,9 @@
         provider.setCustomParameters({ prompt: 'select_account' });
 
         let currentUser = null;
+        let localPatientsCache = [];
 
-        // Gắn thẳng các hàm Auth vào Window để HTML gọi không bị lỗi "is not a function"
+        // Gắn các hàm Auth vào Window
         window.loginWithGoogle = async function() {
             try {
                 await signInWithPopup(auth, provider);
@@ -279,17 +290,20 @@
                 loadPatientsRealtime();
             } else {
                 currentUser = null;
+                localPatientsCache = [];
                 document.getElementById('googleSignInBtn')?.classList.remove('hidden');
                 document.getElementById('doctorProfile')?.classList.add('hidden');
                 
                 const tbody = document.getElementById('allPatientsTableBody');
                 if (tbody) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Vui lòng đăng nhập Gmail để tải và lưu dữ liệu bệnh nhân...</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-medium">Vui lòng đăng nhập Gmail để tải và lưu dữ liệu bệnh nhân...</td></tr>`;
                 }
+                const badge = document.getElementById('patientCountBadge');
+                if (badge) badge.innerText = `0 Bệnh nhân`;
             }
         });
 
-        // Tải danh sách bệnh nhân
+        // Tải danh sách bệnh nhân Realtime
         function loadPatientsRealtime() {
             const tbody = document.getElementById('allPatientsTableBody');
             if (!tbody) return;
@@ -298,37 +312,77 @@
                 const q = query(collection(db, "patients"));
                 
                 onSnapshot(q, (snapshot) => {
-                    tbody.innerHTML = '';
-                    const badge = document.getElementById('patientCountBadge');
-                    if (badge) badge.innerText = `${snapshot.docs.length} Bệnh nhân`;
-
-                    if (snapshot.empty) {
-                        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Chưa có dữ liệu bệnh nhân trên Cloud. Bấm "Thêm BN Mới" để bắt đầu!</td></tr>`;
-                        return;
-                    }
-
+                    localPatientsCache = [];
                     snapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        const tr = document.createElement('tr');
-                        tr.className = "hover:bg-teal-50/50 transition border-b border-slate-100";
-                        tr.innerHTML = `
-                            <td class="p-3 font-bold text-teal-800">${data.patientId || 'N/A'}</td>
-                            <td class="p-3 font-bold text-slate-800">${data.name || 'N/A'}</td>
-                            <td class="p-3 text-slate-600">${data.gender || 'N/A'}</td>
-                            <td class="p-3 text-slate-700 font-medium">${data.diagnosis || 'N/A'}</td>
-                            <td class="p-3 font-bold text-amber-700">${data.protocol || 'Chưa xếp'}</td>
-                            <td class="p-3 text-slate-400 text-[11px]">${data.createdBy || 'Unknown'}</td>
-                        `;
-                        tbody.appendChild(tr);
+                        localPatientsCache.push({
+                            id: docSnap.id,
+                            ...docSnap.data()
+                        });
                     });
+
+                    renderPatientsTable(localPatientsCache);
                 }, (error) => {
                     console.error("Lỗi Firestore:", error);
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-500 font-semibold">Lỗi tải dữ liệu: Bác sĩ cần mở quyền Rules trong Firestore Database!</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-rose-500 font-semibold">Lỗi tải dữ liệu: Bác sĩ cần mở quyền Rules trong Firestore Database!</td></tr>`;
                 });
             } catch (err) {
                 console.error("Lỗi kết nối:", err);
             }
         }
+
+        // Render dữ liệu ra bảng
+        function renderPatientsTable(patients) {
+            const tbody = document.getElementById('allPatientsTableBody');
+            const badge = document.getElementById('patientCountBadge');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+            if (badge) badge.innerText = `${patients.length} Bệnh nhân`;
+
+            if (patients.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">Không tìm thấy dữ liệu bệnh nhân phù hợp.</td></tr>`;
+                return;
+            }
+
+            patients.forEach((data) => {
+                const heightStr = data.height ? `${data.height} cm` : '-';
+                const weightStr = data.weight ? `${data.weight} kg` : '-';
+                const bsaStr = data.bsa ? `${data.bsa} m²` : '-';
+                const bioInfo = (data.height || data.weight) ? `${heightStr} / ${weightStr} (${bsaStr})` : 'Chưa cập nhật';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-teal-50/50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-teal-800">${data.patientId || 'N/A'}</td>
+                    <td class="p-3 font-bold text-slate-800">${data.name || 'N/A'}</td>
+                    <td class="p-3 text-slate-600">${data.gender || 'N/A'}</td>
+                    <td class="p-3 text-slate-600 font-medium">${bioInfo}</td>
+                    <td class="p-3 text-slate-700 font-medium">${data.diagnosis || 'N/A'}</td>
+                    <td class="p-3 font-bold text-amber-700">${data.protocol || 'Chưa xếp'}</td>
+                    <td class="p-3 text-slate-400 text-[11px]">${data.createdBy || 'Unknown'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Lọc bệnh nhân trên giao diện
+        window.filterPatients = function() {
+            const term = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
+            if (!term) {
+                renderPatientsTable(localPatientsCache);
+                return;
+            }
+
+            const filtered = localPatientsCache.filter(p => {
+                const pid = (p.patientId || '').toLowerCase();
+                const name = (p.name || '').toLowerCase();
+                const diag = (p.diagnosis || '').toLowerCase();
+                const proto = (p.protocol || '').toLowerCase();
+                return pid.includes(term) || name.includes(term) || diag.includes(term) || proto.includes(term);
+            });
+
+            renderPatientsTable(filtered);
+        };
 
         // Lưu bệnh nhân lên Cloud
         window.savePatientToFirebase = async function(e) {
@@ -342,6 +396,9 @@
             const pId = document.getElementById('npId')?.value.trim().toUpperCase();
             const pName = document.getElementById('npName')?.value.trim();
             const pGender = document.getElementById('npGender')?.value;
+            const pHeight = parseFloat(document.getElementById('npHeight')?.value) || 0;
+            const pWeight = parseFloat(document.getElementById('npWeight')?.value) || 0;
+            const pBsa = window.calculateBSA(pHeight, pWeight);
             const pDiag = document.getElementById('npDiagnosis')?.value.trim();
             const pProto = document.getElementById('npProtocol')?.value.trim();
 
@@ -350,11 +407,17 @@
                 return;
             }
 
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) saveBtn.disabled = true;
+
             try {
                 await addDoc(collection(db, "patients"), {
                     patientId: pId,
                     name: pName,
                     gender: pGender || "N/A",
+                    height: pHeight,
+                    weight: pWeight,
+                    bsa: pBsa ? pBsa.toFixed(2) : "0.00",
                     diagnosis: pDiag || "Chưa có chẩn đoán",
                     protocol: pProto || "Chưa chỉ định",
                     createdBy: currentUser.email,
@@ -366,6 +429,8 @@
             } catch (err) {
                 console.error("Lỗi lưu Cloud:", err);
                 alert("Không thể lưu! Vui lòng kiểm tra lại Firestore Rules.");
+            } finally {
+                if (saveBtn) saveBtn.disabled = false;
             }
         };
     </script>
