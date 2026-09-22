@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OncoCare Pro - Quản Lý Hóa Trị Ung Bướu (Admin Edition)</title>
+    <title>OncoCare Pro - Quản Lý Hóa Trị Ung Bướu</title>
     <link rel="manifest" href="manifest.json">
     <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,8 +32,8 @@
                 <div>
                     <h1 class="font-bold text-lg sm:text-xl tracking-tight leading-none flex items-center gap-2">
                         <span>OncoCare</span>
-                        <span class="text-[10px] bg-amber-500/80 text-amber-100 border border-amber-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-[9px]"></i> Admin Portal
+                        <span id="roleBadge" class="text-[10px] bg-slate-500/80 text-slate-100 border border-slate-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-user text-[9px]"></i> User
                         </span>
                     </h1>
                     <p class="text-xs text-teal-100/80 font-medium">Hệ Thống Quản Lý Hóa Trị Ung Bướu</p>
@@ -53,7 +53,7 @@
                 </button>
 
                 <div id="doctorProfile" class="hidden flex items-center space-x-3">
-                    <button onclick="window.openUserManagementModal()" class="bg-teal-900/50 hover:bg-teal-900/80 border border-teal-500/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                    <button id="btnUserMgmt" onclick="window.openUserManagementModal()" class="hidden bg-teal-900/50 hover:bg-teal-900/80 border border-teal-500/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                         <i class="fa-solid fa-users-gear text-amber-300"></i>
                         <span class="hidden md:inline">Quản Lý Thành Viên</span>
                     </button>
@@ -115,8 +115,8 @@
                             <th class="p-3">Thông Số Sinh Học</th>
                             <th class="p-3">Chẩn Đoán Lâm Sàng</th>
                             <th class="p-3">Phác Đồ Hóa Trị</th>
-                            <th class="p-3">Bác Sĩ Tạo</th>
-                            <th class="p-3 text-center">Thao Tác Admin</th>
+                            <th class="p-3">Người Cập Nhật</th>
+                            <th class="p-3 text-center">Thao Tác</th>
                         </tr>
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
@@ -254,7 +254,7 @@
 
                 <!-- Người tạo -->
                 <div class="pt-3 border-t border-slate-200 flex justify-between items-center text-slate-400 text-[11px]">
-                    <span>Bác sĩ tạo hồ sơ:</span>
+                    <span>Cập nhật lần cuối bởi:</span>
                     <span id="detCreatedBy" class="font-semibold text-slate-600">-</span>
                 </div>
             </div>
@@ -265,19 +265,19 @@
         </div>
     </div>
 
-    <!-- MODAL: Admin User Management -->
+    <!-- MODAL: Admin User Management (Dành riêng cho xuatuutv@gmail.com) -->
     <div id="userManagementModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-slate-800 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-users-gear text-amber-400"></i>
-                    Quản Lý Thành Viên Hệ Thống (Thành Viên Đăng Nhập)
+                    Quản Lý Thành Viên Đăng Nhập (Admin Exclusive)
                 </h3>
                 <button onclick="window.closeUserManagementModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div class="p-6 space-y-4 text-xs">
-                <p class="text-slate-500">Danh sách tài khoản Bác sĩ/Nhân viên y tế đã truy cập vào OncoCare Cloud Pro:</p>
+                <p class="text-slate-500">Danh sách tài khoản Bác sĩ/Nhân viên y tế đã truy cập vào hệ thống:</p>
                 
                 <div class="overflow-x-auto rounded-xl border border-slate-200">
                     <table class="w-full text-left text-xs text-slate-700">
@@ -286,7 +286,7 @@
                                 <th class="p-3">Thành Viên</th>
                                 <th class="p-3">Email</th>
                                 <th class="p-3">Vai Trò</th>
-                                <th class="p-3">Lần Đăng Nhập Cuối</th>
+                                <th class="p-3">Truy Cập Cuối</th>
                             </tr>
                         </thead>
                         <tbody id="userTableBody" class="divide-y divide-slate-200">
@@ -370,8 +370,10 @@
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // =========================================================================
-        // CẤU HÌNH FIREBASE ONCOCARE PRO
+        // EMAIL CÓ QUYỀN ADMIN DUY NHẤT
         // =========================================================================
+        const ADMIN_EMAIL = "xuatuutv@gmail.com";
+
         const firebaseConfig = {
             apiKey: "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM",
             authDomain: "oncocaer.firebaseapp.com",
@@ -389,18 +391,19 @@
         provider.setCustomParameters({ prompt: 'select_account' });
 
         let currentUser = null;
+        let isAdmin = false;
         let localPatientsCache = [];
 
-        // Gắn các hàm Auth vào Window
+        // Auth Handlers
         window.loginWithGoogle = async function() {
             try {
                 await signInWithPopup(auth, provider);
             } catch (error) {
-                console.warn("Popup bị chặn, chuyển sang chế độ Redirect...", error);
+                console.warn("Popup bị chặn, chuyển sang Redirect...", error);
                 try {
                     await signInWithRedirect(auth, provider);
                 } catch (err) {
-                    alert("Chưa thay API Key thật hoặc chưa thêm Authorized Domain trên Firebase Console!");
+                    alert("Vui lòng kiểm tra lại cấu hình Firebase Authorized Domain!");
                     console.error("Lỗi đăng nhập:", err);
                 }
             }
@@ -412,27 +415,45 @@
             });
         };
 
-        // Lắng nghe trạng thái đăng nhập
+        // Lắng nghe trạng thái đăng nhập & Phân quyền
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                // Kiểm tra email Admin duy nhất
+                isAdmin = (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+
                 document.getElementById('googleSignInBtn')?.classList.add('hidden');
                 document.getElementById('doctorProfile')?.classList.remove('hidden');
                 
-                if (document.getElementById('docName')) document.getElementById('docName').innerText = user.displayName || "Bác sĩ Admin";
+                if (document.getElementById('docName')) document.getElementById('docName').innerText = user.displayName || "Bác sĩ";
                 if (document.getElementById('docEmail')) document.getElementById('docEmail').innerText = user.email;
                 if (document.getElementById('docAvatar')) document.getElementById('docAvatar').src = user.photoURL || "https://placehold.co/100x100/0d9488/ffffff?text=Doctor";
-                
-                // Đồng bộ thông tin Admin/User lên Cloud Firestore
-                await recordUserSession(user);
 
+                // Cập nhật UI theo vai trò
+                const roleBadge = document.getElementById('roleBadge');
+                const btnUserMgmt = document.getElementById('btnUserMgmt');
+
+                if (isAdmin) {
+                    roleBadge.className = "text-[10px] bg-amber-500/90 text-amber-100 border border-amber-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
+                    roleBadge.innerHTML = `<i class="fa-solid fa-shield-halved text-[9px]"></i> Admin`;
+                    btnUserMgmt?.classList.remove('hidden');
+                } else {
+                    roleBadge.className = "text-[10px] bg-slate-500/80 text-slate-100 border border-slate-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
+                    roleBadge.innerHTML = `<i class="fa-solid fa-user text-[9px]"></i> User`;
+                    btnUserMgmt?.classList.add('hidden');
+                }
+                
+                await recordUserSession(user, isAdmin);
                 loadPatientsRealtime();
-                loadUsersRealtime();
+                if (isAdmin) loadUsersRealtime();
+
             } else {
                 currentUser = null;
+                isAdmin = false;
                 localPatientsCache = [];
                 document.getElementById('googleSignInBtn')?.classList.remove('hidden');
                 document.getElementById('doctorProfile')?.classList.add('hidden');
+                document.getElementById('btnUserMgmt')?.classList.add('hidden');
                 
                 const tbody = document.getElementById('allPatientsTableBody');
                 if (tbody) {
@@ -443,8 +464,8 @@
             }
         });
 
-        // Ghi lại lịch sử đăng nhập bác sĩ/thành viên
-        async function recordUserSession(user) {
+        // Ghi nhận User/Admin lên Firestore
+        async function recordUserSession(user, isUserAdmin) {
             try {
                 const userRef = doc(db, "users", user.uid);
                 await setDoc(userRef, {
@@ -452,7 +473,7 @@
                     displayName: user.displayName || "Bác sĩ",
                     email: user.email,
                     photoURL: user.photoURL || "",
-                    role: "Admin",
+                    role: isUserAdmin ? "Admin" : "User",
                     lastLogin: serverTimestamp()
                 }, { merge: true });
             } catch (err) {
@@ -460,7 +481,7 @@
             }
         }
 
-        // Tải danh sách thành viên cho Admin
+        // Tải danh sách thành viên (Chỉ Admin thấy)
         function loadUsersRealtime() {
             const utbody = document.getElementById('userTableBody');
             if (!utbody) return;
@@ -475,6 +496,7 @@
                     }
                     snapshot.forEach((docSnap) => {
                         const u = docSnap.data();
+                        const isUserAdminRole = (u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
                         const tr = document.createElement('tr');
                         tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
                         tr.innerHTML = `
@@ -483,8 +505,12 @@
                                 <span>${u.displayName || 'Bác sĩ'}</span>
                             </td>
                             <td class="p-3 text-slate-600">${u.email}</td>
-                            <td class="p-3"><span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Admin</span></td>
-                            <td class="p-3 text-slate-400 text-[11px]">${u.lastLogin ? new Date(u.lastLogin.toDate()).toLocaleString('vi-VN') : 'Đang trực tuyến'}</td>
+                            <td class="p-3">
+                                ${isUserAdminRole 
+                                    ? `<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Admin</span>`
+                                    : `<span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-semibold">User</span>`}
+                            </td>
+                            <td class="p-3 text-slate-400 text-[11px]">${u.lastLogin ? new Date(u.lastLogin.toDate()).toLocaleString('vi-VN') : 'Mới đăng nhập'}</td>
                         `;
                         utbody.appendChild(tr);
                     });
@@ -494,7 +520,7 @@
             }
         }
 
-        // Tải danh sách bệnh nhân Realtime
+        // Tải dữ liệu bệnh nhân Realtime
         function loadPatientsRealtime() {
             const tbody = document.getElementById('allPatientsTableBody');
             if (!tbody) return;
@@ -514,14 +540,14 @@
                     renderPatientsTable(localPatientsCache);
                 }, (error) => {
                     console.error("Lỗi Firestore:", error);
-                    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-500 font-semibold">Lỗi tải dữ liệu: Bác sĩ cần mở quyền Rules trong Firestore Database!</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-500 font-semibold">Không thể truy cập dữ liệu. Vui lòng kiểm tra lại kết nối Cloud!</td></tr>`;
                 });
             } catch (err) {
                 console.error("Lỗi kết nối:", err);
             }
         }
 
-        // Render dữ liệu ra bảng
+        // Hiển thị danh sách Bệnh nhân
         function renderPatientsTable(patients) {
             const tbody = document.getElementById('allPatientsTableBody');
             const badge = document.getElementById('patientCountBadge');
@@ -541,6 +567,13 @@
                 const bsaStr = data.bsa ? `${data.bsa} m²` : '-';
                 const bioInfo = (data.height || data.weight) ? `${heightStr} / ${weightStr} (${bsaStr})` : 'Chưa cập nhật';
 
+                // Chỉ hiển thị nút Xóa đối với Admin
+                const deleteBtnHtml = isAdmin 
+                    ? `<button onclick="window.deletePatientConfirm('${data.id}', '${data.name}')" title="Xóa hồ sơ (Chỉ Admin)" class="p-1.5 bg-rose-100 text-rose-700 hover:bg-rose-200 rounded-lg transition">
+                        <i class="fa-solid fa-trash-can"></i>
+                       </button>`
+                    : ``;
+
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-teal-50/50 transition border-b border-slate-100";
                 tr.innerHTML = `
@@ -552,15 +585,13 @@
                     <td class="p-3 text-slate-600 font-medium">${bioInfo}</td>
                     <td class="p-3 text-slate-700 font-medium">${data.diagnosis || 'N/A'}</td>
                     <td class="p-3 font-bold text-amber-700">${data.protocol || 'Chưa xếp'}</td>
-                    <td class="p-3 text-slate-400 text-[11px]">${data.createdBy || 'Unknown'}</td>
+                    <td class="p-3 text-slate-400 text-[11px]">${data.updatedBy || data.createdBy || 'Unknown'}</td>
                     <td class="p-3 text-center">
                         <div class="flex items-center justify-center space-x-1.5">
-                            <button onclick="window.editPatientModal('${data.id}')" title="Sửa thông tin" class="p-1.5 bg-sky-100 text-sky-700 hover:bg-sky-200 rounded-lg transition">
+                            <button onclick="window.editPatientModal('${data.id}')" title="Sửa thông tin bệnh nhân" class="p-1.5 bg-sky-100 text-sky-700 hover:bg-sky-200 rounded-lg transition">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
-                            <button onclick="window.deletePatientConfirm('${data.id}', '${data.name}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-100 text-rose-700 hover:bg-rose-200 rounded-lg transition">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                            ${deleteBtnHtml}
                         </div>
                     </td>
                 `;
@@ -568,7 +599,7 @@
             });
         }
 
-        // Lọc bệnh nhân trên giao diện
+        // Tìm kiếm Bệnh nhân
         window.filterPatients = function() {
             const term = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
             if (!term) {
@@ -587,7 +618,7 @@
             renderPatientsTable(filtered);
         };
 
-        // Xem chi tiết Bệnh Nhân
+        // Xem chi tiết
         window.showPatientDetail = function(docId) {
             const patient = localPatientsCache.find(p => p.id === docId);
             if (!patient) return;
@@ -599,12 +630,12 @@
             document.getElementById('detBsa').innerText = patient.bsa ? `${patient.bsa} m²` : '-';
             document.getElementById('detDiagnosis').innerText = patient.diagnosis || 'Chưa có thông tin chẩn đoán.';
             document.getElementById('detProtocol').querySelector('span').innerText = patient.protocol || 'Chưa xếp phác đồ.';
-            document.getElementById('detCreatedBy').innerText = patient.createdBy || 'N/A';
+            document.getElementById('detCreatedBy').innerText = patient.updatedBy || patient.createdBy || 'N/A';
 
             document.getElementById('patientDetailModal').classList.remove('hidden');
         };
 
-        // Mở Modal Chỉnh Sửa
+        // Chỉnh sửa (Cả User và Admin đều thực hiện được)
         window.editPatientModal = function(docId) {
             const patient = localPatientsCache.find(p => p.id === docId);
             if (!patient) return;
@@ -620,17 +651,17 @@
 
             window.calcBaselineBSA();
 
-            document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-user-pen text-amber-200"></i> Cập Nhật Hồ Sơ Bệnh Nhân (Admin)`;
+            document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-user-pen text-amber-200"></i> Cập Nhật Thông Tin Bệnh Nhân`;
             document.getElementById('saveBtnText').innerText = "Cập Nhật Lên Cloud";
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
-        // Thêm mới hoặc Cập nhật bệnh nhân lên Cloud
+        // Lưu thông tin Bệnh Nhân
         window.handlePatientFormSubmit = async function(e) {
             e.preventDefault();
             
             if (!currentUser) {
-                alert("Bác sĩ vui lòng bấm 'Đăng Nhập Gmail' trước khi lưu!");
+                alert("Vui lòng bấm 'Đăng Nhập Gmail' trước khi lưu!");
                 return;
             }
 
@@ -667,40 +698,44 @@
                 };
 
                 if (docId) {
-                    // Cập nhật
                     await updateDoc(doc(db, "patients", docId), patientData);
-                    alert(`Đã cập nhật thành công thông tin bệnh nhân ${pName}!`);
+                    alert(`Đã cập nhật thông tin bệnh nhân ${pName}!`);
                 } else {
-                    // Thêm mới
                     patientData.createdBy = currentUser.email;
                     patientData.createdAt = serverTimestamp();
                     await addDoc(collection(db, "patients"), patientData);
-                    alert(`Đã thêm thành công bệnh nhân ${pName} (${pId}) lên Cloud!`);
+                    alert(`Đã thêm thành công bệnh nhân ${pName} (${pId})!`);
                 }
 
                 window.closePatientFormModal();
             } catch (err) {
                 console.error("Lỗi lưu Cloud:", err);
-                alert("Không thể lưu! Vui lòng kiểm tra lại Firestore Rules.");
+                alert("Không thể lưu dữ liệu! Vui lòng kiểm tra lại quyền truy cập.");
             } finally {
                 if (saveBtn) saveBtn.disabled = false;
             }
         };
 
-        // Xóa Bệnh Nhân (Dành cho Admin)
+        // Chức năng XÓA - CHỈ DÀNH CHO ADMIN
         window.deletePatientConfirm = async function(docId, patientName) {
             if (!currentUser) {
-                alert("Vui lòng đăng nhập tài khoản Admin để thực hiện xóa!");
+                alert("Vui lòng đăng nhập!");
                 return;
             }
 
-            if (confirm(`Bác sĩ Admin có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân "${patientName}" khỏi Cloud Firestore?`)) {
+            // Kiểm tra phân quyền trực tiếp trước khi cho phép xóa
+            if (!isAdmin) {
+                alert("RẤT DIẾC: Bạn không có quyền xóa dữ liệu bệnh nhân! Chỉ Admin (xuatuutv@gmail.com) mới có quyền xóa.");
+                return;
+            }
+
+            if (confirm(`Bác sĩ Admin có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân "${patientName}"?`)) {
                 try {
                     await deleteDoc(doc(db, "patients", docId));
-                    alert(`Đã xóa thành công hồ sơ bệnh nhân ${patientName}!`);
+                    alert(`Đã xóa vĩnh viễn hồ sơ bệnh nhân ${patientName}!`);
                 } catch (err) {
                     console.error("Lỗi xóa hồ sơ:", err);
-                    alert("Không thể xóa! Vui lòng kiểm tra lại quyền Firestore Rules.");
+                    alert("Không thể xóa hồ sơ! Vui lòng kiểm tra lại quyền trên Firestore.");
                 }
             }
         };
