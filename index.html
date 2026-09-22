@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OncoCare - Quản Lý Hóa Trị Ung Bướu</title>
     <link rel="manifest" href="manifest.json">
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <script>
@@ -17,67 +14,45 @@
             theme: {
                 extend: {
                     colors: {
-                        teal: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            500: '#14b8a6',
-                            600: '#0d9488',
-                            700: '#0f766e',
-                            800: '#115e59',
-                            900: '#134e4a'
-                        }
+                        teal: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' }
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between bg-slate-50">
 
-    <!-- Navigation Header -->
+    <!-- Header -->
     <header class="bg-gradient-to-r from-teal-800 to-teal-700 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="resetToHome()">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
                     <i class="fa-solid fa-dna text-teal-200 text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg sm:text-xl tracking-tight leading-none flex items-center gap-2">
+                    <h1 class="font-bold text-lg sm:text-xl flex items-center gap-2">
                         <span>OncoCare</span>
-                        <span class="text-[10px] bg-teal-500/40 text-teal-100 border border-teal-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">v2.4 Pro</span>
+                        <span class="text-[10px] bg-teal-500/40 text-teal-100 border border-teal-400/30 px-2 py-0.5 rounded-full uppercase">Cloud Live</span>
                     </h1>
-                    <p class="text-xs text-teal-100/80 font-medium">Hệ Thống Quản Lý Hóa Trị Ung Bướu</p>
+                    <p class="text-xs text-teal-100/80">Hệ Thống Quản Lý Hóa Trị Ung Bướu</p>
                 </div>
             </div>
 
-            <div id="authHeaderSection" class="flex items-center space-x-3">
-                <button id="googleSignInBtn" onclick="handleGoogleLogin()" class="bg-white hover:bg-teal-50 text-teal-800 font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-2 border border-teal-100">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
+            <div id="authHeaderSection">
+                <button id="googleSignInBtn" onclick="loginWithGoogle()" class="bg-white hover:bg-teal-50 text-teal-800 font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-2 border">
+                    <i class="fa-brands fa-google text-red-500"></i>
                     <span>Đăng Nhập Gmail</span>
                 </button>
 
                 <div id="doctorProfile" class="hidden flex items-center space-x-3">
                     <div class="text-right hidden sm:block">
-                        <p id="docName" class="text-xs font-bold leading-tight">TS.BS. Nguyễn Văn An</p>
-                        <p id="docEmail" class="text-[10px] text-teal-200">bs.nguyenvanan@gmail.com</p>
+                        <p id="docName" class="text-xs font-bold leading-tight">Bác sĩ</p>
+                        <p id="docEmail" class="text-[10px] text-teal-200">email@gmail.com</p>
                     </div>
-                    <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
-                    <button onclick="handleSignOut()" title="Đăng xuất" class="text-teal-200 hover:text-white text-xs bg-teal-900/40 hover:bg-teal-900/60 p-2 rounded-lg transition">
+                    <img id="docAvatar" src="" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
+                    <button onclick="logoutGoogle()" title="Đăng xuất" class="text-teal-200 hover:text-white text-xs bg-teal-900/40 hover:bg-teal-900/60 p-2 rounded-lg transition">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
@@ -85,854 +60,188 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
-
-        <!-- Search & Quick Action Toolbar -->
-        <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                
-                <div class="relative flex-1">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                    </div>
-                    <input type="text" id="searchInput" oninput="liveSearch()" placeholder="Tra cứu theo Mã BN (vd: BN001), Họ tên, Chẩn đoán..." class="w-full pl-10 pr-24 py-3 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 transition font-medium">
-                    <button onclick="executeSearch()" class="absolute right-1.5 top-1.5 bottom-1.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-xs px-4 rounded-lg shadow-sm transition">
-                        Tra Cứu
-                    </button>
-                </div>
-
-                <div class="flex items-center space-x-2">
-                    <button onclick="openNewPatientModal()" class="flex-1 sm:flex-none bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs sm:text-sm px-4 py-3 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span>Thêm BN Mới</span>
-                    </button>
-                    
-                    <button onclick="exportDataCSV()" title="Xuất file CSV" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs sm:text-sm px-3.5 py-3 rounded-xl transition flex items-center justify-center space-x-1.5 border border-slate-200">
-                        <i class="fa-solid fa-file-excel text-emerald-600"></i>
-                        <span class="hidden sm:inline">Xuất CSV</span>
-                    </button>
-                </div>
-
-            </div>
-
-            <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs custom-scrollbar">
-                <span class="text-slate-400 font-semibold whitespace-nowrap"><i class="fa-solid fa-bolt text-amber-500 mr-1"></i>Mẫu xem nhanh:</span>
-                <button onclick="loadPatientById('BN001')" class="bg-teal-50 hover:bg-teal-100 text-teal-800 font-medium px-3 py-1 rounded-lg border border-teal-200/60 whitespace-nowrap transition">
-                    BN001 - Nguyễn Thị Hoa (K Vú)
-                </button>
-                <button onclick="loadPatientById('BN002')" class="bg-teal-50 hover:bg-teal-100 text-teal-800 font-medium px-3 py-1 rounded-lg border border-teal-200/60 whitespace-nowrap transition">
-                    BN002 - Trần Văn Minh (K Phổi)
-                </button>
-                <button onclick="loadPatientById('BN003')" class="bg-teal-50 hover:bg-teal-100 text-teal-800 font-medium px-3 py-1 rounded-lg border border-teal-200/60 whitespace-nowrap transition">
-                    BN003 - Lê Hoàng Nam (K Đại Trực Tràng)
-                </button>
-            </div>
+    <!-- Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+        <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between gap-4">
+            <input type="text" id="searchInput" oninput="liveSearch()" placeholder="Tra cứu theo Mã BN, Họ tên..." class="flex-1 p-3 bg-slate-50 border rounded-xl text-sm">
+            <button onclick="openNewPatientModal()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm px-4 py-3 rounded-xl flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>Thêm Bệnh Nhân Mới</span>
+            </button>
         </section>
 
-        <!-- Patient Detail Dashboard View -->
-        <div id="patientDashboard" class="space-y-6">
-
-            <!-- Baseline Information Header Card -->
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="space-y-2">
-                        <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                            <span id="cardPatientId" class="bg-teal-500/30 text-teal-200 border border-teal-400/30 font-bold text-xs px-2.5 py-1 rounded-md tracking-wider">MÃ BN: BN001</span>
-                            <span id="cardStatus" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs px-2.5 py-1 rounded-md font-medium">Đang điều trị</span>
-                        </div>
-                        <h2 id="cardPatientName" class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                            Nguyễn Thị Hoa
-                            <span id="cardAgeGender" class="text-sm font-normal text-slate-300">(52 tuổi - Nữ)</span>
-                        </h2>
-                        <p id="cardDiagnosis" class="text-sm text-teal-200/90 font-medium flex items-center gap-1.5">
-                            <i class="fa-solid fa-ribbon text-teal-400"></i>
-                            Ung thư Vú Phải (T2N1M0) - Giai đoạn IIB
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs text-slate-800">
-                        <div class="bg-white/10 backdrop-blur-md text-white p-3 rounded-xl border border-white/10 space-y-0.5">
-                            <span class="text-[10px] text-teal-200 uppercase font-semibold block">Chiều cao / Cân nặng</span>
-                            <span id="cardHeightWeight" class="font-bold text-sm">158 cm / 54 kg</span>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-md text-white p-3 rounded-xl border border-white/10 space-y-0.5">
-                            <span class="text-[10px] text-teal-200 uppercase font-semibold block">BSA Cơ Sở (Mosteller)</span>
-                            <span id="cardBaselineBSA" class="font-bold text-sm text-teal-300">1.54 m²</span>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-md text-white p-3 rounded-xl border border-white/10 space-y-0.5 col-span-2 sm:col-span-1">
-                            <span class="text-[10px] text-teal-200 uppercase font-semibold block">Phác đồ Đang Dùng</span>
-                            <span id="cardProtocol" class="font-bold text-sm text-amber-300">AC-T (Chu kỳ 3)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-5 bg-slate-50 border-t border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                    <div class="space-y-1">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] block">Dấu Ấnh Sinh Học (IHC)</span>
-                        <div id="cardBiomarkers" class="font-bold text-slate-700 flex flex-wrap gap-1">
-                            <span class="bg-teal-100 text-teal-800 px-2 py-0.5 rounded">ER(+) 80%</span>
-                            <span class="bg-teal-100 text-teal-800 px-2 py-0.5 rounded">PR(+) 60%</span>
-                            <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded">HER2(3+)</span>
-                            <span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Ki67: 35%</span>
-                        </div>
-                    </div>
-                    <div class="space-y-1">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] block">Điện thoại liên hệ</span>
-                        <p id="cardPhone" class="font-bold text-slate-700">0912 345 678</p>
-                    </div>
-                    <div class="space-y-1">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] block">Ngày Bắt Đầu Hóa Trị</span>
-                        <p id="cardStartDate" class="font-bold text-slate-700">15/01/2026</p>
-                    </div>
-                    <div class="space-y-1">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] block">Bác Sĩ Phụ Trách</span>
-                        <p id="cardDoctor" class="font-bold text-teal-700">TS.BS. Nguyễn Văn An</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Chemotherapy Cycle Records Section -->
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-3 h-3 rounded-full bg-teal-600"></div>
-                        <h3 class="font-bold text-base text-slate-800">Lịch Sử & Tiến Trình Các Chu Kỳ Hóa Trị</h3>
-                    </div>
-                    <button onclick="openNewCycleModal()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Thêm Chu Kỳ Mới</span>
-                    </button>
-                </div>
-
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table class="w-full text-left text-xs text-slate-700">
-                        <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
-                            <tr>
-                                <th class="p-3">Chu Kỳ</th>
-                                <th class="p-3">Ngày Tiêm</th>
-                                <th class="p-3">Thể Trạng (H/W/BSA)</th>
-                                <th class="p-3">Xét Nghiệm Máu (ANC / Plt)</th>
-                                <th class="p-3">Phác Đồ & Liều dùng</th>
-                                <th class="p-3">Độc Tính CTCAE</th>
-                                <th class="p-3">Hẹn Tái Khám</th>
-                                <th class="p-3 text-center">Ghi Chú</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cycleTableBody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-        </div>
-
-        <!-- All Patients List Overview -->
-        <section id="patientListSection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center justify-between">
-                <span>Danh Sách Tất Cả Bệnh Nhân Hóa Trị</span>
-                <span id="patientCountBadge" class="bg-teal-100 text-teal-800 text-xs px-2.5 py-0.5 rounded-full font-bold">3 Bệnh nhân</span>
+        <!-- Patient List Table -->
+        <section class="bg-white rounded-2xl shadow-sm border p-5 space-y-4">
+            <h3 class="font-bold text-slate-800 text-sm uppercase flex justify-between">
+                <span>Danh Sách Bệnh Nhân (Đã đồng bộ Cloud)</span>
+                <span id="patientCountBadge" class="bg-teal-100 text-teal-800 text-xs px-2.5 py-0.5 rounded-full font-bold">0 Bệnh nhân</span>
             </h3>
-
-            <div class="overflow-x-auto rounded-xl border border-slate-200">
-                <table class="w-full text-left text-xs text-slate-700">
-                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
+            <div class="overflow-x-auto rounded-xl border">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-100 text-slate-600 uppercase font-bold">
                         <tr>
                             <th class="p-3">Mã BN</th>
                             <th class="p-3">Họ và Tên</th>
-                            <th class="p-3">Tuổi/Giới</th>
-                            <th class="p-3">Chẩn Đoán & TNM</th>
-                            <th class="p-3">Dấu Ấn Sinh Học</th>
+                            <th class="p-3">Giới Tính/Tuổi</th>
+                            <th class="p-3">Chẩn Đoán</th>
                             <th class="p-3">Phác Đồ</th>
-                            <th class="p-3">Thao Tác</th>
+                            <th class="p-3">Người Tạo</th>
                         </tr>
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
+                        <tr><td colspan="6" class="p-4 text-center text-slate-400">Vui lòng đăng nhập Gmail để tải dữ liệu...</td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
-
     </main>
 
-    <!-- MODAL 1: Add New Patient -->
-    <div id="newPatientModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
-            <div class="bg-teal-700 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
-                <h3 class="font-bold text-base flex items-center gap-2">
-                    <i class="fa-solid fa-user-plus text-teal-200"></i>
-                    Thêm Hồ Sơ Bệnh Nhân Hóa Trị Mới
-                </h3>
-                <button onclick="closeNewPatientModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form id="newPatientForm" onsubmit="saveNewPatient(event)" class="p-6 space-y-4 text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Mã BN <span class="text-rose-500">*</span></label>
-                        <input type="text" id="npId" placeholder="vd: BN004" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-teal-800 uppercase focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block font-semibold text-slate-700 mb-1">Họ và Tên <span class="text-rose-500">*</span></label>
-                        <input type="text" id="npName" placeholder="vd: Nguyễn Văn B" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Năm Sinh</label>
-                        <input type="number" id="npBirthYear" placeholder="1975" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Giới Tính</label>
-                        <select id="npGender" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                            <option value="Nữ">Nữ</option>
-                            <option value="Nam">Nam</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Chiều Cao (cm)</label>
-                        <input type="number" id="npHeight" oninput="calcBaselineBSA()" placeholder="160" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Cân Nặng (kg)</label>
-                        <input type="number" id="npWeight" oninput="calcBaselineBSA()" placeholder="55" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                </div>
-
-                <div class="p-3 bg-teal-50 border border-teal-100 rounded-xl flex items-center justify-between">
-                    <span class="font-bold text-teal-800">BSA Cơ Sở Tính Tự Động (Mosteller):</span>
-                    <span id="npBsaDisplay" class="font-extrabold text-base text-teal-700">0.00 m²</span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Chẩn Đoán Lâm Sàng <span class="text-rose-500">*</span></label>
-                        <input type="text" id="npDiagnosis" placeholder="vd: Ung thư Vú Phải" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Giai Đoạn (TNM)</label>
-                        <input type="text" id="npTnm" placeholder="vd: T2N1M0 - Giai đoạn IIB" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Dấu Ấn Sinh Học (IHC / Gen mutation)</label>
-                    <input type="text" id="npBiomarkers" placeholder="vd: ER(+) 90%, PR(+) 80%, HER2(-), Ki67 20%" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Phác Đồ Hóa Trị Chỉ Định</label>
-                        <input type="text" id="npProtocol" placeholder="vd: AC-T / CAPOX / Pembrolizumab" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Số Điện Thoại</label>
-                        <input type="text" id="npPhone" placeholder="0901234567" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-200 flex justify-end space-x-2">
-                    <button type="button" onclick="closeNewPatientModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Hủy</button>
-                    <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm">Lưu Bệnh Nhân Mới</button>
+    <!-- Modal Thêm Bệnh Nhân -->
+    <div id="newPatientModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 text-xs">
+            <h3 class="font-bold text-base text-teal-800 border-b pb-2">Thêm Bệnh Nhân Mới Vào Firebase</h3>
+            <form onsubmit="savePatientToFirebase(event)" class="space-y-3">
+                <input type="text" id="npId" placeholder="Mã Bệnh Nhân (vd: BN001)" required class="w-full p-2.5 border rounded-lg">
+                <input type="text" id="npName" placeholder="Họ và Tên" required class="w-full p-2.5 border rounded-lg">
+                <input type="text" id="npDiagnosis" placeholder="Chẩn đoán lâm sàng" required class="w-full p-2.5 border rounded-lg">
+                <input type="text" id="npProtocol" placeholder="Phác đồ hóa trị" class="w-full p-2.5 border rounded-lg">
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeNewPatientModal()" class="px-4 py-2 bg-slate-100 rounded-lg">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-teal-600 text-white rounded-lg">Lưu vĩnh viễn</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL 2: Add New Cycle -->
-    <div id="newCycleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
-            <div class="bg-teal-700 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
-                <div>
-                    <h3 class="font-bold text-base flex items-center gap-2">
-                        <i class="fa-solid fa-plus-circle text-teal-200"></i>
-                        Thêm Chu Kỳ Hóa Trị Mới
-                    </h3>
-                    <p id="ncPatientSub" class="text-xs text-teal-200 mt-0.5">Cho bệnh nhân: Nguyễn Thị Hoa (BN001)</p>
-                </div>
-                <button onclick="closeNewCycleModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
+    <!-- Firebase SDK Modular -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-            <form id="newCycleForm" onsubmit="saveNewCycle(event)" class="p-6 space-y-4 text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Tên Chu Kỳ <span class="text-rose-500">*</span></label>
-                        <input type="text" id="ncCycleName" placeholder="vd: Chu kỳ 3 (C3)" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Ngày Tiêm/Truyền <span class="text-rose-500">*</span></label>
-                        <input type="date" id="ncDate" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Phác Đồ & Liều</label>
-                        <input type="text" id="ncProtocol" placeholder="vd: AC (Liều 100%)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                </div>
+        // === THAY CẤU HÌNH FIREBASE CỦA BẠN VÀO DƯỚI ĐÂY ===
+        const firebaseConfig = {// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <span class="font-bold text-slate-700 uppercase text-[10px] block">Thể Trạng Đợt Này (Tính BSA Live)</span>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-slate-500 mb-1">Chiều Cao (cm)</label>
-                            <input type="number" id="ncHeight" oninput="calcCycleBSA()" placeholder="158" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
-                        </div>
-                        <div>
-                            <label class="block text-slate-500 mb-1">Cân Nặng (kg)</label>
-                            <input type="number" id="ncWeight" oninput="calcCycleBSA()" placeholder="54" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
-                        </div>
-                        <div>
-                            <label class="block text-slate-500 mb-1">BSA Tính Được</label>
-                            <div id="ncBsaDisplay" class="p-2 bg-teal-100/80 text-teal-900 font-bold rounded-lg text-center">0.00 m²</div>
-                        </div>
-                    </div>
-                </div>
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM",
+  authDomain: "oncocaer.firebaseapp.com",
+  projectId: "oncocaer",
+  storageBucket: "oncocaer.firebasestorage.app",
+  messagingSenderId: "831474032997",
+  appId: "1:831474032997:web:90615da3cc65aa54c2018c",
+  measurementId: "G-JRLX54RFX6"
+};
 
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold text-slate-700 uppercase text-[10px]">Xét Nghiệm Máu & Đánh Giá Độc Tính</span>
-                        <span class="text-[10px] text-slate-400">ANC chuẩn >=1.5 G/L | Plt >= 100 G/L</span>
-                    </div>
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
 
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-slate-600 mb-1">ANC (Bạch cầu trung tính G/L)</label>
-                            <input type="number" step="0.1" id="ncAnc" oninput="checkHematologyWarning()" placeholder="2.1" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-slate-600 mb-1">Plt (Tiểu cầu G/L)</label>
-                            <input type="number" step="1" id="ncPlt" oninput="checkHematologyWarning()" placeholder="180" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-slate-600 mb-1">Độc tính CTCAE</label>
-                            <select id="ncCtcae" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
-                                <option value="Độ 0 (Không)">Độ 0 (Không)</option>
-                                <option value="Độ 1 (Nhẹ)">Độ 1 (Nhẹ)</option>
-                                <option value="Độ 2 (Trung bình)">Độ 2 (Trung bình)</option>
-                                <option value="Độ 3 (Nặng - Cần hoãn)">Độ 3 (Nặng - Cần hoãn)</option>
-                                <option value="Độ 4 (Nguy hiểm)">Độ 4 (Nguy hiểm)</option>
-                            </select>
-                        </div>
-                    </div>
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
 
-                    <div id="bloodWarningBanner" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl space-y-1">
-                        <div class="font-bold flex items-center gap-1.5 text-xs text-rose-700">
-                            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm"></i>
-                            CẢNH BÁO ĐỘC TÍNH MÁU NGUY HIỂM!
-                        </div>
-                        <p id="bloodWarningText" class="text-[11px] leading-relaxed">
-                            Bạch cầu trung tính ANC < 1.5 G/L hoặc Tiểu cầu Plt < 100 G/L. Cân nhắc hoãn hóa trị hoặc giảm liều!
-                        </p>
-                    </div>
-                </div>
+        let currentUser = null;
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Ngày Hẹn Tái Khám Chu Kỳ Sau</label>
-                        <input type="date" id="ncNextDate" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Ghi Chú Diễn Tiến / Thuốc Kèm Theo</label>
-                        <input type="text" id="ncNotes" placeholder="vd: Đã cho Filgrastim x3 ngày, nôn độ 1" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                </div>
+        // Xử lý Đăng Nhập Gmail
+        window.loginWithGoogle = function() {
+            signInWithPopup(auth, provider).catch(error => console.error("Lỗi đăng nhập:", error));
+        };
 
-                <div class="pt-4 border-t border-slate-200 flex justify-end space-x-2">
-                    <button type="button" onclick="closeNewCycleModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Hủy</button>
-                    <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm">Lưu Chu Kỳ Hóa Trị</button>
-                </div>
-            </form>
-        </div>
-    </div>
+        window.logoutGoogle = function() {
+            signOut(auth);
+        };
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl hidden flex items-center space-x-2.5 z-50 transition-all border border-slate-700">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toastMessage" class="font-medium">Đã cập nhật dữ liệu thành công!</span>
-    </div>
-
-    <script>
-        let samplePatients = [
-            {
-                id: "BN001",
-                name: "Nguyễn Thị Hoa",
-                birthYear: 1974,
-                gender: "Nữ",
-                phone: "0912 345 678",
-                height: 158,
-                weight: 54,
-                baselineBsa: 1.54,
-                diagnosis: "Ung thư Vú Phải (T2N1M0)",
-                tnm: "Giai đoạn IIB",
-                biomarkers: "ER(+) 80%, PR(+) 60%, HER2(3+), Ki67: 35%",
-                protocol: "AC-T (Chu kỳ 3)",
-                startDate: "2026-01-15",
-                doctor: "TS.BS. Nguyễn Văn An",
-                cycles: [
-                    {
-                        cycleName: "Chu kỳ 1 (C1)",
-                        date: "2026-01-15",
-                        height: 158,
-                        weight: 54,
-                        bsa: 1.54,
-                        anc: 3.8,
-                        plt: 240,
-                        protocol: "AC (Doxorubicin + Cyclophosphamide)",
-                        ctcae: "Độ 0 (Không)",
-                        nextDate: "2026-02-05",
-                        notes: "Dung nạp tốt, nôn độ 1 đã xử trí Ondansetron"
-                    },
-                    {
-                        cycleName: "Chu kỳ 2 (C2)",
-                        date: "2026-02-05",
-                        height: 158,
-                        weight: 53.5,
-                        bsa: 1.53,
-                        anc: 2.1,
-                        plt: 185,
-                        protocol: "AC (Doxorubicin + Cyclophosphamide)",
-                        ctcae: "Độ 1 (Nhẹ)",
-                        nextDate: "2026-02-26",
-                        notes: "Hạ bạch cầu nhẹ, thể trạng ổn định"
-                    }
-                ]
-            },
-            {
-                id: "BN002",
-                name: "Trần Văn Minh",
-                birthYear: 1968,
-                gender: "Nam",
-                phone: "0988 765 432",
-                height: 168,
-                weight: 62,
-                baselineBsa: 1.70,
-                diagnosis: "Ung thư Phổi Không Sế Bào Nhỏ (NSCLC)",
-                tnm: "T3N2M0 - Giai đoạn IIIA",
-                biomarkers: "EGFR mutation (+), PD-L1 TPS >= 50%",
-                protocol: "Pembrolizumab + Carboplatin + Pemetrexed",
-                startDate: "2026-02-01",
-                doctor: "TS.BS. Nguyễn Văn An",
-                cycles: [
-                    {
-                        cycleName: "Chu kỳ 1 (C1)",
-                        date: "2026-02-01",
-                        height: 168,
-                        weight: 62,
-                        bsa: 1.70,
-                        anc: 1.2,
-                        plt: 110,
-                        protocol: "Pemetrexed + Carboplatin",
-                        ctcae: "Độ 2 (Trung bình)",
-                        nextDate: "2026-02-22",
-                        notes: "Hạ bạch cầu trung tính nhẹ - tiêm G-CSF x 3 ngày"
-                    }
-                ]
-            },
-            {
-                id: "BN003",
-                name: "Lê Hoàng Nam",
-                birthYear: 1980,
-                gender: "Nam",
-                phone: "0903 112 233",
-                height: 172,
-                weight: 68,
-                baselineBsa: 1.80,
-                diagnosis: "Ung thư Đại Trực Tràng",
-                tnm: "T4aN2aM0 - Giai đoạn III",
-                biomarkers: "RAS wild-type, BRAF wild-type, MSS",
-                protocol: "CAPOX (Capecitabine + Oxaliplatin)",
-                startDate: "2026-01-10",
-                doctor: "TS.BS. Nguyễn Văn An",
-                cycles: [
-                    {
-                        cycleName: "Chu kỳ 1 (C1)",
-                        date: "2026-01-10",
-                        height: 172,
-                        weight: 68,
-                        bsa: 1.80,
-                        anc: 4.2,
-                        plt: 210,
-                        protocol: "CAPOX",
-                        ctcae: "Độ 0 (Không)",
-                        nextDate: "2026-01-31",
-                        notes: "Tê lạnh ngón tay độ 1"
-                    },
-                    {
-                        cycleName: "Chu kỳ 2 (C2)",
-                        date: "2026-01-31",
-                        height: 172,
-                        weight: 67,
-                        bsa: 1.79,
-                        anc: 3.1,
-                        plt: 160,
-                        protocol: "CAPOX",
-                        ctcae: "Độ 1 (Nhẹ)",
-                        nextDate: "2026-02-21",
-                        notes: "Tiếp tục duy trì liều"
-                    }
-                ]
-            }
-        ];
-
-        let selectedPatient = null;
-        let loggedInDoctor = null;
-
-        function initApp() {
-            renderAllPatientsTable();
-            loadPatientById("BN001");
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
-        } else {
-            initApp();
-        }
-
-        function calculateBSA(heightCm, weightKg) {
-            if (!heightCm || !weightKg || heightCm <= 0 || weightKg <= 0) return 0;
-            return Math.sqrt((heightCm * weightKg) / 3600);
-        }
-
-        function calcBaselineBSA() {
-            const h = parseFloat(document.getElementById('npHeight').value);
-            const w = parseFloat(document.getElementById('npWeight').value);
-            const bsa = calculateBSA(h, w);
-            document.getElementById('npBsaDisplay').innerText = bsa ? bsa.toFixed(2) + " m²" : "0.00 m²";
-        }
-
-        function calcCycleBSA() {
-            const h = parseFloat(document.getElementById('ncHeight').value);
-            const w = parseFloat(document.getElementById('ncWeight').value);
-            const bsa = calculateBSA(h, w);
-            document.getElementById('ncBsaDisplay').innerText = bsa ? bsa.toFixed(2) + " m²" : "0.00 m²";
-        }
-
-        function checkHematologyWarning() {
-            const anc = parseFloat(document.getElementById('ncAnc').value);
-            const plt = parseFloat(document.getElementById('ncPlt').value);
-            const banner = document.getElementById('bloodWarningBanner');
-            const warnText = document.getElementById('bloodWarningText');
-
-            let warnings = [];
-            if (!isNaN(anc) && anc < 1.5) {
-                warnings.push(`Bạch cầu trung tính ANC = ${anc} G/L (< 1.5 G/L - Hạ bạch cầu)`);
-            }
-            if (!isNaN(plt) && plt < 100) {
-                warnings.push(`Tiểu cầu Plt = ${plt} G/L (< 100 G/L - Giảm tiểu cầu)`);
-            }
-
-            if (warnings.length > 0) {
-                banner.classList.remove('hidden');
-                warnText.innerHTML = warnings.join("<br>") + "<br><b>Khuyến cáo: Cân nhắc hoãn chu kỳ hóa trị hoặc điều chỉnh liều!</b>";
+        // Lắng nghe trạng thái đăng nhập
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('googleSignInBtn').classList.add('hidden');
+                document.getElementById('doctorProfile').classList.remove('hidden');
+                document.getElementById('docName').innerText = user.displayName;
+                document.getElementById('docEmail').innerText = user.email;
+                document.getElementById('docAvatar').src = user.photoURL;
+                
+                // Tải dữ liệu Realtime từ Firebase
+                loadPatientsRealtime();
             } else {
-                banner.classList.add('hidden');
+                currentUser = null;
+                document.getElementById('googleSignInBtn').classList.remove('hidden');
+                document.getElementById('doctorProfile').classList.add('hidden');
+                document.getElementById('allPatientsTableBody').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Vui lòng đăng nhập Gmail để tải dữ liệu...</td></tr>`;
             }
-        }
+        });
 
-        function loadPatientById(patientId) {
-            const found = samplePatients.find(p => p.id.toLowerCase() === patientId.toLowerCase());
-            if (!found) {
-                showToast(`Không tìm thấy bệnh nhân có mã ${patientId}`, "warning");
-                return;
-            }
+        // Lắng nghe và tự động cập nhật dữ liệu từ Cloud (Realtime)
+        function loadPatientsRealtime() {
+            const q = query(collection(db, "patients"));
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById('allPatientsTableBody');
+                tbody.innerHTML = '';
+                document.getElementById('patientCountBadge').innerText = `${snapshot.docs.length} Bệnh nhân`;
 
-            selectedPatient = found;
-            
-            document.getElementById('cardPatientId').innerText = `MÃ BN: ${found.id}`;
-            document.getElementById('cardPatientName').innerHTML = `${found.name} <span id="cardAgeGender" class="text-sm font-normal text-slate-300">(${2026 - found.birthYear} tuổi - ${found.gender})</span>`;
-            document.getElementById('cardDiagnosis').innerHTML = `<i class="fa-solid fa-ribbon text-teal-400"></i> ${found.diagnosis} - ${found.tnm}`;
-            document.getElementById('cardHeightWeight').innerText = `${found.height} cm / ${found.weight} kg`;
-            document.getElementById('cardBaselineBSA').innerText = `${found.baselineBsa} m²`;
-            document.getElementById('cardProtocol').innerText = found.protocol;
-            document.getElementById('cardPhone').innerText = found.phone || "N/A";
-            document.getElementById('cardStartDate').innerText = formatDate(found.startDate);
-            document.getElementById('cardDoctor').innerText = found.doctor || "TS.BS. Nguyễn Văn An";
-
-            const bmContainer = document.getElementById('cardBiomarkers');
-            bmContainer.innerHTML = '';
-            if (found.biomarkers) {
-                found.biomarkers.split(',').forEach(bm => {
-                    const chip = document.createElement('span');
-                    chip.className = 'bg-teal-100 text-teal-800 px-2 py-0.5 rounded font-medium text-[11px]';
-                    chip.innerText = bm.trim();
-                    bmContainer.appendChild(chip);
-                });
-            }
-
-            renderCyclesTable(found.cycles);
-            showToast(`Đã tải hồ sơ bệnh nhân ${found.name}`);
-        }
-
-        function renderCyclesTable(cycles) {
-            const tbody = document.getElementById('cycleTableBody');
-            tbody.innerHTML = '';
-
-            if (!cycles || cycles.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">Chưa có chu kỳ hóa trị nào được ghi nhận. Bấm "Thêm Chu Kỳ Mới" để bắt đầu.</td></tr>`;
-                return;
-            }
-
-            cycles.forEach((c) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-
-                const isAncDanger = c.anc < 1.5;
-                const isPltDanger = c.plt < 100;
-
-                const ancBadge = isAncDanger 
-                    ? `<span class="bg-rose-100 text-rose-800 border border-rose-300 px-2 py-0.5 rounded font-bold">ANC: ${c.anc} G/L (Hạ)</span>`
-                    : `<span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">ANC: ${c.anc} G/L</span>`;
-
-                const pltBadge = isPltDanger 
-                    ? `<span class="bg-rose-100 text-rose-800 border border-rose-300 px-2 py-0.5 rounded font-bold">Plt: ${c.plt} G/L (Hạ)</span>`
-                    : `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">Plt: ${c.plt} G/L</span>`;
-
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">${c.cycleName}</td>
-                    <td class="p-3 whitespace-nowrap font-medium">${formatDate(c.date)}</td>
-                    <td class="p-3 whitespace-nowrap">${c.height}cm / ${c.weight}kg <br><b class="text-teal-700">${c.bsa} m²</b></td>
-                    <td class="p-3 space-y-1">
-                        <div>${ancBadge}</div>
-                        <div>${pltBadge}</div>
-                    </td>
-                    <td class="p-3 font-medium text-slate-800">${c.protocol}</td>
-                    <td class="p-3">
-                        <span class="px-2 py-1 rounded text-[11px] font-semibold ${c.ctcae.includes('3') || c.ctcae.includes('4') ? 'bg-rose-100 text-rose-800' : 'bg-amber-50 text-amber-800'}">
-                            ${c.ctcae}
-                        </span>
-                    </td>
-                    <td class="p-3 whitespace-nowrap font-bold text-slate-700">${formatDate(c.nextDate)}</td>
-                    <td class="p-3 text-slate-500 max-w-xs text-[11px]">${c.notes || '-'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderAllPatientsTable(patientsToRender = samplePatients) {
-            const tbody = document.getElementById('allPatientsTableBody');
-            tbody.innerHTML = '';
-            document.getElementById('patientCountBadge').innerText = `${patientsToRender.length} Bệnh nhân`;
-
-            patientsToRender.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-teal-50/50 cursor-pointer transition";
-                tr.onclick = (e) => {
-                    if (e.target.tagName !== 'BUTTON') {
-                        loadPatientById(p.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                };
-
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">${p.id}</td>
-                    <td class="p-3 font-bold text-slate-800">${p.name}</td>
-                    <td class="p-3">${2026 - p.birthYear}t / ${p.gender}</td>
-                    <td class="p-3 font-medium">${p.diagnosis} <span class="text-slate-400">(${p.tnm})</span></td>
-                    <td class="p-3 text-slate-600 max-w-xs truncate">${p.biomarkers}</td>
-                    <td class="p-3 font-bold text-amber-700">${p.protocol}</td>
-                    <td class="p-3">
-                        <button onclick="loadPatientById('${p.id}')" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-3 py-1 rounded-lg text-xs transition">
-                            Xem Chi Tiết
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function liveSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!query) {
-                renderAllPatientsTable(samplePatients);
-                return;
-            }
-
-            const filtered = samplePatients.filter(p => 
-                p.id.toLowerCase().includes(query) || 
-                p.name.toLowerCase().includes(query) ||
-                p.diagnosis.toLowerCase().includes(query)
-            );
-
-            renderAllPatientsTable(filtered);
-        }
-
-        function executeSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (query) {
-                loadPatientById(query);
-            }
-        }
-
-        function openNewPatientModal() {
-            document.getElementById('newPatientModal').classList.remove('hidden');
-        }
-        function closeNewPatientModal() {
-            document.getElementById('newPatientModal').classList.add('hidden');
-            document.getElementById('newPatientForm').reset();
-        }
-
-        function openNewCycleModal() {
-            if (!selectedPatient) {
-                showToast("Vui lòng chọn 1 bệnh nhân trước!", "warning");
-                return;
-            }
-            document.getElementById('ncPatientSub').innerText = `Cho bệnh nhân: ${selectedPatient.name} (${selectedPatient.id})`;
-            document.getElementById('ncHeight').value = selectedPatient.height;
-            document.getElementById('ncWeight').value = selectedPatient.weight;
-            calcCycleBSA();
-            document.getElementById('newCycleModal').classList.remove('hidden');
-        }
-        function closeNewCycleModal() {
-            document.getElementById('newCycleModal').classList.add('hidden');
-            document.getElementById('newCycleForm').reset();
-            document.getElementById('bloodWarningBanner').classList.add('hidden');
-        }
-
-        function saveNewPatient(e) {
-            e.preventDefault();
-            const id = document.getElementById('npId').value.trim().toUpperCase();
-            
-            if (samplePatients.some(p => p.id === id)) {
-                showToast(`Mã Bệnh Nhân ${id} đã tồn tại!`, "error");
-                return;
-            }
-
-            const h = parseFloat(document.getElementById('npHeight').value) || 160;
-            const w = parseFloat(document.getElementById('npWeight').value) || 55;
-            const bsa = calculateBSA(h, w);
-
-            const newPatient = {
-                id: id,
-                name: document.getElementById('npName').value.trim(),
-                birthYear: parseInt(document.getElementById('npBirthYear').value) || 1980,
-                gender: document.getElementById('npGender').value,
-                phone: document.getElementById('npPhone').value.trim(),
-                height: h,
-                weight: w,
-                baselineBsa: parseFloat(bsa.toFixed(2)),
-                diagnosis: document.getElementById('npDiagnosis').value.trim(),
-                tnm: document.getElementById('npTnm').value.trim() || 'N/A',
-                biomarkers: document.getElementById('npBiomarkers').value.trim() || 'Chưa thực hiện',
-                protocol: document.getElementById('npProtocol').value.trim() || 'Chưa chỉ định',
-                startDate: new Date().toISOString().split('T')[0],
-                doctor: loggedInDoctor ? loggedInDoctor.name : "TS.BS. Nguyễn Văn An",
-                cycles: []
-            };
-
-            samplePatients.unshift(newPatient);
-            renderAllPatientsTable();
-            closeNewPatientModal();
-            loadPatientById(id);
-            showToast(`Thêm mới bệnh nhân ${newPatient.name} thành công!`);
-        }
-
-        function saveNewCycle(e) {
-            e.preventDefault();
-            if (!selectedPatient) return;
-
-            const h = parseFloat(document.getElementById('ncHeight').value) || selectedPatient.height;
-            const w = parseFloat(document.getElementById('ncWeight').value) || selectedPatient.weight;
-            const bsa = parseFloat(calculateBSA(h, w).toFixed(2));
-
-            const newCycle = {
-                cycleName: document.getElementById('ncCycleName').value.trim(),
-                date: document.getElementById('ncDate').value || new Date().toISOString().split('T')[0],
-                height: h,
-                weight: w,
-                bsa: bsa,
-                anc: parseFloat(document.getElementById('ncAnc').value) || 0,
-                plt: parseFloat(document.getElementById('ncPlt').value) || 0,
-                protocol: document.getElementById('ncProtocol').value.trim() || selectedPatient.protocol,
-                ctcae: document.getElementById('ncCtcae').value,
-                nextDate: document.getElementById('ncNextDate').value || '',
-                notes: document.getElementById('ncNotes').value.trim()
-            };
-
-            selectedPatient.cycles.unshift(newCycle);
-            renderCyclesTable(selectedPatient.cycles);
-            closeNewCycleModal();
-            showToast(`Đã lưu ${newCycle.cycleName} cho bệnh nhân ${selectedPatient.name}!`);
-        }
-
-        function exportDataCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "Ma BN,Ho va Ten,Gioi Tinh,Nam Sinh,Chan Doan,TNM,Dau An Sinh Hoc,Phac Do,Chu Ky,Ngay Tiem,BSA,ANC,Plt,Doc Tinh CTCAE\n";
-
-            samplePatients.forEach(p => {
-                if (p.cycles.length === 0) {
-                    csvContent += `"${p.id}","${p.name}","${p.gender}","${p.birthYear}","${p.diagnosis}","${p.tnm}","${p.biomarkers}","${p.protocol}","Chua co","","${p.baselineBsa}","","",""\n`;
-                } else {
-                    p.cycles.forEach(c => {
-                        csvContent += `"${p.id}","${p.name}","${p.gender}","${p.birthYear}","${p.diagnosis}","${p.tnm}","${p.biomarkers}","${p.protocol}","${c.cycleName}","${c.date}","${c.bsa}","${c.anc}","${c.plt}","${c.ctcae}"\n`;
-                    });
+                if (snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Chưa có dữ liệu. Bấm "Thêm Bệnh Nhân Mới" để tạo dữ liệu lưu trữ.</td></tr>`;
+                    return;
                 }
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-teal-50/50 transition";
+                    tr.innerHTML = `
+                        <td class="p-3 font-bold text-teal-800">${data.patientId}</td>
+                        <td class="p-3 font-bold">${data.name}</td>
+                        <td class="p-3">N/A</td>
+                        <td class="p-3">${data.diagnosis}</td>
+                        <td class="p-3 font-bold text-amber-700">${data.protocol}</td>
+                        <td class="p-3 text-slate-400">${data.createdBy || 'Unknown'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `OncoCare_Patient_Data_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("Đã xuất dữ liệu file CSV thành công!");
         }
 
-        function handleGoogleLogin() {
-            loggedInDoctor = {
-                name: "TS.BS. Nguyễn Văn An",
-                email: "bs.nguyenvanan@gmail.com"
-            };
-
-            document.getElementById('googleSignInBtn').classList.add('hidden');
-            document.getElementById('doctorProfile').classList.remove('hidden');
-            document.getElementById('docName').innerText = loggedInDoctor.name;
-            document.getElementById('docEmail').innerText = loggedInDoctor.email;
-
-            showToast(`Đã đăng nhập thành công với Gmail: ${loggedInDoctor.email}`);
-        }
-
-        function handleSignOut() {
-            loggedInDoctor = null;
-            document.getElementById('googleSignInBtn').classList.remove('hidden');
-            document.getElementById('doctorProfile').classList.add('hidden');
-            showToast("Đã đăng xuất tài khoản!");
-        }
-
-        function resetToHome() {
-            document.getElementById('searchInput').value = '';
-            renderAllPatientsTable(samplePatients);
-            loadPatientById("BN001");
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return 'N/A';
-            const parts = dateStr.split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-            return dateStr;
-        }
-
-        function showToast(msg, type = "success") {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-            const icon = document.getElementById('toastIcon');
-
-            toastMsg.innerText = msg;
-            if (type === "warning") {
-                icon.className = "fa-solid fa-triangle-exclamation text-amber-400 text-base";
-            } else if (type === "error") {
-                icon.className = "fa-solid fa-circle-xmark text-rose-400 text-base";
-            } else {
-                icon.className = "fa-solid fa-circle-check text-emerald-400 text-base";
+        // Lưu bệnh nhân mới lên Cloud Firestore
+        window.savePatientToFirebase = async function(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                alert("Vui lòng đăng nhập Gmail trước khi lưu!");
+                return;
             }
 
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3500);
-        }
+            try {
+                await addDoc(collection(db, "patients"), {
+                    patientId: document.getElementById('npId').value.trim().toUpperCase(),
+                    name: document.getElementById('npName').value.trim(),
+                    diagnosis: document.getElementById('npDiagnosis').value.trim(),
+                    protocol: document.getElementById('npProtocol').value.trim(),
+                    createdBy: currentUser.email,
+                    createdAt: new Date().toISOString()
+                });
+                closeNewPatientModal();
+                alert("Đã lưu hồ sơ bệnh nhân lên Cloud thành công!");
+            } catch (err) {
+                console.error("Lỗi khi lưu dữ liệu:", err);
+                alert("Không thể lưu dữ liệu!");
+            }
+        };
+
+        window.openNewPatientModal = () => document.getElementById('newPatientModal').classList.remove('hidden');
+        window.closeNewPatientModal = () => document.getElementById('newPatientModal').classList.add('hidden');
     </script>
 </body>
 </html>
