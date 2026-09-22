@@ -24,7 +24,7 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- Navigation Header -->
+    <!-- Navigation Header (Có Khoa & Bệnh Viện ở phía trên) -->
     <header class="bg-gradient-to-r from-teal-800 to-teal-700 text-white shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
@@ -32,13 +32,13 @@
                     <i class="fa-solid fa-dna text-teal-200 text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg sm:text-xl tracking-tight leading-none flex items-center gap-2">
+                    <h1 class="font-bold text-base sm:text-lg tracking-tight leading-none flex items-center gap-2">
                         <span>OncoCare Pro</span>
                         <span id="roleBadge" class="text-[10px] bg-slate-500/80 text-slate-100 border border-slate-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
                             <i class="fa-solid fa-user text-[9px]"></i> Khách
                         </span>
                     </h1>
-                    <p class="text-xs text-teal-100/80 font-medium">Hệ Thống Tra Cứu & Quản Lý Hóa Trị Bệnh Nhân</p>
+                    <p class="text-xs text-teal-100/90 font-medium mt-0.5">Khoa Ung Bướu - Bệnh Viện Đa Khoa An Giang</p>
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
     <!-- Main Content Area -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
 
-        <!-- Banner Thông Báo Bảo Bật -->
+        <!-- Banner Thông Báo Bảo Mật -->
         <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 flex items-start space-x-3 text-amber-900 text-xs shadow-sm">
             <i class="fa-solid fa-shield-halved text-amber-600 text-lg mt-0.5"></i>
             <div>
@@ -148,6 +148,24 @@
         </section>
 
     </main>
+
+    <!-- FOOTER: Xác Nhận Bản Quyền Tác Giả & Avatar Admin -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-slate-600 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <!-- Avatar của Admin / Tác giả -->
+                <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="BSCKI Thạch Xuân Tựu" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
+                <div>
+                    <p class="font-bold text-slate-900 text-sm">Bản quyền phần mềm thuộc về: <span class="text-teal-800">BSCKI Thạch Xuân Tựu</span></p>
+                    <p class="text-slate-500">Khoa Ung Bướu - Bệnh Viện Đa Khoa An Giang</p>
+                </div>
+            </div>
+            <div class="text-center sm:text-right text-[11px] text-slate-400">
+                <p>OncoCare Pro Management System &copy; 2026</p>
+                <p class="text-teal-700 font-medium mt-0.5">Bảo mật dữ liệu y tế & Hỗ trợ phác đồ hóa trị chuẩn hóa</p>
+            </div>
+        </div>
+    </footer>
 
     <!-- MODAL: Add / Edit Patient -->
     <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -527,6 +545,12 @@
                 if (document.getElementById('docEmail')) document.getElementById('docEmail').innerText = user.email;
                 if (document.getElementById('docAvatar')) document.getElementById('docAvatar').src = user.photoURL || "https://placehold.co/100x100/0d9488/ffffff?text=Doctor";
 
+                // Đồng thời cập nhật avatar admin ở phần footer nếu là tài khoản admin
+                if (isAdmin && user.photoURL) {
+                    const footerAvatar = document.querySelector('footer img');
+                    if (footerAvatar) footerAvatar.src = user.photoURL;
+                }
+
                 const roleBadge = document.getElementById('roleBadge');
                 const btnUserMgmt = document.getElementById('btnUserMgmt');
 
@@ -769,7 +793,6 @@
                     alert("Thêm bệnh nhân mới thành công!");
                 }
                 
-                // Tự động tìm lại đúng bệnh nhân vừa thêm/sửa để hiển thị
                 document.getElementById('searchInput').value = patientId;
                 window.searchPatientByCode();
 
