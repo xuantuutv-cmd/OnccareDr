@@ -5,35 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OncoCare Pro - Quản Lý Hóa Trị Ung Bướu</title>
     <link rel="manifest" href="manifest.json">
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        teal: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            500: '#14b8a6',
-                            600: '#0d9488',
-                            700: '#0f766e',
-                            800: '#115e59',
-                            900: '#134e4a'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -47,7 +25,6 @@
     <!-- Navigation Header -->
     <header class="bg-gradient-to-r from-teal-800 to-teal-700 text-white shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <!-- Logo & Title -->
             <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
                 <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
                     <i class="fa-solid fa-dna text-teal-200 text-xl"></i>
@@ -93,29 +70,19 @@
         <!-- Search & Quick Action Toolbar -->
         <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                
                 <div class="relative flex-1">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-magnifying-glass text-sm"></i>
                     </div>
-                    <input type="text" id="searchInput" oninput="liveSearch()" placeholder="Tra cứu theo Mã BN, Họ tên, Chẩn đoán..." class="w-full pl-10 pr-24 py-3 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 transition font-medium">
-                    <button onclick="executeSearch()" class="absolute right-1.5 top-1.5 bottom-1.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-xs px-4 rounded-lg shadow-sm transition">
-                        Tra Cứu
-                    </button>
+                    <input type="text" id="searchInput" placeholder="Tra cứu theo Mã BN, Họ tên, Chẩn đoán..." class="w-full pl-10 pr-24 py-3 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 transition font-medium">
                 </div>
 
                 <div class="flex items-center space-x-2">
-                    <button onclick="openNewPatientModal()" class="flex-1 sm:flex-none bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs sm:text-sm px-4 py-3 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
+                    <button onclick="window.openNewPatientModal()" class="flex-1 sm:flex-none bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs sm:text-sm px-4 py-3 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Thêm BN Mới</span>
                     </button>
-                    
-                    <button onclick="exportDataCSV()" title="Xuất file CSV" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs sm:text-sm px-3.5 py-3 rounded-xl transition flex items-center justify-center space-x-1.5 border border-slate-200">
-                        <i class="fa-solid fa-file-excel text-emerald-600"></i>
-                        <span class="hidden sm:inline">Xuất CSV</span>
-                    </button>
                 </div>
-
             </div>
         </section>
 
@@ -139,7 +106,7 @@
                         </tr>
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
-                        <tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Vui lòng bấm "Đăng Nhập Gmail" để tải danh sách bệnh nhân từ Cloud...</td></tr>
+                        <tr><td colspan="6" class="p-4 text-center text-slate-400 font-medium">Đang kết nối Cloud... Vui lòng bấm "Đăng Nhập Gmail" để sử dụng.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -147,7 +114,7 @@
 
     </main>
 
-    <!-- MODAL 1: Add New Patient -->
+    <!-- MODAL: Add New Patient -->
     <div id="newPatientModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
             <div class="bg-teal-700 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
@@ -155,7 +122,7 @@
                     <i class="fa-solid fa-user-plus text-teal-200"></i>
                     Thêm Hồ Sơ Bệnh Nhân Mới Lên Cloud
                 </h3>
-                <button onclick="closeNewPatientModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="window.closeNewPatientModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form id="newPatientForm" onsubmit="window.savePatientToFirebase(event)" class="p-6 space-y-4 text-xs">
@@ -180,11 +147,11 @@
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Chiều Cao (cm)</label>
-                        <input type="number" id="npHeight" oninput="calcBaselineBSA()" placeholder="160" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <input type="number" id="npHeight" oninput="window.calcBaselineBSA()" placeholder="160" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Cân Nặng (kg)</label>
-                        <input type="number" id="npWeight" oninput="calcBaselineBSA()" placeholder="55" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <input type="number" id="npWeight" oninput="window.calcBaselineBSA()" placeholder="55" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">BSA (Mosteller)</label>
@@ -204,63 +171,39 @@
                 </div>
 
                 <div class="pt-4 border-t border-slate-200 flex justify-end space-x-2">
-                    <button type="button" onclick="closeNewPatientModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Hủy</button>
+                    <button type="button" onclick="window.closeNewPatientModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Hủy</button>
                     <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl shadow-sm">Lưu Trực Tiếp Lên Cloud</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl hidden flex items-center space-x-2.5 z-50 transition-all border border-slate-700">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toastMessage" class="font-medium">Đã cập nhật dữ liệu!</span>
-    </div>
-
-    <!-- JavaScript Trợ Lý Tính Toán UI -->
+    <!-- UI Helpers Script -->
     <script>
-        function calculateBSA(heightCm, weightKg) {
+        window.calculateBSA = function(heightCm, weightKg) {
             if (!heightCm || !weightKg || heightCm <= 0 || weightKg <= 0) return 0;
             return Math.sqrt((heightCm * weightKg) / 3600);
-        }
+        };
 
-        function calcBaselineBSA() {
+        window.calcBaselineBSA = function() {
             const h = parseFloat(document.getElementById('npHeight').value);
             const w = parseFloat(document.getElementById('npWeight').value);
-            const bsa = calculateBSA(h, w);
+            const bsa = window.calculateBSA(h, w);
             document.getElementById('npBsaDisplay').innerText = bsa ? bsa.toFixed(2) + " m²" : "0.00 m²";
-        }
+        };
 
-        function openNewPatientModal() {
+        window.openNewPatientModal = function() {
             document.getElementById('newPatientModal').classList.remove('hidden');
-        }
+        };
 
-        function closeNewPatientModal() {
+        window.closeNewPatientModal = function() {
             document.getElementById('newPatientModal').classList.add('hidden');
             document.getElementById('newPatientForm').reset();
             document.getElementById('npBsaDisplay').innerText = "0.00 m²";
-        }
-
-        function showToast(msg, type = "success") {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-            const icon = document.getElementById('toastIcon');
-
-            toastMsg.innerText = msg;
-            if (type === "warning") {
-                icon.className = "fa-solid fa-triangle-exclamation text-amber-400 text-base";
-            } else if (type === "error") {
-                icon.className = "fa-solid fa-circle-xmark text-rose-400 text-base";
-            } else {
-                icon.className = "fa-solid fa-circle-check text-emerald-400 text-base";
-            }
-
-            toast.classList.remove('hidden');
-            setTimeout(() => { toast.classList.add('hidden'); }, 3500);
-        }
+        };
     </script>
 
-    <!-- Firebase SDK Modular (Kết nối Đăng nhập Google + Firestore Storage) -->
+    <!-- Firebase SDK Single Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -280,34 +223,17 @@
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
- apiKey : "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM" , 
-  authDomain : "oncocaer.firebaseapp.com" , 
-  projectId : "oncocaer" , 
-  storageBucket : "oncocaer.firebasestorage.app" , 
-  messagingSenderId : "831474032997" , 
-  appId : "1:831474032997:web:90615da3cc65aa54c2018c" , 
-  measurementId : "G-JRLX54RFX6"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);==================================================================
+        // =========================================================================
+        // LƯU Ý: THAY ĐOẠN FIREBASE CONFIG THẬT CỦA BÁC SĨ VÀO ĐÂY
+        // =========================================================================
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM",
+            authDomain: "oncocaer.firebaseapp.com",
+            projectId: "oncocaer"
+            storageBucket: "oncocaer.firebasestorage.app",
+            messagingSenderId: "831474032997",
+            appId: "1:831474032997:web:90615da3cc65aa54c2018c",
+            measurementId: "G-JRLX54RFX6"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -318,7 +244,7 @@ const analytics = getAnalytics(app);============================================
 
         let currentUser = null;
 
-        // 1. Đăng nhập Google
+        // Gắn thẳng các hàm Auth vào Window để HTML gọi không bị lỗi "is not a function"
         window.loginWithGoogle = async function() {
             try {
                 await signInWithPopup(auth, provider);
@@ -327,20 +253,19 @@ const analytics = getAnalytics(app);============================================
                 try {
                     await signInWithRedirect(auth, provider);
                 } catch (err) {
-                    alert("Không thể đăng nhập Gmail. Vui lòng kiểm tra lại Authorized Domains trên Firebase Console!");
+                    alert("Chưa thay API Key thật hoặc chưa thêm Authorized Domain trên Firebase Console!");
                     console.error("Lỗi đăng nhập:", err);
                 }
             }
         };
 
-        // 2. Đăng xuất
         window.logoutGoogle = function() {
             signOut(auth).then(() => {
-                showToast("Đã đăng xuất tài khoản!");
+                alert("Đã đăng xuất tài khoản!");
             });
         };
 
-        // 3. Theo dõi trạng thái Auth Realtime
+        // Lắng nghe trạng thái đăng nhập
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -364,7 +289,7 @@ const analytics = getAnalytics(app);============================================
             }
         });
 
-        // 4. Lấy dữ liệu bệnh nhân Realtime từ Cloud
+        // Tải danh sách bệnh nhân
         function loadPatientsRealtime() {
             const tbody = document.getElementById('allPatientsTableBody');
             if (!tbody) return;
@@ -378,7 +303,7 @@ const analytics = getAnalytics(app);============================================
                     if (badge) badge.innerText = `${snapshot.docs.length} Bệnh nhân`;
 
                     if (snapshot.empty) {
-                        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Chưa có dữ liệu bệnh nhân trên Cloud. Bấm "Thêm BN Mới" để lưu trữ dữ liệu vĩnh viễn!</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Chưa có dữ liệu bệnh nhân trên Cloud. Bấm "Thêm BN Mới" để bắt đầu!</td></tr>`;
                         return;
                     }
 
@@ -398,19 +323,19 @@ const analytics = getAnalytics(app);============================================
                     });
                 }, (error) => {
                     console.error("Lỗi Firestore:", error);
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-500 font-semibold">Lỗi tải dữ liệu: Bác sĩ cần mở quyền Rules (allow read, write: if true) trong Firestore Database!</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-500 font-semibold">Lỗi tải dữ liệu: Bác sĩ cần mở quyền Rules trong Firestore Database!</td></tr>`;
                 });
             } catch (err) {
                 console.error("Lỗi kết nối:", err);
             }
         }
 
-        // 5. Lưu bệnh nhân mới lên Cloud
+        // Lưu bệnh nhân lên Cloud
         window.savePatientToFirebase = async function(e) {
             e.preventDefault();
             
             if (!currentUser) {
-                alert("Bác sĩ vui lòng đăng nhập Gmail trước khi nhập dữ liệu!");
+                alert("Bác sĩ vui lòng bấm 'Đăng Nhập Gmail' trước khi lưu!");
                 return;
             }
 
@@ -436,8 +361,8 @@ const analytics = getAnalytics(app);============================================
                     createdAt: serverTimestamp()
                 });
 
-                closeNewPatientModal();
-                showToast(`Đã lưu bệnh nhân ${pName} vĩnh viễn lên Cloud!`);
+                window.closeNewPatientModal();
+                alert(`Đã lưu thành công bệnh nhân ${pName} (${pId}) lên Cloud!`);
             } catch (err) {
                 console.error("Lỗi lưu Cloud:", err);
                 alert("Không thể lưu! Vui lòng kiểm tra lại Firestore Rules.");
