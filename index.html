@@ -263,6 +263,28 @@
                         <p class="text-[10px] font-bold text-teal-800 uppercase">Danh sách Marker đã nhập tạm:</p>
                         <div id="existingMarkersList" class="space-y-1.5 max-h-28 overflow-y-auto custom-scrollbar pr-1"></div>
                     </div>
+
+                    <!-- Nút bấm & Khu vực hiển thị biểu đồ marker dạng đường trong modal -->
+                    <div class="pt-2 border-t border-teal-200/60">
+                        <button type="button" onclick="window.toggleFormMarkerChart()" class="w-full py-2 bg-teal-800 hover:bg-teal-900 text-teal-100 font-semibold rounded-lg transition text-xs flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-chart-line text-teal-300"></i>
+                            <span id="formChartToggleBtnText">Xem Biểu Đồ Marker (Theo Thời Gian)</span>
+                        </button>
+                        <div id="formMarkerChartContainer" class="hidden mt-3 bg-white p-3 rounded-xl border border-teal-200 shadow-inner space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-teal-900 text-[11px]">Biểu Đồ Tiến Lùi Marker</span>
+                                <select id="formChartMarkerSelect" onchange="window.renderFormMarkerChart()" class="p-1 bg-slate-50 border border-slate-200 rounded text-[11px] font-semibold focus:outline-none">
+                                    <option value="CEA">CEA</option>
+                                    <option value="CA 19-9">CA 19-9</option>
+                                    <option value="CA 15-3">CA 15-3</option>
+                                    <option value="CA 72-4">CA 72-4</option>
+                                </select>
+                            </div>
+                            <div class="w-full h-48 relative">
+                                <canvas id="formMarkerCanvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Phần Cập Nhật Chu Kỳ Hóa Trị -->
@@ -578,6 +600,11 @@
             document.getElementById('existingCyclesListSection').classList.add('hidden');
             document.getElementById('existingNotesListSection').classList.add('hidden');
             document.getElementById('existingMarkersListSection').classList.add('hidden');
+            
+            // Ẩn biểu đồ marker trong form khi mở mới
+            document.getElementById('formMarkerChartContainer').classList.add('hidden');
+            document.getElementById('formChartToggleBtnText').innerText = "Xem Biểu Đồ Marker (Theo Thời Gian)";
+
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
@@ -589,6 +616,10 @@
             window.tempCurrentCycles = [];
             window.tempCurrentNotes = [];
             window.tempCurrentMarkers = [];
+            if (window.activeFormMarkerChart) {
+                window.activeFormMarkerChart.destroy();
+                window.activeFormMarkerChart = null;
+            }
         };
 
         window.closePatientDetailModal = function() {
@@ -673,6 +704,7 @@
         window.tempCurrentNotes = [];  
         window.tempCurrentMarkers = [];
         window.activeMarkerChart = null;
+        window.activeFormMarkerChart = null;
         window.currentViewingPatient = null;
 
         window.loginWithGoogle = async function() {
@@ -942,6 +974,72 @@
             });
         };
 
+        // Hàm bật/tắt hiển thị và vẽ biểu đồ marker trong modal Thêm/Sửa Hồ Sơ
+        window.toggleFormMarkerChart = function() {
+            const container = document.getElementById('formMarkerChartContainer');
+            const btnText = document.getElementById('formChartToggleBtnText');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                btnText.innerText = "Ẩn Biểu Đồ Marker";
+                window.renderFormMarkerChart();
+            } else {
+                container.classList.add('hidden');
+                btnText.innerText = "Xem Biểu Đồ Marker (Theo Thời Gian)";
+                if (window.activeFormMarkerChart) {
+                    window.activeFormMarkerChart.destroy();
+                    window.activeFormMarkerChart = null;
+                }
+            }
+        };
+
+        window.renderFormMarkerChart = function() {
+            const markerType = document.getElementById('formChartMarkerSelect').value;
+            const markers = (window.tempCurrentMarkers || []).filter(m => m.type === markerType);
+            markers.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const labels = markers.map(m => m.date);
+            const dataValues = markers.map(m => m.value);
+
+            const ctx = document.getElementById('formMarkerCanvas').getContext('2d');
+            if (window.activeFormMarkerChart) {
+                window.activeFormMarkerChart.destroy();
+            }
+
+            window.activeFormMarkerChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Chỉ số ${markerType} (Đang nhập)`,
+                        data: dataValues,
+                        borderColor: '#0f766e',
+                        backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#115e59'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: true, position: 'top' }
+                    }
+                }
+            });
+        };
+
         window.downloadPatientQR = function() {
             const qrImg = document.querySelector('#patientQrCodeContainer img');
             if (!qrImg) {
@@ -1008,6 +1106,10 @@
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
             window.renderTempMarkersList();
 
+            // Ẩn biểu đồ marker trong form khi mở chỉnh sửa
+            document.getElementById('formMarkerChartContainer').classList.add('hidden');
+            document.getElementById('formChartToggleBtnText').innerText = "Xem Biểu Đồ Marker (Theo Thời Gian)";
+
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
@@ -1024,6 +1126,11 @@
             window.tempCurrentMarkers.push({ type, value, date });
             document.getElementById('npMarkerValue').value = "";
             window.renderTempMarkersList();
+
+            // Nếu đang hiển thị biểu đồ marker trong form, tự động cập nhật lại biểu đồ
+            if (!document.getElementById('formMarkerChartContainer').classList.contains('hidden')) {
+                window.renderFormMarkerChart();
+            }
         };
 
         window.renderTempMarkersList = function() {
@@ -1050,6 +1157,9 @@
         window.deleteMarkerItem = function(idx) {
             window.tempCurrentMarkers.splice(idx, 1);
             window.renderTempMarkersList();
+            if (!document.getElementById('formMarkerChartContainer').classList.contains('hidden')) {
+                window.renderFormMarkerChart();
+            }
         };
 
         window.renderTempCyclesList = function() {
