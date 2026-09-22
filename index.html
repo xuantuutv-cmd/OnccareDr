@@ -267,8 +267,11 @@
                         <textarea id="npGeneralNote" rows="2" placeholder="Nhập thêm diễn tiến bệnh, đánh giá đáp ứng, hẹn tái khám..." class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
                     </div>
                     
-                    <div id="existingNotesListSection" class="hidden space-y-1">
-                        <p class="text-[10px] font-bold text-slate-500 uppercase">Nhật ký ghi chú trước đây:</p>
+                    <div id="existingNotesListSection" class="hidden space-y-2">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase flex items-center justify-between">
+                            <span>Nhật ký ghi chú trước đây (Có thể Sửa/Xóa):</span>
+                            <span id="existingNotesCount" class="text-[10px] bg-sky-200/80 text-sky-900 px-2 py-0.5 rounded-full font-bold">0 ghi chú</span>
+                        </p>
                         <div id="existingNotesList" class="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1"></div>
                     </div>
                 </div>
@@ -497,6 +500,7 @@
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
 
             window.tempCurrentCycles = [];
+            window.tempCurrentNotes = [];
             document.getElementById('existingCyclesListSection').classList.add('hidden');
             document.getElementById('existingNotesListSection').classList.add('hidden');
             document.getElementById('patientFormModal').classList.remove('hidden');
@@ -508,6 +512,7 @@
             document.getElementById('npBsaDisplay').innerText = "0.00 m²";
             document.getElementById('editDocId').value = "";
             window.tempCurrentCycles = [];
+            window.tempCurrentNotes = [];
         };
 
         window.closePatientDetailModal = function() {
@@ -585,6 +590,7 @@
         let isAdmin = false;
         let cachedPatientsList = [];
         window.tempCurrentCycles = []; // Biến tạm lưu trữ danh sách chu kỳ để chỉnh sửa trực tiếp trong modal
+        window.tempCurrentNotes = [];  // Biến tạm lưu trữ danh sách ghi chú lâm sàng để chỉnh sửa trực tiếp trong modal
 
         window.loginWithGoogle = async function() {
             try {
@@ -832,20 +838,9 @@
             window.tempCurrentCycles = JSON.parse(JSON.stringify(p.cycles || []));
             window.renderTempCyclesList();
 
-            const notesListDiv = document.getElementById('existingNotesList');
-            notesListDiv.innerHTML = "";
-            const notes = p.notes || [];
-            if (notes.length > 0) {
-                document.getElementById('existingNotesListSection').classList.remove('hidden');
-                notes.forEach(n => {
-                    const d = document.createElement('div');
-                    d.className = "p-2 bg-white border border-sky-200 rounded-lg text-[11px] text-slate-700";
-                    d.innerHTML = `<span>${n.content}</span> <span class="text-[9px] text-slate-400">(${n.date})</span>`;
-                    notesListDiv.appendChild(d);
-                });
-            } else {
-                document.getElementById('existingNotesListSection').classList.add('hidden');
-            }
+            // Sao chép danh sách ghi chú lâm sàng vào biến tạm để có thể xóa/sửa trực tiếp
+            window.tempCurrentNotes = JSON.parse(JSON.stringify(p.notes || []));
+            window.renderTempNotesList();
 
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
@@ -879,6 +874,35 @@
             }
         };
 
+        // Render danh sách ghi chú lâm sàng tạm thời trong modal chỉnh sửa kèm nút Xóa / Sửa
+        window.renderTempNotesList = function() {
+            const notesListDiv = document.getElementById('existingNotesList');
+            notesListDiv.innerHTML = "";
+            const notesCountSpan = document.getElementById('existingNotesCount');
+            if (notesCountSpan) notesCountSpan.innerText = `${window.tempCurrentNotes.length} ghi chú`;
+
+            if (window.tempCurrentNotes.length > 0) {
+                document.getElementById('existingNotesListSection').classList.remove('hidden');
+                window.tempCurrentNotes.forEach((n, idx) => {
+                    const d = document.createElement('div');
+                    d.className = "p-2.5 bg-white border border-sky-200 rounded-xl text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-sm";
+                    d.innerHTML = `
+                        <div class="flex-1">
+                            <p>${n.content}</p>
+                            <p class="text-[9px] text-slate-400 mt-0.5">${n.date || ''} - Cập nhật bởi: ${n.author || ''}</p>
+                        </div>
+                        <div class="flex items-center space-x-1 shrink-0">
+                            <button type="button" onclick="window.editNoteItem(${idx})" title="Điền lại ghi chú để sửa" class="px-2 py-1 bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-pen"></i> Sửa</button>
+                            <button type="button" onclick="window.deleteNoteItem(${idx})" title="Xóa ghi chú này" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
+                        </div>
+                    `;
+                    notesListDiv.appendChild(d);
+                });
+            } else {
+                document.getElementById('existingNotesListSection').classList.add('hidden');
+            }
+        };
+
         // Xóa một chu kỳ cụ thể khỏi danh sách tạm nếu nhập nhầm
         window.deleteCycleItem = function(idx) {
             if (confirm(`Bạn có chắc chắn muốn xóa Chu kỳ ${idx + 1} này không?`)) {
@@ -896,10 +920,26 @@
             window.calcBaselineBSA();
             document.getElementById('npCycleNote').value = c.note || '';
 
-            // Xóa chu kỳ cũ đó ra khỏi mảng tạm, sau khi bấm lưu hệ thống sẽ cập nhật lại chu kỳ mới sửa
             window.tempCurrentCycles.splice(idx, 1);
             window.renderTempCyclesList();
             alert(`Đã nạp thông tin Chu kỳ ${idx + 1} lên form phía trên. Bạn có thể chỉnh sửa lại và bấm Lưu.`);
+        };
+
+        // Xóa một ghi chú lâm sàng cụ thể khỏi danh sách tạm
+        window.deleteNoteItem = function(idx) {
+            if (confirm(`Bạn có chắc chắn muốn xóa ghi chú này không?`)) {
+                window.tempCurrentNotes.splice(idx, 1);
+                window.renderTempNotesList();
+            }
+        };
+
+        // Đưa nội dung ghi chú lâm sàng cũ lên ô nhập phía trên để chỉnh sửa
+        window.editNoteItem = function(idx) {
+            const n = window.tempCurrentNotes[idx];
+            document.getElementById('npGeneralNote').value = n.content || '';
+            window.tempCurrentNotes.splice(idx, 1);
+            window.renderTempNotesList();
+            alert(`Đã nạp nội dung ghi chú lên ô nhập phía trên. Bạn có thể chỉnh sửa lại và bấm Lưu.`);
         };
 
         window.handlePatientFormSubmit = async function(e) {
@@ -926,6 +966,7 @@
 
             try {
                 let finalCycles = [...window.tempCurrentCycles];
+                let finalNotes = [...window.tempCurrentNotes];
 
                 // Nếu người dùng có nhập thông tin ở form chu kỳ mới phía trên thì push vào danh sách
                 if (height > 0 && weight > 0) {
@@ -939,6 +980,15 @@
                     });
                 }
 
+                // Nếu người dùng có nhập thêm ghi chú mới ở ô nhập thì push vào danh sách
+                if (generalNote) {
+                    finalNotes.push({
+                        content: generalNote,
+                        date: todayStr,
+                        author: currentUser.email
+                    });
+                }
+
                 if (docId) {
                     const pRef = doc(db, "patients", docId);
                     const pSnap = await getDoc(pRef);
@@ -946,36 +996,17 @@
                         alert("Không tìm thấy hồ sơ trên Cloud!");
                         return;
                     }
-                    const data = pSnap.data();
-                    let notes = data.notes || [];
-
-                    if (generalNote) {
-                        notes.push({
-                            content: generalNote,
-                            date: todayStr,
-                            author: currentUser.email
-                        });
-                    }
 
                     await updateDoc(pRef, {
                         name, gender, diagnosis, protocol,
                         cycles: finalCycles,
-                        notes,
+                        notes: finalNotes,
                         createdByEmail: currentUser.email,
                         updatedAt: serverTimestamp()
                     });
 
                     alert("Cập nhật hồ sơ bệnh nhân thành công!");
                 } else {
-                    let initialNotes = [];
-                    if (generalNote) {
-                        initialNotes.push({
-                            content: generalNote,
-                            date: todayStr,
-                            author: currentUser.email
-                        });
-                    }
-
                     await addDoc(collection(db, "patients"), {
                         patientId,
                         name,
@@ -983,7 +1014,7 @@
                         diagnosis,
                         protocol,
                         cycles: finalCycles,
-                        notes: initialNotes,
+                        notes: finalNotes,
                         createdByEmail: currentUser.email,
                         createdAt: serverTimestamp()
                     });
