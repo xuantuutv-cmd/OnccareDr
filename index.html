@@ -157,8 +157,7 @@
     <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-slate-600 text-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
-                <!-- Đã cập nhật ảnh đại diện thay cho chữ BS -->
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" alt="BSCKI Thạch Xuân Tựu" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
+                <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="BSCKI Thạch Xuân Tựu" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
                 <div>
                     <p class="font-bold text-slate-900 text-sm">Bản quyền phần mềm thuộc về: <span class="text-teal-800">BSCKI Thạch Xuân Tựu</span></p>
                     <p class="text-slate-500">Khoa Ung Bướu - Bệnh Viện Đa Khoa An Giang</p>
@@ -958,11 +957,12 @@
             const todayStr = new Date().toISOString().split('T')[0];
 
             try {
+                // Kiểm tra nếu là tạo mới (docId trống) và mã BN đã tồn tại trong danh sách
                 if (!docId) {
                     const isDuplicate = cachedPatientsList.some(p => p.patientId && p.patientId.toUpperCase() === patientId);
                     if (isDuplicate) {
                         alert(`Lỗi: Mã bệnh nhân "${patientId}" đã tồn tại trong hệ thống! Vui lòng sử dụng mã khác hoặc tra cứu hồ sơ cũ để cập nhật.`);
-                        return;
+                        return; // Ngăn không cho tạo mới
                     }
                 }
 
