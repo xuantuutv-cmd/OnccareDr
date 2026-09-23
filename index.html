@@ -97,7 +97,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-key text-slate-400"></i>
                     </div>
-                    <input type="text" id="searchInput" placeholder="Nhập chính xác Mã BN gồm 8 chữ số (VD: 24001234...)" maxlength="8" class="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold tracking-wide transition">
+                    <input type="text" id="searchInput" placeholder="Nhập chính xác Mã BN 8 chữ số (VD: 24001234...)" maxlength="8" class="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold tracking-wide transition">
                     <button type="button" onclick="window.clearSearchResult()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                         <i class="fa-solid fa-circle-xmark text-sm"></i>
                     </button>
@@ -261,7 +261,7 @@
                                 <option value="Capecitabine-Bevacizumab">Capecitabine + Bevacizumab (21 ngày)</option>
                                 <option value="FOLFOXIRI">FOLFOXIRI / Cape-Oxa-Iri (21 ngày)</option>
                                 <option value="Vinorelbine-Capecitabine">Vinorelbine - Capecitabine (Ung thư vú)</option>
-                                <option value="Metronomic-Breast">Metronomic Ung Thư Vú (Vinorelbine / Phối hợp)</option>
+                                <option value="Metronomic-Breast">Metronomic Ung Th Vú (Vinorelbine / Phối hợp)</option>
                                 <option value="Capecitabine-Mono">Capecitabine Đơn Trị (Đại trực tràng / Dạ dày)</option>
                                 <option value="EC">EC (Epirubicin + Cyclophosphamide - 21 ngày)</option>
                                 <option value="4EC-4P-Trastuzumab">4EC - 4P + Trastuzumab (Ung thư Vú HER2+)</option>
@@ -588,7 +588,7 @@
                     </div>
                 </div>
 
-                <!-- Thống kê Card tổng quan (Chỉ giữ tổng số bệnh nhân hóa trị) -->
+                <!-- Thống kê Card tổng quan -->
                 <div id="statsSummaryCardsContainer" class="grid grid-cols-1 gap-4">
                     <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl flex items-center justify-between">
                         <div>
@@ -601,7 +601,7 @@
                     </div>
                 </div>
 
-                <!-- Khối Biểu Đồ hình tròn phân bố ICD (Hiện khi chọn ALL, Ẩn khi lọc ICD cụ thể) -->
+                <!-- Khối Biểu Đồ hình tròn phân bố ICD -->
                 <div id="statsPieChartSection" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 hidden">
                     <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-chart-pie text-teal-600"></i> Biểu Đồ Phân Bố Bệnh Nhân Theo Nhóm ICD
@@ -622,12 +622,13 @@
                                     <th class="p-3">Giới Tính</th>
                                     <th class="p-3">Chẩn Đoán Lâm Sàng</th>
                                     <th class="p-3">Phác Đồ</th>
-                                    <th class="p-3 text-center">Thao Tác Admin</th>
+                                    <th class="p-3 text-center">Số Chu Kỳ Phù Hợp</th>
+                                    <th class="p-3 text-center" id="statsActionHeader">Thao Tác Admin</th>
                                 </tr>
                             </thead>
                             <tbody id="statsTableBody" class="divide-y divide-slate-200">
                                 <tr>
-                                    <td colspan="6" class="p-6 text-center text-slate-400 font-medium">
+                                    <td colspan="7" class="p-6 text-center text-slate-400 font-medium">
                                         Vui lòng chọn khoảng thời gian và nhấn "Xem Thống Kê".
                                     </td>
                                 </tr>
@@ -1507,7 +1508,6 @@
                             <p class="text-slate-600 text-xs">${c.note || ''}</p>
                         `;
                     } else {
-                        // HIỂN THỊ RÕ PHÁC ĐỒ ĐANG HÓA TRỊ CỦA BỆNH NHÂN
                         const currentProto = c.protocolUsed || p.protocol || 'Chưa cập nhật';
                         div.className = "relative bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5";
                         div.innerHTML = `
@@ -1855,14 +1855,14 @@
             const gender = document.getElementById('npGender').value;
             const diagnosis = document.getElementById('npDiagnosis').value.trim();
             
-            // Ràng buộc Mã BN bắt buộc đúng 8 chữ số
+            // 1. RÀNG BUỘC: Mã bệnh nhân phải bắt buộc gồm đúng 8 chữ số
             const digitRegex = /^\d{8}$/;
             if (!digitRegex.test(patientId)) {
                 alert("Mã bệnh nhân bắt buộc phải gồm đúng 8 chữ số (VD: 24001234)!");
                 return;
             }
 
-            // Kiểm tra trùng Mã BN khi tạo mới
+            // 2. RÀNG BUỘC: Kiểm tra trùng Mã BN khi tạo mới
             if (!docId) {
                 const isDuplicate = cachedPatientsList.some(p => p.patientId === patientId);
                 if (isDuplicate) {
@@ -1880,6 +1880,7 @@
                 return;
             }
 
+            // 3. XỬ LÝ PHÁC ĐỒ KHÁC / CUSTOM
             let newProtocol = "";
             if (selectedProtoKey === "CUSTOM") {
                 newProtocol = document.getElementById('customProtocolNameInput').value.trim();
@@ -1892,7 +1893,7 @@
                 newProtocol = pInfo ? pInfo.name : selectedProtoKey;
             }
 
-            // Xây dựng tên chu kỳ kết hợp số thứ tự và phân đoạn tuần
+            // Xây dựng tên chu kỳ kết hợp số thứ tự và phân đoạn tuần nếu có thuốc uống 14 ngày
             let finalBranchName = `${branchName} - Chu kỳ ${cycleNum}`;
             const fourteenBox = document.getElementById('fourteenDaysOralWeeksBox');
             if (fourteenBox && !fourteenBox.classList.contains('hidden')) {
@@ -2092,7 +2093,8 @@
                         name: p.name || '-',
                         gender: p.gender || '-',
                         diagnosis: p.diagnosis || '-',
-                        protocol: p.protocol || '-'
+                        protocol: p.protocol || '-',
+                        count: validCycles.length
                     });
 
                     icdGroupCounts[matchedGroup] = (icdGroupCounts[matchedGroup] || 0) + 1;
@@ -2101,7 +2103,6 @@
 
             document.getElementById('statTotalPatients').innerText = matchedPatientsCount;
 
-            // XỬ LÝ ẨN/HIỆN VÀ VẼ BIỂU ĐỒ HÌNH TRÒN (PIE CHART)
             if (icdFilterVal === "ALL" && matchedPatientsCount > 0) {
                 pieSection.classList.remove('hidden');
                 
@@ -2156,7 +2157,7 @@
             }
 
             if (results.length === 0) {
-                statsTableBody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
+                statsTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
                 return;
             }
 
@@ -2169,6 +2170,7 @@
                     <td class="p-3">${item.gender}</td>
                     <td class="p-3 font-medium text-slate-800">${item.diagnosis}</td>
                     <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
+                    <td class="p-3 text-center font-bold text-teal-700">${item.count} chu kỳ</td>
                     <td class="p-3 text-center space-x-1" style="${isAdmin ? '' : 'display:none;'}">
                         <button onclick="window.openEditPatientModal('${item.id}'); window.closeStatsModal();" title="Sửa" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button onclick="window.deletePatientDoc('${item.id}'); window.runChemoStatistics();" title="Xóa" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded"><i class="fa-solid fa-trash"></i></button>
