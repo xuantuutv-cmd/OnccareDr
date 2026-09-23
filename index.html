@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- QRCode.js Generator Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Chart.js for Marker Tracking Chart -->
+    <!-- Chart.js for Marker Tracking Chart & Pie Chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -51,7 +51,7 @@
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                     </svg>
                     <span>Đăng Nhập Gmail</span>
                 </button>
@@ -254,18 +254,19 @@
                             <label class="block font-semibold text-slate-700 mb-1">Chọn Tên Phác Đồ Chuẩn <span class="text-rose-500">*</span></label>
                             <select id="protocolSelectList" onchange="window.onProtocolSelectChanged()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <option value="">-- Chọn phác đồ hóa trị --</option>
-                                <option value="CapeOx">CapeOx (Oxaliplatin + Capecitabine - 21 ngày)</option>
+                                <option value="CapeOx">CapeOx / XELOX (Oxaliplatin + Capecitabine - 21 ngày)</option>
+                                <option value="CapeOx-Bevacizumab">CapeOx / XELOX + Bevacizumab (21 ngày)</option>
                                 <option value="XELIRI">XELIRI (Irinotecan + Capecitabine - 21 ngày)</option>
                                 <option value="XELIRI-Bevacizumab">XELIRI + Bevacizumab (Đại trực tràng di căn - 21 ngày)</option>
-                                <option value="Capecitabine-Bevacizumab">Capecitabine + Bevacizumab (Đại trực tràng - 21 ngày)</option>
-                                <option value="FOLFOXIRI">FOLFOXIRI / Cape-Oxa-Iri (Đại trực tràng - 21 ngày)</option>
+                                <option value="Capecitabine-Bevacizumab">Capecitabine + Bevacizumab (21 ngày)</option>
+                                <option value="FOLFOXIRI">FOLFOXIRI / Cape-Oxa-Iri (21 ngày)</option>
                                 <option value="Vinorelbine-Capecitabine">Vinorelbine - Capecitabine (Ung thư vú)</option>
                                 <option value="Metronomic-Breast">Metronomic Ung Thư Vú (Vinorelbine / Phối hợp)</option>
                                 <option value="Capecitabine-Mono">Capecitabine Đơn Trị (Đại trực tràng / Dạ dày)</option>
-                                <option value="EC">Phác đồ EC (Epirubicin + Cyclophosphamide - 21 ngày)</option>
-                                <option value="4EC-4P-Trastuzumab">Phác đồ 4EC - 4P + Trastuzumab (Ung thư Vú HER2+)</option>
-                                <option value="AC-T">Phác đồ AC-T / AC-P (Anthracycline -> Taxane)</option>
-                                <option value="AC-T-Trastuzumab">Phác đồ AC-T + Trastuzumab (HER2 dương tính)</option>
+                                <option value="EC">EC (Epirubicin + Cyclophosphamide - 21 ngày)</option>
+                                <option value="4EC-4P-Trastuzumab">4EC - 4P + Trastuzumab (Ung thư Vú HER2+)</option>
+                                <option value="AC-T">AC-T / AC-P (Anthracycline -> Taxane)</option>
+                                <option value="AC-T-Trastuzumab">AC-T + Trastuzumab (HER2 dương tính)</option>
                                 <option value="Paclitaxel-Mono">Paclitaxel Đơn Trị (Vú / Dạ dày)</option>
                                 <option value="Vinorelbine-Mono">Vinorelbine Đơn Trị (Ung thư vú)</option>
                             </select>
@@ -580,7 +581,8 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Thống kê Card tổng quan -->
+                <div id="statsSummaryCardsContainer" class="grid grid-cols-1 gap-4">
                     <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl flex items-center justify-between">
                         <div>
                             <p class="text-teal-700 font-semibold uppercase text-[10px]">Tổng số bệnh nhân hóa trị</p>
@@ -590,14 +592,15 @@
                             <i class="fa-solid fa-hospital-user"></i>
                         </div>
                     </div>
-                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
-                        <div>
-                            <p class="text-amber-700 font-semibold uppercase text-[10px]">Tổng số chu kỳ trong khoảng</p>
-                            <h4 id="statTotalCycles" class="text-2xl font-bold text-amber-900 mt-1">0</h4>
-                        </div>
-                        <div class="w-10 h-10 bg-amber-200/60 rounded-full flex items-center justify-center text-amber-800 text-lg">
-                            <i class="fa-solid fa-syringe"></i>
-                        </div>
+                </div>
+
+                <!-- Khối Biểu đồ hình tròn phân bố ICD (Hiện khi chọn ALL, Ẩn khi lọc ICD cụ thể) -->
+                <div id="statsPieChartSection" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 hidden">
+                    <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-teal-600"></i> Biểu Đồ Phân Bố Bệnh Nhân Theo Nhóm ICD
+                    </h4>
+                    <div class="w-full h-64 relative flex items-center justify-center">
+                        <canvas id="icdPieCanvas"></canvas>
                     </div>
                 </div>
 
@@ -707,7 +710,7 @@
         // Dữ liệu chuẩn các phác đồ hóa trị và liều lượng theo BSA (mg/m2) hoặc Theo KG (mg/kg) cho Trastuzumab/Bevacizumab
         const chemoProtocolsData = {
             "CapeOx": {
-                name: "CapeOx (Oxaliplatin + Capecitabine)",
+                name: "CapeOx / XELOX (Oxaliplatin + Capecitabine)",
                 cycleDays: 21,
                 has14DaysOral: true,
                 branches: [
@@ -716,6 +719,20 @@
                 drugs: [
                     { name: "Oxaliplatin", defaultDose: 130, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
                     { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", calcType: "bsa", route: "Uống chia 2 lần/ngày" }
+                ]
+            },
+            "CapeOx-Bevacizumab": {
+                name: "CapeOx / XELOX + Bevacizumab",
+                cycleDays: 21,
+                has14DaysOral: true,
+                branches: [
+                    { name: "Chu kỳ 21 ngày (Bevacizumab 7.5 mg/kg)", desc: "Bevacizumab 7.5 mg/kg N1 + Oxaliplatin 130 mg/m² N1 + Capecitabine 2.000 mg/m²/ngày N1-14" },
+                    { name: "Chu kỳ 21 ngày (Bevacizumab 5 mg/kg)", desc: "Bevacizumab 5 mg/kg N1 + Oxaliplatin 130 mg/m² N1 + Capecitabine 2.000 mg/m²/ngày N1-14" }
+                ],
+                drugs: [
+                    { name: "Bevacizumab", defaultDose: 7.5, range: [5, 7.5], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch ngày 1" },
+                    { name: "Oxaliplatin", defaultDose: 130, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", calcType: "bsa", route: "Uống chia 2 lần/ngày (N1-14)" }
                 ]
             },
             "XELIRI": {
@@ -735,8 +752,8 @@
                 cycleDays: 21,
                 has14DaysOral: true,
                 branches: [
-                    { name: "Chu kỳ 21 ngày (Bevacizumab 7.5 mg/kg)", desc: "Bevacizumab 7.5 mg/kg N1 + Irinotecan 240-250 mg/m² N1 + Capecitabine 2000 mg/m²/ngày N1-14" },
-                    { name: "Chu kỳ 21 ngày (Bevacizumab 5 mg/kg)", desc: "Bevacizumab 5 mg/kg N1 + Irinotecan 240-250 mg/m² N1 + Capecitabine 2000 mg/m²/ngày N1-14" }
+                    { name: "Chu kỳ 21 ngày (Bevacizumab 7.5 mg/kg)", desc: "Bevacizumab 7.5 mg/kg N1 + Irinotecan 240-250 mg/m² N1 + Capecitabine 2.000 mg/m²/ngày N1-14" },
+                    { name: "Chu kỳ 21 ngày (Bevacizumab 5 mg/kg)", desc: "Bevacizumab 5 mg/kg N1 + Irinotecan 240-250 mg/m² N1 + Capecitabine 2.000 mg/m²/ngày N1-14" }
                 ],
                 drugs: [
                     { name: "Bevacizumab", defaultDose: 7.5, range: [5, 7.5], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch ngày 1 (truyền trước hóa chất)" },
@@ -809,13 +826,13 @@
                 ]
             },
             "EC": {
-                name: "Phác đồ EC (Epirubicin + Cyclophosphamide)",
+                name: "EC (Epirubicin + Cyclophosphamide)",
                 cycleDays: 21,
                 has14DaysOral: false,
                 branches: [
-                    { name: "Phác đồ EC chuẩn", desc: "Epirubicin 100 mg/m² + Cyclophosphamide 830 mg/m² ngày 1 (x 8 chu kỳ)" },
-                    { name: "Phác đồ EC nhẹ", desc: "Epirubicin 75 mg/m² + Cyclophosphamide 600 mg/m² ngày 1" },
-                    { name: "Phác đồ 4EC -> 4D (Docetaxel)", desc: "Epirubicin 90 mg/m² + Cyclophosphamide 600 mg/m² truyền tĩnh mạch ngày 1 (x 4 chu kỳ)" }
+                    { name: "EC chuẩn", desc: "Epirubicin 100 mg/m² + Cyclophosphamide 830 mg/m² ngày 1 (x 8 chu kỳ)" },
+                    { name: "EC nhẹ", desc: "Epirubicin 75 mg/m² + Cyclophosphamide 600 mg/m² ngày 1" },
+                    { name: "4EC -> 4D (Docetaxel)", desc: "Epirubicin 90 mg/m² + Cyclophosphamide 600 mg/m² truyền tĩnh mạch ngày 1 (x 4 chu kỳ)" }
                 ],
                 drugs: [
                     { name: "Epirubicin", defaultDose: 100, range: [75, 100], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
@@ -823,7 +840,7 @@
                 ]
             },
             "4EC-4P-Trastuzumab": {
-                name: "Phác đồ 4EC - 4P + Trastuzumab (Ung thư Vú HER2+)",
+                name: "4EC - 4P + Trastuzumab (Ung thư Vú HER2+)",
                 cycleDays: 21,
                 has14DaysOral: false,
                 branches: [
@@ -839,7 +856,7 @@
                 ]
             },
             "AC-T": {
-                name: "Phác đồ AC-T (Anthracycline -> Taxane)",
+                name: "AC-T (Anthracycline -> Taxane)",
                 cycleDays: 21,
                 has14DaysOral: false,
                 branches: [
@@ -855,7 +872,7 @@
                 ]
             },
             "AC-T-Trastuzumab": {
-                name: "Phác đồ AC-T + Trastuzumab (HER2 dương tính)",
+                name: "AC-T + Trastuzumab (HER2 dương tính)",
                 cycleDays: 21,
                 has14DaysOral: false,
                 branches: [
@@ -870,7 +887,7 @@
                 ]
             },
             "Paclitaxel-Mono": {
-                name: "Phác đồ Đơn trị Paclitaxel",
+                name: "Đơn trị Paclitaxel",
                 cycleDays: 21,
                 has14DaysOral: false,
                 branches: [
@@ -883,7 +900,7 @@
                 ]
             },
             "Vinorelbine-Mono": {
-                name: "Phác đồ Đơn trị Vinorelbine",
+                name: "Đơn trị Vinorelbine",
                 cycleDays: 21,
                 has14DaysOral: false,
                 branches: [
@@ -1171,6 +1188,10 @@
 
         window.closeStatsModal = function() {
             document.getElementById('statsModal').classList.add('hidden');
+            if (window.activePieChart) {
+                window.activePieChart.destroy();
+                window.activePieChart = null;
+            }
         };
     </script>
 
@@ -1228,6 +1249,7 @@
         window.tempCurrentMarkers = [];
         window.activeMarkerChart = null;
         window.activeFormMarkerChart = null;
+        window.activePieChart = null;
         window.currentViewingPatient = null;
         window.editingPatientOldProtocol = "";
 
@@ -1456,13 +1478,18 @@
                             <p class="text-slate-600 text-xs">${c.note || ''}</p>
                         `;
                     } else {
+                        // HIỂN THỊ RÕ PHÁC ĐỒ ĐANG HÓA TRỊ CỦA BỆNH NHÂN
+                        const currentProto = c.protocolUsed || p.protocol || 'Chưa cập nhật';
                         div.className = "relative bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5";
                         div.innerHTML = `
                             <div class="flex items-center justify-between font-bold text-teal-800">
                                 <span>${c.branchName || `Chu kỳ ${idx + 1}`} (${c.date || 'Không rõ ngày'})</span>
                                 <span class="text-[10px] bg-teal-100 text-teal-800 px-2 py-0.5 rounded-md">BSA: ${c.bsa || '-'} m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)</span>
                             </div>
-                            <p class="text-slate-600 text-xs font-semibold">Phác đồ: ${c.protocolUsed || '-'}</p>
+                            <div class="p-2 bg-amber-50/80 rounded-lg border border-amber-200/60 font-bold text-amber-900 text-[11px] flex items-center gap-1.5">
+                                <i class="fa-solid fa-prescription-bottle-medical text-amber-600"></i>
+                                <span>Phác đồ đang hóa trị: ${currentProto}</span>
+                            </div>
                             ${c.dosesText ? `<p class="text-indigo-900 text-[11px] bg-indigo-50 p-2 rounded border border-indigo-100 font-mono">${c.dosesText}</p>` : ''}
                             <p class="text-slate-600 text-xs">${c.note || 'Không có ghi chú độc tính.'}</p>
                         `;
@@ -1962,9 +1989,9 @@
             endDate.setHours(23, 59, 59, 999);
 
             let matchedPatientsCount = 0;
-            let totalCyclesInPeriod = 0;
             const statsTableBody = document.getElementById('statsTableBody');
             const statsActionHeader = document.getElementById('statsActionHeader');
+            const pieSection = document.getElementById('statsPieChartSection');
             statsTableBody.innerHTML = "";
 
             if (isAdmin) {
@@ -1974,10 +2001,20 @@
             }
 
             let results = [];
+            let icdGroupCounts = {};
 
             cachedPatientsList.forEach(p => {
+                const diag = (p.diagnosis || "").toUpperCase();
+                
+                // Trích xuất mã ICD 3 ký tự đầu
+                let matchedGroup = "Khác";
+                if (diag.includes("C16")) matchedGroup = "C16 (Dạ dày)";
+                else if (diag.includes("C18")) matchedGroup = "C18 (Đại tràng)";
+                else if (diag.includes("C19")) matchedGroup = "C19 (Nối trực đại tràng)";
+                else if (diag.includes("C20")) matchedGroup = "C20 (Trực tràng)";
+                else if (diag.includes("C50")) matchedGroup = "C50 (Vú)";
+
                 if (icdFilterVal !== "ALL") {
-                    const diag = (p.diagnosis || "").toUpperCase();
                     if (!diag.includes(icdFilterVal)) return;
                 }
 
@@ -1990,7 +2027,6 @@
 
                 if (validCycles.length > 0) {
                     matchedPatientsCount++;
-                    totalCyclesInPeriod += validCycles.length;
                     results.push({
                         id: p.id,
                         patientId: p.patientId || '-',
@@ -2000,11 +2036,67 @@
                         protocol: p.protocol || '-',
                         count: validCycles.length
                     });
+
+                    // Tích lũy số lượng theo nhóm ICD cho biểu đồ hình tròn
+                    icdGroupCounts[matchedGroup] = (icdGroupCounts[matchedGroup] || 0) + 1;
                 }
             });
 
             document.getElementById('statTotalPatients').innerText = matchedPatientsCount;
-            document.getElementById('statTotalCycles').innerText = totalCyclesInPeriod;
+
+            // XỬ LÝ ẨN/HIỆN VÀ VẼ BIỂU ĐỒ HÌNH TRÒN (PIE CHART)
+            if (icdFilterVal === "ALL" && matchedPatientsCount > 0) {
+                pieSection.classList.remove('hidden');
+                
+                const pieLabels = Object.keys(icdGroupCounts);
+                const pieData = Object.values(icdGroupCounts);
+                const bgColors = [
+                    '#0d9488', '#f59e0b', '#6366f1', '#ec4899', '#3b82f6', '#10b981', '#8b5cf6'
+                ];
+
+                const ctx = document.getElementById('icdPieCanvas').getContext('2d');
+                if (window.activePieChart) window.activePieChart.destroy();
+
+                window.activePieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: pieLabels,
+                        datasets: [{
+                            data: pieData,
+                            backgroundColor: bgColors.slice(0, pieLabels.length),
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'right'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const val = context.raw || 0;
+                                        const percentage = ((val / matchedPatientsCount) * 100).toFixed(1);
+                                        return `${label}: ${val} BN (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } else {
+                pieSection.classList.add('hidden');
+                if (window.activePieChart) {
+                    window.activePieChart.destroy();
+                    window.activePieChart = null;
+                }
+            }
 
             if (results.length === 0) {
                 statsTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
@@ -2104,7 +2196,7 @@
 
         window.setUserRole = async function(userId, role) {
             try {
-                await updateDoc(doc(doc(db, "users", userId)), { role: role });
+                await updateDoc(doc(db, "users", userId), { role: role });
                 alert(`Đã cập nhật quyền thành viên thành: ${role}!`);
                 window.loadUsersManagementTable();
             } catch (err) {
