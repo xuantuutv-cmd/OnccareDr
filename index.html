@@ -261,7 +261,7 @@
                                 <option value="Capecitabine-Bevacizumab">Capecitabine + Bevacizumab (21 ngày)</option>
                                 <option value="FOLFOXIRI">FOLFOXIRI / Cape-Oxa-Iri (21 ngày)</option>
                                 <option value="Vinorelbine-Capecitabine">Vinorelbine - Capecitabine (Ung thư vú)</option>
-                                <option value="Metronomic-Breast">Metronomic Ung Th Vú (Vinorelbine / Phối hợp)</option>
+                                <option value="Metronomic-Breast">Metronomic Ung Thư Vú (Vinorelbine / Phối hợp)</option>
                                 <option value="Capecitabine-Mono">Capecitabine Đơn Trị (Đại trực tràng / Dạ dày)</option>
                                 <option value="EC">EC (Epirubicin + Cyclophosphamide - 21 ngày)</option>
                                 <option value="4EC-4P-Trastuzumab">4EC - 4P + Trastuzumab (Ung thư Vú HER2+)</option>
@@ -462,7 +462,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Xem Chi Tiết Bệnh Nhân, Biểu Đồ Marker & QR Code -->
+    <!-- MODAL: Xem Chi Tiết Bệnh Nhân, Biểu Đồ Marker & QR Code (Có Tích Hợp Tab Timeline) -->
     <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-5 px-6 flex items-center justify-between sticky top-0 z-10">
@@ -505,8 +505,29 @@
                     </div>
                 </div>
 
-                <!-- Biểu đồ theo dõi Marker -->
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                <!-- TAB TIMELINE LỊCH SỬ & THEO DÕI -->
+                <div class="bg-slate-100 p-1.5 rounded-xl flex space-x-1 border border-slate-200">
+                    <button onclick="window.switchDetailTab('timeline')" id="btnTabTimeline" class="flex-1 py-2 px-3 rounded-lg font-bold text-xs transition bg-white text-teal-800 shadow-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-timeline"></i> Lịch Sử Chu Kỳ (Timeline)
+                    </button>
+                    <button onclick="window.switchDetailTab('chart')" id="btnTabChart" class="flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-chart-line"></i> Biểu Đồ Marker Ung Thư
+                    </button>
+                    <button onclick="window.switchDetailTab('notes')" id="btnTabNotes" class="flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-notes-medical"></i> Nhật Ký Lâm Sàng
+                    </button>
+                </div>
+
+                <!-- NỘI DUNG TAB 1: TIMELINE CHU KỲ -->
+                <div id="tabContentTimeline" class="space-y-3">
+                    <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-timeline text-teal-600"></i> Dòng Thời Gian Chu Kỳ Hóa Trị & Liều Lượng (Realtime)
+                    </h4>
+                    <div id="detCyclesTimeline" class="space-y-2.5 border-l-2 border-teal-500 pl-4 ml-2"></div>
+                </div>
+
+                <!-- NỘI DUNG TAB 2: BIỂU ĐỒ MARKER -->
+                <div id="tabContentChart" class="hidden space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex items-center justify-between">
                         <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
                             <i class="fa-solid fa-chart-line text-teal-600"></i> Biểu Đồ Theo Dõi Marker Ung Thư (CEA, CA 19-9, CA 15-3, CA 72-4)
@@ -523,16 +544,10 @@
                     </div>
                 </div>
 
-                <div class="space-y-2">
+                <!-- NỘI DUNG TAB 3: NHẬT KÝ LÂM SÀNG -->
+                <div id="tabContentNotes" class="hidden space-y-3">
                     <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-timeline text-teal-600"></i> Lịch Sử Chu Kỳ Hóa Trị & Liều Lượng Tính Theo BSA/Kg (Realtime)
-                    </h4>
-                    <div id="detCyclesTimeline" class="space-y-2.5 border-l-2 border-teal-500 pl-4 ml-2"></div>
-                </div>
-
-                <div class="space-y-2">
-                    <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-notes-medical text-sky-600"></i> Nhật Ký Diễn Tiến Lâm Sàng
+                        <i class="fa-solid fa-notes-medical text-sky-600"></i> Nhật Ký Diễn Tiến & Ghi Chú Lâm Sàng
                     </h4>
                     <div id="detNotesTimeline" class="space-y-2"></div>
                 </div>
@@ -1196,6 +1211,37 @@
             }
         };
 
+        // HÀM CHUYỂN TAB TRONG MODAL CHI TIẾT BỆNH NHÂN (TIMELINE / CHART / NOTES)
+        window.switchDetailTab = function(tabName) {
+            const btnTimeline = document.getElementById('btnTabTimeline');
+            const btnChart = document.getElementById('btnTabChart');
+            const btnNotes = document.getElementById('btnTabNotes');
+            const contentTimeline = document.getElementById('tabContentTimeline');
+            const contentChart = document.getElementById('tabContentChart');
+            const contentNotes = document.getElementById('tabContentNotes');
+
+            // Reset classes
+            btnTimeline.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
+            btnChart.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
+            btnNotes.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
+
+            contentTimeline.classList.add('hidden');
+            contentChart.classList.add('hidden');
+            contentNotes.classList.add('hidden');
+
+            if (tabName === 'timeline') {
+                btnTimeline.className = "flex-1 py-2 px-3 rounded-lg font-bold text-xs transition bg-white text-teal-800 shadow-sm flex items-center justify-center gap-2";
+                contentTimeline.classList.remove('hidden');
+            } else if (tabName === 'chart') {
+                btnChart.className = "flex-1 py-2 px-3 rounded-lg font-bold text-xs transition bg-white text-teal-800 shadow-sm flex items-center justify-center gap-2";
+                contentChart.classList.remove('hidden');
+                window.renderMarkerChart();
+            } else if (tabName === 'notes') {
+                btnNotes.className = "flex-1 py-2 px-3 rounded-lg font-bold text-xs transition bg-white text-teal-800 shadow-sm flex items-center justify-center gap-2";
+                contentNotes.classList.remove('hidden');
+            }
+        };
+
         window.openUserManagementModal = function() {
             document.getElementById('userManagementModal').classList.remove('hidden');
             if (window.loadUsersManagementTable) window.loadUsersManagementTable();
@@ -1541,8 +1587,9 @@
                 });
             }
 
+            // Mặc định mở tab timeline đầu tiên
+            window.switchDetailTab('timeline');
             document.getElementById('patientDetailModal').classList.remove('hidden');
-            window.renderMarkerChart();
         };
 
         window.renderMarkerChart = function() {
@@ -1951,8 +1998,9 @@
                     }
                 }
 
-                // NẾU CÓ NHẬP CÂN NẶNG > 0 THÌ MỚI THÊM CHU KỲ MỚI, KHÔNG THÌ BẢO TỒN DANH SÁCH CHU KỲ SAU KHI ĐÃ XÓA
-                if (weight > 0) {
+                // CHỈ THÊM CHU KỲ MỚI NẾU BÁC SĨ CÓ NHẬP CÂN NẶNG & CHIỀU CAO THỰC TẾ. 
+                // KHI XÓA LỊCH SỬ (CÂN NẶNG TRỐNG), HỆ THỐNG SẼ GIỮ NGUYÊN MẢNG finalCycles ĐÃ ĐƯỢC LỌC XÓA SẠCH.
+                if (weight > 0 && height > 0) {
                     finalCycles.push({
                         date: cycleDate || todayStr,
                         protocolUsed: newProtocol || window.editingPatientOldProtocol || '',
@@ -1965,7 +2013,7 @@
                         updatedBy: currentUser.email
                     });
                 } else if (!docId) {
-                    alert("Vui lòng nhập Cân nặng khi tạo mới hồ sơ!");
+                    alert("Vui lòng nhập Chiều cao và Cân nặng khi tạo mới hồ sơ!");
                     return;
                 }
 
