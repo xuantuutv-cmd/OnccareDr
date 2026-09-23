@@ -247,10 +247,6 @@
                                 <span>Đổi phác đồ mới</span>
                             </label>
                         </div>
-                        <div id="protocolChangeReasonBox" class="hidden mt-2 pt-2 border-t border-slate-100 space-y-1">
-                            <label class="block font-semibold text-rose-800 text-[11px]">Lý do đổi phác đồ: <span class="text-rose-500">*</span></label>
-                            <input type="text" id="npProtocolChangeReason" placeholder="Nhập lý do đổi phác đồ (ví dụ: Kháng thuốc, độc tính độ 3...)" class="w-full p-2 bg-white border border-rose-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-rose-500">
-                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -704,6 +700,7 @@
             { code: "C50.9", desc: "U ác tính vú, không đặc hiệu" }
         ];
 
+        // Dữ liệu chuẩn các phác đồ hóa trị và liều lượng theo BSA (mg/m2) kèm cấu hình dải liều dao động nếu có
         const chemoProtocolsData = {
             "CapeOx": {
                 name: "CapeOx (Oxaliplatin + Capecitabine)",
@@ -946,12 +943,10 @@
             const mode = document.querySelector('input[name="protocolMode"]:checked').value;
             const protoSelect = document.getElementById('protocolSelectList');
             const branchSelect = document.getElementById('protocolCycleBranch');
-            const reasonBox = document.getElementById('protocolChangeReasonBox');
 
             if (mode === 'continue') {
                 protoSelect.disabled = true;
                 protoSelect.classList.add('bg-slate-100');
-                reasonBox.classList.add('hidden');
                 if (window.editingPatientOldProtocol) {
                     protoSelect.value = window.editingPatientOldProtocol;
                     window.onProtocolSelectChanged();
@@ -959,7 +954,6 @@
             } else {
                 protoSelect.disabled = false;
                 protoSelect.classList.remove('bg-slate-100');
-                reasonBox.classList.remove('hidden');
                 protoSelect.value = "";
                 branchSelect.innerHTML = '<option value="">-- Chọn lịch trình cụ thể --</option>';
                 document.getElementById('npProtocol').value = "";
@@ -1356,26 +1350,25 @@
                 cycles.forEach((c, idx) => {
                     const div = document.createElement('div');
                     if (c.isProtocolChange) {
-                        div.className = "relative bg-rose-50 p-3.5 rounded-xl border border-rose-300 space-y-1.5 shadow-sm";
+                        div.className = "relative bg-rose-50 p-3 rounded-xl border border-rose-300 space-y-1";
                         div.innerHTML = `
-                            <div class="flex items-center justify-between font-bold text-rose-800 text-xs">
-                                <span class="flex items-center gap-1.5"><i class="fa-solid fa-arrows-rotate"></i> ĐỔI PHÁC ĐỒ: ${c.newProtocol}</span>
-                                <span class="text-[10px] bg-rose-200/80 text-rose-900 px-2 py-0.5 rounded-md">${c.date || 'N/A'}</span>
+                            <div class="flex items-center justify-between font-bold text-rose-700">
+                                <span class="flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> ĐỔI PHÁC ĐỒ MỚI (${c.date || 'N/A'})</span>
+                                <span class="text-[10px] bg-rose-200 text-rose-800 px-2 py-0.5 rounded-md">Bởi: ${c.updatedBy || 'Admin'}</span>
                             </div>
-                            <p class="text-rose-900 font-semibold text-xs bg-white/80 p-2 rounded border border-rose-200">
-                                <i class="fa-solid fa-circle-exclamation text-rose-600 mr-1"></i> Lý do đổi: <span class="font-bold">${c.reason || 'Không ghi nhận lý do'}</span>
-                            </p>
+                            <p class="text-rose-900 font-semibold text-xs">Phác đồ mới: ${c.newProtocol}</p>
+                            <p class="text-slate-600 text-xs">${c.note || ''}</p>
                         `;
                     } else {
-                        div.className = "relative bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 shadow-sm";
+                        div.className = "relative bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5";
                         div.innerHTML = `
-                            <div class="flex items-center justify-between font-bold text-teal-800 text-xs">
-                                <span><i class="fa-solid fa-syringe text-teal-600 mr-1"></i> ${c.branchName || `Chu kỳ ${idx + 1}`} (${c.date || 'Không rõ ngày'})</span>
-                                <span class="text-[10px] bg-teal-100 text-teal-900 px-2 py-0.5 rounded-md font-extrabold">BSA: ${c.bsa || '-'} m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)</span>
+                            <div class="flex items-center justify-between font-bold text-teal-800">
+                                <span>${c.branchName || `Chu kỳ ${idx + 1}`} (${c.date || 'Không rõ ngày'})</span>
+                                <span class="text-[10px] bg-teal-100 text-teal-800 px-2 py-0.5 rounded-md">BSA: ${c.bsa || '-'} m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)</span>
                             </div>
-                            <p class="text-slate-700 text-xs font-semibold">Phác đồ áp dụng: <span class="text-indigo-900 font-bold">${c.protocolUsed || '-'}</span></p>
-                            ${c.dosesText ? `<div class="text-slate-800 text-[11px] bg-white p-2.5 rounded-lg border border-slate-200 font-mono space-y-0.5">${c.dosesText}</div>` : ''}
-                            <p class="text-slate-600 text-xs italic"><strong class="not-italic text-slate-700">Đánh giá/Độc tính:</strong> ${c.note || 'Không có ghi chú.'}</p>
+                            <p class="text-slate-600 text-xs font-semibold">Phác đồ: ${c.protocolUsed || '-'}</p>
+                            ${c.dosesText ? `<p class="text-indigo-900 text-[11px] bg-indigo-50 p-2 rounded border border-indigo-100 font-mono">${c.dosesText}</p>` : ''}
+                            <p class="text-slate-600 text-xs">${c.note || 'Không có ghi chú độc tính.'}</p>
                         `;
                     }
                     cyclesContainer.appendChild(div);
@@ -1536,7 +1529,6 @@
             const protoSelect = document.getElementById('protocolSelectList');
             protoSelect.disabled = true;
             protoSelect.classList.add('bg-slate-100');
-            document.getElementById('protocolChangeReasonBox').classList.add('hidden');
 
             let foundKey = "";
             for (let key in chemoProtocolsData) {
@@ -1561,7 +1553,6 @@
             document.getElementById('npGeneralNote').value = '';
             document.getElementById('npMarkerValue').value = '';
             document.getElementById('npCycleNumber').value = "1";
-            document.getElementById('npProtocolChangeReason').value = '';
 
             window.tempCurrentCycles = JSON.parse(JSON.stringify(p.cycles || []));
             window.renderTempCyclesList();
@@ -1641,7 +1632,7 @@
                     if (isProto) {
                         d.innerHTML = `
                             <div class="flex-1">
-                                <strong class="text-rose-700">Đổi phác đồ (${c.date || 'N/A'}):</strong> ${c.newProtocol} - <span class="italic text-slate-600">Lý do: ${c.reason || 'Không rõ'}</span>
+                                <strong class="text-rose-700">Đổi phác đồ (${c.date || 'N/A'}):</strong> Phác đồ mới: ${c.newProtocol}
                             </div>
                             <button type="button" onclick="window.deleteCycleItem(${idx})" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
                         `;
@@ -1704,7 +1695,7 @@
             }
 
             const docId = document.getElementById('editDocId').value;
-            let patientId = document.getElementById('npId').value.trim().toUpperCase();
+            const patientId = document.getElementById('npId').value.trim().toUpperCase();
             const name = document.getElementById('npName').value.trim();
             const gender = document.getElementById('npGender').value;
             const diagnosis = document.getElementById('npDiagnosis').value.trim();
@@ -1719,127 +1710,218 @@
             }
 
             const pInfo = chemoProtocolsData[selectedProtoKey];
-            let newProtocol = pInfo.name;
+            const newProtocol = pInfo.name;
 
-            // Admin sync & override check nếu phác đồ nằm ngoài list hoặc cần đồng bộ quyền Admin
-            if (isAdmin && !chemoProtocolsData[selectedProtoKey]) {
-                newProtocol = selectedProtoKey;
-            }
-
+            // Xây dựng tên chu kỳ kết hợp số thứ tự và phân đoạn tuần nếu có thuốc uống 14 ngày
             let finalBranchName = `${branchName} - Chu kỳ ${cycleNum}`;
             const fourteenBox = document.getElementById('fourteenDaysOralWeeksBox');
             if (fourteenBox && !fourteenBox.classList.contains('hidden')) {
-                const weekPart = document.querySelector('input[name="fourteenWeekPart"]:checked').value;
-                finalBranchName += ` (${weekPart})`;
+                const selectedWeekRadio = document.querySelector('input[name="fourteenWeekPart"]:checked');
+                if (selectedWeekRadio) {
+                    finalBranchName += `, ${selectedWeekRadio.value}`;
+                }
             }
 
-            const cycleDate = document.getElementById('npCycleDate').value || new Date().toISOString().split('T')[0];
+            const cycleDate = document.getElementById('npCycleDate').value;
+            const height = parseFloat(document.getElementById('npHeight').value) || 0;
+            const weight = parseFloat(document.getElementById('npWeight').value) || 0;
+            const bsa = window.calculateBSA(height, weight);
             const cycleNote = document.getElementById('npCycleNote').value.trim();
-            const h = parseFloat(document.getElementById('npHeight').value) || 0;
-            const w = parseFloat(document.getElementById('npWeight').value) || 0;
-            const bsa = window.calculateBSA(h, w);
+            const generalNote = document.getElementById('npGeneralNote').value.trim();
+            const todayStr = new Date().toISOString().split('T')[0];
 
-            let dosesTextSummary = "";
+            let dosesText = "";
             pInfo.drugs.forEach((drug, dIndex) => {
                 let doseVal = drug.defaultDose;
                 const customInput = document.getElementById(`varDose_${dIndex}`);
                 if (customInput && !isNaN(parseFloat(customInput.value))) {
                     doseVal = parseFloat(customInput.value);
                 }
-                const totalD = bsa > 0 ? Math.round(doseVal * bsa) : 0;
-                dosesTextSummary += `- ${drug.name}: ${doseVal} ${drug.unit} -> ${totalD} mg (${drug.route})\n`;
+                const totalDose = Math.round(doseVal * bsa);
+                dosesText += `${drug.name}: ${totalDose}mg (${doseVal} ${drug.unit}) - ${drug.route}; `;
             });
-
-            // Xử lý đổi phác đồ mới nếu có chọn mode "change"
-            const protocolMode = document.querySelector('input[name="protocolMode"]:checked');
-            if (protocolMode && protocolMode.value === 'change' && docId) {
-                const changeReason = document.getElementById('npProtocolChangeReason').value.trim();
-                if (!changeReason) {
-                    alert("Vui lòng nhập lý do đổi phác đồ mới!");
-                    document.getElementById('npProtocolChangeReason').focus();
-                    return;
-                }
-                window.tempCurrentCycles.push({
-                    isProtocolChange: true,
-                    newProtocol: newProtocol,
-                    reason: changeReason,
-                    date: cycleDate,
-                    updatedBy: currentUser.email
-                });
-            }
-
-            window.tempCurrentCycles.push({
-                isProtocolChange: false,
-                branchName: finalBranchName,
-                protocolUsed: newProtocol,
-                date: cycleDate,
-                height: h,
-                weight: w,
-                bsa: bsa > 0 ? bsa.toFixed(2) : '-',
-                dosesText: dosesTextSummary.trim(),
-                note: cycleNote
-            });
-
-            const generalNoteText = document.getElementById('npGeneralNote').value.trim();
-            if (generalNoteText) {
-                window.tempCurrentNotes.push({
-                    content: generalNoteText,
-                    date: cycleDate,
-                    author: currentUser.email
-                });
-            }
-
-            const patientData = {
-                patientId: patientId,
-                name: name,
-                gender: gender,
-                diagnosis: diagnosis,
-                protocol: newProtocol,
-                cycles: window.tempCurrentCycles,
-                notes: window.tempCurrentNotes,
-                markers: window.tempCurrentMarkers,
-                updatedAt: serverTimestamp(),
-                createdByEmail: currentUser.email
-            };
 
             try {
+                let finalCycles = [...window.tempCurrentCycles];
+                let finalNotes = [...window.tempCurrentNotes];
+                let finalMarkers = [...window.tempCurrentMarkers];
+
                 if (docId) {
-                    await updateDoc(doc(db, "patients", docId), patientData);
-                    alert("Cập nhật hồ sơ bệnh nhân thành công!");
-                } else {
-                    const existing = cachedPatientsList.find(p => p.patientId === patientId);
-                    if (existing) {
-                        alert("Mã bệnh nhân này đã tồn tại trong hệ thống! Vui lòng dùng chức năng cập nhật chu kỳ.");
-                        return;
+                    const pRef = doc(db, "patients", docId);
+                    const pSnap = await getDoc(pRef);
+                    if (pSnap.exists()) {
+                        const oldData = pSnap.data();
+                        const oldProtocol = oldData.protocol || "";
+                        const protoMode = document.querySelector('input[name="protocolMode"]:checked').value;
+                        if (protoMode === 'change' && newProtocol !== oldProtocol) {
+                            finalCycles.push({
+                                isProtocolChange: true,
+                                oldProtocol: oldProtocol,
+                                newProtocol: newProtocol,
+                                date: todayStr,
+                                updatedBy: currentUser.email,
+                                note: `Đổi phác đồ tổng thể từ [${oldProtocol}] sang [${newProtocol}]`
+                            });
+                        }
                     }
-                    patientData.createdAt = serverTimestamp();
-                    await addDoc(collection(db, "patients"), patientData);
-                    alert("Thêm mới hồ sơ bệnh nhân thành công!");
                 }
+
+                if (height > 0 && weight > 0) {
+                    finalCycles.push({
+                        date: cycleDate || todayStr,
+                        protocolUsed: newProtocol,
+                        branchName: finalBranchName,
+                        height: height,
+                        weight: weight,
+                        bsa: bsa.toFixed(2),
+                        dosesText: dosesText,
+                        note: cycleNote,
+                        updatedBy: currentUser.email
+                    });
+                } else {
+                    alert("Vui lòng nhập chiều cao và cân nặng để tính liều thuốc chính xác!");
+                    return;
+                }
+
+                if (generalNote) {
+                    finalNotes.push({ content: generalNote, date: todayStr, author: currentUser.email });
+                }
+
+                if (docId) {
+                    const pRef = doc(db, "patients", docId);
+                    await updateDoc(pRef, {
+                        patientId, name, gender, diagnosis,
+                        protocol: newProtocol,
+                        cycles: finalCycles,
+                        notes: finalNotes,
+                        markers: finalMarkers,
+                        updatedAt: serverTimestamp()
+                    });
+                    alert("Cập nhật chu kỳ thành công!");
+                } else {
+                    await addDoc(collection(db, "patients"), {
+                        patientId, name, gender, diagnosis,
+                        protocol: newProtocol,
+                        cycles: finalCycles,
+                        notes: finalNotes,
+                        markers: finalMarkers,
+                        createdByEmail: currentUser.email,
+                        createdAt: serverTimestamp()
+                    });
+                    alert("Thêm mới hồ sơ thành công!");
+                }
+
                 window.closePatientFormModal();
-                if (document.getElementById('searchInput').value.trim()) {
-                    window.searchPatientByCode();
-                }
+                document.getElementById('searchInput').value = patientId;
+                window.searchPatientByCode();
+
             } catch (err) {
-                console.error("Lỗi khi lưu bệnh nhân:", err);
-                alert("Lưu dữ liệu thất bại: " + err.message);
+                console.error("Lỗi lưu hồ sơ:", err);
+                alert("Lỗi lưu dữ liệu: " + err.message);
             }
         };
 
         window.deletePatientDoc = async function(docId) {
             if (!isAdmin) {
-                alert("Chỉ có tài khoản Admin mới có quyền xóa hồ sơ!");
+                alert("Chỉ tài khoản Admin mới có quyền xóa hồ sơ!");
                 return;
             }
-            if (confirm("Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân này khỏi Cloud?")) {
+            if (confirm("Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân này không?")) {
                 try {
                     await deleteDoc(doc(db, "patients", docId));
                     alert("Đã xóa hồ sơ thành công!");
                     window.clearSearchResult();
                 } catch (err) {
-                    alert("Xóa thất bại: " + err.message);
+                    alert("Không thể xóa: " + err.message);
                 }
             }
+        };
+
+        window.runChemoStatistics = function() {
+            if (isBlocked) {
+                alert("Tài khoản đã bị khóa!");
+                return;
+            }
+            const startDateStr = document.getElementById('statsStartDate').value;
+            const endDateStr = document.getElementById('statsEndDate').value;
+            const icdFilterVal = document.getElementById('statsIcdFilter').value.trim().toUpperCase();
+
+            if (!startDateStr || !endDateStr) {
+                alert("Vui lòng chọn đầy đủ Từ ngày và Đến ngày!");
+                return;
+            }
+
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+            endDate.setHours(23, 59, 59, 999);
+
+            let matchedPatientsCount = 0;
+            let totalCyclesInPeriod = 0;
+            const statsTableBody = document.getElementById('statsTableBody');
+            const statsActionHeader = document.getElementById('statsActionHeader');
+            statsTableBody.innerHTML = "";
+
+            if (isAdmin) {
+                statsActionHeader.style.display = "";
+            } else {
+                statsActionHeader.style.display = "none";
+            }
+
+            let results = [];
+
+            cachedPatientsList.forEach(p => {
+                if (icdFilterVal !== "ALL") {
+                    const diag = (p.diagnosis || "").toUpperCase();
+                    if (!diag.includes(icdFilterVal)) return;
+                }
+
+                const cycles = p.cycles || [];
+                const validCycles = cycles.filter(c => {
+                    if (!c.date || c.isProtocolChange) return false;
+                    const cDate = new Date(c.date);
+                    return cDate >= startDate && cDate <= endDate;
+                });
+
+                if (validCycles.length > 0) {
+                    matchedPatientsCount++;
+                    totalCyclesInPeriod += validCycles.length;
+                    results.push({
+                        id: p.id,
+                        patientId: p.patientId || '-',
+                        name: p.name || '-',
+                        gender: p.gender || '-',
+                        diagnosis: p.diagnosis || '-',
+                        protocol: p.protocol || '-',
+                        count: validCycles.length
+                    });
+                }
+            });
+
+            document.getElementById('statTotalPatients').innerText = matchedPatientsCount;
+            document.getElementById('statTotalCycles').innerText = totalCyclesInPeriod;
+
+            if (results.length === 0) {
+                statsTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
+                return;
+            }
+
+            results.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-teal-800">${item.patientId}</td>
+                    <td class="p-3 font-semibold text-slate-900">${item.name}</td>
+                    <td class="p-3">${item.gender}</td>
+                    <td class="p-3 font-medium text-slate-800">${item.diagnosis}</td>
+                    <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
+                    <td class="p-3 text-center font-bold text-teal-700">${item.count} chu kỳ</td>
+                    <td class="p-3 text-center space-x-1" style="${isAdmin ? '' : 'display:none;'}">
+                        <button onclick="window.openEditPatientModal('${item.id}'); window.closeStatsModal();" title="Sửa" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="window.deletePatientDoc('${item.id}'); window.runChemoStatistics();" title="Xóa" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                statsTableBody.appendChild(tr);
+            });
         };
 
         window.loadUsersManagementTable = async function() {
@@ -1849,143 +1931,91 @@
                 const querySnapshot = await getDocs(collection(db, "users"));
                 tbody.innerHTML = "";
                 if (querySnapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Chưa có thành viên nào đăng nhập.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Không có tài khoản nào.</td></tr>`;
                     return;
                 }
 
-                querySnapshot.forEach((userDocSnap) => {
-                    const u = userDocSnap.data();
-                    const uId = userDocSnap.id;
-                    const isUsrAdmin = (u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+                querySnapshot.forEach((docSnap) => {
+                    const u = docSnap.data();
+                    const uId = docSnap.id;
+                    const isApprovedUser = u.isApproved === true;
+                    const isBlockedUser = u.isBlocked === true;
+                    const isVipUser = (u.role === "VIP");
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 transition";
+                    tr.className = "hover:bg-slate-50";
                     tr.innerHTML = `
-                        <td class="p-3 font-semibold text-slate-900">${u.name || 'Thành viên'}</td>
+                        <td class="p-3 font-semibold text-slate-900">${u.name || '-'}</td>
                         <td class="p-3 text-slate-600">${u.email || '-'}</td>
+                        <td class="p-3 font-bold text-teal-800">${u.role || 'Doctor'}</td>
                         <td class="p-3">
-                            <select onchange="window.updateUserRole('${uId}', this.value)" ${isUsrAdmin ? 'disabled' : ''} class="p-1 bg-slate-50 border border-slate-200 rounded font-bold text-teal-800 text-xs">
-                                <option value="Doctor" ${u.role === 'Doctor' ? 'selected' : ''}>Doctor</option>
-                                <option value="VIP" ${u.role === 'VIP' ? 'selected' : ''}>VIP (Thống Kê)</option>
-                                <option value="Admin" ${u.role === 'Admin' ? 'selected' : ''}>Admin</option>
-                            </select>
-                        </td>
-                        <td class="p-3">
-                            ${u.isBlocked ? '<span class="px-2 py-0.5 bg-rose-100 text-rose-800 rounded font-bold text-[10px]">Đã khóa</span>' : 
-                              (u.isApproved ? '<span class="px-2 py-0.5 bg-teal-100 text-teal-800 rounded font-bold text-[10px]">Đã duyệt</span>' : 
-                              '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold text-[10px]">Chờ duyệt</span>')}
+                            ${isBlockedUser ? '<span class="px-2 py-0.5 bg-rose-200 text-rose-900 rounded-full font-bold text-[10px]">Đã Block</span>' : 
+                              isApprovedUser ? '<span class="px-2 py-0.5 bg-teal-100 text-teal-800 rounded-full font-bold text-[10px]">Đã duyệt</span>' : 
+                              '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full font-bold text-[10px]">Chờ duyệt</span>'}
                         </td>
                         <td class="p-3 text-center space-x-1">
-                            ${!isUsrAdmin ? `
-                                ${!u.isApproved ? `<button onclick="window.approveUser('${uId}', true)" class="px-2.5 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded font-semibold text-[10px]">Duyệt</button>` : `<button onclick="window.approveUser('${uId}', false)" class="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded font-semibold text-[10px]">Bỏ duyệt</button>`}
-                                ${!u.isBlocked ? `<button onclick="window.blockUser('${uId}', true)" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded font-semibold text-[10px]">Khóa</button>` : `<button onclick="window.blockUser('${uId}', false)" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded font-semibold text-[10px]">Mở khóa</button>`}
-                            ` : '<span class="text-slate-400 italic text-[10px]">Tối cao</span>'}
+                            ${isApprovedUser ? 
+                                `<button onclick="window.setApprovalStatus('${uId}', false)" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded font-bold text-[10px]">Hủy duyệt</button>` : 
+                                `<button onclick="window.setApprovalStatus('${uId}', true)" class="px-2 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded font-bold text-[10px]">Phê duyệt</button>`
+                            }
+                            ${isVipUser ? 
+                                `<button onclick="window.setUserRole('${uId}', 'Doctor')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded font-bold text-[10px]">Hủy VIP</button>` : 
+                                `<button onclick="window.setUserRole('${uId}', 'VIP')" class="px-2 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded font-bold text-[10px]">Cấp VIP</button>`
+                            }
+                            ${isBlockedUser ? 
+                                `<button onclick="window.setBlockStatus('${uId}', false)" class="px-2 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded font-bold text-[10px]">Mở khóa</button>` : 
+                                `<button onclick="window.setBlockStatus('${uId}', true)" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded font-bold text-[10px]">Block</button>`
+                            }
+                            <button onclick="window.deleteUserAccount('${uId}')" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-[10px]"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
                 console.error("Lỗi tải users:", err);
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">Lỗi tải danh sách thành viên.</td></tr>`;
             }
         };
 
-        window.approveUser = async function(uId, status) {
-            if (!isAdmin) return;
+        window.setApprovalStatus = async function(userId, status) {
             try {
-                await updateDoc(doc(db, "users", uId), { isApproved: status });
+                await updateDoc(doc(db, "users", userId), { isApproved: status });
+                alert(status ? "Đã phê duyệt tài khoản thành công!" : "Đã hủy phê duyệt thành viên!");
                 window.loadUsersManagementTable();
             } catch (err) {
-                alert("Thất bại: " + err.message);
+                alert("Lỗi: " + err.message);
             }
         };
 
-        window.blockUser = async function(uId, status) {
-            if (!isAdmin) return;
+        window.setBlockStatus = async function(userId, status) {
             try {
-                await updateDoc(doc(db, "users", uId), { isBlocked: status });
+                await updateDoc(doc(db, "users", userId), { isBlocked: status });
+                alert(status ? "Đã khóa (block) tài khoản thành công!" : "Đã mở khóa tài khoản thành công!");
                 window.loadUsersManagementTable();
             } catch (err) {
-                alert("Thất bại: " + err.message);
+                alert("Lỗi: " + err.message);
             }
         };
 
-        window.updateUserRole = async function(uId, newRole) {
-            if (!isAdmin) return;
+        window.setUserRole = async function(userId, role) {
             try {
-                await updateDoc(doc(db, "users", uId), { role: newRole });
-                alert("Cập nhật quyền thành công!");
+                await updateDoc(doc(db, "users", userId), { role: role });
+                alert(`Đã cập nhật quyền thành viên thành: ${role}!`);
                 window.loadUsersManagementTable();
             } catch (err) {
-                alert("Thất bại: " + err.message);
+                alert("Lỗi: " + err.message);
             }
         };
 
-        window.runChemoStatistics = function() {
-            const startStr = document.getElementById('statsStartDate').value;
-            const endStr = document.getElementById('statsEndDate').value;
-            const icdFilter = document.getElementById('statsIcdFilter').value;
-
-            if (!startStr || !endStr) {
-                alert("Vui lòng chọn đầy đủ khoảng thời gian!");
-                return;
-            }
-
-            const startDate = new Date(startStr);
-            startDate.setHours(0,0,0,0);
-            const endDate = new Date(endStr);
-            endDate.setHours(23,59,59,999);
-
-            let matchedPatientsCount = 0;
-            let totalCyclesCount = 0;
-            const tbody = document.getElementById('statsTableBody');
-            tbody.innerHTML = "";
-
-            const matchedList = [];
-
-            cachedPatientsList.forEach(p => {
-                const diag = (p.diagnosis || "").toUpperCase();
-                if (icdFilter !== "ALL") {
-                    if (!diag.includes(icdFilter.toUpperCase())) return;
+        window.deleteUserAccount = async function(userId) {
+            if (confirm("Bạn có chắc chắn muốn xóa tài khoản này khỏi hệ thống?")) {
+                try {
+                    await deleteDoc(doc(db, "users", userId));
+                    alert("Đã xóa tài khoản thành công!");
+                    window.loadUsersManagementTable();
+                } catch (err) {
+                    alert("Không thể xóa: " + err.message);
                 }
-
-                const validCycles = (p.cycles || []).filter(c => {
-                    if (!c.date) return false;
-                    const cDate = new Date(c.date);
-                    return cDate >= startDate && cDate <= endDate && !c.isProtocolChange;
-                });
-
-                if (validCycles.length > 0) {
-                    matchedPatientsCount++;
-                    totalCyclesCount += validCycles.length;
-                    matchedList.push({ ...p, matchedCyclesCount: validCycles.length });
-                }
-            });
-
-            document.getElementById('statTotalPatients').innerText = matchedPatientsCount;
-            document.getElementById('statTotalCycles').innerText = totalCyclesCount;
-
-            if (matchedList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào có chu kỳ trong khoảng thời gian này.</td></tr>`;
-                return;
             }
-
-            matchedList.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">${p.patientId || '-'}</td>
-                    <td class="p-3 font-semibold text-slate-900">${p.name || '-'}</td>
-                    <td class="p-3">${p.gender || '-'}</td>
-                    <td class="p-3">${p.diagnosis || '-'}</td>
-                    <td class="p-3 font-bold text-amber-800">${p.protocol || '-'}</td>
-                    <td class="p-3 text-center font-extrabold text-teal-700">${p.matchedCyclesCount}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="window.viewPatientDetail('${p.id}'); window.closeStatsModal();" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg font-semibold text-[11px]">Xem</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
         };
     </script>
 </body>
