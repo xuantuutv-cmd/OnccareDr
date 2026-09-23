@@ -211,8 +211,8 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Năm Sinh <span class="text-rose-500">*</span></label>
-                            <input type="number" id="npBirthYear" min="1900" max="2026" placeholder="vd: 1980" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <label class="block font-semibold text-slate-700 mb-1">Năm Sinh (Không bắt buộc)</label>
+                            <input type="number" id="npBirthYear" min="1900" max="2026" placeholder="vd: 1980" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
                         </div>
                     </div>
 
@@ -1230,7 +1230,7 @@
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npCycleNumber').value = "1";
-            document.getElementById('npBirthYear').value = new Date().getFullYear() - 50; // Mặc định 50 tuổi
+            document.getElementById('npBirthYear').value = ""; // Để trống năm sinh mặc định, không bắt buộc
 
             // Mở khóa toàn bộ thông tin hành chính khi tạo mới
             document.getElementById('npId').disabled = false;
@@ -1787,7 +1787,7 @@
             document.getElementById('npId').value = p.patientId || '';
             document.getElementById('npName').value = p.name || '';
             document.getElementById('npGender').value = p.gender || 'Nữ';
-            document.getElementById('npBirthYear').value = p.birthYear || '1980';
+            document.getElementById('npBirthYear').value = p.birthYear || '';
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
 
             // QUYỀN BẢO MẬT HÀNH CHÍNH: Chỉ Admin mới được sửa thông tin hành chính, Bác sĩ thông thường bị khóa ô hành chính
@@ -1991,7 +1991,8 @@
             const patientId = document.getElementById('npId').value.trim();
             const name = document.getElementById('npName').value.trim();
             const gender = document.getElementById('npGender').value;
-            const birthYear = parseInt(document.getElementById('npBirthYear').value) || 1980;
+            const birthYearInput = document.getElementById('npBirthYear').value.trim();
+            const birthYear = birthYearInput ? parseInt(birthYearInput) : "";
             const diagnosis = document.getElementById('npDiagnosis').value.trim();
             
             const digitRegex = /^\d{8}$/;
@@ -2230,15 +2231,19 @@
                     if (genderCounts[g] !== undefined) genderCounts[g]++;
                     else genderCounts["Khác"] = (genderCounts["Khác"] || 0) + 1;
 
-                    // Thống kê Mức độ tuổi theo nghiên cứu y khoa
-                    let birthY = parseInt(p.birthYear) || (currentYear - 50);
-                    let age = currentYear - birthY;
-                    if (age < 35) {
-                        ageGroupCounts["Trẻ (< 35 tuổi)"]++;
-                    } else if (age <= 60) {
-                        ageGroupCounts["Trung niên (35-60 tuổi)"]++;
-                    } else {
-                        ageGroupCounts["Già (> 60 tuổi)"]++;
+                    // Thống kê Mức độ tuổi theo nghiên cứu y khoa (Chỉ thống kê nếu bệnh nhân có nhập năm sinh hợp lệ)
+                    let birthY = parseInt(p.birthYear);
+                    let ageDisplay = "-";
+                    if (!isNaN(birthY) && birthY > 1900) {
+                        let age = currentYear - birthY;
+                        ageDisplay = `${age}t`;
+                        if (age < 35) {
+                            ageGroupCounts["Trẻ (< 35 tuổi)"]++;
+                        } else if (age <= 60) {
+                            ageGroupCounts["Trung niên (35-60 tuổi)"]++;
+                        } else {
+                            ageGroupCounts["Già (> 60 tuổi)"]++;
+                        }
                     }
 
                     results.push({
@@ -2246,8 +2251,7 @@
                         patientId: p.patientId || '-',
                         name: p.name || '-',
                         gender: p.gender || '-',
-                        birthYear: birthY,
-                        age: age,
+                        birthYearText: !isNaN(birthY) ? `${birthY} (${ageDisplay})` : 'Để trống',
                         diagnosis: p.diagnosis || '-',
                         protocol: p.protocol || '-',
                         count: validCycles.length
@@ -2344,7 +2348,7 @@
                     <td class="p-3 font-bold text-teal-800">${item.patientId}</td>
                     <td class="p-3 font-semibold text-slate-900">${item.name}</td>
                     <td class="p-3">${item.gender}</td>
-                    <td class="p-3">${item.birthYear} (${item.age}t)</td>
+                    <td class="p-3">${item.birthYearText}</td>
                     <td class="p-3 font-medium text-slate-800">${item.diagnosis}</td>
                     <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
                     <td class="p-3 text-center font-bold text-teal-700">${item.count} chu kỳ</td>
