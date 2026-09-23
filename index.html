@@ -86,7 +86,7 @@
             <i class="fa-solid fa-shield-halved text-amber-600 text-lg mt-0.5"></i>
             <div>
                 <p class="font-bold">Chế Độ Bảo Mật Thông Tin Bệnh Nhân (HIPAA/Bảo Mật Y Tế)</p>
-                <p id="noticeSubText" class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân được ẩn toàn bộ khi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
+                <p id="noticeSubText" class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân ẩn hoàn toàn khỏi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
             </div>
         </div>
 
@@ -134,6 +134,7 @@
                             <th class="p-3">Mã BN</th>
                             <th class="p-3">Họ và Tên</th>
                             <th class="p-3">Giới Tính</th>
+                            <th class="p-3">Năm Sinh</th>
                             <th class="p-3">Thông Số Gần Nhất</th>
                             <th class="p-3">Chẩn Đoán Lâm Sàng</th>
                             <th class="p-3">Phác Đồ Hiện Tại</th>
@@ -143,7 +144,7 @@
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
                         <tr>
-                            <td colspan="8" class="p-8 text-center text-slate-400 font-medium">
+                            <td colspan="9" class="p-8 text-center text-slate-400 font-medium">
                                 <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
                                 Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
                             </td>
@@ -193,7 +194,7 @@
                             <i class="fa-solid fa-address-card"></i> Thông Tin Hành Chính & Chẩn Đoán
                         </span>
                     </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                         <div>
                             <label class="block font-semibold text-slate-700 mb-1">Mã BN (Bắt buộc đúng 8 số) <span class="text-rose-500">*</span></label>
                             <input type="text" id="npId" maxlength="8" placeholder="vd: 24001234" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 uppercase focus:outline-none focus:ring-2 focus:ring-teal-500">
@@ -208,6 +209,10 @@
                                 <option value="Nữ">Nữ</option>
                                 <option value="Nam">Nam</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Năm Sinh <span class="text-rose-500">*</span></label>
+                            <input type="number" id="npBirthYear" min="1900" max="2026" placeholder="vd: 1980" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
                         </div>
                     </div>
 
@@ -307,7 +312,7 @@
                         </div>
                     </div>
 
-                    <!-- Khu vực nhập liều cụ thể nếu thuốc có dải liều dao động -->
+                    <!-- Khu vực nhập liệu cụ thể nếu thuốc có dải liều dao động -->
                     <div id="variableDoseInputsContainer" class="hidden bg-white p-3 rounded-xl border border-indigo-200 space-y-2">
                         <p class="font-bold text-rose-700 text-[11px] flex items-center gap-1.5">
                             <i class="fa-solid fa-sliders"></i> Nhập liều cụ thể cho các thuốc có dải dao động:
@@ -409,7 +414,7 @@
                     <h4 class="font-bold text-amber-900 uppercase text-[11px] tracking-wider flex items-center justify-between">
                         <span class="flex items-center gap-2">
                             <i class="fa-solid fa-notes-medical text-amber-600"></i> 
-                            <span id="cycleSectionTitle">Thông Tin Ngày Tiêm & Độc Tính (Nếu thêm chu kỳ mới)</span>
+                            <span id="cycleSectionTitle">Thông Tin Ngày Tiêm & Đặc Tính (Nếu thêm chu kỳ mới)</span>
                         </span>
                         <span id="existingCyclesCount" class="text-[10px] bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full font-bold">0 chu kỳ đã lưu</span>
                     </h4>
@@ -564,13 +569,13 @@
         </div>
     </div>
 
-    <!-- MODAL: Thống Kê Khoảng Thời Gian & Lọc ICD -->
+    <!-- MODAL: Thống Kê Khoảng Thời Gian, Giới Tính, Độ Tuổi & Lọc ICD -->
     <div id="statsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
+        <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-teal-800 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-teal-300"></i>
-                    Thống Kê Bệnh Nhân Hóa Trị Theo Khoảng Thời Gian & Nhóm ICD
+                    Thống Kê Bệnh Nhân Hóa Trị Theo Khoảng Thời Gian, Giới Tính, Độ Tuổi & Nhóm ICD
                 </h3>
                 <button onclick="window.closeStatsModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -604,7 +609,7 @@
                 </div>
 
                 <!-- Thống kê Card tổng quan -->
-                <div id="statsSummaryCardsContainer" class="grid grid-cols-1 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl flex items-center justify-between">
                         <div>
                             <p class="text-teal-700 font-semibold uppercase text-[10px]">Tổng số bệnh nhân hóa trị</p>
@@ -612,6 +617,63 @@
                         </div>
                         <div class="w-10 h-10 bg-teal-200/60 rounded-full flex items-center justify-center text-teal-800 text-lg">
                             <i class="fa-solid fa-hospital-user"></i>
+                        </div>
+                    </div>
+                    <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <p class="text-indigo-700 font-semibold uppercase text-[10px]">Phân bố Giới Tính</p>
+                            <div id="statGenderSummary" class="text-xs font-bold text-indigo-900 mt-1 space-x-2">Nam: 0 | Nữ: 0</div>
+                        </div>
+                        <div class="w-10 h-10 bg-indigo-200/60 rounded-full flex items-center justify-center text-indigo-800 text-lg">
+                            <i class="fa-solid fa-venus-mars"></i>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <p class="text-amber-700 font-semibold uppercase text-[10px]">Phân bố Nhóm Độ Tuổi</p>
+                            <div id="statAgeSummary" class="text-[11px] font-bold text-amber-900 mt-1">Trẻ: 0 | Trung niên: 0 | Già: 0</div>
+                        </div>
+                        <div class="w-10 h-10 bg-amber-200/60 rounded-full flex items-center justify-center text-amber-800 text-lg">
+                            <i class="fa-solid fa-user-clock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng Thống Kê Giới Tính & Nhóm Độ Tuổi -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-venus-mars text-indigo-600"></i> Bảng Thống Kê Theo Giới Tính
+                        </h4>
+                        <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-100 text-slate-600 uppercase text-[10px]">
+                                    <tr>
+                                        <th class="p-2.5">Giới Tính</th>
+                                        <th class="p-2.5 text-center">Số Lượng BN</th>
+                                        <th class="p-2.5 text-right">Tỷ Lệ (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="genderStatsTableBody" class="divide-y divide-slate-100 font-semibold"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-user-clock text-amber-600"></i> Bảng Thống Kê Theo Mức Độ Tuổi (Trẻ, Trung niên, Già)
+                        </h4>
+                        <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-100 text-slate-600 uppercase text-[10px]">
+                                    <tr>
+                                        <th class="p-2.5">Nhóm Tuổi (Mốc nghiên cứu)</th>
+                                        <th class="p-2.5 text-center">Số Lượng BN</th>
+                                        <th class="p-2.5 text-right">Tỷ Lệ (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ageStatsTableBody" class="divide-y divide-slate-100 font-semibold"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -635,6 +697,7 @@
                                     <th class="p-3">Mã BN</th>
                                     <th class="p-3">Họ và Tên</th>
                                     <th class="p-3">Giới Tính</th>
+                                    <th class="p-3">Năm Sinh (Tuổi)</th>
                                     <th class="p-3">Chẩn Đoán Lâm Sàng</th>
                                     <th class="p-3">Phác Đồ</th>
                                     <th class="p-3 text-center">Số Chu Kỳ Phù Hợp</th>
@@ -643,7 +706,7 @@
                             </thead>
                             <tbody id="statsTableBody" class="divide-y divide-slate-200">
                                 <tr>
-                                    <td colspan="7" class="p-6 text-center text-slate-400 font-medium">
+                                    <td colspan="8" class="p-6 text-center text-slate-400 font-medium">
                                         Vui lòng chọn khoảng thời gian và nhấn "Xem Thống Kê".
                                     </td>
                                 </tr>
@@ -680,7 +743,7 @@
                                 <th class="p-3">Email</th>
                                 <th class="p-3">Vai Trò</th>
                                 <th class="p-3">Trạng Thái</th>
-                                <th class="p-3 text-center">Hành Động Admin</th>
+                                <th class="p-3 text-center">Hành động Admin</th>
                             </tr>
                         </thead>
                         <tbody id="userTableBody" class="divide-y divide-slate-200">
@@ -699,32 +762,32 @@
     <!-- UI Helpers & Core Script -->
     <script>
         const icdDatabase = [
-            { code: "C16.0", desc: "U ác tính ở tâm vị" },
-            { code: "C16.1", desc: "U ác tính ở đáy vị" },
-            { code: "C16.2", desc: "U ác tính ở thân vị" },
-            { code: "C16.3", desc: "U ác tính ở hang vị" },
-            { code: "C16.4", desc: "U ác tính ở môn vị" },
-            { code: "C16.5", desc: "U ác tính ở bờ cong nhỏ dạ dày" },
-            { code: "C16.6", desc: "U ác tính ở bờ cong lớn dạ dày" },
+            { code: "C16.0", desc: "U ác tính tâm vị" },
+            { code: "C16.1", desc: "U ác tính đáy vị" },
+            { code: "C16.2", desc: "U ác tính thân vị" },
+            { code: "C16.3", desc: "U ác tính hang vị" },
+            { code: "C16.4", desc: "U ác tính môn vị" },
+            { code: "C16.5", desc: "U ác tính bờ cong nhỏ dạ dày" },
+            { code: "C16.6", desc: "U ác tính bờ cong lớn dạ dày" },
             { code: "C16.8", desc: "U ác tính tổn thương lan tràn dạ dày" },
             { code: "C16.9", desc: "U ác tính dạ dày, không đặc hiệu" },
-            { code: "C18.1", desc: "U ác tính ở ruột thừa" },
-            { code: "C18.2", desc: "U ác tính ở đại tràng lên" },
-            { code: "C18.3", desc: "U ác tính ở góc gan đại tràng" },
-            { code: "C18.4", desc: "U ác tính ở đại tràng ngang" },
-            { code: "C18.5", desc: "U ác tính ở góc lách đại tràng" },
-            { code: "C18.6", desc: "U ác tính ở đại tràng xuống" },
-            { code: "C18.7", desc: "U ác tính ở đại tràng xích-ma" },
+            { code: "C18.1", desc: "U ác tính ruột thừa" },
+            { code: "C18.2", desc: "U ác tính đại tràng lên" },
+            { code: "C18.3", desc: "U ác tính góc gan đại tràng" },
+            { code: "C18.4", desc: "U ác tính đại tràng ngang" },
+            { code: "C18.5", desc: "U ác tính góc lách đại tràng" },
+            { code: "C18.6", desc: "U ác tính đại tràng xuống" },
+            { code: "C18.7", desc: "U ác tính đại tràng xích-ma" },
             { code: "C18.8", desc: "U ác tính tổn thương lan tràn đại tràng" },
             { code: "C18.9", desc: "U ác tính đại tràng, không đặc hiệu" },
             { code: "C19", desc: "U ác tính của đoạn nối trực đại tràng" },
             { code: "C20", desc: "U ác tính của trực tràng" },
-            { code: "C50.1", desc: "U ác tính ở vùng trung tâm vú" },
-            { code: "C50.2", desc: "U ác tính ở phần tư trên - trong vú" },
-            { code: "C50.3", desc: "U ác tính ở phần tư dưới - trong vú" },
-            { code: "C50.4", desc: "U ác tính ở phần tư trên - ngoài vú" },
-            { code: "C50.5", desc: "U ác tính ở phần tư dưới - ngoài vú" },
-            { code: "C50.6", desc: "U ác tính ở phần nách vú" },
+            { code: "C50.1", desc: "U ác tính vùng trung tâm vú" },
+            { code: "C50.2", desc: "U ác tính phần tư trên - trong vú" },
+            { code: "C50.3", desc: "U ác tính phần tư dưới - trong vú" },
+            { code: "C50.4", desc: "U ác tính phần tư trên - ngoài vú" },
+            { code: "C50.5", desc: "U ác tính phần tư dưới - ngoài vú" },
+            { code: "C50.6", desc: "U ác tính phần nách vú" },
             { code: "C50.8", desc: "U ác tính tổn thương lan tràn vú" },
             { code: "C50.9", desc: "U ác tính vú, không đặc hiệu" }
         ];
@@ -1159,7 +1222,7 @@
         window.openNewPatientModal = function() {
             document.getElementById('editDocId').value = "";
             document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-user-plus text-teal-200"></i> Thêm Hồ Sơ Bệnh Nhân Mới`;
-            document.getElementById('cycleSectionTitle').innerText = "Thông Tin Ngày Tiêm & Độc Tính";
+            document.getElementById('cycleSectionTitle').innerText = "Thông Tin Ngày Tiêm & Đặc Tính";
             document.getElementById('existingCyclesCount').innerText = "0 chu kỳ đã lưu";
             document.getElementById('saveBtnText').innerText = "Lưu Trực Tiếp Lên Cloud";
             document.getElementById('patientForm').reset();
@@ -1167,6 +1230,14 @@
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npCycleNumber').value = "1";
+            document.getElementById('npBirthYear').value = new Date().getFullYear() - 50; // Mặc định 50 tuổi
+
+            // Mở khóa toàn bộ thông tin hành chính khi tạo mới
+            document.getElementById('npId').disabled = false;
+            document.getElementById('npName').disabled = false;
+            document.getElementById('npGender').disabled = false;
+            document.getElementById('npBirthYear').disabled = false;
+            document.getElementById('npDiagnosis').disabled = false;
 
             document.getElementById('protocolModeContainer').classList.add('hidden');
             document.getElementById('customProtocolInputContainer').classList.add('hidden');
@@ -1211,7 +1282,6 @@
             }
         };
 
-        // HÀM CHUYỂN TAB TRONG MODAL CHI TIẾT BỆNH NHÂN (TIMELINE / CHART / NOTES)
         window.switchDetailTab = function(tabName) {
             const btnTimeline = document.getElementById('btnTabTimeline');
             const btnChart = document.getElementById('btnTabChart');
@@ -1220,7 +1290,6 @@
             const contentChart = document.getElementById('tabContentChart');
             const contentNotes = document.getElementById('tabContentNotes');
 
-            // Reset classes
             btnTimeline.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
             btnChart.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
             btnNotes.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
@@ -1453,7 +1522,7 @@
                 return;
             }
             if (!isAdmin && !isApproved) {
-                alert("Tài khoản của bạn chưa được Admin phê duyệt để tra cứu!");
+                alert("Tài khoản của bạn chưa có Admin phê duyệt để tra cứu!");
                 return;
             }
             const code = document.getElementById('searchInput').value.trim();
@@ -1468,7 +1537,7 @@
             const matched = cachedPatientsList.filter(p => p.patientId && p.patientId === code);
 
             if (matched.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${code}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${code}</td></tr>`;
                 countBadge.innerText = "0 kết quả";
                 return;
             }
@@ -1485,6 +1554,7 @@
                     <td class="p-3 font-bold text-teal-800">${p.patientId || '-'}</td>
                     <td class="p-3 font-semibold text-slate-900">${p.name || '-'}</td>
                     <td class="p-3">${p.gender || '-'}</td>
+                    <td class="p-3 font-bold text-slate-700">${p.birthYear || '-'}</td>
                     <td class="p-3 text-[11px]">${lastCycle.date ? `Ngày: ${lastCycle.date}<br>BSA:${lastCycle.bsa || '-'} m²` : 'Chưa có chu kỳ'}</td>
                     <td class="p-3 font-medium text-slate-800">${p.diagnosis || '-'}</td>
                     <td class="p-3 font-bold text-amber-800">${p.protocol || 'Chưa cập nhật'}</td>
@@ -1504,7 +1574,7 @@
             document.getElementById('patientCountBadge').innerText = "Chưa chọn tra cứu";
             document.getElementById('allPatientsTableBody').innerHTML = `
                 <tr>
-                    <td colspan="8" class="p-8 text-center text-slate-400 font-medium">
+                    <td colspan="9" class="p-8 text-center text-slate-400 font-medium">
                         <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
                         Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
                     </td>
@@ -1518,8 +1588,8 @@
             if (!p) return;
             window.currentViewingPatient = p;
 
-            document.getElementById('detName').innerText = p.name;
-            document.getElementById('detPatientId').innerText = `Mã BN: ${p.patientId}`;
+            document.getElementById('detName').innerText = `${p.name} (Năm sinh: ${p.birthYear || '-'})`;
+            document.getElementById('detPatientId').innerText = `Mã BN: ${p.patientId} | Giới tính: ${p.gender || '-'}`;
             document.getElementById('detDiagnosis').innerText = p.diagnosis || '-';
             document.getElementById('detProtocol').querySelector('span').innerText = p.protocol || 'Chưa cập nhật phác đồ tổng thể';
             document.getElementById('detCreatedBy').innerText = p.createdByEmail || '-';
@@ -1527,7 +1597,7 @@
             const qrContainer = document.getElementById('patientQrCodeContainer');
             qrContainer.innerHTML = "";
             currentQr = new QRCode(qrContainer, {
-                text: `ONCOCARE_PATIENT_ID:${p.patientId} | NAME:${p.name}`,
+                text: `ONCOCARE_PATIENT_ID:${p.patientId} | NAME:${p.name} | DOB:${p.birthYear || '-'}`,
                 width: 120,
                 height: 120,
                 colorDark: "#0f766e",
@@ -1566,7 +1636,7 @@
                                 <span>Phác đồ đang hóa trị: ${currentProto}</span>
                             </div>
                             ${c.dosesText ? `<p class="text-indigo-900 text-[11px] bg-indigo-50 p-2 rounded border border-indigo-100 font-mono">${c.dosesText}</p>` : ''}
-                            <p class="text-slate-600 text-xs">${c.note || 'Không có ghi chú độc tính.'}</p>
+                            <p class="text-slate-600 text-xs">${c.note || 'Không có ghi chú cụ thể.'}</p>
                         `;
                     }
                     cyclesContainer.appendChild(div);
@@ -1587,7 +1657,6 @@
                 });
             }
 
-            // Mặc định mở tab timeline đầu tiên
             window.switchDetailTab('timeline');
             document.getElementById('patientDetailModal').classList.remove('hidden');
         };
@@ -1718,7 +1787,29 @@
             document.getElementById('npId').value = p.patientId || '';
             document.getElementById('npName').value = p.name || '';
             document.getElementById('npGender').value = p.gender || 'Nữ';
+            document.getElementById('npBirthYear').value = p.birthYear || '1980';
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
+
+            // QUYỀN BẢO MẬT HÀNH CHÍNH: Chỉ Admin mới được sửa thông tin hành chính, Bác sĩ thông thường bị khóa ô hành chính
+            if (!isAdmin) {
+                document.getElementById('npId').disabled = true;
+                document.getElementById('npName').disabled = true;
+                document.getElementById('npGender').disabled = true;
+                document.getElementById('npBirthYear').disabled = true;
+                document.getElementById('npDiagnosis').disabled = true;
+                document.getElementById('npId').classList.add('bg-slate-100');
+                document.getElementById('npName').classList.add('bg-slate-100');
+                document.getElementById('npDiagnosis').classList.add('bg-slate-100');
+            } else {
+                document.getElementById('npId').disabled = false;
+                document.getElementById('npName').disabled = false;
+                document.getElementById('npGender').disabled = false;
+                document.getElementById('npBirthYear').disabled = false;
+                document.getElementById('npDiagnosis').disabled = false;
+                document.getElementById('npId').classList.remove('bg-slate-100');
+                document.getElementById('npName').classList.remove('bg-slate-100');
+                document.getElementById('npDiagnosis').classList.remove('bg-slate-100');
+            }
             
             window.editingPatientOldProtocol = p.protocol || "";
             document.getElementById('currentActiveProtoLabel').innerText = window.editingPatientOldProtocol || "Chưa có";
@@ -1900,16 +1991,15 @@
             const patientId = document.getElementById('npId').value.trim();
             const name = document.getElementById('npName').value.trim();
             const gender = document.getElementById('npGender').value;
+            const birthYear = parseInt(document.getElementById('npBirthYear').value) || 1980;
             const diagnosis = document.getElementById('npDiagnosis').value.trim();
             
-            // 1. RÀNG BUỘC: Mã bệnh nhân phải bắt buộc gồm đúng 8 chữ số
             const digitRegex = /^\d{8}$/;
             if (!digitRegex.test(patientId)) {
                 alert("Mã bệnh nhân bắt buộc phải gồm đúng 8 chữ số (VD: 24001234)!");
                 return;
             }
 
-            // 2. RÀNG BUỘC: Kiểm tra trùng Mã BN khi tạo mới
             if (!docId) {
                 const isDuplicate = cachedPatientsList.some(p => p.patientId === patientId);
                 if (isDuplicate) {
@@ -1922,7 +2012,6 @@
             const branchName = document.getElementById('protocolCycleBranch').value;
             const cycleNum = document.getElementById('npCycleNumber').value || 1;
 
-            // XỬ LÝ PHÁC ĐỒ KHÁC / CUSTOM
             let newProtocol = "";
             if (selectedProtoKey === "CUSTOM") {
                 newProtocol = document.getElementById('customProtocolNameInput').value.trim();
@@ -1930,7 +2019,6 @@
                 newProtocol = chemoProtocolsData[selectedProtoKey].name;
             }
 
-            // Xây dựng tên chu kỳ kết hợp số thứ tự và phân đoạn tuần nếu có thuốc uống 14 ngày
             let finalBranchName = branchName ? `${branchName} - Chu kỳ ${cycleNum}` : `Chu kỳ ${cycleNum}`;
             const fourteenBox = document.getElementById('fourteenDaysOralWeeksBox');
             if (fourteenBox && !fourteenBox.classList.contains('hidden')) {
@@ -1998,8 +2086,6 @@
                     }
                 }
 
-                // CHỈ THÊM CHU KỲ MỚI NẾU BÁC SĨ CÓ NHẬP CÂN NẶNG & CHIỀU CAO THỰC TẾ. 
-                // KHI XÓA LỊCH SỬ (CÂN NẶNG TRỐNG), HỆ THỐNG SẼ GIỮ NGUYÊN MẢNG finalCycles ĐÃ ĐƯỢC LỌC XÓA SẠCH.
                 if (weight > 0 && height > 0) {
                     finalCycles.push({
                         date: cycleDate || todayStr,
@@ -2023,18 +2109,26 @@
 
                 if (docId) {
                     const pRef = doc(db, "patients", docId);
-                    await updateDoc(pRef, {
-                        patientId, name, gender, diagnosis,
-                        protocol: newProtocol || window.editingPatientOldProtocol || '',
+                    let updatePayload = {
                         cycles: finalCycles,
                         notes: finalNotes,
                         markers: finalMarkers,
                         updatedAt: serverTimestamp()
-                    });
+                    };
+                    // BẢO MẬT HÀNH CHÍNH: Chỉ cho phép Admin sửa các thông tin hành chính, Bác sĩ thông thường chỉ cập nhật chu kỳ/marker/ghi chú
+                    if (isAdmin) {
+                        updatePayload.patientId = patientId;
+                        updatePayload.name = name;
+                        updatePayload.gender = gender;
+                        updatePayload.birthYear = birthYear;
+                        updatePayload.diagnosis = diagnosis;
+                        updatePayload.protocol = newProtocol || window.editingPatientOldProtocol || '';
+                    }
+                    await updateDoc(pRef, updatePayload);
                     alert("Cập nhật hồ sơ thành công!");
                 } else {
                     await addDoc(collection(db, "patients"), {
-                        patientId, name, gender, diagnosis,
+                        patientId, name, gender, birthYear, diagnosis,
                         protocol: newProtocol,
                         cycles: finalCycles,
                         notes: finalNotes,
@@ -2088,6 +2182,7 @@
             const startDate = new Date(startDateStr);
             const endDate = new Date(endDateStr);
             endDate.setHours(23, 59, 59, 999);
+            const currentYear = new Date().getFullYear();
 
             let matchedPatientsCount = 0;
             const statsTableBody = document.getElementById('statsTableBody');
@@ -2103,6 +2198,8 @@
 
             let results = [];
             let icdGroupCounts = {};
+            let genderCounts = { "Nam": 0, "Nữ": 0, "Khác": 0 };
+            let ageGroupCounts = { "Trẻ (< 35 tuổi)": 0, "Trung niên (35-60 tuổi)": 0, "Già (> 60 tuổi)": 0 };
 
             cachedPatientsList.forEach(p => {
                 const diag = (p.diagnosis || "").toUpperCase();
@@ -2127,11 +2224,30 @@
 
                 if (validCycles.length > 0) {
                     matchedPatientsCount++;
+                    
+                    // Thống kê Giới tính
+                    let g = p.gender || "Khác";
+                    if (genderCounts[g] !== undefined) genderCounts[g]++;
+                    else genderCounts["Khác"] = (genderCounts["Khác"] || 0) + 1;
+
+                    // Thống kê Mức độ tuổi theo nghiên cứu y khoa
+                    let birthY = parseInt(p.birthYear) || (currentYear - 50);
+                    let age = currentYear - birthY;
+                    if (age < 35) {
+                        ageGroupCounts["Trẻ (< 35 tuổi)"]++;
+                    } else if (age <= 60) {
+                        ageGroupCounts["Trung niên (35-60 tuổi)"]++;
+                    } else {
+                        ageGroupCounts["Già (> 60 tuổi)"]++;
+                    }
+
                     results.push({
                         id: p.id,
                         patientId: p.patientId || '-',
                         name: p.name || '-',
                         gender: p.gender || '-',
+                        birthYear: birthY,
+                        age: age,
                         diagnosis: p.diagnosis || '-',
                         protocol: p.protocol || '-',
                         count: validCycles.length
@@ -2142,6 +2258,26 @@
             });
 
             document.getElementById('statTotalPatients').innerText = matchedPatientsCount;
+            document.getElementById('statGenderSummary').innerText = `Nam: ${genderCounts["Nam"]} | Nữ: ${genderCounts["Nữ"]}`;
+            document.getElementById('statAgeSummary').innerText = `Trẻ: ${ageGroupCounts["Trẻ (< 35 tuổi)"]} | Trung niên: ${ageGroupCounts["Trung niên (35-60 tuổi)"]} | Già: ${ageGroupCounts["Già (> 60 tuổi)"]}`;
+
+            // Đổ dữ liệu vào bảng Thống kê Giới tính
+            const genderTableBody = document.getElementById('genderStatsTableBody');
+            genderTableBody.innerHTML = "";
+            for (let [gKey, gVal] of Object.entries(genderCounts)) {
+                if (gVal > 0 || gKey !== "Khác") {
+                    let percent = matchedPatientsCount > 0 ? ((gVal / matchedPatientsCount) * 100).toFixed(1) : 0;
+                    genderTableBody.innerHTML += `<tr><td class="p-2.5 text-indigo-900">${gKey}</td><td class="p-2.5 text-center">${gVal}</td><td class="p-2.5 text-right font-bold">${percent}%</td></tr>`;
+                }
+            }
+
+            // Đổ dữ liệu vào bảng Thống kê Nhóm Độ Tuổi
+            const ageTableBody = document.getElementById('ageStatsTableBody');
+            ageTableBody.innerHTML = "";
+            for (let [aKey, aVal] of Object.entries(ageGroupCounts)) {
+                let percent = matchedPatientsCount > 0 ? ((aVal / matchedPatientsCount) * 100).toFixed(1) : 0;
+                ageTableBody.innerHTML += `<tr><td class="p-2.5 text-amber-900">${aKey}</td><td class="p-2.5 text-center">${aVal}</td><td class="p-2.5 text-right font-bold">${percent}%</td></tr>`;
+            }
 
             if (icdFilterVal === "ALL" && matchedPatientsCount > 0) {
                 pieSection.classList.remove('hidden');
@@ -2197,7 +2333,7 @@
             }
 
             if (results.length === 0) {
-                statsTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
+                statsTableBody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
                 return;
             }
 
@@ -2208,6 +2344,7 @@
                     <td class="p-3 font-bold text-teal-800">${item.patientId}</td>
                     <td class="p-3 font-semibold text-slate-900">${item.name}</td>
                     <td class="p-3">${item.gender}</td>
+                    <td class="p-3">${item.birthYear} (${item.age}t)</td>
                     <td class="p-3 font-medium text-slate-800">${item.diagnosis}</td>
                     <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
                     <td class="p-3 text-center font-bold text-teal-700">${item.count} chu kỳ</td>
