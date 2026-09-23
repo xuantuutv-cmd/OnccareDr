@@ -86,7 +86,7 @@
             <i class="fa-solid fa-shield-halved text-amber-600 text-lg mt-0.5"></i>
             <div>
                 <p class="font-bold">Chế Độ Bảo Mật Thông Tin Bệnh Nhân (HIPAA/Bảo Mật Y Tế)</p>
-                <p id="noticeSubText" class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân được ẩn toàn bộ khỏi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
+                <p id="noticeSubText" class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân được ẩn toàn bộ khi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
             </div>
         </div>
 
@@ -97,7 +97,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-key text-slate-400"></i>
                     </div>
-                    <input type="text" id="searchInput" placeholder="Nhập chính xác Mã BN (VD: BN001, BN002...)" class="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold uppercase tracking-wide transition">
+                    <input type="text" id="searchInput" placeholder="Nhập chính xác Mã BN gồm 8 chữ số (VD: 24001234...)" maxlength="8" class="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold tracking-wide transition">
                     <button type="button" onclick="window.clearSearchResult()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                         <i class="fa-solid fa-circle-xmark text-sm"></i>
                     </button>
@@ -159,9 +159,9 @@
     <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-slate-600 text-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
-                <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="BSCKI Thạch Xuân Tựu" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
+                <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="BSCKI Thạch Xuân Tuấn" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
                 <div>
-                    <p class="font-bold text-slate-900 text-sm">Bản quyền phần mềm thuộc về: <span class="text-teal-800">BSCKI Thạch Xuân Tựu</span></p>
+                    <p class="font-bold text-slate-900 text-sm">Bản quyền phần mềm thuộc về: <span class="text-teal-800">BSCKI Thạch Xuân Tuấn</span></p>
                     <p class="text-slate-500">Khoa Ung Bướu - Bệnh Viện Đa Khoa An Giang</p>
                 </div>
             </div>
@@ -195,8 +195,8 @@
                     </h4>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Mã BN <span class="text-rose-500">*</span></label>
-                            <input type="text" id="npId" placeholder="vd: BN001" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 uppercase focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <label class="block font-semibold text-slate-700 mb-1">Mã BN (Bắt buộc đúng 8 số) <span class="text-rose-500">*</span></label>
+                            <input type="text" id="npId" maxlength="8" placeholder="vd: 24001234" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 uppercase focus:outline-none focus:ring-2 focus:ring-teal-500">
                         </div>
                         <div>
                             <label class="block font-semibold text-slate-700 mb-1">Họ và Tên <span class="text-rose-500">*</span></label>
@@ -269,6 +269,7 @@
                                 <option value="AC-T-Trastuzumab">AC-T + Trastuzumab (HER2 dương tính)</option>
                                 <option value="Paclitaxel-Mono">Paclitaxel Đơn Trị (Vú / Dạ dày)</option>
                                 <option value="Vinorelbine-Mono">Vinorelbine Đơn Trị (Ung thư vú)</option>
+                                <option value="CUSTOM">KHÁC (Tự nhập tên phác đồ thủ công)</option>
                             </select>
                         </div>
                         <div>
@@ -281,6 +282,12 @@
                             <label class="block font-semibold text-slate-700 mb-1">Số Thứ Tự Chu Kỳ <span class="text-rose-500">*</span></label>
                             <input type="number" id="npCycleNumber" min="1" value="1" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
+                    </div>
+
+                    <!-- Ô Nhập Tên Phác Đồ Tự Chọn Khi Chọn KHÁC -->
+                    <div id="customProtocolInputContainer" class="hidden bg-white p-3 rounded-xl border border-indigo-200 space-y-2">
+                        <label class="block font-bold text-indigo-900 text-[11px]">Nhập Tên Phác Đồ Tùy Chỉnh Của Bác Sĩ: <span class="text-rose-500">*</span></label>
+                        <input type="text" id="customProtocolNameInput" oninput="window.onCustomProtocolNameInput()" placeholder="vd: Gemcitabine + Cisplatin..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-teal-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
 
                     <!-- Khu vực phân đoạn Tuần cho thuốc uống 14 ngày (vì không cấp quá 7 ngày) -->
@@ -581,7 +588,7 @@
                     </div>
                 </div>
 
-                <!-- Thống kê Card tổng quan -->
+                <!-- Thống kê Card tổng quan (Chỉ giữ tổng số bệnh nhân hóa trị) -->
                 <div id="statsSummaryCardsContainer" class="grid grid-cols-1 gap-4">
                     <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl flex items-center justify-between">
                         <div>
@@ -594,7 +601,7 @@
                     </div>
                 </div>
 
-                <!-- Khối Biểu đồ hình tròn phân bố ICD (Hiện khi chọn ALL, Ẩn khi lọc ICD cụ thể) -->
+                <!-- Khối Biểu Đồ hình tròn phân bố ICD (Hiện khi chọn ALL, Ẩn khi lọc ICD cụ thể) -->
                 <div id="statsPieChartSection" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 hidden">
                     <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-chart-pie text-teal-600"></i> Biểu Đồ Phân Bố Bệnh Nhân Theo Nhóm ICD
@@ -615,13 +622,12 @@
                                     <th class="p-3">Giới Tính</th>
                                     <th class="p-3">Chẩn Đoán Lâm Sàng</th>
                                     <th class="p-3">Phác Đồ</th>
-                                    <th class="p-3 text-center">Số Chu Kỳ Phù Hợp</th>
-                                    <th class="p-3 text-center" id="statsActionHeader">Thao Tác Admin</th>
+                                    <th class="p-3 text-center">Thao Tác Admin</th>
                                 </tr>
                             </thead>
                             <tbody id="statsTableBody" class="divide-y divide-slate-200">
                                 <tr>
-                                    <td colspan="7" class="p-6 text-center text-slate-400 font-medium">
+                                    <td colspan="6" class="p-6 text-center text-slate-400 font-medium">
                                         Vui lòng chọn khoảng thời gian và nhấn "Xem Thống Kê".
                                     </td>
                                 </tr>
@@ -965,11 +971,27 @@
             const varContainer = document.getElementById('variableDoseInputsContainer');
             const varList = document.getElementById('variableDoseFieldsList');
             const fourteenBox = document.getElementById('fourteenDaysOralWeeksBox');
+            const customContainer = document.getElementById('customProtocolInputContainer');
+            const customInput = document.getElementById('customProtocolNameInput');
             
             branchSelect.innerHTML = '<option value="">-- Chọn lịch trình cụ thể --</option>';
             varList.innerHTML = "";
             varContainer.classList.add('hidden');
             fourteenBox.classList.add('hidden');
+
+            if (protoKey === "CUSTOM") {
+                customContainer.classList.remove('hidden');
+                document.getElementById('npProtocol').value = customInput.value.trim();
+                const opt = document.createElement('option');
+                opt.value = "Lịch trình tùy chỉnh theo phác đồ thủ công";
+                opt.innerText = "Lịch trình tùy chỉnh theo phác đồ thủ công";
+                branchSelect.appendChild(opt);
+                branchSelect.selectedIndex = 1;
+                document.getElementById('calculatedDoseResultArea').classList.add('hidden');
+                return;
+            } else {
+                customContainer.classList.add('hidden');
+            }
 
             if (!protoKey || !chemoProtocolsData[protoKey]) {
                 document.getElementById('npProtocol').value = "";
@@ -1014,6 +1036,14 @@
             window.calcBaselineBSA();
         };
 
+        window.onCustomProtocolNameInput = function() {
+            const protoKey = document.getElementById('protocolSelectList').value;
+            if (protoKey === "CUSTOM") {
+                const val = document.getElementById('customProtocolNameInput').value.trim();
+                document.getElementById('npProtocol').value = val;
+            }
+        };
+
         window.onBranchCycleChanged = function() {
             window.calcBaselineBSA();
         };
@@ -1039,6 +1069,7 @@
                 document.getElementById('variableDoseInputsContainer').classList.add('hidden');
                 document.getElementById('fourteenDaysOralWeeksBox').classList.add('hidden');
                 document.getElementById('calculatedDoseResultArea').classList.add('hidden');
+                document.getElementById('customProtocolInputContainer').classList.add('hidden');
             }
         };
 
@@ -1052,7 +1083,7 @@
             const doseArea = document.getElementById('calculatedDoseResultArea');
             const doseList = document.getElementById('doseDetailsList');
 
-            if (!protoKey || !chemoProtocolsData[protoKey]) {
+            if (!protoKey || protoKey === "CUSTOM" || !chemoProtocolsData[protoKey]) {
                 doseArea.classList.add('hidden');
                 return;
             }
@@ -1072,7 +1103,6 @@
                 let calcText = "";
 
                 if (drug.calcType === "weight") {
-                    // Thuốc tính liều theo cân nặng (Trastuzumab, Bevacizumab)
                     if (w > 0) {
                         totalDose = Math.round(doseVal * w);
                         calcText = `= ${totalDose} mg (${doseVal} ${drug.unit} x ${w}kg)`;
@@ -1081,12 +1111,10 @@
                         calcText = `(Cần nhập Cân nặng kg)`;
                     }
                 } else if (drug.calcType === "fixed") {
-                    // Thuốc liều cố định mg/ngày
                     totalDose = doseVal;
                     calcText = `= ${totalDose} mg/ngày`;
                     canCalculate = true;
                 } else {
-                    // Mặc định tính theo BSA
                     if (bsa > 0) {
                         totalDose = Math.round(doseVal * bsa);
                         calcText = `= ${totalDose} mg (${doseVal} ${drug.unit} x ${bsa.toFixed(2)}m²)`;
@@ -1125,6 +1153,7 @@
             document.getElementById('npCycleNumber').value = "1";
 
             document.getElementById('protocolModeContainer').classList.add('hidden');
+            document.getElementById('customProtocolInputContainer').classList.add('hidden');
             const protoSelect = document.getElementById('protocolSelectList');
             protoSelect.disabled = false;
             protoSelect.classList.remove('bg-slate-100');
@@ -1380,19 +1409,19 @@
                 alert("Tài khoản của bạn chưa được Admin phê duyệt để tra cứu!");
                 return;
             }
-            const code = document.getElementById('searchInput').value.trim().toUpperCase();
+            const code = document.getElementById('searchInput').value.trim();
             const tbody = document.getElementById('allPatientsTableBody');
             const countBadge = document.getElementById('patientCountBadge');
 
             if (!code) {
-                alert("Vui lòng nhập mã số bệnh nhân cần tra cứu!");
+                alert("Vui lòng nhập Mã BN cần tra cứu!");
                 return;
             }
 
-            const matched = cachedPatientsList.filter(p => p.patientId && p.patientId.toUpperCase() === code);
+            const matched = cachedPatientsList.filter(p => p.patientId && p.patientId === code);
 
             if (matched.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã: ${code}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${code}</td></tr>`;
                 countBadge.innerText = "0 kết quả";
                 return;
             }
@@ -1590,7 +1619,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: `Chỉ số ${markerType} (Đang nhập)`,
+                        label: `Chỉ số ${markerType} (đang nhập)`,
                         data: dataValues,
                         borderColor: '#0f766e',
                         backgroundColor: 'rgba(15, 118, 110, 0.1)',
@@ -1647,6 +1676,7 @@
             window.editingPatientOldProtocol = p.protocol || "";
             document.getElementById('currentActiveProtoLabel').innerText = window.editingPatientOldProtocol || "Chưa có";
             document.getElementById('protocolModeContainer').classList.remove('hidden');
+            document.getElementById('customProtocolInputContainer').classList.add('hidden');
             
             document.querySelector('input[name="protocolMode"][value="continue"]').checked = true;
             const protoSelect = document.getElementById('protocolSelectList');
@@ -1663,7 +1693,9 @@
             if (foundKey) {
                 protoSelect.value = foundKey;
             } else {
-                protoSelect.value = Object.keys(chemoProtocolsData)[0];
+                protoSelect.value = "CUSTOM";
+                document.getElementById('customProtocolInputContainer').classList.remove('hidden');
+                document.getElementById('customProtocolNameInput').value = window.editingPatientOldProtocol;
             }
             window.onProtocolSelectChanged();
 
@@ -1818,11 +1850,27 @@
             }
 
             const docId = document.getElementById('editDocId').value;
-            const patientId = document.getElementById('npId').value.trim().toUpperCase();
+            const patientId = document.getElementById('npId').value.trim();
             const name = document.getElementById('npName').value.trim();
             const gender = document.getElementById('npGender').value;
             const diagnosis = document.getElementById('npDiagnosis').value.trim();
             
+            // Ràng buộc Mã BN bắt buộc đúng 8 chữ số
+            const digitRegex = /^\d{8}$/;
+            if (!digitRegex.test(patientId)) {
+                alert("Mã bệnh nhân bắt buộc phải gồm đúng 8 chữ số (VD: 24001234)!");
+                return;
+            }
+
+            // Kiểm tra trùng Mã BN khi tạo mới
+            if (!docId) {
+                const isDuplicate = cachedPatientsList.some(p => p.patientId === patientId);
+                if (isDuplicate) {
+                    alert(`Mã bệnh nhân [${patientId}] đã tồn tại trên hệ thống! Vui lòng kiểm tra lại.`);
+                    return;
+                }
+            }
+
             const selectedProtoKey = document.getElementById('protocolSelectList').value;
             const branchName = document.getElementById('protocolCycleBranch').value;
             const cycleNum = document.getElementById('npCycleNumber').value || 1;
@@ -1832,10 +1880,19 @@
                 return;
             }
 
-            const pInfo = chemoProtocolsData[selectedProtoKey];
-            const newProtocol = pInfo.name;
+            let newProtocol = "";
+            if (selectedProtoKey === "CUSTOM") {
+                newProtocol = document.getElementById('customProtocolNameInput').value.trim();
+                if (!newProtocol) {
+                    alert("Vui lòng nhập tên phác đồ thủ công!");
+                    return;
+                }
+            } else {
+                const pInfo = chemoProtocolsData[selectedProtoKey];
+                newProtocol = pInfo ? pInfo.name : selectedProtoKey;
+            }
 
-            // Xây dựng tên chu kỳ kết hợp số thứ tự và phân đoạn tuần nếu có thuốc uống 14 ngày
+            // Xây dựng tên chu kỳ kết hợp số thứ tự và phân đoạn tuần
             let finalBranchName = `${branchName} - Chu kỳ ${cycleNum}`;
             const fourteenBox = document.getElementById('fourteenDaysOralWeeksBox');
             if (fourteenBox && !fourteenBox.classList.contains('hidden')) {
@@ -1854,25 +1911,28 @@
             const todayStr = new Date().toISOString().split('T')[0];
 
             let dosesText = "";
-            pInfo.drugs.forEach((drug, dIndex) => {
-                let doseVal = drug.defaultDose;
-                const customInput = document.getElementById(`varDose_${dIndex}`);
-                if (customInput && !isNaN(parseFloat(customInput.value))) {
-                    doseVal = parseFloat(customInput.value);
-                }
+            if (selectedProtoKey !== "CUSTOM" && chemoProtocolsData[selectedProtoKey]) {
+                const pInfo = chemoProtocolsData[selectedProtoKey];
+                pInfo.drugs.forEach((drug, dIndex) => {
+                    let doseVal = drug.defaultDose;
+                    const customInput = document.getElementById(`varDose_${dIndex}`);
+                    if (customInput && !isNaN(parseFloat(customInput.value))) {
+                        doseVal = parseFloat(customInput.value);
+                    }
 
-                let totalDose = 0;
-                if (drug.calcType === "weight") {
-                    totalDose = Math.round(doseVal * weight);
-                    dosesText += `${drug.name}: ${totalDose}mg (${doseVal} ${drug.unit} x ${weight}kg) - ${drug.route}; `;
-                } else if (drug.calcType === "fixed") {
-                    totalDose = doseVal;
-                    dosesText += `${drug.name}: ${totalDose}mg/ngày - ${drug.route}; `;
-                } else {
-                    totalDose = Math.round(doseVal * bsa);
-                    dosesText += `${drug.name}: ${totalDose}mg (${doseVal} ${drug.unit}) - ${drug.route}; `;
-                }
-            });
+                    let totalDose = 0;
+                    if (drug.calcType === "weight") {
+                        totalDose = Math.round(doseVal * weight);
+                        dosesText += `${drug.name}: ${totalDose}mg (${doseVal} ${drug.unit} x ${weight}kg) - ${drug.route}; `;
+                    } else if (drug.calcType === "fixed") {
+                        totalDose = doseVal;
+                        dosesText += `${drug.name}: ${totalDose}mg/ngày - ${drug.route}; `;
+                    } else {
+                        totalDose = Math.round(doseVal * bsa);
+                        dosesText += `${drug.name}: ${totalDose}mg (${doseVal} ${drug.unit}) - ${drug.route}; `;
+                    }
+                });
+            }
 
             try {
                 let finalCycles = [...window.tempCurrentCycles];
@@ -2006,7 +2066,6 @@
             cachedPatientsList.forEach(p => {
                 const diag = (p.diagnosis || "").toUpperCase();
                 
-                // Trích xuất mã ICD 3 ký tự đầu
                 let matchedGroup = "Khác";
                 if (diag.includes("C16")) matchedGroup = "C16 (Dạ dày)";
                 else if (diag.includes("C18")) matchedGroup = "C18 (Đại tràng)";
@@ -2033,11 +2092,9 @@
                         name: p.name || '-',
                         gender: p.gender || '-',
                         diagnosis: p.diagnosis || '-',
-                        protocol: p.protocol || '-',
-                        count: validCycles.length
+                        protocol: p.protocol || '-'
                     });
 
-                    // Tích lũy số lượng theo nhóm ICD cho biểu đồ hình tròn
                     icdGroupCounts[matchedGroup] = (icdGroupCounts[matchedGroup] || 0) + 1;
                 }
             });
@@ -2099,7 +2156,7 @@
             }
 
             if (results.length === 0) {
-                statsTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
+                statsTableBody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
                 return;
             }
 
@@ -2112,7 +2169,6 @@
                     <td class="p-3">${item.gender}</td>
                     <td class="p-3 font-medium text-slate-800">${item.diagnosis}</td>
                     <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
-                    <td class="p-3 text-center font-bold text-teal-700">${item.count} chu kỳ</td>
                     <td class="p-3 text-center space-x-1" style="${isAdmin ? '' : 'display:none;'}">
                         <button onclick="window.openEditPatientModal('${item.id}'); window.closeStatsModal();" title="Sửa" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button onclick="window.deletePatientDoc('${item.id}'); window.runChemoStatistics();" title="Xóa" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded"><i class="fa-solid fa-trash"></i></button>
