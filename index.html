@@ -172,8 +172,8 @@
         </div>
     </footer>
 
-    <!-- MODAL: Thêm / Sửa Hồ Sơ Bệnh Nhân -->
-    <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- MODAL: Thêm / Sửa Hồ Sơ Bệnh Nhân (z-[70] để luôn nằm đè lên trên bảng thống kê z-50) -->
+    <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-teal-700 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
                 <h3 id="patientFormModalTitle" class="font-bold text-base flex items-center gap-2">
@@ -1463,7 +1463,6 @@
             const statsActionHeader = document.getElementById('statsActionHeader');
             statsTableBody.innerHTML = "";
 
-            // Nếu là Admin, hiện cột Thao tác Sửa/Xóa; nếu là VIP hoặc Khác, ẩn cột thao tác
             if (isAdmin) {
                 statsActionHeader.style.display = "";
             } else {
