@@ -213,10 +213,10 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 relative">
                         <div class="relative">
-                            <label class="block font-semibold text-slate-700 mb-1">Chẩn Đoán Lâm Sàng (Nhập 3 ký tự đầu ICD vd: C16, C18, C50...) <span class="text-rose-500">*</span></label>
-                            <input type="text" id="npDiagnosis" placeholder="Nhập 3 ký tự ICD hoặc chẩn đoán..." autocomplete="off" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                            <!-- Dropdown gợi ý ICD -->
-                            <div id="icdDropdown" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
+                            <label class="block font-semibold text-slate-700 mb-1">Chẩn Đoán Lâm Sàng (Nhập mã ICD hoặc tên bệnh) <span class="text-rose-500">*</span></label>
+                            <input type="text" id="npDiagnosis" placeholder="Nhập mã ICD hoặc tên bệnh..." autocomplete="off" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <!-- Dropdown gợi ý ICD (Phía trên Mã ICD, Phía dưới Tên bệnh) -->
+                            <div id="icdDropdown" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto z-50 hidden custom-scrollbar"></div>
                         </div>
                         <div>
                             <label class="block font-semibold text-slate-700 mb-1">Đổi Phác Đồ Tổng Thể Mới</label>
@@ -507,7 +507,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">Danh Sách Bệnh Nhân Chi Tiết Trong Khoảng Thời Gian (Bấm vào Mã BN để xem thông tin cụ thể):</h4>
+                    <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">Danh Sách Bệnh Nhân Chi Tiết Trong Khoảng Thời Gian:</h4>
                     <div class="overflow-x-auto rounded-xl border border-slate-200">
                         <table class="w-full text-left text-xs text-slate-700">
                             <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
@@ -577,7 +577,7 @@
 
     <!-- UI Helpers Script -->
     <script>
-        // Dữ liệu danh mục ICD chuẩn dựa theo tập tin icd 10.txt
+        // Dữ liệu danh mục ICD chuẩn
         const icdDatabase = [
             { code: "C16.0", desc: "U ác tính ở tâm vị" },
             { code: "C16.1", desc: "U ác tính ở đáy vị" },
@@ -612,26 +612,33 @@
         document.addEventListener('DOMContentLoaded', () => {
             const diagInput = document.getElementById('npDiagnosis');
             const dropdown = document.getElementById('icdDropdown');
+            let selectedIndex = -1;
 
             if (diagInput && dropdown) {
+                // Xử lý sự kiện nhập liệu tìm kiếm ICD
                 diagInput.addEventListener('input', (e) => {
                     const val = e.target.value.trim().toLowerCase();
+                    selectedIndex = -1;
                     if (!val) {
                         dropdown.classList.add('hidden');
                         return;
                     }
 
-                    // Lọc theo ký tự nhập vào (hỗ trợ tìm theo mã hoặc mô tả)
                     const matches = icdDatabase.filter(item => 
                         item.code.toLowerCase().includes(val) || item.desc.toLowerCase().includes(val)
                     );
 
                     if (matches.length > 0) {
                         dropdown.innerHTML = "";
-                        matches.forEach(m => {
+                        matches.forEach((m, idx) => {
                             const div = document.createElement('div');
-                            div.className = "p-2.5 hover:bg-teal-50 cursor-pointer border-b border-slate-100 text-slate-700 text-xs flex items-center justify-between";
-                            div.innerHTML = `<span class="font-bold text-teal-800">${m.code}</span> <span class="text-right text-slate-600">${m.desc}</span>`;
+                            // Bố trí: Phía trên là mã ICD, phía dưới là chẩn đoán (tên bệnh)
+                            div.className = "p-2.5 hover:bg-teal-50 cursor-pointer border-b border-slate-100 text-xs flex flex-col transition item-suggestion";
+                            div.innerHTML = `
+                                <span class="font-bold text-teal-800 text-xs">${m.code}</span>
+                                <span class="text-slate-600 text-xs mt-0.5">${m.desc}</span>
+                            `;
+                            
                             div.addEventListener('click', () => {
                                 diagInput.value = `${m.code}: ${m.desc}`;
                                 dropdown.classList.add('hidden');
@@ -643,6 +650,40 @@
                         dropdown.classList.add('hidden');
                     }
                 });
+
+                // Hỗ trợ điều hướng bằng bàn phím (Mũi tên lên/xuống và Enter)
+                diagInput.addEventListener('keydown', (e) => {
+                    const items = dropdown.querySelectorAll('.item-suggestion');
+                    if (dropdown.classList.contains('hidden') || items.length === 0) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        selectedIndex = (selectedIndex + 1) % items.length;
+                        updateActiveItem(items);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                        updateActiveItem(items);
+                    } else if (e.key === 'Enter') {
+                        if (selectedIndex >= 0 && selectedIndex < items.length) {
+                            e.preventDefault();
+                            items[selectedIndex].click();
+                        }
+                    } else if (e.key === 'Escape') {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+
+                function updateActiveItem(items) {
+                    items.forEach((item, idx) => {
+                        if (idx === selectedIndex) {
+                            item.classList.add('bg-teal-100');
+                            item.scrollIntoView({ block: 'nearest' });
+                        } else {
+                            item.classList.remove('bg-teal-100');
+                        }
+                    });
+                }
 
                 // Đóng dropdown khi click bên ngoài
                 document.addEventListener('click', (e) => {
@@ -676,7 +717,6 @@
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
 
-            // Mở khóa các trường hành chính cho form thêm mới
             ['npId', 'npName', 'npGender', 'npDiagnosis', 'npProtocol'].forEach(id => {
                 const el = document.getElementById(id);
                 el.disabled = false;
@@ -690,7 +730,6 @@
             document.getElementById('existingNotesListSection').classList.add('hidden');
             document.getElementById('existingMarkersListSection').classList.add('hidden');
             
-            // Ẩn biểu đồ marker trong form khi mở mới
             document.getElementById('formMarkerChartContainer').classList.add('hidden');
             document.getElementById('formChartToggleBtnText').innerText = "Xem Biểu Đồ Marker (Theo Thời Gian)";
 
@@ -847,7 +886,7 @@
                     } else {
                         roleBadge.innerHTML = `<i class="fa-solid fa-user-doctor text-[9px]"></i> Bác Sĩ`;
                         roleBadge.className = "text-[10px] bg-teal-600 text-teal-100 border border-teal-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
-                        btnStats.classList.remove('hidden'); // Cho phép bác sĩ xem thống kê hóa trị
+                        btnStats.classList.remove('hidden');
                     }
 
                     await setDoc(userDocRef, {
@@ -964,7 +1003,6 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
-            // Render Timeline (Chu kỳ + Thay đổi phác đồ màu đỏ)
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
             const cycles = p.cycles || [];
@@ -1065,7 +1103,6 @@
             });
         };
 
-        // Hàm bật/tắt hiển thị và vẽ biểu đồ marker trong modal Thêm/Sửa Hồ Sơ
         window.toggleFormMarkerChart = function() {
             const container = document.getElementById('formMarkerChartContainer');
             const btnText = document.getElementById('formChartToggleBtnText');
@@ -1182,7 +1219,6 @@
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
             window.renderTempMarkersList();
 
-            // Ẩn biểu đồ marker trong form khi mở chỉnh sửa
             document.getElementById('formMarkerChartContainer').classList.add('hidden');
             document.getElementById('formChartToggleBtnText').innerText = "Xem Biểu Đồ Marker (Theo Thời Gian)";
 
@@ -1250,7 +1286,6 @@
                     const isProto = c.isProtocolChange;
                     d.className = `p-2.5 bg-white border ${isProto ? 'border-rose-300 bg-rose-50/30' : 'border-amber-200'} rounded-xl text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-sm`;
                     
-                    // Chỉ hiển thị nút Sửa/Xóa nếu là Admin HOẶC item được tạo/ghi nhận trong cùng ngày hôm nay
                     const canEditDelete = isAdmin || (c.date === todayStr);
 
                     if (isProto) {
@@ -1297,7 +1332,6 @@
                     const d = document.createElement('div');
                     d.className = "p-2.5 bg-white border border-sky-200 rounded-xl text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-sm";
                     
-                    // Chỉ hiển thị nút Sửa/Xóa nếu là Admin HOẶC ghi chú được tạo trong cùng ngày hôm nay
                     const canEditDelete = isAdmin || (n.date === todayStr);
 
                     d.innerHTML = `
@@ -1508,11 +1542,10 @@
             let results = [];
 
             cachedPatientsList.forEach(p => {
-                // Kiểm tra điều kiện lọc theo 3 ký tự đầu ICD hoặc All
                 if (icdFilterVal !== "ALL") {
                     const diag = (p.diagnosis || "").toUpperCase();
                     if (!diag.includes(icdFilterVal)) {
-                        return; // Bỏ qua nếu không khớp mã ICD
+                        return;
                     }
                 }
 
@@ -1527,7 +1560,6 @@
                     matchedPatientsCount++;
                     totalCyclesInPeriod += validCycles.length;
                     results.push({
-                        docId: p.id,
                         patientId: p.patientId || '-',
                         name: p.name || '-',
                         gender: p.gender || '-',
@@ -1550,11 +1582,7 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">
-                        <button onclick="window.viewPatientDetail('${item.docId}')" class="hover:underline text-teal-700 flex items-center gap-1.5 cursor-pointer text-left font-bold bg-teal-50 hover:bg-teal-100 px-2 py-1 rounded-md transition" title="Bấm để xem chi tiết bệnh nhân">
-                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-teal-600"></i> ${item.patientId}
-                        </button>
-                    </td>
+                    <td class="p-3 font-bold text-teal-800">${item.patientId}</td>
                     <td class="p-3 font-semibold text-slate-900">${item.name}</td>
                     <td class="p-3">${item.gender}</td>
                     <td class="p-3">${item.diagnosis}</td>
