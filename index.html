@@ -249,7 +249,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="block font-semibold text-slate-700 mb-1">Chọn Tên Phác Đồ Chuẩn <span class="text-rose-500">*</span></label>
                             <select id="protocolSelectList" onchange="window.onProtocolSelectChanged()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -267,10 +267,31 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Chu Kỳ / Lịch Trình Chi Tiết <span class="text-rose-500">*</span></label>
+                            <label class="block font-semibold text-slate-700 mb-1">Lịch Trình Chi Tiết <span class="text-rose-500">*</span></label>
                             <select id="protocolCycleBranch" onchange="window.onBranchCycleChanged()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <option value="">-- Chọn lịch trình cụ thể --</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Số Thứ Tự Chu Kỳ <span class="text-rose-500">*</span></label>
+                            <input type="number" id="npCycleNumber" min="1" value="1" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+
+                    <!-- Khu vực phân đoạn Tuần cho thuốc uống 14 ngày (vî không cấp quá 7 ngày) -->
+                    <div id="fourteenDaysOralWeeksBox" class="hidden bg-amber-50 border border-amber-200 p-3 rounded-xl space-y-2">
+                        <p class="font-bold text-amber-900 text-[11px] flex items-center gap-1.5">
+                            <i class="fa-solid fa-calendar-week"></i> Phân đoạn cấp phát thuốc uống 14 ngày (Tối đa 7 ngày/lần cấp):
+                        </p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-amber-200 cursor-pointer">
+                                <input type="radio" name="fourteenWeekPart" value="Tuần 1 (N1-7)" checked class="text-amber-600">
+                                <span class="font-semibold text-slate-800 text-xs">Tuần 1 (N1-7)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-amber-200 cursor-pointer">
+                                <input type="radio" name="fourteenWeekPart" value="Tuần 2 (N8-14)" class="text-amber-600">
+                                <span class="font-semibold text-slate-800 text-xs">Tuần 2 (N8-14)</span>
+                            </label>
                         </div>
                     </div>
 
@@ -684,28 +705,31 @@
             "CapeOx": {
                 name: "CapeOx (Oxaliplatin + Capecitabine)",
                 cycleDays: 21,
+                has14DaysOral: true,
                 branches: [
                     { name: "Chu kỳ chuẩn 21 ngày", desc: "Oxaliplatin 130 mg/m² ngày 1 + Capecitabine 1.000 mg/m² uống ngày 1-14" }
                 ],
                 drugs: [
                     { name: "Oxaliplatin", defaultDose: 130, unit: "mg/m²", route: "Truyền tĩnh mạch ngày 1" },
-                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày, ngày 1-14" }
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày" }
                 ]
             },
             "XELIRI": {
                 name: "XELIRI (Irinotecan + Capecitabine)",
                 cycleDays: 21,
+                has14DaysOral: true,
                 branches: [
                     { name: "Lịch trình 3 tuần chuẩn", desc: "Irinotecan 240-250 mg/m² (có thể tùy chỉnh) + Capecitabine 1.000 mg/m² uống 2 lần/ngày x 14 ngày" }
                 ],
                 drugs: [
                     { name: "Irinotecan", defaultDose: 245, range: [240, 250], unit: "mg/m²", route: "Truyền tĩnh mạch 90 phút ngày 1" },
-                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày, ngày 1-14" }
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày" }
                 ]
             },
             "Vinorelbine-Capecitabine": {
                 name: "Vinorelbine - Capecitabine (Ung thư Vú)",
                 cycleDays: 21,
+                has14DaysOral: true,
                 branches: [
                     { name: "Lịch trình chuẩn (Chu kỳ đầu)", desc: "Vinorelbine 60 mg/m² (chu kỳ sau 80 mg/m²) ngày 1, 8 + Capecitabine 2.000 mg/m² ngày 1-14" },
                     { name: "Lịch trình chuẩn (Chu kỳ sau)", desc: "Vinorelbine 80 mg/m² ngày 1, 8 + Capecitabine 2.000 mg/m² ngày 1-14" },
@@ -713,12 +737,13 @@
                 ],
                 drugs: [
                     { name: "Vinorelbine", defaultDose: 80, unit: "mg/m²", route: "Uống ngày 1, 8" },
-                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống ngày 1-14" }
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống" }
                 ]
             },
             "Metronomic-Breast": {
                 name: "Liệu pháp Metronomic (Ung thư Vú)",
                 cycleDays: 28,
+                has14DaysOral: false,
                 branches: [
                     { name: "Vinorelbine đơn chất liều thấp", desc: "Vinorelbine 30-50 mg/ngày uống ngày 1, 3, 5 hàng tuần" },
                     { name: "Vinorelbine + Capecitabine phối hợp", desc: "Vinorelbine 40 mg/ngày (1,3,5) + Capecitabine 1.500 mg/ngày" }
@@ -730,17 +755,19 @@
             "Capecitabine-Mono": {
                 name: "Capecitabine Đơn Trị",
                 cycleDays: 21,
+                has14DaysOral: true,
                 branches: [
                     { name: "Đại tràng - Trực tràng (Thể trạng yếu)", desc: "Capecitabine 1.250 mg/m² uống 2 lần/ngày x 14 ngày" },
                     { name: "Ung thư Dạ dày", desc: "Capecitabine 1.000-1.250 mg/m² (có thể tùy chỉnh) uống ngày 1-14" }
                 ],
                 drugs: [
-                    { name: "Capecitabine", defaultDose: 2500, range: [2000, 2500], unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày, ngày 1-14" }
+                    { name: "Capecitabine", defaultDose: 2500, range: [2000, 2500], unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày" }
                 ]
             },
             "EC": {
                 name: "Phác đồ EC (Epirubicin + Cyclophosphamide)",
                 cycleDays: 21,
+                has14DaysOral: false,
                 branches: [
                     { name: "Phác đồ EC chuẩn", desc: "Epirubicin 100 mg/m² + Cyclophosphamide 830 mg/m² ngày 1 (x 8 chu kỳ)" },
                     { name: "Phác đồ EC nhẹ", desc: "Epirubicin 75 mg/m² + Cyclophosphamide 600 mg/m² ngày 1" }
@@ -753,6 +780,7 @@
             "AC-T": {
                 name: "Phác đồ AC-T (Anthracycline -> Taxane)",
                 cycleDays: 21,
+                has14DaysOral: false,
                 branches: [
                     { name: "4AC liều dày -> 4P liều dày (2 tuần + G-CSF)", desc: "Doxorubicin 60 mg/m² + Cyclophosphamide 600 mg/m² (14 ngày) -> Paclitaxel 175 mg/m²" },
                     { name: "4AC -> 12 tuần Paclitaxel hàng tuần", desc: "4AC (14 ngày) -> Paclitaxel 80 mg/m²/tuần x 12 tuần" },
@@ -768,6 +796,7 @@
             "AC-T-Trastuzumab": {
                 name: "Phác đồ AC-T + Trastuzumab (HER2 dương tính)",
                 cycleDays: 21,
+                has14DaysOral: false,
                 branches: [
                     { name: "Lịch trình 3 tuần chuẩn", desc: "4AC -> 4P + Trastuzumab (Liều tải 8 mg/kg, sau đó 6 mg/kg mỗi 3 tuần)" },
                     { name: "Lịch trình hàng tuần", desc: "4AC -> 12 tuần Paclitaxel + Trastuzumab (Liều tải 4 mg/kg, sau đó 2 mg/kg hàng tuần)" }
@@ -782,6 +811,7 @@
             "Paclitaxel-Mono": {
                 name: "Phác đồ Đơn trị Paclitaxel",
                 cycleDays: 21,
+                has14DaysOral: false,
                 branches: [
                     { name: "Ung thư Vú - Lịch hàng tuần", desc: "Paclitaxel 80 mg/m² truyền tĩnh mạch 1 giờ, ngày 1 hàng tuần x 12 tuần" },
                     { name: "Ung thư Vú - Lịch 3 tuần", desc: "Paclitaxel 175 mg/m² truyền tĩnh mạch ngày 1, chu kỳ 21 ngày" },
@@ -794,6 +824,7 @@
             "Vinorelbine-Mono": {
                 name: "Phác đồ Đơn trị Vinorelbine",
                 cycleDays: 21,
+                has14DaysOral: false,
                 branches: [
                     { name: "Truyền tĩnh mạch hàng tuần", desc: "Vinorelbine 25 mg/m² truyền tĩnh mạch ngày 1 hàng tuần" },
                     { name: "Dạng uống hàng tuần", desc: "Vinorelbine 80 mg/m² (chu kỳ đầu 60 mg/m²) uống ngày 1 hàng tuần" },
@@ -854,10 +885,12 @@
             const branchSelect = document.getElementById('protocolCycleBranch');
             const varContainer = document.getElementById('variableDoseInputsContainer');
             const varList = document.getElementById('variableDoseFieldsList');
+            const fourteenBox = document.getElementById('fourteenDaysOralWeeksBox');
             
             branchSelect.innerHTML = '<option value="">-- Chọn lịch trình cụ thể --</option>';
             varList.innerHTML = "";
             varContainer.classList.add('hidden');
+            fourteenBox.classList.add('hidden');
 
             if (!protoKey || !chemoProtocolsData[protoKey]) {
                 document.getElementById('npProtocol').value = "";
@@ -876,7 +909,10 @@
             });
             branchSelect.selectedIndex = 1;
 
-            // Kiểm tra thuốc có dải liều dao động để sinh ô nhập liều cụ thể
+            if (pInfo.has14DaysOral) {
+                fourteenBox.classList.remove('hidden');
+            }
+
             let hasVariable = false;
             let varHtml = "";
             pInfo.drugs.forEach((drug, dIndex) => {
@@ -922,6 +958,7 @@
                 branchSelect.innerHTML = '<option value="">-- Chọn lịch trình cụ thể --</option>';
                 document.getElementById('npProtocol').value = "";
                 document.getElementById('variableDoseInputsContainer').classList.add('hidden');
+                document.getElementById('fourteenDaysOralWeeksBox').classList.add('hidden');
                 document.getElementById('calculatedDoseResultArea').classList.add('hidden');
             }
         };
@@ -972,6 +1009,7 @@
             document.getElementById('npBsaDisplay').innerText = "0.00 m²";
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('npCycleNumber').value = "1";
 
             document.getElementById('protocolModeContainer').classList.add('hidden');
             const protoSelect = document.getElementById('protocolSelectList');
@@ -987,6 +1025,7 @@
             document.getElementById('formMarkerChartContainer').classList.add('hidden');
             document.getElementById('calculatedDoseResultArea').classList.add('hidden');
             document.getElementById('variableDoseInputsContainer').classList.add('hidden');
+            document.getElementById('fourteenDaysOralWeeksBox').classList.add('hidden');
             document.getElementById('formChartToggleBtnText').innerText = "Xem Biểu Đồ Marker (Theo Thời Gian)";
 
             document.getElementById('patientFormModal').classList.remove('hidden');
@@ -1171,7 +1210,7 @@
                     btnStats.classList.remove('hidden');
                     btnUserMgmt.classList.add('hidden');
                     accountStatusNotice.classList.add('hidden');
-                    btnAddPatient.classList.add('hidden'); // VIP không được thêm/sửa/xóa, chỉ tra cứu & xem thống kê
+                    btnAddPatient.classList.add('hidden');
                 } else if (isApproved) {
                     roleBadge.innerHTML = `<i class="fa-solid fa-user-doctor text-[9px]"></i> Bác Sĩ (Đã Duyệt)`;
                     roleBadge.className = "text-[10px] bg-teal-600 text-teal-100 border border-teal-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
@@ -1513,6 +1552,7 @@
             document.getElementById('npCycleNote').value = '';
             document.getElementById('npGeneralNote').value = '';
             document.getElementById('npMarkerValue').value = '';
+            document.getElementById('npCycleNumber').value = "1";
 
             window.tempCurrentCycles = JSON.parse(JSON.stringify(p.cycles || []));
             window.renderTempCyclesList();
@@ -1662,6 +1702,7 @@
             
             const selectedProtoKey = document.getElementById('protocolSelectList').value;
             const branchName = document.getElementById('protocolCycleBranch').value;
+            const cycleNum = document.getElementById('npCycleNumber').value || 1;
             
             if (!selectedProtoKey || !branchName) {
                 alert("Vui lòng chọn Phác đồ và Lịch trình cụ thể hóa trị!");
@@ -1670,6 +1711,16 @@
 
             const pInfo = chemoProtocolsData[selectedProtoKey];
             const newProtocol = pInfo.name;
+
+            // Xây dựng tên chu kỳ kết hợp số thứ tự và phân đoạn tuần nếu có thuốc uống 14 ngày
+            let finalBranchName = `${branchName} - Chu kỳ ${cycleNum}`;
+            const fourteenBox = document.getElementById('fourteenDaysOralWeeksBox');
+            if (fourteenBox && !fourteenBox.classList.contains('hidden')) {
+                const selectedWeekRadio = document.querySelector('input[name="fourteenWeekPart"]:checked');
+                if (selectedWeekRadio) {
+                    finalBranchName += `, ${selectedWeekRadio.value}`;
+                }
+            }
 
             const cycleDate = document.getElementById('npCycleDate').value;
             const height = parseFloat(document.getElementById('npHeight').value) || 0;
@@ -1719,7 +1770,7 @@
                     finalCycles.push({
                         date: cycleDate || todayStr,
                         protocolUsed: newProtocol,
-                        branchName: branchName,
+                        branchName: finalBranchName,
                         height: height,
                         weight: weight,
                         bsa: bsa.toFixed(2),
