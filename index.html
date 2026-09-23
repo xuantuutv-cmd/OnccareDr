@@ -409,7 +409,7 @@
                     <h4 class="font-bold text-amber-900 uppercase text-[11px] tracking-wider flex items-center justify-between">
                         <span class="flex items-center gap-2">
                             <i class="fa-solid fa-notes-medical text-amber-600"></i> 
-                            <span id="cycleSectionTitle">Thông Tin Ngày Tiêm & Độc Tính</span>
+                            <span id="cycleSectionTitle">Thông Tin Ngày Tiêm & Độc Tính (Nếu thêm chu kỳ mới)</span>
                         </span>
                         <span id="existingCyclesCount" class="text-[10px] bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full font-bold">0 chu kỳ đã lưu</span>
                     </h4>
@@ -1874,27 +1874,17 @@
             const selectedProtoKey = document.getElementById('protocolSelectList').value;
             const branchName = document.getElementById('protocolCycleBranch').value;
             const cycleNum = document.getElementById('npCycleNumber').value || 1;
-            
-            if (!selectedProtoKey || !branchName) {
-                alert("Vui lòng chọn Phác đồ và Lịch trình cụ thể hóa trị!");
-                return;
-            }
 
-            // 3. XỬ LÝ PHÁC ĐỒ KHÁC / CUSTOM
+            // XỬ LÝ PHÁC ĐỒ KHÁC / CUSTOM
             let newProtocol = "";
             if (selectedProtoKey === "CUSTOM") {
                 newProtocol = document.getElementById('customProtocolNameInput').value.trim();
-                if (!newProtocol) {
-                    alert("Vui lòng nhập tên phác đồ thủ công!");
-                    return;
-                }
-            } else {
-                const pInfo = chemoProtocolsData[selectedProtoKey];
-                newProtocol = pInfo ? pInfo.name : selectedProtoKey;
+            } else if (selectedProtoKey && chemoProtocolsData[selectedProtoKey]) {
+                newProtocol = chemoProtocolsData[selectedProtoKey].name;
             }
 
             // Xây dựng tên chu kỳ kết hợp số thứ tự và phân đoạn tuần nếu có thuốc uống 14 ngày
-            let finalBranchName = `${branchName} - Chu kỳ ${cycleNum}`;
+            let finalBranchName = branchName ? `${branchName} - Chu kỳ ${cycleNum}` : `Chu kỳ ${cycleNum}`;
             const fourteenBox = document.getElementById('fourteenDaysOralWeeksBox');
             if (fourteenBox && !fourteenBox.classList.contains('hidden')) {
                 const selectedWeekRadio = document.querySelector('input[name="fourteenWeekPart"]:checked');
@@ -1912,7 +1902,7 @@
             const todayStr = new Date().toISOString().split('T')[0];
 
             let dosesText = "";
-            if (selectedProtoKey !== "CUSTOM" && chemoProtocolsData[selectedProtoKey]) {
+            if (selectedProtoKey && selectedProtoKey !== "CUSTOM" && chemoProtocolsData[selectedProtoKey]) {
                 const pInfo = chemoProtocolsData[selectedProtoKey];
                 pInfo.drugs.forEach((drug, dIndex) => {
                     let doseVal = drug.defaultDose;
@@ -1946,8 +1936,9 @@
                     if (pSnap.exists()) {
                         const oldData = pSnap.data();
                         const oldProtocol = oldData.protocol || "";
-                        const protoMode = document.querySelector('input[name="protocolMode"]:checked').value;
-                        if (protoMode === 'change' && newProtocol !== oldProtocol) {
+                        const protoModeObj = document.querySelector('input[name="protocolMode"]:checked');
+                        const protoMode = protoModeObj ? protoModeObj.value : 'continue';
+                        if (protoMode === 'change' && newProtocol && newProtocol !== oldProtocol) {
                             finalCycles.push({
                                 isProtocolChange: true,
                                 oldProtocol: oldProtocol,
@@ -1960,10 +1951,11 @@
                     }
                 }
 
+                // NẾU CÓ NHẬP CÂN NẶNG > 0 THÌ MỚI THÊM CHU KỲ MỚI, KHÔNG THÌ BẢO TỒN DANH SÁCH CHU KỲ SAU KHI ĐÃ XÓA
                 if (weight > 0) {
                     finalCycles.push({
                         date: cycleDate || todayStr,
-                        protocolUsed: newProtocol,
+                        protocolUsed: newProtocol || window.editingPatientOldProtocol || '',
                         branchName: finalBranchName,
                         height: height,
                         weight: weight,
@@ -1972,8 +1964,8 @@
                         note: cycleNote,
                         updatedBy: currentUser.email
                     });
-                } else {
-                    alert("Vui lòng nhập cân nặng để tính liều thuốc chính xác!");
+                } else if (!docId) {
+                    alert("Vui lòng nhập Cân nặng khi tạo mới hồ sơ!");
                     return;
                 }
 
@@ -1985,13 +1977,13 @@
                     const pRef = doc(db, "patients", docId);
                     await updateDoc(pRef, {
                         patientId, name, gender, diagnosis,
-                        protocol: newProtocol,
+                        protocol: newProtocol || window.editingPatientOldProtocol || '',
                         cycles: finalCycles,
                         notes: finalNotes,
                         markers: finalMarkers,
                         updatedAt: serverTimestamp()
                     });
-                    alert("Cập nhật chu kỳ thành công!");
+                    alert("Cập nhật hồ sơ thành công!");
                 } else {
                     await addDoc(collection(db, "patients"), {
                         patientId, name, gender, diagnosis,
