@@ -133,7 +133,7 @@
                         <tr>
                             <th class="p-3">Mã BN</th>
                             <th class="p-3">Họ và Tên</th>
-                            <th class="p-3">Giới Tính</th>
+                            <th class="p-3 text-center">Giới Tính</th>
                             <th class="p-3">Năm Sinh</th>
                             <th class="p-3">Thông Số Gần Nhất</th>
                             <th class="p-3">Chẩn Đoán Lâm Sàng</th>
@@ -187,7 +187,7 @@
             <form id="patientForm" onsubmit="window.handlePatientFormSubmit(event)" class="p-6 space-y-5 text-xs">
                 <input type="hidden" id="editDocId" value="">
                 
-                <!-- Phần Thông Tin Hành Chính (Cân đối ngang hàng, phân bổ kích thước cột hợp lý) -->
+                <!-- Phần Thông Tin Hành Chính -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                     <h4 class="font-bold text-teal-800 uppercase text-[11px] tracking-wider flex items-center justify-between">
                         <span class="flex items-center gap-2">
@@ -204,15 +204,15 @@
                             <input type="text" id="npName" placeholder="vd: Nguyễn Văn A" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                         </div>
                         <div class="sm:col-span-3">
-                            <label class="block font-semibold text-slate-700 mb-1">Giới Tính <span class="text-rose-500">*</span></label>
-                            <select id="npGender" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <label class="block font-semibold text-slate-700 mb-1 text-center">Giới Tính <span class="text-rose-500">*</span></label>
+                            <select id="npGender" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-center font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500">
                                 <option value="Nữ">Nữ</option>
                                 <option value="Nam">Nam</option>
                             </select>
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block font-semibold text-slate-700 mb-1">Năm Sinh <span class="text-rose-500">*</span></label>
-                            <input type="number" id="npBirthYear" min="1900" max="2026" placeholder="1980" required class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 text-center focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <input type="number" id="npBirthYear" min="1900" max="2026" placeholder="YYYY" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 text-center focus:outline-none focus:ring-2 focus:ring-teal-500">
                         </div>
                     </div>
 
@@ -696,7 +696,7 @@
                                 <tr>
                                     <th class="p-3">Mã BN</th>
                                     <th class="p-3">Họ và Tên</th>
-                                    <th class="p-3">Giới Tính</th>
+                                    <th class="p-3 text-center">Giới Tính</th>
                                     <th class="p-3">Năm Sinh (Tuổi)</th>
                                     <th class="p-3">Chẩn Đoán Lâm Sàng</th>
                                     <th class="p-3">Phác Đồ</th>
@@ -1230,7 +1230,9 @@
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npCycleNumber').value = "1";
-            document.getElementById('npBirthYear').value = new Date().getFullYear() - 50; // Mặc định 50 tuổi
+            
+            // Xóa dữ liệu năm sinh mặc định, để trống để người dùng/Admin nhập qua chức năng chỉnh sửa
+            document.getElementById('npBirthYear').value = "";
 
             // Mở khóa toàn bộ thông tin hành chính khi tạo mới
             document.getElementById('npId').disabled = false;
@@ -1553,7 +1555,7 @@
                 tr.innerHTML = `
                     <td class="p-3 font-bold text-teal-800">${p.patientId || '-'}</td>
                     <td class="p-3 font-semibold text-slate-900">${p.name || '-'}</td>
-                    <td class="p-3">${p.gender || '-'}</td>
+                    <td class="p-3 text-center">${p.gender || '-'}</td>
                     <td class="p-3 font-bold text-slate-700">${p.birthYear || '-'}</td>
                     <td class="p-3 text-[11px]">${lastCycle.date ? `Ngày: ${lastCycle.date}<br>BSA:${lastCycle.bsa || '-'} m²` : 'Chưa có chu kỳ'}</td>
                     <td class="p-3 font-medium text-slate-800">${p.diagnosis || '-'}</td>
@@ -1787,7 +1789,7 @@
             document.getElementById('npId').value = p.patientId || '';
             document.getElementById('npName').value = p.name || '';
             document.getElementById('npGender').value = p.gender || 'Nữ';
-            document.getElementById('npBirthYear').value = p.birthYear || '1980';
+            document.getElementById('npBirthYear').value = p.birthYear || '';
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
 
             // QUYỀN BẢO MẬT HÀNH CHÍNH: Chỉ Admin mới được sửa thông tin hành chính, Bác sĩ thông thường bị khóa ô hành chính
@@ -1991,7 +1993,8 @@
             const patientId = document.getElementById('npId').value.trim();
             const name = document.getElementById('npName').value.trim();
             const gender = document.getElementById('npGender').value;
-            const birthYear = parseInt(document.getElementById('npBirthYear').value) || 1980;
+            const birthYearInput = document.getElementById('npBirthYear').value.trim();
+            const birthYear = birthYearInput ? parseInt(birthYearInput) : "";
             const diagnosis = document.getElementById('npDiagnosis').value.trim();
             
             const digitRegex = /^\d{8}$/;
@@ -2246,7 +2249,7 @@
                         patientId: p.patientId || '-',
                         name: p.name || '-',
                         gender: p.gender || '-',
-                        birthYear: birthY,
+                        birthYear: p.birthYear || '-',
                         age: age,
                         diagnosis: p.diagnosis || '-',
                         protocol: p.protocol || '-',
@@ -2343,8 +2346,8 @@
                 tr.innerHTML = `
                     <td class="p-3 font-bold text-teal-800">${item.patientId}</td>
                     <td class="p-3 font-semibold text-slate-900">${item.name}</td>
-                    <td class="p-3">${item.gender}</td>
-                    <td class="p-3">${item.birthYear} (${item.age}t)</td>
+                    <td class="p-3 text-center">${item.gender}</td>
+                    <td class="p-3">${item.birthYear}</td>
                     <td class="p-3 font-medium text-slate-800">${item.diagnosis}</td>
                     <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
                     <td class="p-3 text-center font-bold text-teal-700">${item.count} chu kỳ</td>
