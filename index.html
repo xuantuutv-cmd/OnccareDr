@@ -51,7 +51,7 @@
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                     </svg>
                     <span>Đăng Nhập Gmail</span>
                 </button>
@@ -226,7 +226,7 @@
                     </div>
                 </div>
 
-                <!-- PHẦN CHỌN PHÁC ĐỒ & TÍNH LIỀU THUỐC THEO BSA -->
+                <!-- PHẦN CHỌN PHÁC ĐỒ & TÍNH LIỀU THUỐC THEO BSA / KG -->
                 <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200 space-y-4">
                     <h4 class="font-bold text-indigo-900 uppercase text-[11px] tracking-wider flex items-center justify-between">
                         <span class="flex items-center gap-2">
@@ -256,10 +256,14 @@
                                 <option value="">-- Chọn phác đồ hóa trị --</option>
                                 <option value="CapeOx">CapeOx (Oxaliplatin + Capecitabine - 21 ngày)</option>
                                 <option value="XELIRI">XELIRI (Irinotecan + Capecitabine - 21 ngày)</option>
+                                <option value="XELIRI-Bevacizumab">XELIRI + Bevacizumab (Đại trực tràng di căn - 21 ngày)</option>
+                                <option value="Capecitabine-Bevacizumab">Capecitabine + Bevacizumab (Đại trực tràng - 21 ngày)</option>
+                                <option value="FOLFOXIRI">FOLFOXIRI / Cape-Oxa-Iri (Đại trực tràng - 21 ngày)</option>
                                 <option value="Vinorelbine-Capecitabine">Vinorelbine - Capecitabine (Ung thư vú)</option>
                                 <option value="Metronomic-Breast">Metronomic Ung Thư Vú (Vinorelbine / Phối hợp)</option>
                                 <option value="Capecitabine-Mono">Capecitabine Đơn Trị (Đại trực tràng / Dạ dày)</option>
                                 <option value="EC">Phác đồ EC (Epirubicin + Cyclophosphamide - 21 ngày)</option>
+                                <option value="4EC-4P-Trastuzumab">Phác đồ 4EC - 4P + Trastuzumab (Ung thư Vú HER2+)</option>
                                 <option value="AC-T">Phác đồ AC-T / AC-P (Anthracycline -> Taxane)</option>
                                 <option value="AC-T-Trastuzumab">Phác đồ AC-T + Trastuzumab (HER2 dương tính)</option>
                                 <option value="Paclitaxel-Mono">Paclitaxel Đơn Trị (Vú / Dạ dày)</option>
@@ -278,7 +282,7 @@
                         </div>
                     </div>
 
-                    <!-- Khu vực phân đoạn Tuần cho thuốc uống 14 ngày (vî không cấp quá 7 ngày) -->
+                    <!-- Khu vực phân đoạn Tuần cho thuốc uống 14 ngày (vì không cấp quá 7 ngày) -->
                     <div id="fourteenDaysOralWeeksBox" class="hidden bg-amber-50 border border-amber-200 p-3 rounded-xl space-y-2">
                         <p class="font-bold text-amber-900 text-[11px] flex items-center gap-1.5">
                             <i class="fa-solid fa-calendar-week"></i> Phân đoạn cấp phát thuốc uống 14 ngày (Tối đa 7 ngày/lần cấp):
@@ -295,7 +299,7 @@
                         </div>
                     </div>
 
-                    <!-- Khu vực nhập liều cụ thể nếu thuốc có dải liều dao động (vd: Irinotecan 240-250) -->
+                    <!-- Khu vực nhập liều cụ thể nếu thuốc có dải liều dao động -->
                     <div id="variableDoseInputsContainer" class="hidden bg-white p-3 rounded-xl border border-indigo-200 space-y-2">
                         <p class="font-bold text-rose-700 text-[11px] flex items-center gap-1.5">
                             <i class="fa-solid fa-sliders"></i> Nhập liều cụ thể cho các thuốc có dải dao động:
@@ -303,10 +307,10 @@
                         <div id="variableDoseFieldsList" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                     </div>
 
-                    <!-- Khu vực tính liều thuốc theo BSA -->
+                    <!-- Khu vực tính liều thuốc theo BSA & Cân nặng (kg) -->
                     <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-3 shadow-sm">
                         <h5 class="font-bold text-indigo-900 uppercase text-[10px] tracking-wider flex items-center justify-between">
-                            <span>Nhập Thông Số Cơ Thể & Tự Động Tính Liều Thuốc Theo BSA</span>
+                            <span>Nhập Thông Số Cơ Thể & Tự Động Tính Liều Thuốc (BSA / Kg)</span>
                         </h5>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
@@ -325,7 +329,7 @@
 
                         <!-- Bảng kết quả liều thuốc -->
                         <div id="calculatedDoseResultArea" class="hidden pt-2 border-t border-slate-100 space-y-1.5">
-                            <p class="font-bold text-teal-800 text-[11px]"><i class="fa-solid fa-calculator"></i> Bảng tự động tính liều lượng thuốc theo BSA:</p>
+                            <p class="font-bold text-teal-800 text-[11px]"><i class="fa-solid fa-calculator"></i> Bảng tự động tính liều lượng thuốc theo BSA / Cân nặng (kg):</p>
                             <div id="doseDetailsList" class="p-3 bg-teal-50/60 rounded-xl border border-teal-200 space-y-1 text-slate-800 text-xs font-semibold"></div>
                         </div>
                     </div>
@@ -513,7 +517,7 @@
 
                 <div class="space-y-2">
                     <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-timeline text-teal-600"></i> Lịch Sử Chu Kỳ Hóa Trị & Liều Lượng Tính Theo BSA (Realtime)
+                        <i class="fa-solid fa-timeline text-teal-600"></i> Lịch Sử Chu Kỳ Hóa Trị & Liều Lượng Tính Theo BSA/Kg (Realtime)
                     </h4>
                     <div id="detCyclesTimeline" class="space-y-2.5 border-l-2 border-teal-500 pl-4 ml-2"></div>
                 </div>
@@ -700,7 +704,7 @@
             { code: "C50.9", desc: "U ác tính vú, không đặc hiệu" }
         ];
 
-        // Dữ liệu chuẩn các phác đồ hóa trị và liều lượng theo BSA (mg/m2) kèm cấu hình dải liều dao động nếu có
+        // Dữ liệu chuẩn các phác đồ hóa trị và liều lượng theo BSA (mg/m2) hoặc Theo KG (mg/kg) cho Trastuzumab/Bevacizumab
         const chemoProtocolsData = {
             "CapeOx": {
                 name: "CapeOx (Oxaliplatin + Capecitabine)",
@@ -710,8 +714,8 @@
                     { name: "Chu kỳ chuẩn 21 ngày", desc: "Oxaliplatin 130 mg/m² ngày 1 + Capecitabine 1.000 mg/m² uống ngày 1-14" }
                 ],
                 drugs: [
-                    { name: "Oxaliplatin", defaultDose: 130, unit: "mg/m²", route: "Truyền tĩnh mạch ngày 1" },
-                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày" }
+                    { name: "Oxaliplatin", defaultDose: 130, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", calcType: "bsa", route: "Uống chia 2 lần/ngày" }
                 ]
             },
             "XELIRI": {
@@ -719,11 +723,51 @@
                 cycleDays: 21,
                 has14DaysOral: true,
                 branches: [
-                    { name: "Lịch trình 3 tuần chuẩn", desc: "Irinotecan 240-250 mg/m² (có thể tùy chỉnh) + Capecitabine 1.000 mg/m² uống 2 lần/ngày x 14 ngày" }
+                    { name: "Lịch trình 3 tuần chuẩn", desc: "Irinotecan 240-250 mg/m² (tùy chỉnh) + Capecitabine 1.000 mg/m² uống 2 lần/ngày x 14 ngày" }
                 ],
                 drugs: [
-                    { name: "Irinotecan", defaultDose: 245, range: [240, 250], unit: "mg/m²", route: "Truyền tĩnh mạch 90 phút ngày 1" },
-                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày" }
+                    { name: "Irinotecan", defaultDose: 245, range: [240, 250], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch 90 phút ngày 1" },
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", calcType: "bsa", route: "Uống chia 2 lần/ngày" }
+                ]
+            },
+            "XELIRI-Bevacizumab": {
+                name: "XELIRI + Bevacizumab (Đại trực tràng di căn)",
+                cycleDays: 21,
+                has14DaysOral: true,
+                branches: [
+                    { name: "Chu kỳ 21 ngày (Bevacizumab 7.5 mg/kg)", desc: "Bevacizumab 7.5 mg/kg N1 + Irinotecan 240-250 mg/m² N1 + Capecitabine 2000 mg/m²/ngày N1-14" },
+                    { name: "Chu kỳ 21 ngày (Bevacizumab 5 mg/kg)", desc: "Bevacizumab 5 mg/kg N1 + Irinotecan 240-250 mg/m² N1 + Capecitabine 2000 mg/m²/ngày N1-14" }
+                ],
+                drugs: [
+                    { name: "Bevacizumab", defaultDose: 7.5, range: [5, 7.5], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch ngày 1 (truyền trước hóa chất)" },
+                    { name: "Irinotecan", defaultDose: 245, range: [240, 250], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch 90 phút ngày 1" },
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", calcType: "bsa", route: "Uống chia 2 lần/ngày (N1-14)" }
+                ]
+            },
+            "Capecitabine-Bevacizumab": {
+                name: "Capecitabine + Bevacizumab",
+                cycleDays: 21,
+                has14DaysOral: true,
+                branches: [
+                    { name: "Chu kỳ 21 ngày (Bevacizumab 7.5 mg/kg)", desc: "Bevacizumab 7.5 mg/kg N1 + Capecitabine 2.000-2.500 mg/m²/ngày N1-14" },
+                    { name: "Chu kỳ 21 ngày (Bevacizumab 5 mg/kg)", desc: "Bevacizumab 5 mg/kg N1 + Capecitabine 2.000-2.500 mg/m²/ngày N1-14" }
+                ],
+                drugs: [
+                    { name: "Bevacizumab", defaultDose: 7.5, range: [5, 7.5], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch ngày 1" },
+                    { name: "Capecitabine", defaultDose: 2000, range: [2000, 2500], unit: "mg/m²/ngày", calcType: "bsa", route: "Uống chia 2 lần/ngày từ ngày 1-14" }
+                ]
+            },
+            "FOLFOXIRI": {
+                name: "FOLFOXIRI / Cape-Oxa-Iri",
+                cycleDays: 21,
+                has14DaysOral: true,
+                branches: [
+                    { name: "Lịch trình chuẩn 21 ngày", desc: "Irinotecan 165 mg/m² N1 + Oxaliplatin 130 mg/m² N1 + Capecitabine 2.000 mg/m²/ngày N1-14" }
+                ],
+                drugs: [
+                    { name: "Irinotecan", defaultDose: 165, range: [165, 200], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch 90 phút ngày 1" },
+                    { name: "Oxaliplatin", defaultDose: 130, range: [85, 130], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch 2 giờ ngày 1" },
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", calcType: "bsa", route: "Uống chia 2 lần/ngày từ ngày 1-14" }
                 ]
             },
             "Vinorelbine-Capecitabine": {
@@ -731,13 +775,13 @@
                 cycleDays: 21,
                 has14DaysOral: true,
                 branches: [
-                    { name: "Lịch trình chuẩn (Chu kỳ đầu)", desc: "Vinorelbine 60 mg/m² (chu kỳ sau 80 mg/m²) ngày 1, 8 + Capecitabine 2.000 mg/m² ngày 1-14" },
+                    { name: "Lịch trình chuẩn (Chu kỳ đầu)", desc: "Vinorelbine 60 mg/m² ngày 1, 8 + Capecitabine 2.000 mg/m² ngày 1-14" },
                     { name: "Lịch trình chuẩn (Chu kỳ sau)", desc: "Vinorelbine 80 mg/m² ngày 1, 8 + Capecitabine 2.000 mg/m² ngày 1-14" },
                     { name: "Lịch trình Metronomic (liều thấp duy trì)", desc: "Vinorelbine 40 mg/ngày (ngày 1,3,5) + Capecitabine 1.500 mg/ngày liên tục" }
                 ],
                 drugs: [
-                    { name: "Vinorelbine", defaultDose: 80, unit: "mg/m²", route: "Uống ngày 1, 8" },
-                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", route: "Uống" }
+                    { name: "Vinorelbine", defaultDose: 80, unit: "mg/m²", calcType: "bsa", route: "Uống ngày 1, 8" },
+                    { name: "Capecitabine", defaultDose: 2000, unit: "mg/m²/ngày", calcType: "bsa", route: "Uống" }
                 ]
             },
             "Metronomic-Breast": {
@@ -749,7 +793,7 @@
                     { name: "Vinorelbine + Capecitabine phối hợp", desc: "Vinorelbine 40 mg/ngày (1,3,5) + Capecitabine 1.500 mg/ngày" }
                 ],
                 drugs: [
-                    { name: "Vinorelbine", defaultDose: 40, range: [30, 50], unit: "mg/ngày", route: "Uống ngày 1, 3, 5 hàng tuần" }
+                    { name: "Vinorelbine", defaultDose: 40, range: [30, 50], unit: "mg/ngày", calcType: "fixed", route: "Uống ngày 1, 3, 5 hàng tuần" }
                 ]
             },
             "Capecitabine-Mono": {
@@ -758,10 +802,10 @@
                 has14DaysOral: true,
                 branches: [
                     { name: "Đại tràng - Trực tràng (Thể trạng yếu)", desc: "Capecitabine 1.250 mg/m² uống 2 lần/ngày x 14 ngày" },
-                    { name: "Ung thư Dạ dày", desc: "Capecitabine 1.000-1.250 mg/m² (có thể tùy chỉnh) uống ngày 1-14" }
+                    { name: "Ung thư Dạ dày", desc: "Capecitabine 1.000-1.250 mg/m² (tùy chỉnh) uống ngày 1-14" }
                 ],
                 drugs: [
-                    { name: "Capecitabine", defaultDose: 2500, range: [2000, 2500], unit: "mg/m²/ngày", route: "Uống chia 2 lần/ngày" }
+                    { name: "Capecitabine", defaultDose: 2500, range: [2000, 2500], unit: "mg/m²/ngày", calcType: "bsa", route: "Uống chia 2 lần/ngày" }
                 ]
             },
             "EC": {
@@ -770,11 +814,28 @@
                 has14DaysOral: false,
                 branches: [
                     { name: "Phác đồ EC chuẩn", desc: "Epirubicin 100 mg/m² + Cyclophosphamide 830 mg/m² ngày 1 (x 8 chu kỳ)" },
-                    { name: "Phác đồ EC nhẹ", desc: "Epirubicin 75 mg/m² + Cyclophosphamide 600 mg/m² ngày 1" }
+                    { name: "Phác đồ EC nhẹ", desc: "Epirubicin 75 mg/m² + Cyclophosphamide 600 mg/m² ngày 1" },
+                    { name: "Phác đồ 4EC -> 4D (Docetaxel)", desc: "Epirubicin 90 mg/m² + Cyclophosphamide 600 mg/m² truyền tĩnh mạch ngày 1 (x 4 chu kỳ)" }
                 ],
                 drugs: [
-                    { name: "Epirubicin", defaultDose: 100, range: [75, 100], unit: "mg/m²", route: "Truyền tĩnh mạch ngày 1" },
-                    { name: "Cyclophosphamide", defaultDose: 830, range: [600, 830], unit: "mg/m²", route: "Truyền tĩnh mạch ngày 1" }
+                    { name: "Epirubicin", defaultDose: 100, range: [75, 100], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
+                    { name: "Cyclophosphamide", defaultDose: 830, range: [600, 830], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" }
+                ]
+            },
+            "4EC-4P-Trastuzumab": {
+                name: "Phác đồ 4EC - 4P + Trastuzumab (Ung thư Vú HER2+)",
+                cycleDays: 21,
+                has14DaysOral: false,
+                branches: [
+                    { name: "Giai đoạn 1: 4EC (3 tuần)", desc: "Epirubicin 100 mg/m² + Cyclophosphamide 830 mg/m² N1 mỗi 3 tuần x 4 chu kỳ" },
+                    { name: "Giai đoạn 2: 4P + Trastuzumab (3 tuần)", desc: "Paclitaxel 175 mg/m² + Trastuzumab (Tải 8 mg/kg, duy trì 6 mg/kg) mỗi 3 tuần x 4" },
+                    { name: "Giai đoạn 2: 12 tuần Paclitaxel + Trastuzumab", desc: "Paclitaxel 80 mg/m²/tuần x 12 tuần + Trastuzumab (Tải 4 mg/kg, duy trì 2 mg/kg)" }
+                ],
+                drugs: [
+                    { name: "Epirubicin", defaultDose: 100, range: [75, 100], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch (Giai đoạn EC)" },
+                    { name: "Cyclophosphamide", defaultDose: 830, range: [600, 830], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch (Giai đoạn EC)" },
+                    { name: "Paclitaxel", defaultDose: 175, range: [80, 175], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch (Giai đoạn P)" },
+                    { name: "Trastuzumab", defaultDose: 6, range: [2, 8], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch (Tải 8mg/kg hoặc duy trì 6mg/kg 3 tuần, 2mg/kg hàng tuần)" }
                 ]
             },
             "AC-T": {
@@ -788,9 +849,9 @@
                     { name: "4AC -> 4D (Docetaxel 3 tuần)", desc: "AC -> Docetaxel 100 mg/m² truyền tĩnh mạch ngày 1" }
                 ],
                 drugs: [
-                    { name: "Doxorubicin", defaultDose: 60, unit: "mg/m²", route: "Truyền tĩnh mạch ngày 1" },
-                    { name: "Cyclophosphamide", defaultDose: 600, unit: "mg/m²", route: "Truyền tĩnh mạch ngày 1" },
-                    { name: "Paclitaxel / Docetaxel", defaultDose: 175, range: [80, 175], unit: "mg/m²", route: "Truyền tĩnh mạch" }
+                    { name: "Doxorubicin", defaultDose: 60, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
+                    { name: "Cyclophosphamide", defaultDose: 600, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
+                    { name: "Paclitaxel / Docetaxel", defaultDose: 175, range: [80, 175], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch" }
                 ]
             },
             "AC-T-Trastuzumab": {
@@ -802,10 +863,10 @@
                     { name: "Lịch trình hàng tuần", desc: "4AC -> 12 tuần Paclitaxel + Trastuzumab (Liều tải 4 mg/kg, sau đó 2 mg/kg hàng tuần)" }
                 ],
                 drugs: [
-                    { name: "Doxorubicin", defaultDose: 60, unit: "mg/m²", route: "Truyền tĩnh mạch ngày 1 (Không dùng đồng thời Trastuzumab)" },
-                    { name: "Cyclophosphamide", defaultDose: 600, unit: "mg/m²", route: "Truyền tĩnh mạch ngày 1" },
-                    { name: "Paclitaxel", defaultDose: 175, unit: "mg/m²", route: "Truyền tĩnh mạch" },
-                    { name: "Trastuzumab", defaultDose: 6, unit: "mg/kg", route: "Truyền tĩnh mạch định kỳ (Tải 8mg/kg)" }
+                    { name: "Doxorubicin", defaultDose: 60, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1 (Không dùng đồng thời Trastuzumab)" },
+                    { name: "Cyclophosphamide", defaultDose: 600, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
+                    { name: "Paclitaxel", defaultDose: 175, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch" },
+                    { name: "Trastuzumab", defaultDose: 6, range: [2, 8], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch định kỳ (Tải 8mg/kg hoặc duy trì 6mg/kg 3 tuần, 2mg/kg hàng tuần)" }
                 ]
             },
             "Paclitaxel-Mono": {
@@ -818,7 +879,7 @@
                     { name: "Ung thư Dạ dày (Bước 2 / Di căn)", desc: "Paclitaxel 135-250 mg/m² (tùy chỉnh) ngày 1 hoặc lịch ngày 1, 8, 15" }
                 ],
                 drugs: [
-                    { name: "Paclitaxel", defaultDose: 175, range: [80, 250], unit: "mg/m²", route: "Truyền tĩnh mạch" }
+                    { name: "Paclitaxel", defaultDose: 175, range: [80, 250], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch" }
                 ]
             },
             "Vinorelbine-Mono": {
@@ -828,10 +889,11 @@
                 branches: [
                     { name: "Truyền tĩnh mạch hàng tuần", desc: "Vinorelbine 25 mg/m² truyền tĩnh mạch ngày 1 hàng tuần" },
                     { name: "Dạng uống hàng tuần", desc: "Vinorelbine 80 mg/m² (chu kỳ đầu 60 mg/m²) uống ngày 1 hàng tuần" },
-                    { name: "Dạng uống chu kỳ 3 tuần", desc: "Vinorelbine 80 mg/m² (chu kỳ đầu 60 mg/m²) uống ngày 1, 8 mỗi 3 tuần" }
+                    { name: "Dạng uống chu kỳ 3 tuần", desc: "Vinorelbine 80 mg/m² (chu kỳ đầu 60 mg/m²) uống ngày 1, 8 mỗi 3 tuần" },
+                    { name: "Dạng Metronomic", desc: "Vinorelbine 30-50 mg/ngày uống ngày 1, 3, 5 hàng tuần" }
                 ],
                 drugs: [
-                    { name: "Vinorelbine", defaultDose: 80, range: [25, 80], unit: "mg/m²", route: "Truyền hoặc uống theo lịch" }
+                    { name: "Vinorelbine", defaultDose: 80, range: [25, 80], unit: "mg/m²", calcType: "bsa", route: "Truyền hoặc uống theo lịch" }
                 ]
             }
         };
@@ -973,13 +1035,15 @@
             const doseArea = document.getElementById('calculatedDoseResultArea');
             const doseList = document.getElementById('doseDetailsList');
 
-            if (!protoKey || !chemoProtocolsData[protoKey] || bsa <= 0) {
+            if (!protoKey || !chemoProtocolsData[protoKey]) {
                 doseArea.classList.add('hidden');
                 return;
             }
 
             const pInfo = chemoProtocolsData[protoKey];
             doseList.innerHTML = "";
+            let canCalculate = false;
+
             pInfo.drugs.forEach((drug, dIndex) => {
                 let doseVal = drug.defaultDose;
                 const customInput = document.getElementById(`varDose_${dIndex}`);
@@ -987,16 +1051,48 @@
                     doseVal = parseFloat(customInput.value);
                 }
 
-                const totalDose = Math.round(doseVal * bsa);
+                let totalDose = 0;
+                let calcText = "";
+
+                if (drug.calcType === "weight") {
+                    // Thuốc tính liều theo cân nặng (Trastuzumab, Bevacizumab)
+                    if (w > 0) {
+                        totalDose = Math.round(doseVal * w);
+                        calcText = `= ${totalDose} mg (${doseVal} ${drug.unit} x ${w}kg)`;
+                        canCalculate = true;
+                    } else {
+                        calcText = `(Cần nhập Cân nặng kg)`;
+                    }
+                } else if (drug.calcType === "fixed") {
+                    // Thuốc liều cố định mg/ngày
+                    totalDose = doseVal;
+                    calcText = `= ${totalDose} mg/ngày`;
+                    canCalculate = true;
+                } else {
+                    // Mặc định tính theo BSA
+                    if (bsa > 0) {
+                        totalDose = Math.round(doseVal * bsa);
+                        calcText = `= ${totalDose} mg (${doseVal} ${drug.unit} x ${bsa.toFixed(2)}m²)`;
+                        canCalculate = true;
+                    } else {
+                        calcText = `(Cần nhập Chiều cao & Cân nặng)`;
+                    }
+                }
+
                 const div = document.createElement('div');
                 div.className = "flex items-center justify-between py-1 border-b border-teal-100/60";
                 div.innerHTML = `
                     <span><i class="fa-solid fa-pills text-teal-600"></i> <strong>${drug.name}</strong> (${doseVal} ${drug.unit}):</span>
-                    <span class="bg-white px-2 py-0.5 rounded border border-teal-200 font-bold text-teal-900">= ${totalDose} mg (${drug.route})</span>
+                    <span class="bg-white px-2 py-0.5 rounded border border-teal-200 font-bold text-teal-900">${calcText} - ${drug.route}</span>
                 `;
                 doseList.appendChild(div);
             });
-            doseArea.classList.remove('hidden');
+
+            if (canCalculate) {
+                doseArea.classList.remove('hidden');
+            } else {
+                doseArea.classList.add('hidden');
+            }
         };
 
         window.openNewPatientModal = function() {
@@ -1737,8 +1833,18 @@
                 if (customInput && !isNaN(parseFloat(customInput.value))) {
                     doseVal = parseFloat(customInput.value);
                 }
-                const totalDose = Math.round(doseVal * bsa);
-                dosesText += `${drug.name}: ${totalDose}mg (${doseVal} ${drug.unit}) - ${drug.route}; `;
+
+                let totalDose = 0;
+                if (drug.calcType === "weight") {
+                    totalDose = Math.round(doseVal * weight);
+                    dosesText += `${drug.name}: ${totalDose}mg (${doseVal} ${drug.unit} x ${weight}kg) - ${drug.route}; `;
+                } else if (drug.calcType === "fixed") {
+                    totalDose = doseVal;
+                    dosesText += `${drug.name}: ${totalDose}mg/ngày - ${drug.route}; `;
+                } else {
+                    totalDose = Math.round(doseVal * bsa);
+                    dosesText += `${drug.name}: ${totalDose}mg (${doseVal} ${drug.unit}) - ${drug.route}; `;
+                }
             });
 
             try {
@@ -1766,7 +1872,7 @@
                     }
                 }
 
-                if (height > 0 && weight > 0) {
+                if (weight > 0) {
                     finalCycles.push({
                         date: cycleDate || todayStr,
                         protocolUsed: newProtocol,
@@ -1779,7 +1885,7 @@
                         updatedBy: currentUser.email
                     });
                 } else {
-                    alert("Vui lòng nhập chiều cao và cân nặng để tính liều thuốc chính xác!");
+                    alert("Vui lòng nhập cân nặng để tính liều thuốc chính xác!");
                     return;
                 }
 
@@ -1998,7 +2104,7 @@
 
         window.setUserRole = async function(userId, role) {
             try {
-                await updateDoc(doc(db, "users", userId), { role: role });
+                await updateDoc(doc(doc(db, "users", userId)), { role: role });
                 alert(`Đã cập nhật quyền thành viên thành: ${role}!`);
                 window.loadUsersManagementTable();
             } catch (err) {
