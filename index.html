@@ -84,7 +84,7 @@
             <i class="fa-solid fa-shield-halved text-amber-600 text-lg mt-0.5"></i>
             <div>
                 <p class="font-bold">Chế Độ Bảo Mật Thông Tin Bệnh Nhân (HIPAA/Bảo Mật Y Tế)</p>
-                <p id="noticeSubText" class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân ẩn hoàn toàn khỏi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
+                <p id="noticeSubText" class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân ẩn hoàn toàn khi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
             </div>
         </div>
 
@@ -656,7 +656,39 @@
             { code: "C50.6", desc: "U ác tính phần nách vú" },
             { code: "C50.8", desc: "U ác tính tổn thương lan tràn vú" },
             { code: "C50.9", desc: "U ác tính vú, không có hiệu" },
-            { code: "Z51.1", desc: "Buổi trị liệu hóa chất cho khối u" }
+            { code: "Z51.1", desc: "Buổi trị liệu hóa chất cho khối u" },
+            
+            // --- BỔ SUNG ICD PHỤ (DI CĂN) TỪ FILE ICD PHỤ ---
+            // 1. Di căn hạch lympho (C77.-)
+            { code: "C77.0", desc: "U ác thứ phát của hạch lympho đầu, mặt và cổ" },
+            { code: "C77.1", desc: "U ác thứ phát của hạch lympho lồng ngực (bao gồm hạch trung thất, hạch rốn phổi, hạch phế quản-phổi)" },
+            { code: "C77.2", desc: "U ác thứ phát của hạch lympho ổ bụng" },
+            { code: "C77.3", desc: "U ác thứ phát của hạch lympho nách và chi trên" },
+            { code: "C77.4", desc: "U ác thứ phát của hạch lympho bẹn và chi dưới" },
+            { code: "C77.5", desc: "U ác thứ phát của hạch lympho vùng chậu" },
+            { code: "C77.8", desc: "U ác thứ phát của hạch lympho nhiều vùng" },
+            { code: "C77.9", desc: "U ác thứ phát của hạch lympho không xác định" },
+            // 2. Di căn các cơ quan hô hấp và tiêu hóa (C78.-)
+            { code: "C78.0", desc: "U ác thứ phát của phổi" },
+            { code: "C78.1", desc: "U ác thứ phát của trung thất (mô mềm/cơ quan trong trung thất, trừ hạch trung thất)" },
+            { code: "C78.2", desc: "U ác thứ phát của màng phổi" },
+            { code: "C78.3", desc: "U ác thứ phát của các cơ quan hô hấp khác và không xác định" },
+            { code: "C78.4", desc: "U ác thứ phát của ruột non" },
+            { code: "C78.5", desc: "U ác thứ phát của ruột già và trực tràng" },
+            { code: "C78.6", desc: "U ác thứ phát của phúc mạc và màng bụng sau (mạc treo ruột, mạc nối)" },
+            { code: "C78.7", desc: "U ác thứ phát của gan và đường mật trong gan" },
+            { code: "C78.8", desc: "U ác thứ phát của các cơ quan tiêu hóa khác và không xác định" },
+            // 3. Di căn các vị trí khác (C79.-)
+            { code: "C79.0", desc: "U ác thứ phát của thận và bể thận" },
+            { code: "C79.1", desc: "U ác thứ phát của bàng quang, cơ quan tiết niệu khác và không xác định" },
+            { code: "C79.2", desc: "U ác thứ phát của da" },
+            { code: "C79.3", desc: "U ác thứ phát của não và màng não" },
+            { code: "C79.4", desc: "U ác thứ phát của các phần khác và không xác định của hệ thần kinh" },
+            { code: "C79.5", desc: "U ác thứ phát của xương và tủy xương" },
+            { code: "C79.6", desc: "U ác thứ phát của buồng trứng" },
+            { code: "C79.7", desc: "U ác thứ phát của tuyến thượng thận" },
+            { code: "C79.8", desc: "U ác thứ phát của các vị trí xác định khác" },
+            { code: "C79.9", desc: "U ác thứ phát của vị trí không xác định" }
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
