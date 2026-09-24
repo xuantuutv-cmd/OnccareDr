@@ -167,7 +167,7 @@
         </div>
     </footer>
 
-    <!-- MODAL: Thêm / Sửa Hồ Sơ Bệnh Nhân (Chia 2 khung ICD chính & phụ) -->
+    <!-- MODAL: Thêm / Sửa Hồ Sơ Bệnh Nhân -->
     <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10 border-b border-slate-800">
@@ -189,10 +189,8 @@
                 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                     
-                    <!-- CỘT TRÁI: THÔNG TIN HÀNH CHÍNH & 2 KHUNG ICD (CHÍNH & PHỤ) -->
                     <div class="lg:col-span-5 space-y-4">
                         
-                        <!-- Hiển thị Hành chính đầy đủ -->
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2 text-xs shadow-sm">
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
@@ -247,7 +245,6 @@
                             </div>
                         </div>
 
-                        <!-- Panel: NHẬP THÔNG TIN ĐIỀU TRỊ MỚI (CHU KỲ HIỆN TẠI) -->
                         <div class="bg-teal-900/5 p-4 rounded-xl border border-teal-800/20 space-y-3 shadow-sm">
                             <h4 class="font-bold text-teal-900 uppercase text-[11px] tracking-wider flex items-center gap-2 pb-1 border-b border-teal-800/10">
                                 <i class="fa-solid fa-pen-to-square text-teal-700"></i> NHẬP THÔNG TIN ĐIỀU TRỊ MỚI (CHU KỲ HIỆN TẠI)
@@ -353,7 +350,6 @@
 
                     </div>
 
-                    <!-- CỘT PHẢI: LỊCH SỬ CÁC CHU KỲ ĐIỀU TRỊ -->
                     <div class="lg:col-span-7 space-y-3">
                         <div class="bg-slate-800 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between">
                             <span class="flex items-center gap-2">
@@ -1105,7 +1101,6 @@
             document.getElementById('npGender').value = p.gender || 'N';
             document.getElementById('npBirthYear').value = p.birthYear || '';
             
-            // Giữ lại chẩn đoán cũ làm mặc định, bác sĩ có thể gõ thay đổi mới nếu cần mà không mất dữ liệu cũ ở lịch sử
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
             document.getElementById('npSubDiagnosis').value = p.subDiagnosis || '';
 
@@ -1221,8 +1216,8 @@
                 if (docId) {
                     const pRef = doc(db, "patients", docId);
                     await updateDoc(pRef, {
-                        diagnosis: diagnosis,       // Cho phép cập nhật chẩn đoán chính mới nếu cần
-                        subDiagnosis: subDiagnosis, // Cập nhật chẩn đoán phụ
+                        diagnosis: diagnosis,
+                        subDiagnosis: subDiagnosis,
                         cycles: window.tempCurrentCycles,
                         protocol: protocol,
                         updatedAt: serverTimestamp()
@@ -1273,7 +1268,10 @@
             const endDateStr = document.getElementById('statsEndDate').value;
             const icdFilterVal = document.getElementById('statsIcdFilter').value.trim().toUpperCase();
             
-            if (!startDateStr || !endDateStr) return;
+            if (!startDateStr || !endDateStr) {
+                alert("Vui lòng chọn đầy đủ Từ ngày và Đến ngày!");
+                return;
+            }
 
             const startDate = new Date(startDateStr);
             const endDate = new Date(endDateStr);
@@ -1353,9 +1351,10 @@
                     </td>
                     <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
                     <td class="p-3 text-center font-bold text-teal-700">${item.count} chu kỳ</td>
-                    <td class="p-3 text-center space-x-1" style="${isAdmin ? '' : 'display:none;'}">
-                        <button onclick="window.openEditPatientModal('${item.id}'); window.closeStatsModal();" title="Sửa" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="window.deletePatientDoc('${item.id}'); window.runChemoStatistics();" title="Xóa" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded"><i class="fa-solid fa-trash"></i></button>
+                    <td class="p-3 text-center space-x-1">
+                        <button onclick="window.viewPatientDetail('${item.id}')" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="window.closeStatsModal(); window.openEditPatientModal('${item.id}');" title="Sửa" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="window.deletePatientDoc('${item.id}'); window.runChemoStatistics();" title="Xóa" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded" style="${isAdmin ? '' : 'display:none;'}"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 statsTableBody.appendChild(tr);
