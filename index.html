@@ -65,7 +65,7 @@
                         <i class="fa-solid fa-users-gear text-amber-300"></i>
                         <span class="hidden md:inline">Quản Lý Thành Viên</span>
                     </button>
-                    <!-- Chỉ hiển thị tên / cấp độ người dùng theo yêu cầu, không hiển thị địa chỉ mail ở góc ảnh đại diện -->
+                    <!-- Chỉ hiển thị tên / cấp độ người dùng, ẩn địa chỉ mail ở góc -->
                     <div class="text-right hidden sm:block">
                         <p id="docName" class="text-xs font-bold leading-tight">Bác sĩ</p>
                         <p id="docLevelTag" class="text-[10px] text-teal-200 font-semibold">User</p>
@@ -163,7 +163,7 @@
             <div class="flex items-center space-x-3">
                 <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="Thạch Xuân Tựu" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
                 <div>
-                    <!-- Cập nhật tên tác giả theo đúng yêu cầu -->
+                    <!-- Tên tác giả theo đúng yêu cầu -->
                     <p class="font-bold text-slate-900 text-sm">Bản quyền thuộc về - <span class="text-teal-800">Thạch Xuân Tựu</span> - Khoa Ung bướu</p>
                     <p class="text-slate-500">Bệnh Viện Đa Khoa An Giang</p>
                 </div>
@@ -470,7 +470,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Xem Chi Tiết Bệnh Nhân, Biểu Đồ Marker & QR Code -->
+    <!-- MODAL: Form Tóm Tắt Chi Tiết Bệnh Nhân, Biểu Đồ Marker & QR Code -->
     <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-5 px-6 flex items-center justify-between sticky top-0 z-10">
@@ -487,23 +487,27 @@
             </div>
 
             <div class="p-6 space-y-6 text-xs">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                <!-- Form Tóm Tắt Tổng Quan -->
+                <div class="bg-teal-50/50 p-4 rounded-2xl border border-teal-200/80 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                     <div class="md:col-span-2 space-y-3">
-                        <div>
-                            <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-1">Chẩn Đoán Lâm Sàng</label>
-                            <div id="detDiagnosis" class="p-3 bg-slate-100 rounded-xl font-semibold text-slate-800 text-xs border border-slate-200/60">-</div>
+                        <div class="flex items-center gap-2 pb-2 border-b border-teal-200/60">
+                            <span class="font-bold text-teal-900 uppercase text-[11px]"><i class="fa-solid fa-file-medical"></i> Form Tóm Tắt Hồ Sơ Bệnh Nhân</span>
                         </div>
                         <div>
-                            <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-1">Phác Đồ Hóa Trị Tổng Thể</label>
-                            <div id="detProtocol" class="p-3 bg-amber-50 rounded-xl font-bold text-amber-800 text-xs border border-amber-200/80 flex items-center gap-2">
+                            <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-0.5">Chẩn Đoán Lâm Sàng</label>
+                            <div id="detDiagnosis" class="p-2.5 bg-white rounded-xl font-semibold text-slate-800 text-xs border border-slate-200/60">-</div>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-0.5">Phác Đồ Hóa Trị Tổng Thể</label>
+                            <div id="detProtocol" class="p-2.5 bg-amber-50 rounded-xl font-bold text-amber-800 text-xs border border-amber-200/80 flex items-center gap-2">
                                 <i class="fa-solid fa-vial text-amber-600"></i>
                                 <span>-</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col items-center justify-center space-y-2 text-center shadow-inner">
-                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col items-center justify-center space-y-2 text-center shadow-inner">
+                        <div class="bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
                             <div id="patientQrCodeContainer" class="flex justify-center"></div>
                         </div>
                         <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Mã QR Tra Cứu BN</p>
@@ -526,7 +530,7 @@
                     </button>
                 </div>
 
-                <!-- NỘI DUNG TAB 1: TIMELINE CHU KỲ (GROUP THEO PHÁC ĐỒ VỚI DẤU CỘNG THU GỌN/MỞ RỘNG VÀ HIỂN THỊ ĐỦ THÔNG TIN ĐIỀU TRỊ) -->
+                <!-- NỘI DUNG TAB 1: TIMELINE CHU KỲ -->
                 <div id="tabContentTimeline" class="space-y-3">
                     <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-timeline text-teal-600"></i> Dòng Thời Gian Chu Kỳ Hóa Trị & Thông Tin Điều Trị (Realtime)
@@ -936,10 +940,10 @@
                     { name: "Giai đoạn 2: 12 tuần Paclitaxel + Trastuzumab", desc: "Paclitaxel 80 mg/m²/tuần x 12 tuần + Trastuzumab (Tải 4 mg/kg, duy trì 2 mg/kg)" }
                 ],
                 drugs: [
-                    { name: "Epirubicin", defaultDose: 100, range: [75, 100], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch (G giai đoạn EC)" },
+                    { name: "Epirubicin", defaultDose: 100, range: [75, 100], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch (Giai đoạn EC)" },
                     { name: "Cyclophosphamide", defaultDose: 830, range: [600, 830], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch (Giai đoạn EC)" },
                     { name: "Paclitaxel", defaultDose: 175, range: [80, 175], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch (Giai đoạn P)" },
-                    { name: "Trastuzumab", defaultDose: 6, range: [2, 8], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch (Tải 8mg/kg hoặc duy trì 6mg/kg 3 tuần, 2mg/kg hàng tuần)" }
+                    { name: "Trastuzumab", defaultDose: 6, range: [2, 8], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch" }
                 ]
             },
             "AC-T": {
@@ -949,8 +953,7 @@
                 branches: [
                     { name: "4AC liều dày -> 4P liều dày (2 tuần + G-CSF)", desc: "Doxorubicin 60 mg/m² + Cyclophosphamide 600 mg/m² (14 ngày) -> Paclitaxel 175 mg/m²" },
                     { name: "4AC -> 12 tuần Paclitaxel hàng tuần", desc: "4AC (14 ngày) -> Paclitaxel 80 mg/m²/tuần x 12 tuần" },
-                    { name: "4AC -> 4P chu kỳ 3 tuần", desc: "AC (21 ngày x 4) -> Paclitaxel 175 mg/m² (21 ngày x 4)" },
-                    { name: "4AC -> 4D (Docetaxel 3 tuần)", desc: "AC -> Docetaxel 100 mg/m² truyền tĩnh mạch ngày 1" }
+                    { name: "4AC -> 4P chu kỳ 3 tuần", desc: "AC (21 ngày x 4) -> Paclitaxel 175 mg/m² (21 ngày x 4)" }
                 ],
                 drugs: [
                     { name: "Doxorubicin", defaultDose: 60, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
@@ -967,10 +970,10 @@
                     { name: "Lịch trình hàng tuần", desc: "4AC -> 12 tuần Paclitaxel + Trastuzumab (Liều tải 4 mg/kg, sau đó 2 mg/kg hàng tuần)" }
                 ],
                 drugs: [
-                    { name: "Doxorubicin", defaultDose: 60, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1 (Không dùng đồng thời Trastuzumab)" },
+                    { name: "Doxorubicin", defaultDose: 60, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
                     { name: "Cyclophosphamide", defaultDose: 600, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch ngày 1" },
                     { name: "Paclitaxel", defaultDose: 175, unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch" },
-                    { name: "Trastuzumab", defaultDose: 6, range: [2, 8], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch định kỳ (Tải 8mg/kg hoặc duy trì 6mg/kg 3 tuần, 2mg/kg hàng tuần)" }
+                    { name: "Trastuzumab", defaultDose: 6, range: [2, 8], unit: "mg/kg", calcType: "weight", route: "Truyền tĩnh mạch định kỳ" }
                 ]
             },
             "Paclitaxel-Mono": {
@@ -979,8 +982,7 @@
                 has14DaysOral: false,
                 branches: [
                     { name: "Ung thư Vú - Lịch hàng tuần", desc: "Paclitaxel 80 mg/m² truyền tĩnh mạch 1 giờ, ngày 1 hàng tuần x 12 tuần" },
-                    { name: "Ung thư Vú - Lịch 3 tuần", desc: "Paclitaxel 175 mg/m² truyền tĩnh mạch ngày 1, chu kỳ 21 ngày" },
-                    { name: "Ung thư Dạ dày (Bước 2 / Di căn)", desc: "Paclitaxel 135-250 mg/m² (tùy chỉnh) ngày 1 hoặc lịch ngày 1, 8, 15" }
+                    { name: "Ung thư Vú - Lịch 3 tuần", desc: "Paclitaxel 175 mg/m² truyền tĩnh mạch ngày 1, chu kỳ 21 ngày" }
                 ],
                 drugs: [
                     { name: "Paclitaxel", defaultDose: 175, range: [80, 250], unit: "mg/m²", calcType: "bsa", route: "Truyền tĩnh mạch" }
@@ -992,9 +994,7 @@
                 has14DaysOral: false,
                 branches: [
                     { name: "Truyền tĩnh mạch hàng tuần", desc: "Vinorelbine 25 mg/m² truyền tĩnh mạch ngày 1 hàng tuần" },
-                    { name: "Dạng uống hàng tuần", desc: "Vinorelbine 80 mg/m² (chu kỳ đầu 60 mg/m²) uống ngày 1 hàng tuần" },
-                    { name: "Dạng uống chu kỳ 3 tuần", desc: "Vinorelbine 80 mg/m² (chu kỳ đầu 60 mg/m²) uống ngày 1, 8 mỗi 3 tuần" },
-                    { name: "Dạng Metronomic", desc: "Vinorelbine 30-50 mg/ngày uống ngày 1, 3, 5 hàng tuần" }
+                    { name: "Dạng uống hàng tuần", desc: "Vinorelbine 80 mg/m² (chu kỳ đầu 60 mg/m²) uống ngày 1 hàng tuần" }
                 ],
                 drugs: [
                     { name: "Vinorelbine", defaultDose: 80, range: [25, 80], unit: "mg/m²", calcType: "bsa", route: "Truyền hoặc uống theo lịch" }
@@ -1083,7 +1083,7 @@
             const pInfo = chemoProtocolsData[protoKey];
             document.getElementById('npProtocol').value = pInfo.name;
 
-            pInfo.branches.forEach((b, idx) => {
+            pInfo.branches.forEach((b) => {
                 const opt = document.createElement('option');
                 opt.value = b.name;
                 opt.innerText = b.name + (b.desc ? ` (${b.desc})` : '');
@@ -1241,6 +1241,9 @@
             document.getElementById('npGender').disabled = false;
             document.getElementById('npBirthYear').disabled = false;
             document.getElementById('npDiagnosis').disabled = false;
+            document.getElementById('npId').classList.remove('bg-slate-100');
+            document.getElementById('npName').classList.remove('bg-slate-100');
+            document.getElementById('npDiagnosis').classList.remove('bg-slate-100');
 
             document.getElementById('protocolModeContainer').classList.add('hidden');
             document.getElementById('customProtocolInputContainer').classList.add('hidden');
@@ -1455,7 +1458,7 @@
 
                 document.getElementById('docName').innerText = user.displayName || "Bác sĩ";
                 
-                // Hiển thị cấp độ người dùng theo yêu cầu (User / VIP / Admin) cạnh tên, ẩn địa chỉ mail ở góc
+                // Hiển thị cấp độ người dùng (User / VIP / Admin) cạnh tên, ẩn email ở góc avatar
                 let userLevelStr = "User";
                 if (isAdmin) userLevelStr = "Admin";
                 else if (isVip) userLevelStr = "VIP";
@@ -1467,7 +1470,7 @@
                 if (isBlocked) {
                     roleBadge.innerHTML = `<i class="fa-solid fa-ban text-[9px]"></i> Đã bị Block`;
                     roleBadge.className = "text-[10px] bg-rose-800 text-rose-100 border border-rose-500 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
-                    noticeSubText.innerHTML = `<strong class="text-rose-700">Tài khoản của bạn đã bị Khóa (Block) bởi Quản trị viên.</strong> Vui lòng liên hệ Admin để biết thêm chi tiết.`;
+                    noticeSubText.innerHTML = `<strong class="text-rose-700">Tài khoản của bạn đã bị Khóa (Block) bởi Quản trị viên.</strong>`;
                     accountStatusNotice.className = "bg-rose-50 border border-rose-200/80 rounded-2xl p-4 flex items-start space-x-3 text-rose-900 text-xs shadow-sm";
                     searchInput.disabled = true;
                     btnAddPatient.disabled = true;
@@ -1480,21 +1483,21 @@
                     btnStats.classList.remove('hidden');
                     accountStatusNotice.classList.add('hidden');
                 } else if (isVip) {
-                    roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px]"></i> VIP (Xem Thống Kê)`;
+                    roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px]"></i> VIP`;
                     roleBadge.className = "text-[10px] bg-indigo-600 text-indigo-100 border border-indigo-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
                     btnStats.classList.remove('hidden');
                     btnUserMgmt.classList.add('hidden');
                     accountStatusNotice.classList.add('hidden');
                     btnAddPatient.classList.add('hidden');
                 } else if (isApproved) {
-                    roleBadge.innerHTML = `<i class="fa-solid fa-user-doctor text-[9px]"></i> Bác Sĩ (Đã Duyệt)`;
+                    roleBadge.innerHTML = `<i class="fa-solid fa-user-doctor text-[9px]"></i> Bác Sĩ`;
                     roleBadge.className = "text-[10px] bg-teal-600 text-teal-100 border border-teal-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
                     btnStats.classList.remove('hidden');
                     accountStatusNotice.classList.add('hidden');
                 } else {
-                    roleBadge.innerHTML = `<i class="fa-solid fa-clock text-[9px]"></i> Tài khoản chờ duyệt`;
+                    roleBadge.innerHTML = `<i class="fa-solid fa-clock text-[9px]"></i> Chờ duyệt`;
                     roleBadge.className = "text-[10px] bg-rose-600 text-rose-100 border border-rose-400/30 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1";
-                    noticeSubText.innerHTML = `<strong class="text-rose-700">Tài khoản của bạn đang chờ Quản trị viên (Admin) phê duyệt.</strong> Bạn chưa thể tra cứu hay nhập thông tin cho đến khi được duyệt.`;
+                    noticeSubText.innerHTML = `<strong class="text-rose-700">Tài khoản đang chờ Quản trị viên phê duyệt.</strong>`;
                     accountStatusNotice.className = "bg-rose-50 border border-rose-200/80 rounded-2xl p-4 flex items-start space-x-3 text-rose-900 text-xs shadow-sm";
                     searchInput.disabled = true;
                     btnAddPatient.disabled = true;
@@ -1572,7 +1575,7 @@
                     <td class="p-3 font-bold text-amber-800">${p.protocol || 'Chưa cập nhật'}</td>
                     <td class="p-3 text-slate-500">${p.createdByEmail || '-'}</td>
                     <td class="p-3 text-center space-x-1">
-                        <button onclick="window.viewPatientDetail('${p.id}')" title="Xem chi tiết & QR" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="window.viewPatientDetail('${p.id}')" title="Form tóm tắt chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
                         ${currentUser && !isVip && !isBlocked ? `<button onclick="window.openEditPatientModal('${p.id}')" title="Cập nhật chu kỳ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>` : ''}
                         ${isAdmin ? `<button onclick="window.deletePatientDoc('${p.id}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </td>
@@ -1610,14 +1613,14 @@
             qrContainer.innerHTML = "";
             currentQr = new QRCode(qrContainer, {
                 text: `ONCOCARE_PATIENT_ID:${p.patientId} | NAME:${p.name} | DOB:${p.birthYear || '-'}`,
-                width: 120,
-                height: 120,
+                width: 110,
+                height: 110,
                 colorDark: "#0f766e",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
 
-            // GIAO DIỆN LỊCH SỬ CHU KỲ THEO YÊU CẦU: Nhóm theo phác đồ, có dấu cộng mở rộng/thu gọn và hiển thị thông tin điều trị đầy đủ
+            // Form tóm tắt lịch sử chu kỳ theo nhóm phác đồ với nút mở rộng/thu gọn
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
             const cycles = p.cycles || [];
@@ -1668,7 +1671,6 @@
                         `;
                         cyclesContainer.appendChild(div);
                     } else {
-                        const cardId = `protoGroup_${gIdx}`;
                         const contentId = `protoContent_${gIdx}`;
                         const iconId = `protoIcon_${gIdx}`;
 
@@ -1681,12 +1683,12 @@
                             itemsHtml += `
                                 <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5 text-xs">
                                     <div class="flex items-center justify-between font-bold text-teal-800">
-                                        <span>Chu kỳ thứ mấy: ${c.branchName || `Chu kỳ ${iIdx + 1}`}</span>
-                                        <span class="text-slate-600 font-semibold"><i class="fa-solid fa-calendar-day text-teal-600"></i> Ngày: ${c.date || 'Không rõ ngày'}</span>
+                                        <span>Chu kỳ: ${c.branchName || `Chu kỳ ${iIdx + 1}`}</span>
+                                        <span class="text-slate-600 font-semibold"><i class="fa-solid fa-calendar-day text-teal-600"></i> Ngày: ${c.date || 'Không rõ'}</span>
                                     </div>
                                     <div class="text-[10px] text-slate-500 font-medium">BSA: ${c.bsa || '-'} m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)</div>
                                     ${c.dosesText ? `<p class="text-indigo-900 text-[11px] bg-indigo-50 p-2 rounded border border-indigo-100 font-mono">${c.dosesText}</p>` : ''}
-                                    <p class="text-slate-700 font-medium bg-white p-2 rounded border border-slate-100"><strong>Thông tin điều trị / Ghi chú:</strong> ${c.note || 'Không có ghi chú cụ thể.'}</p>
+                                    <p class="text-slate-700 font-medium bg-white p-2 rounded border border-slate-100"><strong>Thông tin điều trị:</strong> ${c.note || 'Không có ghi chú.'}</p>
                                 </div>
                             `;
                         });
@@ -1698,7 +1700,7 @@
                                     <span>Tên phác đồ: ${group.protoName} (${group.items.length} chu kỳ)</span>
                                 </div>
                                 <div class="flex items-center space-x-2 text-teal-800 font-bold">
-                                    <span class="text-[10px] bg-white px-2 py-0.5 rounded border border-teal-200">Xem chi tiết</span>
+                                    <span class="text-[10px] bg-white px-2 py-0.5 rounded border border-teal-200">Thu gọn/Mở rộng</span>
                                     <i id="${iconId}" class="fa-solid fa-plus text-sm transition-transform"></i>
                                 </div>
                             </div>
@@ -1720,7 +1722,7 @@
                 notes.forEach(n => {
                     const div = document.createElement('div');
                     div.className = "p-2.5 bg-sky-50/50 rounded-xl border border-sky-100 text-xs text-sky-900";
-                    div.innerHTML = `<p>${n.content}</p><p class="text-[10px] text-sky-600 mt-1 font-semibold">${n.date || ''} - Cập nhật bởi: ${n.author || ''}</p>`;
+                    div.innerHTML = `<p>${n.content}</p><p class="text-[10px] text-sky-600 mt-1 font-semibold">${n.date || ''} - Tác giả: ${n.author || ''}</p>`;
                     notesContainer.appendChild(div);
                 });
             }
@@ -1815,7 +1817,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: `Chỉ số ${markerType} (đang nhập)`,
+                        label: `Chỉ số ${markerType}`,
                         data: dataValues,
                         borderColor: '#0f766e',
                         backgroundColor: 'rgba(15, 118, 110, 0.1)',
@@ -1852,13 +1854,17 @@
             document.body.removeChild(link);
         };
 
+        // Hàm sửa bệnh nhân đã được sửa lỗi chính xác để kích hoạt modal điền dữ liệu
         window.openEditPatientModal = function(docId) {
             if (isBlocked || isVip || (!isAdmin && !isApproved)) {
                 alert("Tài khoản của bạn không có quyền chỉnh sửa hồ sơ!");
                 return;
             }
             const p = cachedPatientsList.find(item => item.id === docId);
-            if (!p) return;
+            if (!p) {
+                alert("Không tìm thấy thông tin bệnh nhân!");
+                return;
+            }
 
             document.getElementById('editDocId').value = p.id;
             document.getElementById('editCycleIndex').value = "";
@@ -1942,7 +1948,6 @@
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
-        // Chức năng sửa nhanh thông tin chu kỳ từ danh sách lịch sử trong form cập nhật
         window.editCycleItem = function(idx) {
             const c = window.tempCurrentCycles[idx];
             if (!c || c.isProtocolChange) {
@@ -1958,7 +1963,7 @@
                 document.getElementById('npBsaDisplay').innerText = c.bsa + " m²";
             }
             window.calcBaselineBSA();
-            alert(`Đã tải thông tin chu kỳ vào form nhập. Hãy chỉnh sửa thông tin cần thiết và bấm nút cập nhật để lưu thay thế!`);
+            alert(`Đã tải thông tin chu kỳ vào form. Chỉnh sửa và bấm Cập nhật hồ sơ để lưu thay thế!`);
         };
 
         window.addTempMarker = function() {
@@ -2053,11 +2058,27 @@
             }
         };
 
-        window.deleteNoteItem = function(idx) {
-            if (confirm(`Bạn có chắc chắn muốn xóa ghi chú này không?`)) {
-                window.tempCurrentNotes.splice(idx, 1);
-                window.renderTempNotesList();
+        window.renderTempNotesList = function() {
+            const listDiv = document.getElementById('existingNotesList');
+            if (!listDiv) return;
+            listDiv.innerHTML = "";
+            document.getElementById('existingNotesCount').innerText = `${window.tempCurrentNotes.length} ghi chú`;
+            if (window.tempCurrentNotes.length > 0) {
+                document.getElementById('existingNotesListSection').classList.remove('hidden');
+                window.tempCurrentNotes.forEach((n, idx) => {
+                    const d = document.createElement('div');
+                    d.className = "p-2 bg-white border border-sky-200 rounded-lg text-[11px] text-sky-900 flex justify-between items-center";
+                    d.innerHTML = `<span>${n.content} (${n.date || ''})</span><button type="button" onclick="window.deleteNoteItem(${idx})" class="text-rose-600"><i class="fa-solid fa-trash"></i></button>`;
+                    listDiv.appendChild(d);
+                });
+            } else {
+                document.getElementById('existingNotesListSection').classList.add('hidden');
             }
+        };
+
+        window.deleteNoteItem = function(idx) {
+            window.tempCurrentNotes.splice(idx, 1);
+            window.renderTempNotesList();
         };
 
         window.handlePatientFormSubmit = async function(e) {
@@ -2085,7 +2106,7 @@
             if (!docId) {
                 const isDuplicate = cachedPatientsList.some(p => p.patientId === patientId);
                 if (isDuplicate) {
-                    alert(`Mã bệnh nhân [${patientId}] đã tồn tại trên hệ thống! Vui lòng kiểm tra lại.`);
+                    alert(`Mã bệnh nhân [${patientId}] đã tồn tại trên hệ thống!`);
                     return;
                 }
             }
@@ -2181,12 +2202,10 @@
                         updatedBy: currentUser.email
                     };
 
-                    // CHỐNG CHỒNG CHÉO THÔNG TIN NẾU BẤM CẬP NHẬT NHIỀU LẦN TRÊN CÙNG GIÁ TRỊ KHÔNG ĐỔI HOẶC SỬA CHU KỲ CŨ
                     if (editCycleIdx !== "" && !isNaN(parseInt(editCycleIdx))) {
                         const idx = parseInt(editCycleIdx);
                         finalCycles[idx] = newCycleData;
                     } else {
-                        // Kiểm tra nếu giá trị chu kỳ gần nhất trùng khớp hoàn toàn, không tạo chồng thông tin trùng lặp
                         let isIdentical = false;
                         if (finalCycles.length > 0) {
                             const lastC = finalCycles[finalCycles.length - 1];
