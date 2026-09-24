@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OncoCare Pro - Quản Lý Hóa Trị Ung Bướu & Theo Dõi Marker</title>
+    <title>OncoCare Pro - Quản Lý Hóa Trị Ung Bướu & Thống Kê</title>
     <link rel="manifest" href="manifest.json">
     <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -200,7 +200,7 @@
                             <span class="font-bold text-slate-700 flex items-center gap-1.5 uppercase">
                                 <i class="fa-solid fa-id-card text-teal-600"></i> B. Thông Tin Hành Chính <span class="text-rose-500">*</span>
                             </span>
-                            <span id="adminEditNotice" class="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium hidden">Chế Độ Admin</span>
+                            <span id="adminEditNotice" class="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium hidden">Chế độ Admin</span>
                         </div>
 
                         <div id="adminInputFields" class="space-y-3">
@@ -400,7 +400,7 @@
                             </div>
 
                             <div id="customProtocolInputContainer" class="hidden space-y-1">
-                                <label class="block font-bold text-indigo-900 text-[10px]">Nhập Tên Phác Đồ Tùy Chỉnh:</label>
+                                <label class="block font-bold text-indigo-900 text-[10px]">Nhập Tên Phác Đồ Tự Chỉnh:</label>
                                 <input type="text" id="customProtocolNameInput" oninput="window.onCustomProtocolNameInput()" placeholder="VD: Gemcitabine + Cisplatin..." class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-900 focus:outline-none">
                             </div>
 
@@ -610,7 +610,7 @@
                             <option value="ALL">Tất cả (All)</option>
                             <option value="C16">C16 (Dạ dày)</option>
                             <option value="C18">C18 (Đại tràng)</option>
-                            <option value="C19">C19 (Đoạn nối trực đại tràng)</option>
+                            <option value="C19">C19 (Đoạn nối trực - đại tràng)</option>
                             <option value="C20">C20 (Trực tràng)</option>
                             <option value="C50">C50 (Vú)</option>
                         </select>
@@ -733,7 +733,6 @@
     <script>
         // Danh sách nguồn ICD Chính & ICD Phụ đầy đủ
         const icdDatabase = [
-            // ICD Chính gốc
             { code: "C16.0", desc: "U ác tính tâm vị" },
             { code: "C16.1", desc: "U ác tính đáy vị" },
             { code: "C16.2", desc: "U ác tính thân vị" },
@@ -752,8 +751,8 @@
             { code: "C18.7", desc: "U ác tính đại tràng xích-ma" },
             { code: "C18.8", desc: "U ác tính tổn thương lan tràn đại tràng" },
             { code: "C18.9", desc: "U ác tính đại tràng, không có hiệu" },
-            { code: "C19", desc: "U ác tính đoạn nối trực đại tràng" },
-            { code: "C20", desc: "U ác tính của trực tràng" },
+            { code: "C19", desc: "U ác tính đoạn nối trực - đại tràng" },
+            { code: "C20", desc: "U ác tính trực tràng" },
             { code: "C50.1", desc: "U ác tính vùng trung tâm vú" },
             { code: "C50.2", desc: "U ác tính phần tư trên - trong vú" },
             { code: "C50.3", desc: "U ác tính phần tư dưới - trong vú" },
@@ -763,10 +762,8 @@
             { code: "C50.8", desc: "U ác tính tổn thương lan tràn vú" },
             { code: "C50.9", desc: "U ác tính vú, không có hiệu" },
             { code: "Z51.1", desc: "Buổi trị liệu hóa chất cho khối u" },
-
-            // Nguồn ICD phụ mới cập nhật
             { code: "C77.0", desc: "U ác thứ phát của hạch lympho đầu, mặt và cổ" },
-            { code: "C77.1", desc: "U ác thứ phát của hạch lympho lồng ngực (bao gồm hạch trung thất, hạch rốn phổi, hạch phế quản-phổi)" },
+            { code: "C77.1", desc: "U ác thứ phát của hạch lympho lồng ngực" },
             { code: "C77.2", desc: "U ác thứ phát của hạch lympho ổ bụng" },
             { code: "C77.3", desc: "U ác thứ phát của hạch lympho nách và chi trên" },
             { code: "C77.4", desc: "U ác thứ phát của hạch lympho bẹn và chi dưới" },
@@ -774,23 +771,23 @@
             { code: "C77.8", desc: "U ác thứ phát của hạch lympho nhiều vùng" },
             { code: "C77.9", desc: "U ác thứ phát của hạch lympho không xác định" },
             { code: "C78.0", desc: "U ác thứ phát của phổi" },
-            { code: "C78.1", desc: "U ác thứ phát của trung thất (mô mềm/cơ quan trong trung thất, trừ hạch trung thất)" },
+            { code: "C78.1", desc: "U ác thứ phát của trung thất" },
             { code: "C78.2", desc: "U ác thứ phát của màng phổi" },
-            { code: "C78.3", desc: "U ác thứ phát của các cơ quan hô hấp khác và không xác định" },
+            { code: "C78.3", desc: "U ác thứ phát của các cơ quan hô hấp khác" },
             { code: "C78.4", desc: "U ác thứ phát của ruột non" },
             { code: "C78.5", desc: "U ác thứ phát của ruột già và trực tràng" },
-            { code: "C78.6", desc: "U ác thứ phát của phúc mạc và màng bụng sau (mạc treo ruột, mạc nối)" },
-            { code: "C78.7", desc: "U ác thứ phát của gan và đường mật trong gan" },
-            { code: "C78.8", desc: "U ác thứ phát của các cơ quan tiêu hóa khác và không xác định" },
+            { code: "C78.6", desc: "U ác thứ phát của phúc mạc và màng bụng sau" },
+            { code: "C78.7", desc: "U ác thứ phát của gan và ống mật trong gan" },
+            { code: "C78.8", desc: "U ác thứ phát của các cơ quan tiêu hóa khác" },
             { code: "C79.0", desc: "U ác thứ phát của thận và bể thận" },
-            { code: "C79.1", desc: "U ác thứ phát của bàng quang, cơ quan tiết niệu khác và không xác định" },
+            { code: "C79.1", desc: "U ác thứ phát của bàng quang" },
             { code: "C79.2", desc: "U ác thứ phát của da" },
             { code: "C79.3", desc: "U ác thứ phát của não và màng não" },
-            { code: "C79.4", desc: "U ác thứ phát của các phần khác và không xác định của hệ thần kinh" },
+            { code: "C79.4", desc: "U ác thứ phát của hệ thần kinh" },
             { code: "C79.5", desc: "U ác thứ phát của xương và tủy xương" },
             { code: "C79.6", desc: "U ác thứ phát của buồng trứng" },
             { code: "C79.7", desc: "U ác thứ phát của tuyến thượng thận" },
-            { code: "C79.8", desc: "U ác thứ phát của các vị trí xác định khác" },
+            { code: "C79.8", desc: "U ác thứ phát của vị trí xác định khác" },
             { code: "C79.9", desc: "U ác thứ phát của vị trí không xác định" }
         ];
 
@@ -1086,7 +1083,6 @@
             }
         };
 
-        // Vẽ biểu đồ Line Marker trong Modal Chi Tiết
         window.renderMarkerChart = function() {
             const markerType = document.getElementById('chartMarkerSelect').value;
             const ctx = document.getElementById('markerCanvas').getContext('2d');
@@ -1138,7 +1134,6 @@
                 }
             });
 
-            // Hiển thị phân tích & bảng dữ liệu
             let lastVal = dataValues[dataValues.length - 1];
             let prevVal = dataValues.length > 1 ? dataValues[dataValues.length - 2] : null;
             let statusText = "";
@@ -1430,7 +1425,6 @@
                 colorLight: "#ffffff"
             });
 
-            // Cấu trúc Lịch sử Hóa trị nhóm theo Phác đồ
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
             const cycles = p.cycles || [];
@@ -1542,7 +1536,6 @@
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
             
-            // Tính toán chu kỳ mặc định phù hợp
             let lastCycleNum = 0;
             if (p.cycles && p.cycles.length > 0) {
                 let lastCycle = p.cycles[p.cycles.length - 1];
@@ -1732,9 +1725,11 @@
             });
         };
 
-        window.deleteTempMarker = function(idx) {
+        // ĐÃ KHẮC PHỤC LỖI: Tự động lưu ngay lập tức lên Firestore khi xóa marker hoặc chu kỳ để tránh mất dữ liệu khi load lại
+        window.deleteTempMarker = async function(idx) {
             window.tempCurrentMarkers.splice(idx, 1);
             window.renderTempMarkersList();
+            await window.autoSyncChangesToDatabase();
         };
 
         window.editTempCycle = function(idx) {
@@ -1751,10 +1746,33 @@
             window.showToast("Đã đưa dữ liệu chu kỳ lên form để sửa.");
         };
 
-        window.deleteTempCycle = function(idx) {
+        window.deleteTempCycle = async function(idx) {
             if (confirm("Bạn có chắc chắn muốn xóa chu kỳ này?")) {
                 window.tempCurrentCycles.splice(idx, 1);
                 window.renderTempCyclesList();
+                await window.autoSyncChangesToDatabase();
+            }
+        };
+
+        // Hàm hỗ trợ đồng bộ ngầm thay đổi xóa lịch sử trực tiếp lên Database
+        window.autoSyncChangesToDatabase = async function() {
+            const docId = document.getElementById('editDocId').value;
+            if (docId) {
+                try {
+                    await updateDoc(doc(db, "patients", docId), {
+                        cycles: window.tempCurrentCycles,
+                        markers: window.tempCurrentMarkers,
+                        updatedAt: serverTimestamp()
+                    });
+                    const pIndex = cachedPatientsList.findIndex(item => item.id === docId);
+                    if (pIndex !== -1) {
+                        cachedPatientsList[pIndex].cycles = [...window.tempCurrentCycles];
+                        cachedPatientsList[pIndex].markers = [...window.tempCurrentMarkers];
+                    }
+                    window.showToast("Đã đồng bộ xóa và cập nhật cơ sở dữ liệu thành công!");
+                } catch (err) {
+                    console.error("Lỗi đồng bộ tự động:", err);
+                }
             }
         };
 
@@ -1836,6 +1854,10 @@
                     await deleteDoc(doc(db, "patients", docId));
                     window.showToast("Đã xóa hồ sơ thành công!");
                     window.clearSearchResult();
+                    // Nếu đang mở modal thống kê thì cập nhật lại bảng thống kê
+                    if (!document.getElementById('statsModal').classList.contains('hidden')) {
+                        window.runChemoStatistics();
+                    }
                 } catch (err) {
                     alert("Lỗi khi xóa hồ sơ: " + err.message);
                 }
@@ -1928,15 +1950,17 @@
                         </td>
                         <td class="p-3 font-bold text-amber-800">${p.protocol || '-'}</td>
                         <td class="p-3 text-center font-bold text-teal-700">${p.matchedCyclesCount}</td>
-                        <td class="p-3 text-center">
+                        <td class="p-3 text-center space-x-1">
                             <button onclick="window.viewPatientDetail('${p.id}')" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
+                            <!-- TÍNH NĂNG MỚI: Thêm nút sửa/xóa trực tiếp cho Admin ngay trong danh sách thống kê -->
+                            <button onclick="window.closeStatsModal(); window.openEditPatientModal('${p.id}')" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                            ${isAdmin ? `<button onclick="window.deletePatientDoc('${p.id}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            // Biểu đồ Pie
             const ctxPie = document.getElementById('statsPieChart').getContext('2d');
             if (window.statsPieChartInstance) window.statsPieChartInstance.destroy();
 
