@@ -65,9 +65,10 @@
                         <i class="fa-solid fa-users-gear text-amber-300"></i>
                         <span class="hidden md:inline">Quản Lý Thành Viên</span>
                     </button>
+                    <!-- Chỉ hiển thị tên / cấp độ người dùng theo yêu cầu, không hiển thị địa chỉ mail ở góc ảnh đại diện -->
                     <div class="text-right hidden sm:block">
                         <p id="docName" class="text-xs font-bold leading-tight">Bác sĩ</p>
-                        <p id="docEmail" class="text-[10px] text-teal-200">email@gmail.com</p>
+                        <p id="docLevelTag" class="text-[10px] text-teal-200 font-semibold">User</p>
                     </div>
                     <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
                     <button onclick="window.logoutGoogle()" title="Đăng xuất" class="text-teal-200 hover:text-white text-xs bg-teal-900/40 hover:bg-teal-900/60 p-2 rounded-lg transition">
@@ -160,10 +161,11 @@
     <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-slate-600 text-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
-                <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="BSCKI Thạch Xuân Tuấn" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
+                <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="Thạch Xuân Tựu" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
                 <div>
-                    <p class="font-bold text-slate-900 text-sm">Bản quyền phần mềm thuộc về: <span class="text-teal-800">BSCKI Thạch Xuân Tuấn</span></p>
-                    <p class="text-slate-500">Khoa Ung Bướu - Bệnh Viện Đa Khoa An Giang</p>
+                    <!-- Cập nhật tên tác giả theo đúng yêu cầu -->
+                    <p class="font-bold text-slate-900 text-sm">Bản quyền thuộc về - <span class="text-teal-800">Thạch Xuân Tựu</span> - Khoa Ung bướu</p>
+                    <p class="text-slate-500">Bệnh Viện Đa Khoa An Giang</p>
                 </div>
             </div>
             <div class="text-center sm:text-right text-[11px] text-slate-400">
@@ -186,6 +188,7 @@
 
             <form id="patientForm" onsubmit="window.handlePatientFormSubmit(event)" class="p-6 space-y-5 text-xs">
                 <input type="hidden" id="editDocId" value="">
+                <input type="hidden" id="editCycleIndex" value="">
                 
                 <!-- Phần HÀNH CHÍNH -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
@@ -523,12 +526,12 @@
                     </button>
                 </div>
 
-                <!-- NỘI DUNG TAB 1: TIMELINE CHU KỲ (THỨ TỰ: TÊN PHÁC ĐỒ CHUẨN Ở TRÊN -> LỊCH TRÌNH ĐIỀU TRỊ HÀNG DƯỚI + NGÀY ĐIỀU TRỊ) -->
+                <!-- NỘI DUNG TAB 1: TIMELINE CHU KỲ (GROUP THEO PHÁC ĐỒ VỚI DẤU CỘNG THU GỌN/MỞ RỘNG VÀ HIỂN THỊ ĐỦ THÔNG TIN ĐIỀU TRỊ) -->
                 <div id="tabContentTimeline" class="space-y-3">
                     <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-timeline text-teal-600"></i> Dòng Thời Gian Chu Kỳ Hóa Trị & Liều Lượng (Realtime)
+                        <i class="fa-solid fa-timeline text-teal-600"></i> Dòng Thời Gian Chu Kỳ Hóa Trị & Thông Tin Điều Trị (Realtime)
                     </h4>
-                    <div id="detCyclesTimeline" class="space-y-2.5 border-l-2 border-teal-500 pl-4 ml-2"></div>
+                    <div id="detCyclesTimeline" class="space-y-3"></div>
                 </div>
 
                 <!-- NỘI DUNG TAB 2: BIỂU ĐỒ MARKER -->
@@ -1220,6 +1223,7 @@
 
         window.openNewPatientModal = function() {
             document.getElementById('editDocId').value = "";
+            document.getElementById('editCycleIndex').value = "";
             document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-user-plus text-teal-200"></i> Thêm Hồ Sơ Bệnh Nhân Mới`;
             document.getElementById('cycleSectionTitle').innerText = "THÔNG TIN ĐIỀU TRỊ";
             document.getElementById('existingCyclesCount').innerText = "0 chu kỳ đã lưu";
@@ -1230,7 +1234,6 @@
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npCycleNumber').value = "1";
             
-            // Không tự thêm tuổi bệnh nhân đã nhập (để trống giá trị đó nếu chưa nhập)
             document.getElementById('npBirthYear').value = "";
 
             document.getElementById('npId').disabled = false;
@@ -1265,6 +1268,7 @@
             document.getElementById('patientForm').reset();
             document.getElementById('npBsaDisplay').innerText = "0.00 m²";
             document.getElementById('editDocId').value = "";
+            document.getElementById('editCycleIndex').value = "";
             window.tempCurrentCycles = [];
             window.tempCurrentNotes = [];
             window.tempCurrentMarkers = [];
@@ -1416,6 +1420,7 @@
             const signInBtn = document.getElementById('googleSignInBtn');
             const docProfile = document.getElementById('doctorProfile');
             const roleBadge = document.getElementById('roleBadge');
+            const docLevelTag = document.getElementById('docLevelTag');
             const btnUserMgmt = document.getElementById('btnUserMgmt');
             const btnStats = document.getElementById('btnStats');
             const noticeSubText = document.getElementById('noticeSubText');
@@ -1449,7 +1454,14 @@
                 docProfile.classList.remove('hidden');
 
                 document.getElementById('docName').innerText = user.displayName || "Bác sĩ";
-                document.getElementById('docEmail').innerText = user.email;
+                
+                // Hiển thị cấp độ người dùng theo yêu cầu (User / VIP / Admin) cạnh tên, ẩn địa chỉ mail ở góc
+                let userLevelStr = "User";
+                if (isAdmin) userLevelStr = "Admin";
+                else if (isVip) userLevelStr = "VIP";
+                else if (isApproved) userLevelStr = "Doctor";
+                docLevelTag.innerText = userLevelStr;
+
                 if (user.photoURL) document.getElementById('docAvatar').src = user.photoURL;
 
                 if (isBlocked) {
@@ -1605,17 +1617,47 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
+            // GIAO DIỆN LỊCH SỬ CHU KỲ THEO YÊU CẦU: Nhóm theo phác đồ, có dấu cộng mở rộng/thu gọn và hiển thị thông tin điều trị đầy đủ
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
             const cycles = p.cycles || [];
+            
             if (cycles.length === 0) {
                 cyclesContainer.innerHTML = `<p class="text-slate-400 italic text-xs">Chưa có lịch sử chu kỳ hóa trị.</p>`;
             } else {
-                // PHẦN HIỂN THỊ LỊCH SỬ BỆNH NHÂN THEO THỨ TỰ: TÊN PHÁC ĐỒ CHUẨN (Ở TRÊN) -> LỊCH TRÌNH ĐIỀU TRỊ HÀNG DƯỚI + NGÀY ĐIỀU TRỊ
+                let groups = [];
+                let currentGroup = null;
+
                 cycles.forEach((c, idx) => {
-                    const div = document.createElement('div');
                     if (c.isProtocolChange) {
-                        div.className = "relative bg-rose-50 p-3 rounded-xl border border-rose-300 space-y-1";
+                        if (currentGroup) groups.push(currentGroup);
+                        currentGroup = {
+                            isChangeBlock: true,
+                            changeInfo: c,
+                            items: []
+                        };
+                        groups.push(currentGroup);
+                        currentGroup = null;
+                    } else {
+                        let protoName = c.protocolUsed || p.protocol || "Phác đồ tổng thể";
+                        if (!currentGroup || currentGroup.protoName !== protoName || currentGroup.isChangeBlock) {
+                            if (currentGroup) groups.push(currentGroup);
+                            currentGroup = {
+                                isChangeBlock: false,
+                                protoName: protoName,
+                                items: []
+                            };
+                        }
+                        currentGroup.items.push({ cycle: c, originalIndex: idx });
+                    }
+                });
+                if (currentGroup) groups.push(currentGroup);
+
+                groups.forEach((group, gIdx) => {
+                    if (group.isChangeBlock) {
+                        const c = group.changeInfo;
+                        const div = document.createElement('div');
+                        div.className = "bg-rose-50 p-3 rounded-xl border border-rose-300 space-y-1";
                         div.innerHTML = `
                             <div class="flex items-center justify-between font-bold text-rose-700">
                                 <span class="flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> ĐỔI PHÁC ĐỒ MỚI (${c.date || 'N/A'})</span>
@@ -1624,24 +1666,48 @@
                             <p class="text-rose-900 font-semibold text-xs">Phác đồ mới: ${c.newProtocol}</p>
                             <p class="text-slate-600 text-xs">${c.note || ''}</p>
                         `;
+                        cyclesContainer.appendChild(div);
                     } else {
-                        const currentProto = c.protocolUsed || p.protocol || 'Chưa cập nhật';
-                        div.className = "relative bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5";
-                        div.innerHTML = `
-                            <div class="p-2 bg-amber-50/80 rounded-lg border border-amber-200/60 font-bold text-amber-900 text-[11px] flex items-center gap-1.5">
-                                <i class="fa-solid fa-prescription-bottle-medical text-amber-600"></i>
-                                <span>Phác đồ chuẩn: ${currentProto}</span>
+                        const cardId = `protoGroup_${gIdx}`;
+                        const contentId = `protoContent_${gIdx}`;
+                        const iconId = `protoIcon_${gIdx}`;
+
+                        const groupWrapper = document.createElement('div');
+                        groupWrapper.className = "bg-white rounded-xl border border-teal-200 shadow-sm overflow-hidden mb-3";
+
+                        let itemsHtml = "";
+                        group.items.forEach((itemObj, iIdx) => {
+                            const c = itemObj.cycle;
+                            itemsHtml += `
+                                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5 text-xs">
+                                    <div class="flex items-center justify-between font-bold text-teal-800">
+                                        <span>Chu kỳ thứ mấy: ${c.branchName || `Chu kỳ ${iIdx + 1}`}</span>
+                                        <span class="text-slate-600 font-semibold"><i class="fa-solid fa-calendar-day text-teal-600"></i> Ngày: ${c.date || 'Không rõ ngày'}</span>
+                                    </div>
+                                    <div class="text-[10px] text-slate-500 font-medium">BSA: ${c.bsa || '-'} m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)</div>
+                                    ${c.dosesText ? `<p class="text-indigo-900 text-[11px] bg-indigo-50 p-2 rounded border border-indigo-100 font-mono">${c.dosesText}</p>` : ''}
+                                    <p class="text-slate-700 font-medium bg-white p-2 rounded border border-slate-100"><strong>Thông tin điều trị / Ghi chú:</strong> ${c.note || 'Không có ghi chú cụ thể.'}</p>
+                                </div>
+                            `;
+                        });
+
+                        groupWrapper.innerHTML = `
+                            <div onclick="window.toggleProtoGroup('${contentId}', '${iconId}')" class="bg-teal-50/80 p-3 px-4 flex items-center justify-between cursor-pointer hover:bg-teal-100/70 transition">
+                                <div class="flex items-center space-x-2 font-bold text-teal-900 text-xs">
+                                    <i class="fa-solid fa-prescription-bottle-medical text-teal-600"></i>
+                                    <span>Tên phác đồ: ${group.protoName} (${group.items.length} chu kỳ)</span>
+                                </div>
+                                <div class="flex items-center space-x-2 text-teal-800 font-bold">
+                                    <span class="text-[10px] bg-white px-2 py-0.5 rounded border border-teal-200">Xem chi tiết</span>
+                                    <i id="${iconId}" class="fa-solid fa-plus text-sm transition-transform"></i>
+                                </div>
                             </div>
-                            <div class="flex items-center justify-between font-bold text-teal-800 text-xs">
-                                <span>Lịch trình điều trị: ${c.branchName || `Chu kỳ ${idx + 1}`}</span>
-                                <span class="text-slate-600 font-semibold"><i class="fa-solid fa-calendar-day text-teal-600"></i> Ngày điều trị: ${c.date || 'Không rõ ngày'}</span>
+                            <div id="${contentId}" class="hidden p-3 space-y-2.5 bg-white border-t border-teal-100">
+                                ${itemsHtml}
                             </div>
-                            <div class="text-[10px] text-slate-500 font-medium">BSA: ${c.bsa || '-'} m² (Cao: ${c.height || '-'}cm, Nặng: ${c.weight || '-'}kg)</div>
-                            ${c.dosesText ? `<p class="text-indigo-900 text-[11px] bg-indigo-50 p-2 rounded border border-indigo-100 font-mono">${c.dosesText}</p>` : ''}
-                            <p class="text-slate-600 text-xs">${c.note || 'Không có ghi chú cụ thể.'}</p>
                         `;
+                        cyclesContainer.appendChild(groupWrapper);
                     }
-                    cyclesContainer.appendChild(div);
                 });
             }
 
@@ -1661,6 +1727,18 @@
 
             window.switchDetailTab('timeline');
             document.getElementById('patientDetailModal').classList.remove('hidden');
+        };
+
+        window.toggleProtoGroup = function(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.className = "fa-solid fa-minus text-sm transition-transform";
+            } else {
+                content.classList.add('hidden');
+                icon.className = "fa-solid fa-plus text-sm transition-transform";
+            }
         };
 
         window.renderMarkerChart = function() {
@@ -1783,6 +1861,7 @@
             if (!p) return;
 
             document.getElementById('editDocId').value = p.id;
+            document.getElementById('editCycleIndex').value = "";
             document.getElementById('patientFormModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-teal-200"></i> Cập Nhật Chu Kỳ Cho: ${p.name} (${p.patientId})`;
             document.getElementById('saveBtnText').innerText = "Cập Nhật Hồ Sơ & Lưu Lịch Sử";
 
@@ -1863,6 +1942,25 @@
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
+        // Chức năng sửa nhanh thông tin chu kỳ từ danh sách lịch sử trong form cập nhật
+        window.editCycleItem = function(idx) {
+            const c = window.tempCurrentCycles[idx];
+            if (!c || c.isProtocolChange) {
+                alert("Chỉ có thể chỉnh sửa thông tin chi tiết các chu kỳ điều trị!");
+                return;
+            }
+            document.getElementById('editCycleIndex').value = idx;
+            document.getElementById('npCycleDate').value = c.date || new Date().toISOString().split('T')[0];
+            document.getElementById('npHeight').value = c.height || '';
+            document.getElementById('npWeight').value = c.weight || '';
+            document.getElementById('npCycleNote').value = c.note || '';
+            if (c.bsa) {
+                document.getElementById('npBsaDisplay').innerText = c.bsa + " m²";
+            }
+            window.calcBaselineBSA();
+            alert(`Đã tải thông tin chu kỳ vào form nhập. Hãy chỉnh sửa thông tin cần thiết và bấm nút cập nhật để lưu thay thế!`);
+        };
+
         window.addTempMarker = function() {
             const type = document.getElementById('npMarkerType').value;
             const value = parseFloat(document.getElementById('npMarkerValue').value);
@@ -1933,37 +2031,18 @@
                     } else {
                         d.innerHTML = `
                             <div class="flex-1">
-                                <strong class="text-amber-900">${c.branchName || `Chu kỳ ${idx+1}`} (${c.date || 'N/A'}):</strong> BSA: ${c.bsa || '-'}m²
+                                <strong class="text-amber-900">${c.branchName || `Chu kỳ ${idx+1}`} (${c.date || 'N/A'}):</strong> BSA: ${c.bsa || '-'}m² - Note: ${c.note || 'Không có'}
                             </div>
-                            <button type="button" onclick="window.deleteCycleItem(${idx})" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
+                            <div class="flex space-x-1">
+                                <button type="button" onclick="window.editCycleItem(${idx})" class="px-2 py-1 bg-teal-100 hover:bg-teal-200 text-teal-800 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-pen"></i> Sửa</button>
+                                <button type="button" onclick="window.deleteCycleItem(${idx})" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
+                            </div>
                         `;
                     }
                     cyclesListDiv.appendChild(d);
                 });
             } else {
                 document.getElementById('existingCyclesListSection').classList.add('hidden');
-            }
-        };
-
-        window.renderTempNotesList = function() {
-            const notesListDiv = document.getElementById('existingNotesList');
-            notesListDiv.innerHTML = "";
-            const notesCountSpan = document.getElementById('existingNotesCount');
-            if (notesCountSpan) notesCountSpan.innerText = `${window.tempCurrentNotes.length} ghi chú`;
-
-            if (window.tempCurrentNotes.length > 0) {
-                document.getElementById('existingNotesListSection').classList.remove('hidden');
-                window.tempCurrentNotes.forEach((n, idx) => {
-                    const d = document.createElement('div');
-                    d.className = "p-2.5 bg-white border border-sky-200 rounded-xl text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-sm";
-                    d.innerHTML = `
-                        <div class="flex-1"><p>${n.content}</p></div>
-                        <button type="button" onclick="window.deleteNoteItem(${idx})" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-md font-semibold text-[10px]"><i class="fa-solid fa-trash"></i> Xóa</button>
-                    `;
-                    notesListDiv.appendChild(d);
-                });
-            } else {
-                document.getElementById('existingNotesListSection').classList.add('hidden');
             }
         };
 
@@ -1989,6 +2068,7 @@
             }
 
             const docId = document.getElementById('editDocId').value;
+            const editCycleIdx = document.getElementById('editCycleIndex').value;
             const patientId = document.getElementById('npId').value.trim();
             const name = document.getElementById('npName').value.trim();
             const gender = document.getElementById('npGender').value;
@@ -2089,7 +2169,7 @@
                 }
 
                 if (weight > 0 && height > 0) {
-                    finalCycles.push({
+                    const newCycleData = {
                         date: cycleDate || todayStr,
                         protocolUsed: newProtocol || window.editingPatientOldProtocol || '',
                         branchName: finalBranchName,
@@ -2099,7 +2179,25 @@
                         dosesText: dosesText,
                         note: cycleNote,
                         updatedBy: currentUser.email
-                    });
+                    };
+
+                    // CHỐNG CHỒNG CHÉO THÔNG TIN NẾU BẤM CẬP NHẬT NHIỀU LẦN TRÊN CÙNG GIÁ TRỊ KHÔNG ĐỔI HOẶC SỬA CHU KỲ CŨ
+                    if (editCycleIdx !== "" && !isNaN(parseInt(editCycleIdx))) {
+                        const idx = parseInt(editCycleIdx);
+                        finalCycles[idx] = newCycleData;
+                    } else {
+                        // Kiểm tra nếu giá trị chu kỳ gần nhất trùng khớp hoàn toàn, không tạo chồng thông tin trùng lặp
+                        let isIdentical = false;
+                        if (finalCycles.length > 0) {
+                            const lastC = finalCycles[finalCycles.length - 1];
+                            if (!lastC.isProtocolChange && lastC.date === newCycleData.date && lastC.branchName === newCycleData.branchName && lastC.bsa === newCycleData.bsa && lastC.note === newCycleData.note) {
+                                isIdentical = true;
+                            }
+                        }
+                        if (!isIdentical) {
+                            finalCycles.push(newCycleData);
+                        }
+                    }
                 } else if (!docId) {
                     alert("Vui lòng nhập Chiều cao và Cân nặng khi tạo mới hồ sơ!");
                     return;
@@ -2208,7 +2306,7 @@
                 let matchedGroup = "Khác";
                 if (diag.includes("C16")) matchedGroup = "C16 (Dạ dày)";
                 else if (diag.includes("C18")) matchedGroup = "C18 (Đại tràng)";
-                else if (diag.includes("C19")) matchedGroup = "C19 (Nối trực đại tràng)";
+                else if (diag.includes("C19")) matchedGroup = "C19 (Đoạn nối trực đại tràng)";
                 else if (diag.includes("C20")) matchedGroup = "C20 (Trực tràng)";
                 else if (diag.includes("C50")) matchedGroup = "C50 (Vú)";
 
