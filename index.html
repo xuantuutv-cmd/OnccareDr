@@ -40,7 +40,6 @@
                     <i class="fa-solid fa-dna text-amber-300 text-2xl"></i>
                 </div>
                 <div>
-                    <!-- OncoCare Pro tăng kích thước, đổi màu vàng, không còn nhãn Admin/Doctor bên cạnh -->
                     <h1 class="font-extrabold text-xl sm:text-2xl tracking-tight leading-none text-amber-300 drop-shadow-sm">
                         OncoCare Pro
                     </h1>
@@ -60,17 +59,18 @@
                 </button>
 
                 <div id="doctorProfile" class="hidden flex items-center space-x-3">
-                    <button id="btnStats" onclick="window.openStatsModal()" class="hidden bg-teal-800/80 hover:bg-teal-900 border border-teal-400/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                    <!-- Nút Thống Kê được hiển thị đúng cho Admin và Doctor/VIP có quyền -->
+                    <button id="btnStats" onclick="window.openStatsModal()" class="bg-teal-800/80 hover:bg-teal-900 border border-teal-400/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                         <i class="fa-solid fa-chart-pie text-teal-300"></i>
                         <span class="hidden md:inline">Thống Kê</span>
                     </button>
+                    <!-- Nút Quản Lý Thành Viên hiển thị chính xác khi đăng nhập tài khoản Admin -->
                     <button id="btnUserMgmt" onclick="window.openUserManagementModal()" class="hidden bg-teal-900/50 hover:bg-teal-900/80 border border-teal-500/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                         <i class="fa-solid fa-users-gear text-amber-300"></i>
                         <span class="hidden md:inline">Quản Lý Thành Viên</span>
                     </button>
                     <div class="text-right hidden sm:block">
                         <p id="docName" class="text-xs font-bold leading-tight">Thạch Xuân Tựu</p>
-                        <!-- Thẻ hiển thị vai trò theo màu sắc mới: User (xanh dương), VIP (vàng nhợt), Admin (vàng đậm) -->
                         <p id="docLevelTag" class="text-[10px] font-bold text-blue-300">User</p>
                     </div>
                     <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
@@ -193,7 +193,6 @@
 
                 <div class="lg:col-span-5 space-y-4 overflow-y-auto max-h-[calc(85vh-120px)] pr-2 custom-scrollbar">
                     
-                    <!-- B. MỤC THÔNG TIN HÀNH CHÍNH -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3 shadow-sm">
                         <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                             <span class="font-bold text-slate-700 flex items-center gap-1.5 uppercase">
@@ -1309,7 +1308,6 @@
 
                 document.getElementById('docName').innerText = user.displayName || "Thạch Xuân Tựu";
                 
-                // Thiết lập nhãn vai trò màu sắc chuẩn xác: User (xanh dương), VIP (vàng nhợt), Admin (vàng đậm)
                 let userLevelStr = "User";
                 if (isAdmin) {
                     userLevelStr = "Admin";
@@ -1331,12 +1329,13 @@
                     btnAddPatient.disabled = true;
                 } else if (isAdmin) {
                     roleBadge.innerHTML = `<i class="fa-solid fa-shield-halved text-[9px]"></i> Admin`;
-                    btnUserMgmt.classList.remove('hidden');
-                    btnStats.classList.remove('hidden');
+                    btnUserMgmt.classList.remove('hidden'); // Hiển thị Quản lý thành viên cho Admin
+                    btnStats.classList.remove('hidden');    // Hiển thị Thống kê cho Admin
                     accountStatusNotice.classList.add('hidden');
                 } else if (isApproved || isVip) {
                     roleBadge.innerHTML = `<i class="fa-solid fa-user-doctor text-[9px]"></i> ${userLevelStr}`;
-                    btnStats.classList.remove('hidden');
+                    btnStats.classList.remove('hidden');    // Hiển thị Thống kê cho Doctor/VIP
+                    btnUserMgmt.classList.add('hidden');    // Ẩn Quản lý thành viên với non-admin
                     accountStatusNotice.classList.add('hidden');
                 } else {
                     roleBadge.innerHTML = `<i class="fa-solid fa-clock text-[9px]"></i> Chờ duyệt`;
@@ -1752,7 +1751,6 @@
             await window.autoSyncChangesToDatabase();
         };
 
-        // Đã khắc phục lỗi tên phác đồ không thay đổi bằng cách link chính xác protocolUsed vào form
         window.editTempCycle = function(idx) {
             const c = window.tempCurrentCycles[idx];
             if (!c) return;
@@ -1765,10 +1763,8 @@
             document.getElementById('npDoseInput').value = c.doseInput || '';
             document.getElementById('npCycleNote').value = c.note || '';
             
-            // Tự động link tên phác đồ lịch sử qua ô input/select phác đồ
             if (c.protocolUsed) {
                 document.getElementById('npProtocol').value = c.protocolUsed;
-                // Kiểm tra nếu phác đồ có sẵn trong danh sách select thì chọn lại key tương ứng
                 let foundKey = "";
                 for (let key in chemoProtocolsData) {
                     if (chemoProtocolsData[key].name === c.protocolUsed) {
@@ -1850,7 +1846,7 @@
                         cycleNum: cycleNum,
                         week: weekVal,
                         date: cycleDate,
-                        protocolUsed: protocol, // Cập nhật đồng bộ tên phác đồ mới chỉnh sửa
+                        protocolUsed: protocol,
                         drugNames: drugNames,
                         doseInput: doseInput,
                         note: note,
@@ -1981,7 +1977,6 @@
                 statsTbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">Không tìm thấy bệnh nhân phù hợp với bộ lọc thống kê.</td></tr>`;
             } else {
                 filtered.forEach(p => {
-                    // Thêm nút Sửa/Xóa chuyên nghiệp tại bảng thống kê cho Admin
                     statsTbody.innerHTML += `
                         <tr class="hover:bg-slate-50 transition">
                             <td class="p-3 font-bold text-teal-800">${p.patientId || '-'}</td>
@@ -2048,7 +2043,7 @@
                             </td>
                             <td class="p-3 text-center space-x-1">
                                 ${!isUserAdmin ? `
-                                    <button onclick="window.toggleUserApproval('${uid}',${!u.isApproved})" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[10px]">${u.isApproved ? 'Hủy duyệt' : 'Phê duyệt'}</button>
+                                    <button onclick="window.openStatsModal(); window.toggleUserApproval('${uid}',${!u.isApproved})" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[10px]">${u.isApproved ? 'Hủy duyệt' : 'Phê duyệt'}</button>
                                     <button onclick="window.toggleUserBlock('${uid}',${!u.isBlocked})" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px]">${u.isBlocked ? 'Mở khóa' : 'Khóa'}</button>
                                 ` : '<span class="text-[10px] text-slate-400 font-bold">Hệ thống Admin</span>'}
                             </td>
