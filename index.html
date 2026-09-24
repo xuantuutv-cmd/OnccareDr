@@ -26,6 +26,9 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
+    <!-- Toast Notification Container (Mục E) -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
     <!-- Navigation Header -->
     <header class="bg-gradient-to-r from-teal-800 to-teal-700 text-white shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
@@ -83,7 +86,7 @@
         <div id="accountStatusNotice" class="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 flex items-start space-x-3 text-amber-900 text-xs shadow-sm">
             <i class="fa-solid fa-shield-halved text-amber-600 text-lg mt-0.5"></i>
             <div>
-                <p class="font-bold">Chế Độ Bảo Mật Thông Tin Bệnh Nhân (HIPAA/Bảo Mật Y Tế)</p>
+                <p class="font-bold">Chế Độ Bảo Mật Thông Tin Bệnh Nhân (HIPAA / Bảo Mật Y Tế)</p>
                 <p id="noticeSubText" class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân ẩn hoàn toàn khỏi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
             </div>
         </div>
@@ -154,9 +157,9 @@
     <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-slate-600 text-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
-                <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="Thạch Xuân Tựu" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
+                <img src="https://lh3.googleusercontent.com/a/ACg8ocKw_a07u...=s96-c" onerror="this.src='https://placehold.co/100x100/0d9488/ffffff?text=BS'" alt="Thạch Xuân Tuấn" class="w-12 h-12 rounded-full border-2 border-teal-600 object-cover shadow-sm">
                 <div>
-                    <p class="font-bold text-slate-900 text-sm">Bản quyền thuộc về - <span class="text-teal-800">Thạch Xuân Tựu</span> - Khoa Ung bướu</p>
+                    <p class="font-bold text-slate-900 text-sm">Bản quyền thuộc về - <span class="text-teal-800">Thạch Xuân Tuấn</span> - Khoa Ung bướu</p>
                     <p class="text-slate-500">Bệnh Viện Đa Khoa An Giang</p>
                 </div>
             </div>
@@ -167,10 +170,10 @@
         </div>
     </footer>
 
-    <!-- MODAL: Thêm / Sửa Hồ Sơ Bệnh Nhân -->
+    <!-- MODAL: Thêm / Sửa Hồ Sơ Bệnh Nhân (MỤC B, C1, D, D1, F) -->
     <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
-            <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10 border-b border-slate-800">
+        <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
+            <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 bg-teal-600/30 rounded-lg flex items-center justify-center border border-teal-400/30">
                         <i class="fa-solid fa-hospital text-teal-300 text-sm"></i>
@@ -183,44 +186,65 @@
                 <button onclick="window.closePatientFormModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <form id="patientForm" onsubmit="window.handlePatientFormSubmit(event)" class="p-6 space-y-5 text-xs">
+            <form id="patientForm" onsubmit="window.handlePatientFormSubmit(event)" class="p-6 text-xs overflow-hidden flex flex-col flex-1">
                 <input type="hidden" id="editDocId" value="">
                 <input type="hidden" id="editCycleIndex" value="">
                 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                <!-- C1: CHIA 2 KHUNG THÔNG TIN HÀNH CHÍNH / NHẬP LIỆU VÀ LỊCH SỬ THÀNH 2 KHUNG ĐỘC LẬP CÓ THANH CUỘN RIÊNG -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start flex-1 overflow-hidden">
                     
-                    <div class="lg:col-span-5 space-y-4">
+                    <!-- KHUNG TRÁI: THÔNG TIN HÀNH CHÍNH & NHẬP LIỆU (CÓ THANH CUỘN ĐỘC LẬP) -->
+                    <div class="lg:col-span-5 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar pr-2">
                         
-                        <!-- KHUNG HÀNH CHÍNH BỆNH NHÂN -->
+                        <!-- B. MỤC THÔNG TIN HÀNH CHÍNH: ADMIN -> DẠNG BẢNG EDIT, KHÁC ADMIN -> DẠNG VĂN BẢN -->
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3 text-xs shadow-sm">
                             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                                 <span class="font-bold text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-id-card text-teal-600"></i> THÔNG TIN HÀNH CHÍNH <span class="text-rose-500">*</span></span>
-                                <span id="adminEditNotice" class="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium hidden">Quyền Admin: Cho phép sửa</span>
+                                <span id="adminEditNotice" class="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium hidden">Quyền Admin: Được phép sửa</span>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-slate-500 font-semibold mb-1">Mã BN (8 ký tự) <span class="text-rose-500">*</span>:</label>
-                                    <input type="text" id="npId" maxlength="8" placeholder="VD: 24001234" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                            <!-- DẠNG 1: HIỂN THỊ DẠNG EDITABLE BẢNG CHO ADMIN -->
+                            <div id="adminAdminInfoBox" class="space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-slate-500 font-semibold mb-1">Mã BN (8 ký tự) <span class="text-rose-500">*</span>:</label>
+                                        <input type="text" id="npId" maxlength="8" placeholder="VD: 24001234" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-500 font-semibold mb-1">Họ và tên BN <span class="text-rose-500">*</span>:</label>
+                                        <input type="text" id="npName" placeholder="VD: Nguyễn Văn A" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-slate-500 font-semibold mb-1">Họ và tên BN <span class="text-rose-500">*</span>:</label>
-                                    <input type="text" id="npName" placeholder="VD: Nguyễn Văn A" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-slate-500 font-semibold mb-1">Giới tính <span class="text-rose-500">*</span>:</label>
+                                        <select id="npGender" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                            <option value="">-- Chọn --</option>
+                                            <option value="Nữ">Nữ</option>
+                                            <option value="Nam">Nam</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-500 font-semibold mb-1">Năm sinh <span class="text-rose-500">*</span>:</label>
+                                        <input type="number" id="npBirthYear" min="1900" max="2026" placeholder="VD: 1980" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-slate-500 font-semibold mb-1">Giới tính <span class="text-rose-500">*</span>:</label>
-                                    <select id="npGender" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-teal-500" required>
-                                        <option value="">-- Chọn --</option>
-                                        <option value="Nữ">Nữ</option>
-                                        <option value="Nam">Nam</option>
-                                    </select>
+                            <!-- DẠNG 2: HIỂN THỊ DẠNG VĂN BẢN CHO KHÁC ADMIN -->
+                            <div id="nonAdminInfoBox" class="hidden bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 text-xs">
+                                <div class="flex justify-between border-b pb-1">
+                                    <span class="text-slate-500 font-medium">Mã BN:</span>
+                                    <span id="dispTextId" class="font-bold text-teal-800">-</span>
                                 </div>
-                                <div>
-                                    <label class="block text-slate-500 font-semibold mb-1">Năm sinh <span class="text-rose-500">*</span>:</label>
-                                    <input type="number" id="npBirthYear" min="1900" max="2026" placeholder="VD: 1980" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                <div class="flex justify-between border-b pb-1">
+                                    <span class="text-slate-500 font-medium">Họ và Tên:</span>
+                                    <span id="dispTextName" class="font-bold text-slate-900">-</span>
+                                </div>
+                                <div class="flex justify-between border-b pb-1">
+                                    <span class="text-slate-500 font-medium">Giới tính / Năm sinh:</span>
+                                    <span id="dispTextGenderBirth" class="font-semibold text-slate-700">-</span>
                                 </div>
                             </div>
 
@@ -235,7 +259,7 @@
                                     <input type="number" id="npWeight" oninput="window.calculateBSAandDoses()" placeholder="55" class="w-full p-1.5 bg-white border border-slate-200 rounded text-center font-bold text-slate-800 focus:outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-teal-800 font-semibold text-[10px]">BSA ($m^2$):</label>
+                                    <label class="block text-teal-800 font-semibold text-[10px]">BSA (m²):</label>
                                     <div id="npBsaDisplay" class="p-1.5 bg-white border border-teal-200 rounded text-center font-extrabold text-teal-700 text-xs shadow-inner">--</div>
                                 </div>
                             </div>
@@ -258,15 +282,33 @@
                             </div>
                         </div>
 
-                        <!-- KHUNG 2: ICD PHỤ & CHẨN ĐOÁN PHỤ -->
+                        <!-- F. KHUNG ICD PHỤ VÀ CHẨN ĐOÁN PHỤ (GỘP THÀNH 1 BẢNG VỪA HIỂN THỊ CẢ ICD PHỤ VÀ CHẨN ĐOÁN PHỤ VÀO BẢNG ĐÓ) -->
                         <div class="bg-amber-900/5 p-3.5 rounded-xl border border-amber-800/20 space-y-2.5 shadow-sm relative">
                             <h4 class="font-bold text-amber-900 uppercase text-[11px] tracking-wider flex items-center gap-1.5">
-                                <i class="fa-solid fa-notes-medical text-amber-700"></i> ICD PHỤ & CHẨN ĐOÁN PHỤ (TÙY CHỌN)
+                                <i class="fa-solid fa-notes-medical text-amber-700"></i> MÃ ICD PHỤ & CHẨN ĐOÁN PHỤ (TÙY CHỌN)
                             </h4>
-                            <div class="relative">
+                            <div class="relative space-y-2">
                                 <label class="block font-semibold text-slate-700 mb-1">Nhập ICD hoặc tên chẩn đoán phụ:</label>
                                 <input type="text" id="npSubDiagnosis" placeholder="Nhập mã ICD hoặc tên bệnh phụ..." autocomplete="off" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium">
                                 <div id="icdDropdownSub" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
+
+                                <!-- BẢNG HIỂN THỊ MÃ ICD PHỤ VÀ CHẨN ĐOÁN PHỤ -->
+                                <div class="overflow-hidden rounded-lg border border-amber-200/80 bg-white">
+                                    <table class="w-full text-left text-xs">
+                                        <thead class="bg-amber-100/60 text-amber-900 font-bold uppercase text-[10px]">
+                                            <tr>
+                                                <th class="p-2 border-b border-amber-200/60">Mã ICD Phụ</th>
+                                                <th class="p-2 border-b border-amber-200/60">Tên Chẩn Đoán Phụ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td id="tableSubIcdCode" class="p-2 font-bold text-amber-800 border-r border-slate-100 bg-amber-50/30 font-mono">-</td>
+                                                <td id="tableSubIcdDesc" class="p-2 font-medium text-slate-800">Chưa nhập chẩn đoán phụ</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
 
@@ -301,22 +343,22 @@
                             </button>
                         </div>
 
-                        <!-- KHUNG NHẬP THÔNG TIN ĐIỀU TRỊ (CHỈNH SỬA THEO YÊU CẦU) -->
+                        <!-- KHUNG NHẬP THÔNG TIN ĐIỀU TRỊ (CHỈNH SỬA THEO YÊU CẦU A1, A2) -->
                         <div class="bg-teal-900/5 p-4 rounded-xl border border-teal-800/20 space-y-3 shadow-sm">
                             <h4 class="font-bold text-teal-900 uppercase text-[11px] tracking-wider flex items-center gap-2 pb-1 border-b border-teal-800/10">
                                 <i class="fa-solid fa-pen-to-square text-teal-700"></i> NHẬP THÔNG TIN ĐIỀU TRỊ
                             </h4>
 
-                            <!-- ĐIỀU KIỆN 1: TÙY CHỌN CHỈ HIỂN THỊ NẾU LÀ BỆNH ĐÃ CÓ -->
+                            <!-- A1: PHẦN NHẬP THÔNG TIN ĐIỀU TRỊ BỆNH NHÂN ĐÃ CÓ PHÁC ĐỒ TRƯỚC ĐÓ MẶC ĐỊNH CHỌN TIẾP TỤC PHÁC ĐỒ CŨ -->
                             <div id="protocolModeContainer" class="hidden bg-white p-2.5 rounded-lg border border-teal-100 space-y-1">
                                 <label class="block font-bold text-slate-700 text-[10px]">Tùy chọn phác đồ điều trị:</label>
                                 <div class="flex items-center space-x-4">
                                     <label class="flex items-center space-x-1.5 cursor-pointer font-semibold text-teal-800">
-                                        <input type="radio" name="protocolMode" value="continue" onchange="window.toggleProtocolMode()" class="text-teal-600">
+                                        <input type="radio" id="protoModeContinue" name="protocolMode" value="continue" checked onchange="window.toggleProtocolMode()" class="text-teal-600">
                                         <span>Tiếp tục phác đồ cũ (<span id="currentActiveProtoLabel">-</span>)</span>
                                     </label>
                                     <label class="flex items-center space-x-1.5 cursor-pointer font-semibold text-rose-700">
-                                        <input type="radio" name="protocolMode" value="change" checked onchange="window.toggleProtocolMode()" class="text-rose-600">
+                                        <input type="radio" id="protoModeChange" name="protocolMode" value="change" onchange="window.toggleProtocolMode()" class="text-rose-600">
                                         <span>Đổi phác đồ mới</span>
                                     </label>
                                 </div>
@@ -325,7 +367,6 @@
                             <div class="space-y-2.5">
                                 <div>
                                     <label class="block font-semibold text-slate-700 mb-1">Lựa chọn phác đồ điều trị <span class="text-rose-500">*</span>:</label>
-                                    <!-- LIST PHÁC ĐỒ PHÂN NHÁNH NGAY TRÊN LIST LỰA CHỌN -->
                                     <select id="protocolSelectList" onchange="window.onProtocolSelectChanged()" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
                                         <option value="">-- Chọn phác đồ hóa trị --</option>
                                         
@@ -350,14 +391,13 @@
                                             <option value="Vinorelbine-Mono">Vinorelbine Đơn Trị</option>
                                         </optgroup>
 
-                                        <optgroup label="Phác đồ Khác">
+                                        <optgroup label="Phác Đồ Khác">
                                             <option value="CUSTOM">KHÁC (Tự nhập tên phác đồ)</option>
                                         </optgroup>
                                     </select>
                                     <input type="hidden" id="npProtocol">
                                 </div>
 
-                                <!-- MỤC CHỌN TUẦN ĐỐI VỚI PHÁC ĐỒ CÓ THUỐC LIÊN TỤC 14 NGÀY -->
                                 <div id="weekSelectContainer" class="hidden bg-amber-50/60 p-2.5 rounded-lg border border-amber-200 space-y-1">
                                     <label class="block font-bold text-amber-900 text-[11px]">
                                         <i class="fa-solid fa-calendar-week text-amber-700"></i> Phân tuần dùng thuốc (Thuốc uống 14 ngày):
@@ -374,15 +414,10 @@
                                     <input type="text" id="customProtocolNameInput" oninput="window.onCustomProtocolNameInput()" placeholder="VD: Gemcitabine + Cisplatin..." class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-900 focus:outline-none">
                                 </div>
 
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block font-semibold text-slate-700 mb-1">Chu kỳ thứ:</label>
-                                        <input type="number" id="npCycleNumber" min="1" value="1" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 text-center focus:outline-none">
-                                    </div>
-                                    <div>
-                                        <label class="block font-semibold text-slate-700 mb-1">Số lượng chu kỳ:</label>
-                                        <input type="text" id="npCycleCountDisplay" readonly value="1" class="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 text-center">
-                                    </div>
+                                <!-- A2. BỎ MỤC SỐ LƯỢNG CHU KỲ (CHỈ GIỮ CHU KỲ THỨ / TỰ ĐỘNG) -->
+                                <div>
+                                    <label class="block font-semibold text-slate-700 mb-1">Chu kỳ thứ:</label>
+                                    <input type="number" id="npCycleNumber" min="1" value="1" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 text-center focus:outline-none">
                                 </div>
 
                                 <div>
@@ -391,7 +426,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-semibold text-slate-700 mb-1">Thuốc hóa trị (Tên hoạt chất tự động link):</label>
+                                    <label class="block font-semibold text-slate-700 mb-1">Thuốc hóa trị (Tên hoạt chất tự động liên kết):</label>
                                     <input type="text" id="npDrugNamesInput" placeholder="VD: Doxorubicin, Cyclophosphamide" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium text-teal-900">
                                 </div>
 
@@ -415,32 +450,36 @@
                                 </div>
 
                                 <p class="text-[10px] text-slate-400 italic pt-1">
-                                    *Thông tin chỉnh sửa cùng ngày hoặc sửa lịch sử sẽ được đồng bộ, không bị lặp lại dữ liệu.*
+                                    *Thông tin chỉnh sửa cùng ngày hoặc sửa lịch sử sẽ được đồng bộ, không bị trùng lặp dữ liệu.*
                                 </p>
                             </div>
                         </div>
 
                     </div>
 
-                    <div class="lg:col-span-7 space-y-4">
-                        <div class="bg-slate-800 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between">
+                    <!-- KHUNG PHẢI: LỊCH SỬ HÓA TRỊ & MARKER (CÓ THANH CUỘN ĐỘC LẬP - C1, D, D1) -->
+                    <div class="lg:col-span-7 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar pl-1">
+                        
+                        <!-- D. CHỈNH TÊN THÀNH LỊCH SỬ HÓA TRỊ -->
+                        <div class="bg-slate-800 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between sticky top-0 z-10 shadow-sm">
                             <span class="flex items-center gap-2">
-                                <i class="fa-solid fa-timeline text-teal-300"></i> LỊCH SỬ CÁC CHU KỲ ĐIỀU TRỊ (ĐÃ NHẬP)
+                                <i class="fa-solid fa-timeline text-teal-300"></i> LỊCH SỬ HÓA TRỊ (ĐÃ NHẬP)
                             </span>
                             <span id="existingCyclesCount" class="text-[10px] bg-slate-700 text-slate-200 px-2 py-0.5 rounded-full">0 chu kỳ</span>
                         </div>
 
-                        <div id="existingCyclesList" class="space-y-2 max-h-[350px] overflow-y-auto custom-scrollbar pr-1"></div>
+                        <!-- D1. DANH SÁCH LỊCH SỬ HÓA TRỊ CÓ DẤU (+) VÀ (-) MỞ RỘNG/THU GỌN -->
+                        <div id="existingCyclesList" class="space-y-2.5"></div>
 
                         <!-- DANH SÁCH MARKER ĐÃ NHẬP -->
-                        <div class="bg-indigo-900 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between mt-4">
+                        <div class="bg-indigo-900 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between mt-6 sticky top-0 z-10 shadow-sm">
                             <span class="flex items-center gap-2">
                                 <i class="fa-solid fa-vial text-indigo-300"></i> DANH SÁCH CHỈ SỐ MARKER ĐÃ GHI NHẬN
                             </span>
                             <span id="existingMarkersCount" class="text-[10px] bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded-full">0 chỉ số</span>
                         </div>
 
-                        <div id="existingMarkersList" class="space-y-2 max-h-[250px] overflow-y-auto custom-scrollbar pr-1"></div>
+                        <div id="existingMarkersList" class="space-y-2"></div>
                     </div>
 
                 </div>
@@ -706,7 +745,7 @@
         </div>
     </div>
 
-    <!-- Core Script & ICD Autocomplete & Dose Calculation Logic -->
+    <!-- Core Script & Autocomplete & Dose Calculation Logic -->
     <script>
         const icdDatabase = [
             { code: "C16.0", desc: "U ác tính tâm vị" },
@@ -740,24 +779,54 @@
             { code: "Z51.1", desc: "Buổi trị liệu hóa chất cho khối u" }
         ];
 
+        // E. BẢNG THÔNG BÁO TỰ ẨN KHÔNG CẦN BẤM OK (TOAST)
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-teal-800' : 'bg-slate-800';
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+
+            toast.className = `${bgColor} text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 transition-all duration-300 transform translate-x-10 opacity-0 border border-white/20`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-teal-300 text-sm"></i> <span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-x-10', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-x-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             setupIcdAutocomplete('npDiagnosis', 'icdDropdownMain');
-            setupIcdAutocomplete('npSubDiagnosis', 'icdDropdownSub');
+            setupIcdAutocomplete('npSubDiagnosis', 'icdDropdownSub', true);
         });
 
-        function setupIcdAutocomplete(inputId, dropdownId) {
+        // F. CẬP NHẬT TỰ ĐỘNG BẢNG MÃ ICD PHỤ & CHẨN ĐOÁN PHỤ
+        function setupIcdAutocomplete(inputId, dropdownId, isSub = false) {
             const input = document.getElementById(inputId);
             const dropdown = document.getElementById(dropdownId);
             if (!input || !dropdown) return;
 
             input.addEventListener('input', (e) => {
-                const val = e.target.value.trim().toLowerCase();
-                if (!val) {
+                const val = e.target.value.trim();
+                if (isSub) {
+                    updateSubIcdTableDisplay(val);
+                }
+
+                const queryVal = val.toLowerCase();
+                if (!queryVal) {
                     dropdown.classList.add('hidden');
                     return;
                 }
                 const matches = icdDatabase.filter(item => 
-                    item.code.toLowerCase().includes(val) || item.desc.toLowerCase().includes(val)
+                    item.code.toLowerCase().includes(queryVal) || item.desc.toLowerCase().includes(queryVal)
                 );
 
                 if (matches.length > 0) {
@@ -770,7 +839,11 @@
                             <span class="text-slate-600 text-xs mt-0.5">${m.desc}</span>
                         `;
                         div.addEventListener('click', () => {
-                            input.value = `${m.code}: ${m.desc}`;
+                            const formatted = `${m.code}: ${m.desc}`;
+                            input.value = formatted;
+                            if (isSub) {
+                                updateSubIcdTableDisplay(formatted);
+                            }
                             dropdown.classList.add('hidden');
                         });
                         dropdown.appendChild(div);
@@ -780,6 +853,27 @@
                     dropdown.classList.add('hidden');
                 }
             });
+        }
+
+        function updateSubIcdTableDisplay(val) {
+            const tableCode = document.getElementById('tableSubIcdCode');
+            const tableDesc = document.getElementById('tableSubIcdDesc');
+            if (!tableCode || !tableDesc) return;
+
+            if (!val) {
+                tableCode.innerText = "-";
+                tableDesc.innerText = "Chưa nhập chẩn đoán phụ";
+                return;
+            }
+
+            if (val.includes(':')) {
+                const parts = val.split(':');
+                tableCode.innerText = parts[0].trim();
+                tableDesc.innerText = parts.slice(1).join(':').trim();
+            } else {
+                tableCode.innerText = "ICD";
+                tableDesc.innerText = val;
+            }
         }
 
         // DANH SÁCH PHÁC ĐỒ & HOẠT CHẤT & LIỀU TIÊU CHUẨN
@@ -803,7 +897,6 @@
             const drugInput = document.getElementById('npDrugNamesInput');
             const weekContainer = document.getElementById('weekSelectContainer');
             
-            // Hiện/Ẩn tùy chọn phân tuần 1 / tuần 2 cho các phác đồ uống 14 ngày
             if (chemoProtocolsData[protoKey] && chemoProtocolsData[protoKey].is14Days) {
                 weekContainer.classList.remove('hidden');
             } else {
@@ -831,7 +924,7 @@
             window.calculateBSAandDoses();
         };
 
-        // Tính BSA & Liều theo phác đồ, tuần uống thuốc & BSA/Cân nặng
+        // Tính BSA & Liều theo phác đồ & BSA/Cân nặng
         window.calculateBSAandDoses = function() {
             const h = parseFloat(document.getElementById('npHeight').value);
             const w = parseFloat(document.getElementById('npWeight').value);
@@ -885,7 +978,9 @@
         };
 
         window.toggleProtocolMode = function() {
-            const mode = document.querySelector('input[name="protocolMode"]:checked').value;
+            const modeRadio = document.querySelector('input[name="protocolMode"]:checked');
+            if (!modeRadio) return;
+            const mode = modeRadio.value;
             const protoSelect = document.getElementById('protocolSelectList');
             if (mode === 'continue') {
                 protoSelect.disabled = true;
@@ -896,7 +991,7 @@
             }
         };
 
-        // Mở Modal Thêm Bệnh Nhân Mới (Xử lý điều kiện phác đồ bệnh mới)
+        // Mở Modal Thêm Bệnh Nhân Mới
         window.openNewPatientModal = function() {
             document.getElementById('editDocId').value = "";
             document.getElementById('editCycleIndex').value = "";
@@ -908,13 +1003,15 @@
             const npBirthYear = document.getElementById('npBirthYear');
             const notice = document.getElementById('adminEditNotice');
 
+            // B. ĐIỀU CHỈNH FORM THEO QUYỀN ADMIN / KHÁC ADMIN
+            applyAdminUiMode(true);
+
             npId.readOnly = false;
             npName.readOnly = false;
             npGender.disabled = false;
             npBirthYear.readOnly = false;
             if (notice) notice.classList.add('hidden');
 
-            // BỆNH MỚI: ẨN MỤC CHỌN TIẾP TỤC/ĐỔI PHÁC ĐỒ
             document.getElementById('protocolModeContainer').classList.add('hidden');
             document.getElementById('protocolSelectList').disabled = false;
             document.getElementById('protocolSelectList').classList.remove('bg-slate-100');
@@ -926,6 +1023,8 @@
             npBirthYear.value = "";
             document.getElementById('npDiagnosis').value = "";
             document.getElementById('npSubDiagnosis').value = "";
+            updateSubIcdTableDisplay("");
+
             document.getElementById('protocolSelectList').value = "";
             document.getElementById('npProtocol').value = "";
             document.getElementById('weekSelectContainer').classList.add('hidden');
@@ -936,7 +1035,6 @@
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npCycleNumber').value = "1";
-            document.getElementById('npCycleCountDisplay').value = "1";
             document.getElementById('npDrugNamesInput').value = "";
             document.getElementById('npDoseInput').value = "";
             document.getElementById('npCycleNote').value = "";
@@ -947,6 +1045,26 @@
             window.renderTempMarkersList();
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
+
+        // B. QUẢN LÝ DẠNG HIỂN THỊ HÀNH CHÍNH (ADMIN HOẶC NON-ADMIN)
+        function applyAdminUiMode(isUserAdmin, patientObj = null) {
+            const adminBox = document.getElementById('adminAdminInfoBox');
+            const nonAdminBox = document.getElementById('nonAdminInfoBox');
+
+            if (isUserAdmin) {
+                adminBox.classList.remove('hidden');
+                nonAdminBox.classList.add('hidden');
+            } else {
+                adminBox.classList.add('hidden');
+                nonAdminBox.classList.remove('hidden');
+
+                if (patientObj) {
+                    document.getElementById('dispTextId').innerText = patientObj.patientId || '-';
+                    document.getElementById('dispTextName').innerText = patientObj.name || '-';
+                    document.getElementById('dispTextGenderBirth').innerText = `${patientObj.gender || '-'} / ${patientObj.birthYear || '-'}`;
+                }
+            }
+        }
 
         window.closePatientFormModal = function() {
             document.getElementById('patientFormModal').classList.add('hidden');
@@ -1031,7 +1149,7 @@
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Tên tác giả: Thạch Xuân Tựu
+        // Tác giả: Thạch Xuân Tuấn
         const ADMIN_EMAIL = "xuantuutv@gmail.com";
 
         const firebaseConfig = {
@@ -1112,7 +1230,7 @@
                 signInBtn.classList.add('hidden');
                 docProfile.classList.remove('hidden');
 
-                document.getElementById('docName').innerText = user.displayName || "BS. Thạch Xuân Tựu";
+                document.getElementById('docName').innerText = user.displayName || "BS. Thạch Xuân Tuấn";
                 let userLevelStr = "User";
                 if (isAdmin) userLevelStr = "Admin";
                 else if (isVip) userLevelStr = "VIP";
@@ -1141,7 +1259,7 @@
                 }
 
                 loadAllPatientsRealtime();
-                if (isAdmin) loadUsersManagementTable();
+                if (isAdmin) window.loadUsersManagementTable();
 
             } else {
                 currentUser = null;
@@ -1206,165 +1324,17 @@
             });
         };
 
-        window.clearSearchResult = function() {
-            document.getElementById('searchInput').value = "";
-            document.getElementById('patientCountBadge').innerText = "Chưa chọn tra cứu";
-            document.getElementById('allPatientsTableBody').innerHTML = `
-                <tr>
-                    <td colspan="7" class="p-8 text-center text-slate-400 font-medium">
-                        <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
-                        Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
-                    </td>
-                </tr>
-            `;
-        };
-
-        window.viewPatientDetail = function(docId) {
-            const p = cachedPatientsList.find(item => item.id === docId);
-            if (!p) return;
-            window.currentViewingPatient = p;
-
-            document.getElementById('detName').innerText = `${p.name} (Năm sinh: ${p.birthYear || '-'})`;
-            document.getElementById('detPatientId').innerText = `Mã BN: ${p.patientId} | Giới tính: ${p.gender || '-'}`;
-            document.getElementById('detDiagMain').innerText = p.diagnosis || '-';
-            document.getElementById('detDiagSub').innerText = p.subDiagnosis || 'Không có';
-            document.getElementById('detProtocol').querySelector('span').innerText = p.protocol || 'Chưa cập nhật';
-            document.getElementById('detCreatedBy').innerText = p.createdByEmail || 'BS. Thạch Xuân Tựu';
-
-            const qrContainer = document.getElementById('patientQrCodeContainer');
-            qrContainer.innerHTML = "";
-            new QRCode(qrContainer, {
-                text: `ONCOCARE_PATIENT_ID:${p.patientId} | NAME:${p.name}`,
-                width: 110,
-                height: 110,
-                colorDark: "#0f766e",
-                colorLight: "#ffffff"
-            });
-
-            const cyclesContainer = document.getElementById('detCyclesTimeline');
-            cyclesContainer.innerHTML = "";
-            const cycles = p.cycles || [];
-            if (cycles.length === 0) {
-                cyclesContainer.innerHTML = `<p class="text-slate-400 italic text-xs">Chưa có lịch sử chu kỳ.</p>`;
-            } else {
-                cycles.forEach((c, i) => {
-                    cyclesContainer.innerHTML += `
-                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-                            <p class="font-bold text-teal-800">${c.branchName || 'Chu kỳ ' + (i+1)}: Ngày ${c.date || 'N/A'}</p>
-                            <p class="text-slate-700">Thuốc: ${c.drugNames || 'N/A'} - Liều dùng: ${c.doseInput || 'N/A'}</p>
-                            <p class="text-slate-500">Ghi chú: ${c.note || 'Không có'}</p>
-                        </div>
-                    `;
-                });
-            }
-
-            document.getElementById('patientDetailModal').classList.remove('hidden');
-            window.switchDetailTab('timeline');
-        };
-
-        window.renderMarkerChart = function() {
-            const p = window.currentViewingPatient;
-            if (!p) return;
-
-            const selectedType = document.getElementById('chartMarkerSelect').value;
-            const markers = p.markers || [];
-            
-            const filtered = markers
-                .filter(m => m.type === selectedType)
-                .sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            const card = document.getElementById('markerAnalysisCard');
-            const tableBody = document.getElementById('markerDetailTableBody');
-            tableBody.innerHTML = "";
-
-            if (filtered.length === 0) {
-                card.innerHTML = `<span class="text-slate-500 italic"><i class="fa-solid fa-circle-info"></i> Chưa có dữ liệu chỉ số <strong>${selectedType}</strong> được ghi nhận.</span>`;
-                if (window.activeMarkerChart) {
-                    window.activeMarkerChart.destroy();
-                    window.activeMarkerChart = null;
-                }
-                return;
-            }
-
-            let analysisText = "";
-            if (filtered.length === 1) {
-                analysisText = `<span>Chỉ số <strong>${selectedType}</strong> đo ngày ${filtered[0].date}: <strong>${filtered[0].value}</strong> (Cần thêm dữ liệu lần sau để so sánh %).</span>`;
-            } else {
-                const prev = parseFloat(filtered[filtered.length - 2].value);
-                const curr = parseFloat(filtered[filtered.length - 1].value);
-                const diff = curr - prev;
-                const percent = ((diff / prev) * 100).toFixed(1);
-
-                if (diff > 0) {
-                    analysisText = `<span class="text-rose-700 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up text-base"></i> Chỉ số <strong>${selectedType}</strong> TĂNG <strong>+${percent}%</strong> (từ ${prev} lên ${curr}) so với lần đo trước (${filtered[filtered.length - 2].date}).</span>`;
-                } else if (diff < 0) {
-                    analysisText = `<span class="text-emerald-700 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-down text-base"></i> Chỉ số <strong>${selectedType}</strong> GIẢM <strong>${percent}%</strong> (từ ${prev} xuống ${curr}) so với lần đo trước (${filtered[filtered.length - 2].date}).</span>`;
-                } else {
-                    analysisText = `<span class="text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-minus text-base"></i> Chỉ số <strong>${selectedType}</strong> KHÔNG ĐỔI (${curr}) so với lần đo trước.</span>`;
-                }
-            }
-            card.innerHTML = analysisText;
-
-            filtered.forEach((item, index) => {
-                let percentText = "-";
-                if (index > 0) {
-                    const prevVal = parseFloat(filtered[index - 1].value);
-                    const currVal = parseFloat(item.value);
-                    const pct = (((currVal - prevVal) / prevVal) * 100).toFixed(1);
-                    if (pct > 0) percentText = `<span class="text-rose-600 font-bold">+${pct}% </span>`;
-                    else if (pct < 0) percentText = `<span class="text-emerald-600 font-bold">${pct}% </span>`;
-                    else percentText = `<span class="text-slate-500">0%</span>`;
-                }
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-2 font-medium">${item.date}</td>
-                    <td class="p-2 font-bold text-indigo-900">${item.type}</td>
-                    <td class="p-2 font-bold">${item.value}</td>
-                    <td class="p-2">${percentText}</td>
-                `;
-                tableBody.appendChild(tr);
-            });
-
-            const ctx = document.getElementById('markerCanvas').getContext('2d');
-            if (window.activeMarkerChart) {
-                window.activeMarkerChart.destroy();
-            }
-
-            const labels = filtered.map(m => m.date);
-            const dataValues = filtered.map(m => parseFloat(m.value));
-
-            window.activeMarkerChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: `Chỉ số ${selectedType}`,
-                        data: dataValues,
-                        borderColor: '#4f46e5',
-                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: true, position: 'top' } },
-                    scales: { y: { beginAtZero: false } }
-                }
-            });
-        };
-
-        // BỆNH ĐÃ CÓ: HIỆN MỤC TIẾP TỤC / ĐỔI PHÁC ĐỒ
+        // A1. MỞ MODAL SỬA HỒ SƠ -> MẶC ĐỊNH LỰA CHỌN "TIẾP TỤC PHÁC ĐỒ CỦ"
         window.openEditPatientModal = function(docId) {
             const p = cachedPatientsList.find(item => item.id === docId);
             if (!p) return;
 
             document.getElementById('editDocId').value = p.id;
-            document.getElementById('dispModalDoc').innerText = p.createdByEmail || 'BS. Thạch Xuân Tựu';
+            document.getElementById('editCycleIndex').value = "";
+            document.getElementById('dispModalDoc').innerText = p.createdByEmail || (currentUser ? currentUser.email : "BS. Thạch Xuân Tuấn");
+
+            // QUẢN LÝ DẠNG HIỂN THỊ HÀNH CHÍNH (ADMIN HOẶC NON-ADMIN)
+            applyAdminUiMode(isAdmin, p);
 
             const npId = document.getElementById('npId');
             const npName = document.getElementById('npName');
@@ -1372,89 +1342,226 @@
             const npBirthYear = document.getElementById('npBirthYear');
             const notice = document.getElementById('adminEditNotice');
 
-            npId.value = p.patientId || '';
-            npName.value = p.name || '';
-            npGender.value = p.gender || '';
-            npBirthYear.value = p.birthYear || '';
-            document.getElementById('npHeight').value = p.height || '';
-            document.getElementById('npWeight').value = p.weight || '';
+            npId.value = p.patientId || "";
+            npName.value = p.name || "";
+            npGender.value = p.gender || "";
+            npBirthYear.value = p.birthYear || "";
+            document.getElementById('npDiagnosis').value = p.diagnosis || "";
+            
+            const subDiagValue = p.subDiagnosis || "";
+            document.getElementById('npSubDiagnosis').value = subDiagValue;
+            updateSubIcdTableDisplay(subDiagValue);
 
-            if (isAdmin) {
-                npId.readOnly = false;
-                npName.readOnly = false;
-                npGender.disabled = false;
-                npBirthYear.readOnly = false;
-                if (notice) notice.classList.remove('hidden');
+            document.getElementById('npHeight').value = p.height || "";
+            document.getElementById('npWeight').value = p.weight || "";
+            if (p.height && p.weight) {
+                window.calculateBSAandDoses();
             } else {
-                npId.readOnly = true;
-                npName.readOnly = true;
-                npGender.disabled = true;
-                npBirthYear.readOnly = true;
-                if (notice) notice.classList.add('hidden');
+                document.getElementById('npBsaDisplay').innerText = "--";
             }
 
-            document.getElementById('npDiagnosis').value = p.diagnosis || '';
-            document.getElementById('npSubDiagnosis').value = p.subDiagnosis || '';
+            // A1: NẾU ĐÃ CÓ PHÁC ĐỒ TRƯỚC ĐÓ -> MẶC ĐỊNH CHỌN "TIẾP TỤC PHÁC ĐỒ CỦ"
+            const currentProto = p.protocol || "";
+            if (currentProto) {
+                document.getElementById('protocolModeContainer').classList.remove('hidden');
+                document.getElementById('currentActiveProtoLabel').innerText = currentProto;
+                document.getElementById('npProtocol').value = currentProto;
 
-            // BỆNH ĐÃ CÓ: HIỆN MỤC TIẾP TỤC PHÁC ĐỒ CŨ HOẶC ĐỔI PHÁC ĐỒ
-            document.getElementById('protocolModeContainer').classList.remove('hidden');
-            document.getElementById('currentActiveProtoLabel').innerText = p.protocol || "Chưa có";
+                // Tự động tích chọn Tiếp tục phác đồ cũ
+                const continueRadio = document.getElementById('protoModeContinue');
+                if (continueRadio) continueRadio.checked = true;
 
-            document.getElementById('protocolSelectList').value = p.protocolKey || '';
-            document.getElementById('npProtocol').value = p.protocol || '';
+                // Tìm phác đồ khớp danh sách dropdown
+                let matchedKey = "";
+                Object.keys(chemoProtocolsData).forEach(key => {
+                    if (chemoProtocolsData[key].name === currentProto) matchedKey = key;
+                });
+
+                if (matchedKey) {
+                    document.getElementById('protocolSelectList').value = matchedKey;
+                } else {
+                    document.getElementById('protocolSelectList').value = "CUSTOM";
+                    document.getElementById('customProtocolInputContainer').classList.remove('hidden');
+                    document.getElementById('customProtocolNameInput').value = currentProto;
+                }
+
+                document.getElementById('protocolSelectList').disabled = true;
+                document.getElementById('protocolSelectList').classList.add('bg-slate-100');
+            } else {
+                document.getElementById('protocolModeContainer').classList.add('hidden');
+                document.getElementById('protocolSelectList').disabled = false;
+                document.getElementById('protocolSelectList').classList.remove('bg-slate-100');
+                document.getElementById('protocolSelectList').value = "";
+                document.getElementById('npProtocol').value = "";
+            }
 
             document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('npCycleNumber').value = (p.cycles ? p.cycles.length + 1 : 1);
-            document.getElementById('npCycleCountDisplay').value = document.getElementById('npCycleNumber').value;
             
-            window.tempCurrentCycles = JSON.parse(JSON.stringify(p.cycles || []));
-            window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
+            window.tempCurrentCycles = p.cycles ? JSON.parse(JSON.stringify(p.cycles)) : [];
+            window.tempCurrentMarkers = p.markers ? JSON.parse(JSON.stringify(p.markers)) : [];
 
-            window.onProtocolSelectChanged();
+            document.getElementById('npCycleNumber').value = (window.tempCurrentCycles.length + 1).toString();
+            document.getElementById('npDrugNamesInput').value = "";
+            document.getElementById('npDoseInput').value = "";
+            document.getElementById('npCycleNote').value = "";
+
             window.renderTempCyclesList();
             window.renderTempMarkersList();
-
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
-        // THÊM/TỰ ĐỘNG CẬP NHẬT CHU KỲ (GIỮ NGUYÊN CHU KỲ THỨ)
-        window.addNewCycleFromForm = function() {
-            const cycleDate = document.getElementById('npCycleDate').value;
-            const cycleNum = parseInt(document.getElementById('npCycleNumber').value) || 1;
-            const drugNames = document.getElementById('npDrugNamesInput').value;
-            const doseInput = document.getElementById('npDoseInput').value;
-            const note = document.getElementById('npCycleNote').value;
-            const proto = document.getElementById('npProtocol').value || "AC-T";
+        // D1. CẢI TIẾN LỊCH SỬ HÓA TRỊ: THÊM NÚT CỘNG (+) VÀ TRỪ (-) ĐỂ MỞ RỘNG / THU GỌN CHI TIẾT CHU KỲ
+        window.renderTempCyclesList = function() {
+            const container = document.getElementById('existingCyclesList');
+            const countBadge = document.getElementById('existingCyclesCount');
+            if (!container) return;
 
-            if (!cycleDate) {
-                alert("Vui lòng chọn ngày chu kỳ!");
+            container.innerHTML = "";
+            const cycles = window.tempCurrentCycles || [];
+            countBadge.innerText = `${cycles.length} chu kỳ`;
+
+            if (cycles.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 italic text-xs text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">Chưa có lịch sử hóa trị nào được nhập.</p>`;
                 return;
             }
 
-            const existingIndex = window.tempCurrentCycles.findIndex(c => c.date === cycleDate);
+            cycles.forEach((c, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2 transition";
+                
+                card.innerHTML = `
+                    <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                        <div class="flex items-center space-x-2">
+                            <!-- NÚT MỞ RỘNG (+) VÀ THU GỌN (-) -->
+                            <button type="button" onclick="window.toggleCycleDetailAccordion(${index})" class="w-6 h-6 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg font-bold text-xs flex items-center justify-center transition border border-teal-200">
+                                <span id="cycleAccordionIcon_${index}">+</span>
+                            </button>
+                            <span class="font-bold text-teal-900 text-xs">${c.branchName || ('Chu kỳ ' + (index + 1))}</span>
+                            <span class="text-[10px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded font-semibold border border-teal-100">Ngày: ${c.date || '-'}</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button type="button" onclick="window.editCycleFromTemp(${index})" title="Sửa chu kỳ này" class="p-1 text-amber-600 hover:text-amber-800 text-xs"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" onclick="window.removeCycleFromTemp(${index})" title="Xóa chu kỳ này" class="p-1 text-rose-600 hover:text-rose-800 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
 
-            const cycleData = {
-                branchName: `Chu kỳ ${cycleNum}`,
-                date: cycleDate,
-                protocolUsed: proto,
-                drugNames: drugNames,
-                doseInput: doseInput,
-                note: note,
-                updatedBy: currentUser ? currentUser.email : "BS. Thạch Xuân Tựu"
-            };
+                    <!-- KHUNG THÔNG TIN CHI TIẾT CHU KỲ (THU GỌN MẶC ĐỊNH) -->
+                    <div id="cycleDetailBody_${index}" class="hidden pt-1 text-xs space-y-1 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                        <div class="grid grid-cols-1 gap-1">
+                            <div><strong class="text-slate-700">Thuốc hóa trị:</strong> <span class="text-teal-900 font-semibold">${c.drugNames || 'Không ghi nhận'}</span></div>
+                            <div><strong class="text-slate-700">Liều dùng:</strong> <span class="text-slate-800">${c.doseInput || 'Không ghi nhận'}</span></div>
+                            <div><strong class="text-slate-700">Tác dụng phụ / Ghi chú:</strong> <span class="text-slate-600 italic">${c.note || 'Không có'}</span></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        };
 
-            if (existingIndex !== -1) {
-                window.tempCurrentCycles[existingIndex] = cycleData;
-                alert(`Đã tự động cập nhật thông tin chu kỳ ngày ${cycleDate} trong lịch sử!`);
+        window.toggleCycleDetailAccordion = function(index) {
+            const body = document.getElementById(`cycleDetailBody_${index}`);
+            const icon = document.getElementById(`cycleAccordionIcon_${index}`);
+            if (!body || !icon) return;
+
+            if (body.classList.contains('hidden')) {
+                body.classList.remove('hidden');
+                icon.innerText = "-";
             } else {
-                window.tempCurrentCycles.push(cycleData);
-                alert("Đã thêm chu kỳ mới vào lịch sử!");
+                body.classList.add('hidden');
+                icon.innerText = "+";
+            }
+        };
+
+        window.renderTempMarkersList = function() {
+            const container = document.getElementById('existingMarkersList');
+            const countBadge = document.getElementById('existingMarkersCount');
+            if (!container) return;
+
+            container.innerHTML = "";
+            const markers = window.tempCurrentMarkers || [];
+            countBadge.innerText = `${markers.length} chỉ số`;
+
+            if (markers.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 italic text-xs text-center py-3 bg-slate-50 rounded-xl border border-dashed border-slate-200">Chưa ghi nhận chỉ số Marker nào.</p>`;
+                return;
             }
 
-            document.getElementById('npCycleNumber').value = window.tempCurrentCycles.length + 1;
-            document.getElementById('npCycleCountDisplay').value = document.getElementById('npCycleNumber').value;
+            markers.forEach((m, index) => {
+                const item = document.createElement('div');
+                item.className = "bg-white p-2.5 rounded-xl border border-slate-200 text-xs flex items-center justify-between shadow-sm";
+                item.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="font-extrabold text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">${m.type}</span>
+                        <span class="font-bold text-slate-800">${m.value}</span>
+                        <span class="text-[10px] text-slate-400">(${m.date})</span>
+                    </div>
+                    <button type="button" onclick="window.removeMarkerFromTemp(${index})" title="Xóa chỉ số này" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                container.appendChild(item);
+            });
+        };
+
+        // E. KHI THÊM / CẬP NHẬT CHU KỲ -> THÔNG BÁO TỰ ẨN
+        window.addNewCycleFromForm = function() {
+            const date = document.getElementById('npCycleDate').value;
+            const cycleNum = document.getElementById('npCycleNumber').value || "1";
+            const drugNames = document.getElementById('npDrugNamesInput').value.trim();
+            const doseInput = document.getElementById('npDoseInput').value.trim();
+            const note = document.getElementById('npCycleNote').value.trim();
+            const editIndexStr = document.getElementById('editCycleIndex').value;
+
+            if (!date) {
+                alert("Vui lòng chọn ngày thực hiện chu kỳ!");
+                return;
+            }
+
+            const cycleObj = {
+                branchName: `Chu kỳ ${cycleNum}`,
+                date: date,
+                drugNames: drugNames,
+                doseInput: doseInput,
+                note: note
+            };
+
+            if (editIndexStr !== "") {
+                const idx = parseInt(editIndexStr);
+                window.tempCurrentCycles[idx] = cycleObj;
+                document.getElementById('editCycleIndex').value = "";
+                window.showToast("Đã cập nhật thông tin chu kỳ thành công!");
+            } else {
+                window.tempCurrentCycles.push(cycleObj);
+                window.showToast("Đã thêm chu kỳ mới thành công!");
+            }
+
+            document.getElementById('npCycleNumber').value = (window.tempCurrentCycles.length + 1).toString();
+            document.getElementById('npDrugNamesInput').value = "";
+            document.getElementById('npDoseInput').value = "";
+            document.getElementById('npCycleNote').value = "";
+
             window.renderTempCyclesList();
+        };
+
+        window.editCycleFromTemp = function(index) {
+            const c = window.tempCurrentCycles[index];
+            if (!c) return;
+
+            document.getElementById('editCycleIndex').value = index;
+            document.getElementById('npCycleDate').value = c.date || "";
+            document.getElementById('npDrugNamesInput').value = c.drugNames || "";
+            document.getElementById('npDoseInput').value = c.doseInput || "";
+            document.getElementById('npCycleNote').value = c.note || "";
+
+            const match = (c.branchName || "").match(/\d+/);
+            if (match) {
+                document.getElementById('npCycleNumber').value = match[0];
+            }
+        };
+
+        window.removeCycleFromTemp = function(index) {
+            window.tempCurrentCycles.splice(index, 1);
+            window.renderTempCyclesList();
+            window.showToast("Đã xóa chu kỳ khỏi danh sách!", "info");
         };
 
         window.addNewMarkerFromForm = function() {
@@ -1462,376 +1569,185 @@
             const val = document.getElementById('npMarkerValue').value;
             const date = document.getElementById('npMarkerDate').value;
 
-            if (!val || parseFloat(val) < 0) {
-                alert("Vui lòng nhập giá trị marker hợp lệ!");
+            if (!val || !date) {
+                alert("Vui lòng nhập đầy đủ Giá trị và Ngày xét nghiệm Marker!");
                 return;
             }
 
-            const existingIndex = window.tempCurrentMarkers.findIndex(m => m.type === type && m.date === date);
-            if (existingIndex !== -1) {
-                window.tempCurrentMarkers[existingIndex].value = parseFloat(val).toFixed(2);
-            } else {
-                window.tempCurrentMarkers.push({
-                    type: type,
-                    value: parseFloat(val).toFixed(2),
-                    date: date
-                });
-            }
+            window.tempCurrentMarkers.push({
+                type: type,
+                value: parseFloat(val),
+                date: date
+            });
 
             document.getElementById('npMarkerValue').value = "";
             window.renderTempMarkersList();
-            alert(`Đã cập nhật chỉ số ${type}: ${val} (${date}). Nhớ nhấn 'Cập nhật lại thông tin' để lưu.`);
+            window.showToast("Đã thêm chỉ số Marker thành công!");
         };
 
-        window.renderTempCyclesList = function() {
-            const listDiv = document.getElementById('existingCyclesList');
-            listDiv.innerHTML = "";
-            document.getElementById('existingCyclesCount').innerText = `${window.tempCurrentCycles.length} chu kỳ`;
-
-            if (window.tempCurrentCycles.length === 0) {
-                listDiv.innerHTML = `<div class="p-4 bg-slate-50 text-slate-400 text-center text-xs rounded-xl">Chưa có chu kỳ điều trị nào được ghi nhận.</div>`;
-                return;
-            }
-
-            window.tempCurrentCycles.forEach((c, idx) => {
-                const div = document.createElement('div');
-                div.className = "bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-xs";
-                div.innerHTML = `
-                    <div class="bg-slate-50 p-2.5 px-3 flex items-center justify-between border-b border-slate-100">
-                        <span class="font-bold text-slate-800">Phác đồ: ${c.protocolUsed || 'N/A'} (Ngày: ${c.date || 'N/A'})</span>
-                        <div class="flex items-center space-x-1">
-                            <button type="button" onclick="window.editTempCycle(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[10px] border border-amber-200"><i class="fa-solid fa-pen"></i> Sửa</button>
-                            <button type="button" onclick="window.deleteTempCycle(${idx})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px] border border-rose-200"><i class="fa-solid fa-trash"></i> Xóa</button>
-                        </div>
-                    </div>
-                    <div class="p-3 space-y-1 bg-white">
-                        <div class="flex items-center justify-between font-semibold text-teal-800">
-                            <span>[+] ${c.branchName || 'Chu kỳ ' + (idx+1)}, Ngày ${c.date || ''}</span>
-                        </div>
-                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-1 text-[11px] text-slate-700">
-                            <div><strong>Thuốc:</strong> ${c.drugNames || 'N/A'}</div>
-                            <div><strong>Liều dùng:</strong> ${c.doseInput || 'N/A'}</div>
-                            <div><strong>Tác dụng phụ / Ghi chú:</strong> ${c.note || 'Không ghi nhận'}</div>
-                        </div>
-                    </div>
-                `;
-                listDiv.appendChild(div);
-            });
-        };
-
-        window.renderTempMarkersList = function() {
-            const listDiv = document.getElementById('existingMarkersList');
-            if (!listDiv) return;
-            listDiv.innerHTML = "";
-            document.getElementById('existingMarkersCount').innerText = `${window.tempCurrentMarkers.length} chỉ số`;
-
-            if (window.tempCurrentMarkers.length === 0) {
-                listDiv.innerHTML = `<div class="p-3 bg-indigo-50/50 text-indigo-400 text-center text-xs rounded-xl">Chưa có chỉ số marker ung thư nào.</div>`;
-                return;
-            }
-
-            window.tempCurrentMarkers.forEach((m, idx) => {
-                const div = document.createElement('div');
-                div.className = "bg-white p-2.5 rounded-xl border border-indigo-100 shadow-sm flex items-center justify-between text-xs";
-                div.innerHTML = `
-                    <div>
-                        <span class="font-bold text-indigo-900">[${m.type}]</span> 
-                        <span class="font-bold text-slate-800">${m.value}</span> 
-                        <span class="text-slate-500 text-[10px]">(${m.date})</span>
-                    </div>
-                    <button type="button" onclick="window.deleteTempMarker(${idx})" class="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-[10px] border border-rose-200"><i class="fa-solid fa-trash"></i> Xóa</button>
-                `;
-                listDiv.appendChild(div);
-            });
-        };
-
-        window.deleteTempMarker = function(idx) {
-            window.tempCurrentMarkers.splice(idx, 1);
+        window.removeMarkerFromTemp = function(index) {
+            window.tempCurrentMarkers.splice(index, 1);
             window.renderTempMarkersList();
+            window.showToast("Đã xóa chỉ số Marker!", "info");
         };
 
-        window.editTempCycle = function(idx) {
-            const c = window.tempCurrentCycles[idx];
-            if (!c) return;
-            document.getElementById('npCycleDate').value = c.date || '';
-            document.getElementById('npCycleNumber').value = idx + 1;
-            document.getElementById('npCycleCountDisplay').value = idx + 1;
-            document.getElementById('npDrugNamesInput').value = c.drugNames || '';
-            document.getElementById('npDoseInput').value = c.doseInput || '';
-            document.getElementById('npCycleNote').value = c.note || '';
-            window.renderTempCyclesList();
-            alert("Đã đưa dữ liệu chu kỳ lên form để chỉnh sửa.");
-        };
-
-        window.deleteTempCycle = function(idx) {
-            if (confirm("Bạn có chắc chắn muốn xóa chu kỳ này?")) {
-                window.tempCurrentCycles.splice(idx, 1);
-                window.renderTempCyclesList();
-            }
-        };
-
-        // LƯU HỒ SƠ VỚI ĐẦY ĐỦ THÔNG TIN HÀNH CHÍNH VÀ PHÁC ĐỒ
+        // E. KHI CẬP NHẬT THÔNG TIN BỆNH NHÂN -> HIỆN THÔNG BÁO THÀNH CÔNG TỰ ẨN KHÔNG CẦN BẤM OK
         window.handlePatientFormSubmit = async function(e) {
             e.preventDefault();
             const docId = document.getElementById('editDocId').value;
-            const patientId = document.getElementById('npId').value.trim();
-            const name = document.getElementById('npName').value.trim();
-            const gender = document.getElementById('npGender').value;
-            const birthYear = parseInt(document.getElementById('npBirthYear').value);
-            const diagnosis = document.getElementById('npDiagnosis').value.trim();
-            const subDiagnosis = document.getElementById('npSubDiagnosis').value.trim();
-            const protocolKey = document.getElementById('protocolSelectList').value;
-            const protocol = document.getElementById('npProtocol').value.trim();
-            const height = document.getElementById('npHeight').value;
-            const weight = document.getElementById('npWeight').value;
 
-            if (!patientId || !name || !gender || !birthYear || !protocol) {
-                alert("BẮT BUỘC: Nhập đầy đủ thông tin hành chính (Mã BN, Họ tên, Giới tính, Năm sinh) và Lựa chọn phác đồ điều trị!");
+            const pId = document.getElementById('npId').value.trim();
+            const pName = document.getElementById('npName').value.trim();
+            const pGender = document.getElementById('npGender').value;
+            const pBirthYear = document.getElementById('npBirthYear').value;
+            const pDiagnosis = document.getElementById('npDiagnosis').value.trim();
+            const pSubDiagnosis = document.getElementById('npSubDiagnosis').value.trim();
+            const pProtocol = document.getElementById('npProtocol').value.trim();
+            const pHeight = document.getElementById('npHeight').value;
+            const pWeight = document.getElementById('npWeight').value;
+
+            if (!pId || !pName) {
+                alert("Vui lòng điền đầy đủ Mã BN và Họ tên bệnh nhân!");
                 return;
             }
 
-            if (patientId.length !== 8) {
-                alert("Mã bệnh nhân bắt buộc phải đủ 8 ký tự!");
-                return;
-            }
-
-            if (!docId) {
-                const isDuplicate = cachedPatientsList.some(p => p.patientId === patientId);
-                if (isDuplicate) {
-                    alert(`Mã bệnh nhân "${patientId}" đã tồn tại trên hệ thống! Vui lòng đổi Mã BN khác.`);
-                    return;
-                }
-            }
+            const patientPayload = {
+                patientId: pId,
+                name: pName,
+                gender: pGender,
+                birthYear: pBirthYear,
+                diagnosis: pDiagnosis,
+                subDiagnosis: pSubDiagnosis,
+                protocol: pProtocol,
+                height: pHeight,
+                weight: pWeight,
+                cycles: window.tempCurrentCycles,
+                markers: window.tempCurrentMarkers,
+                updatedAt: serverTimestamp(),
+                createdByEmail: currentUser ? currentUser.email : "BS. Thạch Xuân Tuấn"
+            };
 
             try {
                 if (docId) {
-                    const pRef = doc(db, "patients", docId);
-                    let updateData = {
-                        diagnosis: diagnosis,
-                        subDiagnosis: subDiagnosis,
-                        protocolKey: protocolKey,
-                        protocol: protocol,
-                        height: height,
-                        weight: weight,
-                        cycles: window.tempCurrentCycles,
-                        markers: window.tempCurrentMarkers,
-                        updatedAt: serverTimestamp()
-                    };
-
-                    if (isAdmin) {
-                        updateData.patientId = patientId;
-                        updateData.name = name;
-                        updateData.gender = gender;
-                        updateData.birthYear = birthYear;
-                    }
-
-                    await updateDoc(pRef, updateData);
-                    alert("Cập nhật thông tin hồ sơ thành công!");
+                    await updateDoc(doc(db, "patients", docId), patientPayload);
+                    window.showToast("Cập nhật thông tin bệnh nhân thành công!");
                 } else {
-                    await addDoc(collection(db, "patients"), {
-                        patientId, 
-                        name, 
-                        gender, 
-                        birthYear, 
-                        diagnosis: diagnosis, 
-                        subDiagnosis: subDiagnosis,
-                        protocolKey: protocolKey,
-                        protocol: protocol,
-                        height: height,
-                        weight: weight,
-                        cycles: window.tempCurrentCycles,
-                        markers: window.tempCurrentMarkers,
-                        notes: [],
-                        createdByEmail: currentUser ? currentUser.email : "BS. Thạch Xuân Tựu",
-                        createdAt: serverTimestamp()
-                    });
-                    alert("Thêm mới hồ sơ bệnh nhân thành công!");
+                    await addDoc(collection(db, "patients"), patientPayload);
+                    window.showToast("Thêm hồ sơ bệnh nhân mới thành công!");
                 }
 
                 window.closePatientFormModal();
-                document.getElementById('searchInput').value = patientId;
-                window.searchPatientByCode();
+                if (pId) {
+                    document.getElementById('searchInput').value = pId;
+                    window.searchPatientByCode();
+                }
             } catch (err) {
-                console.error("Lỗi lưu:", err);
-                alert("Lỗi lưu dữ liệu: " + err.message);
+                console.error("Lỗi khi lưu dữ liệu:", err);
+                alert("Có lỗi xảy ra khi lưu dữ liệu: " + err.message);
             }
         };
 
         window.deletePatientDoc = async function(docId) {
-            if (!isAdmin) {
-                alert("Chỉ tài khoản Admin mới có quyền xóa hồ sơ!");
-                return;
+            if (!confirm("Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân này không?")) return;
+            try {
+                await deleteDoc(doc(db, "patients", docId));
+                window.showToast("Đã xóa hồ sơ bệnh nhân thành công!", "info");
+                window.clearSearchResult();
+            } catch (err) {
+                alert("Lỗi khi xóa hồ sơ: " + err.message);
             }
-            if (confirm("Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ này?")) {
-                try {
-                    await deleteDoc(doc(db, "patients", docId));
-                    alert("Đã xóa thành công!");
-                    window.clearSearchResult();
-                } catch (err) {
-                    alert("Không thể xóa: " + err.message);
-                }
-            }
-        };
-
-        window.runChemoStatistics = function() {
-            const startDateStr = document.getElementById('statsStartDate').value;
-            const endDateStr = document.getElementById('statsEndDate').value;
-            const icdFilterVal = document.getElementById('statsIcdFilter').value.trim().toUpperCase();
-            
-            if (!startDateStr || !endDateStr) {
-                alert("Vui lòng chọn đầy đủ Từ ngày và Đến ngày!");
-                return;
-            }
-
-            const startDate = new Date(startDateStr);
-            const endDate = new Date(endDateStr);
-            endDate.setHours(23, 59, 59, 999);
-            const currentYear = new Date().getFullYear();
-
-            let matchedCount = 0;
-            const statsTableBody = document.getElementById('statsTableBody');
-            statsTableBody.innerHTML = "";
-
-            let results = [];
-            let genderCounts = { "Nam": 0, "Nữ": 0, "Khác": 0 };
-            let ageCounts = { "Trẻ (< 35 tuổi)": 0, "Trung niên (35-60 tuổi)": 0, "Già (> 60 tuổi)": 0 };
-
-            cachedPatientsList.forEach(p => {
-                const diag = (p.diagnosis || "").toUpperCase();
-                const subDiag = (p.subDiagnosis || "").toUpperCase();
-
-                if (icdFilterVal !== "ALL") {
-                    if (!diag.includes(icdFilterVal) && !subDiag.includes(icdFilterVal)) return;
-                }
-
-                const cycles = p.cycles || [];
-                const validCycles = cycles.filter(c => {
-                    if (!c.date) return false;
-                    const cDate = new Date(c.date);
-                    return cDate >= startDate && cDate <= endDate;
-                });
-
-                if (validCycles.length > 0 || cycles.length === 0) {
-                    matchedCount++;
-                    let g = p.gender || "Khác";
-                    if (genderCounts[g] !== undefined) genderCounts[g]++;
-                    else genderCounts["Khác"] = (genderCounts["Khác"] || 0) + 1;
-
-                    let birthY = parseInt(p.birthYear) || (currentYear - 50);
-                    let age = currentYear - birthY;
-                    if (age < 35) ageCounts["Trẻ (< 35 tuổi)"]++;
-                    else if (age <= 60) ageCounts["Trung niên (35-60 tuổi)"]++;
-                    else ageCounts["Già (> 60 tuổi)"]++;
-
-                    results.push({
-                        id: p.id,
-                        patientId: p.patientId || '-',
-                        name: p.name || '-',
-                        gender: p.gender || '-',
-                        birthYear: p.birthYear || '-',
-                        age: age,
-                        diagnosis: p.diagnosis || '-',
-                        subDiagnosis: p.subDiagnosis || 'Không có',
-                        protocol: p.protocol || '-',
-                        count: validCycles.length > 0 ? validCycles.length : cycles.length
-                    });
-                }
-            });
-
-            document.getElementById('statTotalPatients').innerText = matchedCount;
-            document.getElementById('statGenderSummary').innerText = `Nam: ${genderCounts["Nam"]} | Nữ: ${genderCounts["Nữ"]}`;
-            document.getElementById('statAgeSummary').innerText = `Trẻ: ${ageCounts["Trẻ (< 35 tuổi)"]} | Trung niên: ${ageCounts["Trung niên (35-60 tuổi)"]} | Già: ${ageCounts["Già (> 60 tuổi)"]}`;
-
-            if (results.length === 0) {
-                statsTableBody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400 font-medium">Không tìm thấy bệnh nhân nào trong khoảng thời gian này.</td></tr>`;
-                return;
-            }
-
-            const canEdit = isAdmin || isVip;
-
-            results.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">${item.patientId}</td>
-                    <td class="p-3 font-semibold text-slate-900">${item.name}</td>
-                    <td class="p-3 text-center">${item.gender}</td>
-                    <td class="p-3">${item.birthYear} (${item.age}t)</td>
-                    <td class="p-3 font-medium text-slate-800">
-                        <strong class="text-teal-800">Chính:</strong> ${item.diagnosis}<br>
-                        <strong class="text-amber-800">Phụ:</strong> ${item.subDiagnosis}
-                    </td>
-                    <td class="p-3 font-bold text-amber-800">${item.protocol}</td>
-                    <td class="p-3 text-center font-bold text-teal-700">${item.count} chu kỳ</td>
-                    <td class="p-3 text-center space-x-1">
-                        <button onclick="window.viewPatientDetail('${item.id}')" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded"><i class="fa-solid fa-eye"></i></button>
-                        ${canEdit ? `<button onclick="window.closeStatsModal(); window.openEditPatientModal('${item.id}');" title="Chỉnh sửa thông tin bệnh nhân" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>` : ''}
-                        ${isAdmin ? `<button onclick="window.deletePatientDoc('${item.id}'); window.runChemoStatistics();" title="Xóa" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded"><i class="fa-solid fa-trash"></i></button>` : ''}
-                    </td>
-                `;
-                statsTableBody.appendChild(tr);
-            });
         };
 
         window.loadUsersManagementTable = async function() {
             const tbody = document.getElementById('userTableBody');
+            if (!tbody) return;
+
             try {
-                const querySnapshot = await getDocs(collection(db, "users"));
+                const snap = await getDocs(collection(db, "users"));
                 tbody.innerHTML = "";
-                querySnapshot.forEach((docSnap) => {
+
+                snap.forEach(docSnap => {
                     const u = docSnap.data();
-                    const uUid = docSnap.id;
-                    const uRole = u.role || 'Doctor';
-                    const uIsApproved = u.isApproved || false;
-                    const uIsBlocked = u.isBlocked || false;
-                    const isUserAdmin = (u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
-
-                    let roleBadge = `<span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded font-bold text-[10px]">${uRole}</span>`;
-                    if (isUserAdmin) roleBadge = `<span class="px-2 py-0.5 bg-purple-100 text-purple-800 rounded font-bold text-[10px]"><i class="fa-solid fa-shield"></i> Admin</span>`;
-                    else if (uRole === 'VIP') roleBadge = `<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold text-[10px]"><i class="fa-solid fa-crown"></i> VIP</span>`;
-
-                    let statusBadge = uIsApproved ? `<span class="px-2 py-0.5 bg-teal-100 text-teal-800 rounded font-bold text-[10px]">Đã duyệt</span>` : `<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold text-[10px]">Chờ duyệt</span>`;
-                    if (uIsBlocked) statusBadge = `<span class="px-2 py-0.5 bg-rose-100 text-rose-800 rounded font-bold text-[10px]">Đã khóa</span>`;
+                    const uId = docSnap.id;
 
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 transition";
                     tr.innerHTML = `
-                        <td class="p-3 font-semibold text-slate-900">${u.name || 'Thành viên'}</td>
-                        <td class="p-3 text-slate-600">${u.email || '-'}</td>
-                        <td class="p-3">${roleBadge}</td>
-                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 font-bold text-slate-800">${u.name || 'N/A'}</td>
+                        <td class="p-3 text-slate-600">${u.email}</td>
+                        <td class="p-3 font-semibold text-teal-800">${u.role || 'Doctor'}</td>
+                        <td class="p-3">
+                            ${u.isBlocked ? '<span class="text-rose-600 font-bold">Blocked</span>' : (u.isApproved ? '<span class="text-emerald-600 font-bold">Đã Duyệt</span>' : '<span class="text-amber-600 font-bold">Chờ Phê Duyệt</span>')}
+                        </td>
                         <td class="p-3 text-center space-x-1">
-                            ${!isUserAdmin ? `
-                                <button onclick="window.toggleApproveUser('${uUid}', ${!uIsApproved})" class="px-2 py-1 ${uIsApproved ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-teal-50 text-teal-700 border-teal-200'} rounded font-semibold text-[10px] border">${uIsApproved ? 'Hủy duyệt' : 'Duyệt'}</button>
-                                <button onclick="window.toggleBlockUser('${uUid}', ${!uIsBlocked})" class="px-2 py-1 ${uIsBlocked ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'} rounded font-semibold text-[10px] border">${uIsBlocked ? 'Mở khóa' : 'Khóa'}</button>
-                            ` : '<span class="text-slate-400 italic text-[10px]">Admin gốc</span>'}
+                            ${!u.isApproved ? `<button onclick="window.approveUser('${uId}')" class="px-2 py-1 bg-teal-600 text-white rounded hover:bg-teal-700">Duyệt</button>` : ''}
+                            ${!u.isBlocked ? `<button onclick="window.blockUser('${uId}', true)" class="px-2 py-1 bg-rose-600 text-white rounded hover:bg-rose-700">Block</button>` : `<button onclick="window.blockUser('${uId}', false)" class="px-2 py-1 bg-slate-600 text-white rounded hover:bg-slate-700">Unblock</button>`}
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
-                console.error("Lỗi tải người dùng:", err);
+                console.error("Lỗi danh sách thành viên:", err);
             }
         };
 
-        window.toggleApproveUser = async function(uid, newStatus) {
-            try {
-                await updateDoc(doc(db, "users", uid), { isApproved: newStatus });
-                alert("Đã cập nhật trạng thái duyệt!");
-                loadUsersManagementTable();
-            } catch (err) {
-                alert("Lỗi: " + err.message);
-            }
+        window.approveUser = async function(uid) {
+            await updateDoc(doc(db, "users", uid), { isApproved: true });
+            window.showToast("Đã phê duyệt tài khoản thành công!");
+            window.loadUsersManagementTable();
         };
 
-        window.toggleBlockUser = async function(uid, newStatus) {
-            try {
-                await updateDoc(doc(db, "users", uid), { isBlocked: newStatus });
-                alert("Đã cập nhật trạng thái khóa!");
-                loadUsersManagementTable();
-            } catch (err) {
-                alert("Lỗi: " + err.message);
+        window.blockUser = async function(uid, status) {
+            await updateDoc(doc(db, "users", uid), { isBlocked: status });
+            window.showToast(status ? "Đã khóa tài khoản!" : "Đã mở khóa tài khoản!", "info");
+            window.loadUsersManagementTable();
+        };
+
+        window.runChemoStatistics = function() {
+            const start = document.getElementById('statsStartDate').value;
+            const end = document.getElementById('statsEndDate').value;
+            const icdFilter = document.getElementById('statsIcdFilter').value;
+            const tbody = document.getElementById('statsTableBody');
+
+            let filtered = cachedPatientsList.filter(p => {
+                if (icdFilter !== "ALL") {
+                    const mainDiag = p.diagnosis || "";
+                    if (!mainDiag.startsWith(icdFilter)) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('statTotalPatients').innerText = filtered.length;
+            let maleCount = 0, femaleCount = 0;
+            filtered.forEach(p => {
+                if (p.gender === "Nam") maleCount++;
+                else if (p.gender === "Nữ") femaleCount++;
+            });
+            document.getElementById('statGenderSummary').innerText = `Nam: ${maleCount} | Nữ: ${femaleCount}`;
+
+            tbody.innerHTML = "";
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">Không tìm thấy bệnh nhân thỏa điều kiện thống kê.</td></tr>`;
+                return;
             }
+
+            filtered.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-teal-800">${p.patientId || '-'}</td>
+                    <td class="p-3 font-semibold text-slate-900">${p.name || '-'}</td>
+                    <td class="p-3 text-center">${p.gender || '-'}</td>
+                    <td class="p-3">${p.birthYear || '-'}</td>
+                    <td class="p-3">${p.diagnosis || '-'}</td>
+                    <td class="p-3 font-bold text-amber-800">${p.protocol || '-'}</td>
+                    <td class="p-3 text-center font-bold text-teal-800">${(p.cycles || []).length}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="window.viewPatientDetail('${p.id}')" class="px-2 py-1 bg-teal-50 text-teal-700 rounded font-semibold"><i class="fa-solid fa-eye"></i> Xem</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         };
     </script>
 </body>
