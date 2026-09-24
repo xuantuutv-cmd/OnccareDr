@@ -59,19 +59,19 @@
                 </button>
 
                 <div id="doctorProfile" class="hidden flex items-center space-x-3">
-                    <!-- Nút Thống Kê được hiển thị đúng cho Admin và Doctor/VIP có quyền -->
+                    <!-- Nút Thống Kê được khôi phục hiển thị -->
                     <button id="btnStats" onclick="window.openStatsModal()" class="bg-teal-800/80 hover:bg-teal-900 border border-teal-400/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                         <i class="fa-solid fa-chart-pie text-teal-300"></i>
                         <span class="hidden md:inline">Thống Kê</span>
                     </button>
-                    <!-- Nút Quản Lý Thành Viên hiển thị chính xác khi đăng nhập tài khoản Admin -->
+                    <!-- Nút Quản Lý Thành Viên hiển thị chuẩn theo phân quyền Admin -->
                     <button id="btnUserMgmt" onclick="window.openUserManagementModal()" class="hidden bg-teal-900/50 hover:bg-teal-900/80 border border-teal-500/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                         <i class="fa-solid fa-users-gear text-amber-300"></i>
                         <span class="hidden md:inline">Quản Lý Thành Viên</span>
                     </button>
                     <div class="text-right hidden sm:block">
                         <p id="docName" class="text-xs font-bold leading-tight">Thạch Xuân Tựu</p>
-                        <p id="docLevelTag" class="text-[10px] font-bold text-blue-300">User</p>
+                        <p id="docLevelTag" class="text-[10px] font-bold text-blue-300 uppercase">User</p>
                     </div>
                     <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
                     <button onclick="window.logoutGoogle()" title="Đăng xuất" class="text-teal-200 hover:text-white text-xs bg-teal-900/40 hover:bg-teal-900/60 p-2 rounded-lg transition">
@@ -1273,7 +1273,6 @@
         onAuthStateChanged(auth, async (user) => {
             const signInBtn = document.getElementById('googleSignInBtn');
             const docProfile = document.getElementById('doctorProfile');
-            const roleBadge = document.getElementById('roleBadge');
             const docLevelTag = document.getElementById('docLevelTag');
             const btnUserMgmt = document.getElementById('btnUserMgmt');
             const btnStats = document.getElementById('btnStats');
@@ -1324,21 +1323,17 @@
                 if (user.photoURL) document.getElementById('docAvatar').src = user.photoURL;
 
                 if (isBlocked) {
-                    roleBadge.innerHTML = `<i class="fa-solid fa-ban text-[9px]"></i> Đã bị Block`;
                     searchInput.disabled = true;
                     btnAddPatient.disabled = true;
                 } else if (isAdmin) {
-                    roleBadge.innerHTML = `<i class="fa-solid fa-shield-halved text-[9px]"></i> Admin`;
-                    btnUserMgmt.classList.remove('hidden'); // Hiển thị Quản lý thành viên cho Admin
-                    btnStats.classList.remove('hidden');    // Hiển thị Thống kê cho Admin
+                    btnUserMgmt.classList.remove('hidden'); // Hiển thị nút Quản lý thành viên cho Admin
+                    btnStats.classList.remove('hidden');    // Hiển thị nút Thống kê cho Admin
                     accountStatusNotice.classList.add('hidden');
                 } else if (isApproved || isVip) {
-                    roleBadge.innerHTML = `<i class="fa-solid fa-user-doctor text-[9px]"></i> ${userLevelStr}`;
-                    btnStats.classList.remove('hidden');    // Hiển thị Thống kê cho Doctor/VIP
-                    btnUserMgmt.classList.add('hidden');    // Ẩn Quản lý thành viên với non-admin
+                    btnStats.classList.remove('hidden');    // Hiển thị nút Thống kê cho Doctor/VIP
+                    btnUserMgmt.classList.add('hidden');    // Ẩn Quản lý thành viên đối với User thường
                     accountStatusNotice.classList.add('hidden');
                 } else {
-                    roleBadge.innerHTML = `<i class="fa-solid fa-clock text-[9px]"></i> Chờ duyệt`;
                     searchInput.disabled = true;
                     btnAddPatient.disabled = true;
                 }
@@ -2043,7 +2038,7 @@
                             </td>
                             <td class="p-3 text-center space-x-1">
                                 ${!isUserAdmin ? `
-                                    <button onclick="window.openStatsModal(); window.toggleUserApproval('${uid}',${!u.isApproved})" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[10px]">${u.isApproved ? 'Hủy duyệt' : 'Phê duyệt'}</button>
+                                    <button onclick="window.toggleUserApproval('${uid}',${!u.isApproved})" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[10px]">${u.isApproved ? 'Hủy duyệt' : 'Phê duyệt'}</button>
                                     <button onclick="window.toggleUserBlock('${uid}',${!u.isBlocked})" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px]">${u.isBlocked ? 'Mở khóa' : 'Khóa'}</button>
                                 ` : '<span class="text-[10px] text-slate-400 font-bold">Hệ thống Admin</span>'}
                             </td>
