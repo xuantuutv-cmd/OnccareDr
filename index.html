@@ -119,19 +119,18 @@
                 </button>
 
                 <div id="doctorProfile" class="hidden flex items-center space-x-3">
-                    <button id="btnStats" onclick="window.openStatsModal()" class="bg-slate-100 hover:bg-teal-50 border border-slate-200 text-slate-700 font-medium text-xs px-3 py-2 rounded-full transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-pie text-teal-700"></i>
-                        <span class="hidden md:inline">Thống Kê</span>
+                    <button id="btnStats" onclick="window.openStatsModal()" title="Thống kê" aria-label="Thống kê" class="hidden w-10 h-10 bg-slate-100 hover:bg-teal-50 border border-slate-200 text-slate-700 text-sm rounded-full transition flex items-center justify-center">
+                        <i class="fa-solid fa-chart-pie text-teal-700" aria-hidden="true"></i>
                     </button>
-                    <button id="btnUserMgmt" onclick="window.openUserManagementModal()" class="hidden bg-slate-100 hover:bg-amber-50 border border-slate-200 text-slate-700 font-medium text-xs px-3 py-2 rounded-full transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-users-gear text-amber-600"></i>
-                        <span class="hidden md:inline">Quản Lý Thành Viên</span>
+                    <button id="btnUserMgmt" onclick="window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-10 h-10 bg-slate-100 hover:bg-amber-50 border border-slate-200 text-slate-700 text-sm rounded-full transition flex items-center justify-center">
+                        <i class="fa-solid fa-users-gear text-amber-600" aria-hidden="true"></i>
                     </button>
-                    <div class="text-right hidden sm:block">
-                        <p id="docName" class="text-xs font-bold leading-tight">Thạch Xuân Tựu</p>
-                        <p id="docLevelTag" class="text-[10px] font-bold text-blue-300 uppercase">User</p>
+                    <div class="relative inline-flex shrink-0">
+                        <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Ảnh đại diện" class="w-10 h-10 rounded-full border-2 border-emerald-500 object-cover shadow-sm">
+                        <span id="docAdminCrown" class="hidden absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-amber-400 text-amber-950 border-2 border-white items-center justify-center text-[9px] shadow" title="Admin" aria-label="Admin">
+                            <i class="fa-solid fa-crown" aria-hidden="true"></i>
+                        </span>
                     </div>
-                    <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
                     <button onclick="window.logoutGoogle()" title="Đăng xuất" class="text-slate-500 hover:text-rose-700 text-xs bg-slate-100 hover:bg-rose-50 p-2.5 rounded-full transition">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
@@ -160,19 +159,19 @@
         <section class="bg-white p-5 sm:p-7 rounded-[2rem] shadow-[0_8px_35px_rgba(15,23,42,0.06)] border border-slate-200/80 space-y-4">
             <form onsubmit="window.searchPatientByCode(event)" class="flex flex-col sm:flex-row items-center gap-3">
                 <div class="relative flex-1 w-full">
-                    <input type="text" id="searchInput" aria-label="Mã bệnh nhân" maxlength="8" inputmode="numeric" class="w-full px-5 py-4 bg-slate-50/80 border border-slate-200/80 text-slate-900 text-sm rounded-full focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 font-semibold tracking-wide transition">
+                    <input type="text" id="searchInput" aria-label="Mã bệnh nhân" maxlength="8" inputmode="numeric" disabled class="w-full px-5 py-4 bg-slate-50/80 border border-slate-200/80 text-slate-900 text-sm rounded-full focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 font-semibold tracking-wide transition disabled:opacity-50">
                     <button type="button" onclick="window.clearSearchResult()" title="Xóa nội dung" aria-label="Xóa nội dung" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600">
                         <i class="fa-solid fa-circle-xmark text-sm"></i>
                     </button>
                 </div>
 
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
-                    <button type="submit" title="Tra cứu mã bệnh nhân" aria-label="Tra cứu mã bệnh nhân" class="w-12 h-12 bg-teal-700 hover:bg-teal-800 text-white text-base rounded-full shadow-sm transition flex items-center justify-center">
+                    <button id="btnSearchPatient" type="submit" title="Tra cứu mã bệnh nhân" aria-label="Tra cứu mã bệnh nhân" disabled class="w-12 h-12 bg-teal-700 hover:bg-teal-800 text-white text-base rounded-full shadow-sm transition flex items-center justify-center disabled:opacity-50">
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         <span class="sr-only">Tra cứu mã bệnh nhân</span>
                     </button>
                     
-                    <button type="button" id="btnAddPatient" onclick="window.openNewPatientModal()" title="Thêm bệnh nhân mới" aria-label="Thêm bệnh nhân mới" class="w-12 h-12 bg-slate-100 hover:bg-slate-200 text-slate-700 text-base rounded-full transition flex items-center justify-center border border-slate-200">
+                    <button type="button" id="btnAddPatient" onclick="window.openNewPatientModal()" title="Thêm bệnh nhân mới" aria-label="Thêm bệnh nhân mới" disabled class="w-12 h-12 bg-slate-100 hover:bg-slate-200 text-slate-700 text-base rounded-full transition flex items-center justify-center border border-slate-200 disabled:opacity-50">
                         <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
                         <span class="sr-only">Thêm bệnh nhân mới</span>
                     </button>
@@ -1198,6 +1197,7 @@
         };
 
         window.openNewPatientModal = function() {
+            if (!window.canUseOncoCare) return;
             document.getElementById('editDocId').value = "";
             window.resetFormToAddNewMode();
             document.getElementById('npMarkerValue').onkeydown = (event) => {
@@ -1374,6 +1374,7 @@
         };
 
         window.openUserManagementModal = function() {
+            if (!isAdmin || !window.canUseOncoCare) return;
             document.getElementById('userManagementModal').classList.remove('hidden');
             if (window.loadUsersManagementTable) window.loadUsersManagementTable();
         };
@@ -1384,6 +1385,7 @@
 
         window.statsModalIsMaximized = false;
         window.openStatsModal = function() {
+            if (!window.canUseOncoCare) return;
             const now = new Date();
             const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
             const today = now.toISOString().split('T')[0];
@@ -1397,6 +1399,7 @@
         };
 
         window.switchStatsTab = function(tabName) {
+            if (!window.canUseOncoCare) return;
             const showOverview = tabName === 'overview';
             document.getElementById('statsOverviewPanel').classList.toggle('hidden', !showOverview);
             document.getElementById('statsPatientsPanel').classList.toggle('hidden', showOverview);
@@ -1508,6 +1511,7 @@
         let isVip = false;
         let isApproved = false;
         let isBlocked = false;
+        window.canUseOncoCare = false;
         let cachedPatientsList = [];
         let statsFilteredPatients = [];
         let statsCurrentPage = 1;
@@ -1535,11 +1539,12 @@
         onAuthStateChanged(auth, async (user) => {
             const signInBtn = document.getElementById('googleSignInBtn');
             const docProfile = document.getElementById('doctorProfile');
-            const docLevelTag = document.getElementById('docLevelTag');
             const btnUserMgmt = document.getElementById('btnUserMgmt');
             const btnStats = document.getElementById('btnStats');
             const accountStatusNotice = document.getElementById('accountStatusNotice');
+            const noticeSubText = document.getElementById('noticeSubText');
             const searchInput = document.getElementById('searchInput');
+            const btnSearchPatient = document.getElementById('btnSearchPatient');
             const btnAddPatient = document.getElementById('btnAddPatient');
 
             if (user) {
@@ -1563,49 +1568,45 @@
                 isApproved = userData.isApproved;
                 isBlocked = userData.isBlocked;
                 isVip = (userData.role === "VIP");
+                window.canUseOncoCare = !isBlocked && (isAdmin || isVip || isApproved);
 
                 signInBtn.classList.add('hidden');
                 docProfile.classList.remove('hidden');
+                const avatar = document.getElementById('docAvatar');
+                const adminCrown = document.getElementById('docAdminCrown');
+                if (user.photoURL) avatar.src = user.photoURL;
+                avatar.classList.toggle('border-amber-400', isVip);
+                avatar.classList.toggle('border-emerald-500', !isVip);
+                adminCrown.classList.toggle('hidden', !isAdmin);
+                adminCrown.classList.toggle('flex', isAdmin);
 
-                document.getElementById('docName').innerText = user.displayName || "Thạch Xuân Tựu";
-                
-                let userLevelStr = "User";
-                if (isAdmin) {
-                    userLevelStr = "Admin";
-                    docLevelTag.className = "text-[10px] font-extrabold text-amber-500 uppercase";
-                } else if (isVip) {
-                    userLevelStr = "VIP";
-                    docLevelTag.className = "text-[10px] font-bold text-amber-200 uppercase";
-                } else {
-                    userLevelStr = "User";
-                    docLevelTag.className = "text-[10px] font-bold text-blue-300 uppercase";
-                }
-                docLevelTag.innerText = userLevelStr;
+                btnStats.classList.toggle('hidden', !window.canUseOncoCare);
+                btnUserMgmt.classList.toggle('hidden', !isAdmin);
+                searchInput.disabled = !window.canUseOncoCare;
+                btnSearchPatient.disabled = !window.canUseOncoCare;
+                btnAddPatient.disabled = !window.canUseOncoCare;
+                accountStatusNotice.classList.toggle('hidden', window.canUseOncoCare);
+                if (isBlocked) noticeSubText.innerText = 'Tài khoản đã bị khóa. Vui lòng liên hệ Admin để được hỗ trợ.';
+                else if (!window.canUseOncoCare) noticeSubText.innerText = 'Tài khoản đang chờ Admin phê duyệt. Các chức năng tra cứu, thêm hồ sơ và thống kê hiện chưa khả dụng.';
 
-                if (user.photoURL) document.getElementById('docAvatar').src = user.photoURL;
-
-                if (isBlocked) {
-                    searchInput.disabled = true;
-                    btnAddPatient.disabled = true;
-                } else if (isAdmin) {
-                    btnUserMgmt.classList.remove('hidden');
-                    btnStats.classList.remove('hidden');
-                    accountStatusNotice.classList.add('hidden');
-                } else if (isApproved || isVip) {
-                    btnStats.classList.remove('hidden');
-                    btnUserMgmt.classList.add('hidden');
-                    accountStatusNotice.classList.add('hidden');
-                } else {
-                    searchInput.disabled = true;
-                    btnAddPatient.disabled = true;
-                }
-
-                loadAllPatientsRealtime();
+                if (window.canUseOncoCare) loadAllPatientsRealtime();
 
             } else {
                 currentUser = null;
+                isAdmin = false;
+                isVip = false;
+                isApproved = false;
+                isBlocked = false;
+                window.canUseOncoCare = false;
                 signInBtn.classList.remove('hidden');
                 docProfile.classList.add('hidden');
+                btnStats.classList.add('hidden');
+                btnUserMgmt.classList.add('hidden');
+                searchInput.disabled = true;
+                btnSearchPatient.disabled = true;
+                btnAddPatient.disabled = true;
+                accountStatusNotice.classList.remove('hidden');
+                noticeSubText.innerText = 'Danh sách bệnh nhân được ẩn. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để sử dụng chức năng.';
             }
         });
 
@@ -1623,6 +1624,10 @@
 
         window.searchPatientByCode = function(e) {
             if (e) e.preventDefault();
+            if (!window.canUseOncoCare) {
+                alert('Tài khoản chưa được phê duyệt hoặc đã bị khóa.');
+                return;
+            }
             const code = document.getElementById('searchInput').value.trim();
             const tbody = document.getElementById('allPatientsTableBody');
             const countBadge = document.getElementById('patientCountBadge');
@@ -1659,7 +1664,7 @@
                     <td class="p-3 text-center space-x-1">
                         <button onclick="window.viewPatientDetail('${p.id}')" title="Form tóm tắt & Marker" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
                         <button onclick="window.openEditPatientModal('${p.id}')" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
-                        ${isAdmin ? `<button onclick="window.deletePatientDoc('${p.id}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        ${(isAdmin || isVip) ? `<button onclick="window.deletePatientDoc('${p.id}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1681,6 +1686,7 @@
         };
 
         window.viewPatientDetail = function(docId) {
+            if (!window.canUseOncoCare) return;
             const p = cachedPatientsList.find(item => item.id === docId);
             if (!p) return;
             window.currentViewingPatient = p;
@@ -1746,6 +1752,7 @@
         };
 
         window.openEditPatientModal = function(docId) {
+            if (!window.canUseOncoCare) return;
             const p = cachedPatientsList.find(item => item.id === docId);
             if (!p) return;
 
@@ -2141,6 +2148,7 @@
 
         window.handlePatientFormSubmit = async function(e) {
             e.preventDefault();
+            if (!window.canUseOncoCare) return;
             if (isSavingPatientForm) return;
             isSavingPatientForm = true;
             const saveButton = document.getElementById('saveBtn');
@@ -2318,6 +2326,7 @@
         };
 
         window.autoSyncChangesToDatabase = async function() {
+            if (!window.canUseOncoCare) return;
             const docId = document.getElementById('editDocId').value;
             if (!docId) return;
             try {
@@ -2333,8 +2342,8 @@
         };
 
         window.deletePatientDoc = async function(docId) {
-            if (!isAdmin) {
-                alert("Chỉ tài khoản Admin mới có quyền xóa hồ sơ bệnh nhân!");
+            if (!window.canUseOncoCare || !(isAdmin || isVip)) {
+                alert("Chỉ tài khoản Admin hoặc VIP mới có quyền xóa hồ sơ bệnh nhân!");
                 return;
             }
             if (confirm("CẢNH BÁO: Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân này khỏi hệ thống không?")) {
@@ -2379,7 +2388,7 @@
                         <td class="p-3 font-bold text-amber-800">${p.protocol || 'Chưa cập nhật'}</td>
                         <td class="p-3 text-center font-bold text-teal-700">${p.cycles ? p.cycles.length : 0} chu kỳ</td>
                         <td class="p-3 text-center">
-                            <button onclick="window.viewPatientDetail('${p.id}')" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button> <button onclick="window.closeStatsModal(); window.openEditPatientModal('${p.id}')" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button> ${isAdmin ? `<button onclick="window.deletePatientDoc('${p.id}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            <button onclick="window.viewPatientDetail('${p.id}')" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button> <button onclick="window.closeStatsModal(); window.openEditPatientModal('${p.id}')" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button> ${(isAdmin || isVip) ? `<button onclick="window.deletePatientDoc('${p.id}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -2408,6 +2417,7 @@
         };
 
         window.runChemoStatistics = function() {
+            if (!window.canUseOncoCare) return;
             const startDate = document.getElementById('statsStartDate').value;
             const endDate = document.getElementById('statsEndDate').value;
             const icdFilter = document.getElementById('statsIcdFilter').value;
@@ -2494,6 +2504,7 @@
         };
 
         window.loadUsersManagementTable = async function() {
+            if (!isAdmin || !window.canUseOncoCare) return;
             const tbody = document.getElementById('userTableBody');
             tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Đang tải danh sách thành viên...</td></tr>`;
             try {
@@ -2518,6 +2529,7 @@
                         <td class="p-3 text-center space-x-1">
                             <button onclick="window.adminApproveUser('${uId}', true)" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[10px]">Duyệt</button>
                             <button onclick="window.adminToggleBlockUser('${uId}', ${!u.isBlocked})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px]">${u.isBlocked ? 'Mở khóa' : 'Khóa'}</button>
+                            ${u.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase() ? `<button onclick="window.adminToggleVip('${uId}', ${u.role !== 'VIP'})" title="${u.role === 'VIP' ? 'Bỏ quyền VIP' : 'Cấp quyền VIP'}" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded font-semibold text-[10px]"><i class="fa-solid ${u.role === 'VIP' ? 'fa-crown' : 'fa-crown'}"></i> ${u.role === 'VIP' ? 'Bỏ VIP' : 'Cấp VIP'}</button>` : ''}
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -2529,7 +2541,7 @@
         };
 
         window.adminApproveUser = async function(userId, status) {
-            if (!isAdmin) return;
+            if (!isAdmin || !window.canUseOncoCare) return;
             try {
                 await updateDoc(doc(db, "users", userId), { isApproved: status });
                 window.showToast("Đã cập nhật trạng thái duyệt thành viên!");
@@ -2540,10 +2552,27 @@
         };
 
         window.adminToggleBlockUser = async function(userId, status) {
-            if (!isAdmin) return;
+            if (!isAdmin || !window.canUseOncoCare) return;
             try {
                 await updateDoc(doc(db, "users", userId), { isBlocked: status });
                 window.showToast("Đã cập nhật trạng thái khóa tài khoản!");
+                window.loadUsersManagementTable();
+            } catch (err) {
+                alert("Lỗi: " + err.message);
+            }
+        };
+
+        window.adminToggleVip = async function(userId, status) {
+            if (!isAdmin || !window.canUseOncoCare) return;
+            try {
+                const targetRef = doc(db, "users", userId);
+                const targetSnapshot = await getDoc(targetRef);
+                if (!targetSnapshot.exists() || targetSnapshot.data().email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return;
+                await updateDoc(targetRef, {
+                    role: status ? "VIP" : "Doctor",
+                    isApproved: true
+                });
+                window.showToast(status ? "Đã cấp quyền VIP cho thành viên!" : "Đã hủy quyền VIP của thành viên!");
                 window.loadUsersManagementTable();
             } catch (err) {
                 alert("Lỗi: " + err.message);
