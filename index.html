@@ -938,6 +938,7 @@
                 }
             }
             window.calculateBSAandDoses();
+            if (window.previewNewPatientCycle) window.previewNewPatientCycle();
         };
 
         window.calculateBSAandDoses = function() {
@@ -957,6 +958,7 @@
                 if (!protoKey || !chemoProtocolsData[protoKey]) {
                     doseInput.value = "";
                 }
+                if (window.previewNewPatientCycle) window.previewNewPatientCycle();
                 return;
             }
 
@@ -983,6 +985,7 @@
 
                 doseInput.value = resultDoseText;
             }
+            if (window.previewNewPatientCycle) window.previewNewPatientCycle();
         };
 
         window.onCustomProtocolNameInput = function() {
@@ -990,6 +993,7 @@
             if (protoKey === "CUSTOM") {
                 document.getElementById('npProtocol').value = document.getElementById('customProtocolNameInput').value.trim();
             }
+            if (window.previewNewPatientCycle) window.previewNewPatientCycle();
         };
 
         window.toggleProtocolMode = function() {
@@ -1050,7 +1054,7 @@
                     window.addNewMarkerFromForm();
                 }
             };
-            document.getElementById('patientInputPanel').classList.remove('lg:col-span-5'); document.getElementById('patientInputPanel').classList.add('lg:col-span-12'); document.getElementById('patientHistoryPanel').classList.add('hidden'); document.getElementById('btnAddCycleBtn').classList.add('hidden'); document.getElementById('saveBtn').classList.remove('hidden'); document.getElementById('saveBtnText').innerText = "Lưu thông tin"; document.getElementById('dispModalDoc').innerText = "Thạch Xuân Tựu";
+            document.getElementById('patientInputPanel').classList.remove('lg:col-span-12'); document.getElementById('patientInputPanel').classList.add('lg:col-span-5'); document.getElementById('patientHistoryPanel').classList.remove('hidden'); document.getElementById('btnAddCycleBtn').classList.add('hidden'); document.getElementById('saveBtn').classList.remove('hidden'); document.getElementById('saveBtnText').innerText = "Lưu thông tin"; document.getElementById('dispModalDoc').innerText = "Thạch Xuân Tựu";
             
             document.getElementById('adminInputFields').classList.remove('hidden');
             document.getElementById('nonAdminTextDisplay').classList.add('hidden');
@@ -1086,8 +1090,14 @@
 
             window.tempCurrentCycles = [];
             window.tempCurrentMarkers = [];
+            ['npCycleNumber', 'npCycleDate', 'npDrugNamesInput', 'npDoseInput', 'npCycleNote'].forEach((id) => {
+                const field = document.getElementById(id);
+                field.oninput = window.previewNewPatientCycle;
+                field.onchange = window.previewNewPatientCycle;
+            });
             window.renderTempCyclesList();
             window.renderTempMarkersList();
+            window.previewNewPatientCycle();
             document.getElementById('patientFormModal').classList.remove('hidden');
         };
 
@@ -1279,6 +1289,7 @@
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
+        let isSavingPatientForm = false;
         let currentUser = null;
         let isAdmin = false;
         let isVip = false;
@@ -1657,6 +1668,35 @@
             window.renderTempCyclesList();
         };
 
+        window.previewNewPatientCycle = function() {
+            if (document.getElementById('editDocId').value) return;
+
+            const protocol = document.getElementById('npProtocol').value.trim();
+            const cycleDate = document.getElementById('npCycleDate').value;
+            if (!protocol || !cycleDate) {
+                window.tempCurrentCycles = [];
+                window.renderTempCyclesList();
+                return;
+            }
+
+            const protocolKey = document.getElementById('protocolSelectList').value;
+            const cycleNum = parseInt(document.getElementById('npCycleNumber').value) || 1;
+            const is14Days = chemoProtocolsData[protocolKey]?.is14Days;
+            window.tempCurrentCycles = [{
+                branchName: `Chu kỳ ${cycleNum}`,
+                cycleNum,
+                week: is14Days ? document.getElementById('npProtocolWeek').value : "",
+                date: cycleDate,
+                protocolUsed: protocol,
+                isChangedProtocol: false,
+                drugNames: document.getElementById('npDrugNamesInput').value,
+                doseInput: document.getElementById('npDoseInput').value,
+                note: document.getElementById('npCycleNote').value,
+                updatedBy: currentUser ? (currentUser.displayName || currentUser.email) : "Thạch Xuân Tựu"
+            }];
+            window.renderTempCyclesList();
+        };
+
         window.addNewMarkerFromForm = function() {
             const type = document.getElementById('npMarkerType').value;
             const val = document.getElementById('npMarkerValue').value;
@@ -1818,6 +1858,10 @@
 
         window.handlePatientFormSubmit = async function(e) {
             e.preventDefault();
+            if (isSavingPatientForm) return;
+            isSavingPatientForm = true;
+            const saveButton = document.getElementById('saveBtn');
+            saveButton.disabled = true;
             const docId = document.getElementById('editDocId').value;
             const editCycleIndexStr = document.getElementById('editCycleIndex').value;
 
@@ -1882,6 +1926,8 @@
                 const cycleDate = document.getElementById('npCycleDate').value;
                 if (!cycleDate) {
                     alert("Vui lòng chọn ngày chu kỳ!");
+                    isSavingPatientForm = false;
+                    saveButton.disabled = false;
                     return;
                 }
 
@@ -1935,7 +1981,8 @@
                     window.showToast("Đã lưu và cập nhật hồ sơ bệnh nhân thành công!");
                 } else {
                     payload.createdAt = serverTimestamp();
-                    await addDoc(collection(db, "patients"), payload);
+                    const createdPatientRef = await addDoc(collection(db, "patients"), payload);
+                    cachedPatientsList.push({ id: createdPatientRef.id, ...payload });
                     window.showToast("Đã thêm mới hồ sơ bệnh nhân thành công!");
                 }
                 window.closePatientFormModal();
@@ -1946,6 +1993,9 @@
             } catch (err) {
                 console.error("Lỗi lưu dữ liệu:", err);
                 alert("Lỗi khi lưu dữ liệu lên hệ thống: " + err.message);
+            } finally {
+                isSavingPatientForm = false;
+                saveButton.disabled = false;
             }
         };
 
