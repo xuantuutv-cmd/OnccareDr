@@ -278,6 +278,9 @@
         <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
             <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between shrink-0 border-b border-slate-800">
                 <div class="flex items-center space-x-3">
+                    <button type="button" onclick="window.closePatientFormModal()" title="Đóng" aria-label="Đóng cửa sổ cập nhật hồ sơ" class="group shrink-0 w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
+                        <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                    </button>
                     <div class="w-8 h-8 bg-teal-600/30 rounded-lg flex items-center justify-center border border-teal-400/30">
                         <i class="fa-solid fa-hospital text-teal-300 text-sm"></i>
                     </div>
@@ -285,7 +288,6 @@
                         <h3 id="patientFormModalTitle" class="font-bold text-sm tracking-wide uppercase">Cập nhật hồ sơ</h3>
                     </div>
                 </div>
-                <button onclick="window.closePatientFormModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
 <form id="patientForm" autocomplete="off" onsubmit="window.handlePatientFormSubmit(event)" class="p-6 text-xs flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden">
@@ -581,6 +583,9 @@
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-5 px-6 flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center space-x-3">
+                    <button type="button" onclick="window.closePatientDetailModal()" title="Đóng" aria-label="Đóng cửa sổ chi tiết bệnh nhân" class="group shrink-0 w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
+                        <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                    </button>
                     <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
                         <i class="fa-solid fa-id-card text-teal-200 text-lg"></i>
                     </div>
@@ -589,7 +594,6 @@
                         <p id="detPatientId" class="text-xs text-teal-200 font-semibold">Mã BN: -</p>
                     </div>
                 </div>
-                <button onclick="window.closePatientDetailModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div class="p-6 space-y-6 text-xs">
@@ -838,10 +842,14 @@
     <div id="userManagementModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-slate-800 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
-                <h3 class="font-bold text-base flex items-center gap-2">
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="window.closeUserManagementModal()" title="Đóng" aria-label="Đóng cửa sổ quản lý thành viên" class="group shrink-0 w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
+                        <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                    </button>
+                    <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-users-gear text-amber-400"></i> Quản Lý Thành Viên & Phân Quyền
-                </h3>
-                <button onclick="window.closeUserManagementModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+                    </h3>
+                </div>
             </div>
 
             <div class="p-6 space-y-4 text-xs">
