@@ -27,7 +27,14 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        html[data-theme="dark"] body { background: #0b1220; color: #e2e8f0; color-scheme: dark; }
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(ellipse 68% 58% at 50% 42%, rgba(27, 103, 176, 0.48) 0%, rgba(16, 54, 99, 0.34) 38%, rgba(8, 23, 44, 0.12) 72%, transparent 100%),
+                radial-gradient(ellipse at center, #0b1a30 0%, #07111f 65%, #040811 100%);
+            background-attachment: fixed;
+            color: #e2e8f0;
+            color-scheme: dark;
+        }
         html[data-theme="dark"] .bg-white,
         html[data-theme="dark"] .bg-white\/90,
         html[data-theme="dark"] .bg-slate-50,
@@ -70,6 +77,8 @@
         html[data-theme="dark"] input::placeholder,
         html[data-theme="dark"] textarea::placeholder { color: #94a3b8; }
         html[data-theme="dark"] table thead { background-color: #111a2b; }
+        table thead th { font-size: 0.75rem !important; }
+        html[data-theme="dark"] table thead th { color: #f8fafc !important; }
         html[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-track { background: #111a2b; }
         html[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
         html[data-theme="dark"] footer { color: #a8b4c7; }
@@ -80,7 +89,6 @@
         #themeToggleButton[aria-pressed="true"] .theme-toggle-thumb { transform: translateX(1.35rem); background: #303238; }
         #themeToggleButton .theme-toggle-thumb i { font-size: .7rem; color: #d1d5db; }
         #themeToggleButton[aria-pressed="true"] .theme-toggle-thumb i { color: #e5e7eb; }
-        #themeToggleButton.theme-toggle-floating { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 100; box-shadow: 0 8px 24px rgba(15,23,42,.28); }
         html[data-theme="dark"] select option { background-color: #374151; color: #f3f4f6; }
         html[data-theme="dark"] select optgroup { background-color: #374151; color: #f3f4f6; }
         html[data-theme="dark"] ::selection { background: #3a3a3c; color: #ffffff; }
@@ -93,7 +101,6 @@
         html[data-theme="dark"] #allPatientsTableBody tr:hover td strong,
         html[data-theme="dark"] #statsTableBody tr:hover td strong,
         html[data-theme="dark"] #userTableBody tr:hover td strong { color: #f3f4f6 !important; }
-        @media (max-width: 640px) { #themeToggleButton.theme-toggle-floating { right: 1rem; bottom: 1rem; } }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
@@ -110,7 +117,7 @@
     <!-- MODUN 2: THANH ĐIỀU HƯỚNG HEADER & XÁC THỰC -->
     <!-- ========================================== -->
     <header class="bg-white/90 backdrop-blur-xl text-slate-800 border-b border-slate-200/80 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        <div class="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-6 2xl:px-10 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
                 <div class="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center border border-teal-100">
                     <i class="fa-solid fa-leaf text-teal-700 text-3xl"></i>
@@ -133,23 +140,6 @@
                     <span>Đăng Nhập Gmail</span>
                 </button>
 
-                <div id="doctorProfile" class="hidden flex items-center space-x-3">
-                    <button id="btnStats" onclick="window.openStatsModal()" title="Thống kê" aria-label="Thống kê" class="hidden w-10 h-10 bg-slate-100 hover:bg-teal-50 border border-slate-200 text-slate-700 text-sm rounded-full transition flex items-center justify-center">
-                        <i class="fa-solid fa-chart-pie text-teal-700" aria-hidden="true"></i>
-                    </button>
-                    <button id="btnUserMgmt" onclick="window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-10 h-10 bg-slate-100 hover:bg-amber-50 border border-slate-200 text-slate-700 text-sm rounded-full transition flex items-center justify-center">
-                        <i class="fa-solid fa-users-gear text-amber-600" aria-hidden="true"></i>
-                    </button>
-                    <div class="relative inline-flex shrink-0">
-                        <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Ảnh đại diện" class="w-10 h-10 rounded-full border-2 border-emerald-500 object-cover shadow-sm">
-                        <span id="docAdminCrown" class="hidden absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-amber-400 text-amber-950 border-2 border-white items-center justify-center text-[9px] shadow" title="Admin" aria-label="Admin">
-                            <i class="fa-solid fa-crown" aria-hidden="true"></i>
-                        </span>
-                    </div>
-                    <button onclick="window.logoutGoogle()" title="Đăng xuất" class="text-slate-500 hover:text-rose-700 text-xs bg-slate-100 hover:bg-rose-50 p-2.5 rounded-full transition">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </button>
-                </div>
             </div>
         </div>
     </header>
@@ -231,16 +221,53 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center text-center">
             <div class="flex items-center space-x-3">
                 <div>
-                    <p class="font-bold text-slate-900 text-sm">Bản quyền thuộc về - <span class="text-teal-800">Thạch Xuân Tựu</span> - Khoa Ung Bướu</p>
+                    <p class="font-normal text-slate-500 text-xs">Bản quyền thuộc về - <span class="font-extrabold text-teal-700 text-sm tracking-wide">Thạch Xuân Tựu</span> - Khoa Ung Bướu</p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <button id="themeToggleButton" type="button" onclick="window.toggleTheme()" title="Bật giao diện tối" aria-label="Bật giao diện tối" aria-pressed="false" class="theme-toggle-floating inline-flex items-center shrink-0" role="switch">
-        <span class="theme-toggle-thumb"><i id="themeToggleIcon" class="fa-solid fa-sun" aria-hidden="true"></i></span>
-        <span class="sr-only">Đổi giao diện sáng/tối</span>
-    </button>
+    <div id="doctorProfile" class="hidden fixed bottom-5 left-5 z-[90] flex flex-row items-center gap-2">
+        <div class="relative inline-flex shrink-0">
+            <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Ảnh đại diện" class="w-9 h-9 rounded-full border-2 border-emerald-500 object-cover shadow-lg bg-white">
+            <span id="docAdminCrown" class="hidden absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-amber-400 text-amber-950 border-2 border-white items-center justify-center text-[9px] shadow" title="Admin" aria-label="Admin">
+                <i class="fa-solid fa-crown" aria-hidden="true"></i>
+            </span>
+        </div>
+        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-700 shadow-lg flex items-center justify-center transition">
+            <i class="fa-solid fa-users-gear text-sm" aria-hidden="true"></i>
+        </button>
+        <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-teal-800 text-slate-200 hover:text-white border border-slate-600 shadow-lg flex items-center justify-center transition">
+            <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        </button>
+        <section id="accountSettingsMenu" class="hidden absolute left-0 bottom-[calc(100%+0.75rem)] w-80 max-w-[calc(100vw-2.5rem)] max-h-[78vh] overflow-y-auto custom-scrollbar bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 space-y-3 text-xs">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
+                <img id="settingsAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="" class="w-10 h-10 rounded-full object-cover border border-slate-200">
+                <div class="min-w-0">
+                    <p id="settingsAccountName" class="font-bold text-slate-800 truncate">Tài khoản bác sĩ</p>
+                    <p id="settingsAccountEmail" class="text-slate-500 truncate"></p>
+                </div>
+            </div>
+            <div class="space-y-1.5">
+                <label for="professionalTitleInput" class="block font-semibold text-slate-700">Chức danh hiển thị trong lịch sử hóa trị</label>
+                <input id="professionalTitleInput" type="text" maxlength="100" placeholder="Ví dụ: BS CK.I Nguyễn Văn A" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium">
+                <button type="button" onclick="window.saveProfessionalTitle()" class="w-full px-3 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold transition">Lưu chức danh</button>
+            </div>
+            <div class="flex items-center justify-between gap-3 py-2 border-y border-slate-200">
+                <span class="font-semibold text-slate-700">Giao diện sáng / tối</span>
+                <button id="themeToggleButton" type="button" onclick="window.toggleTheme()" title="Bật giao diện tối" aria-label="Bật giao diện tối" aria-pressed="false" class="inline-flex items-center shrink-0" role="switch">
+                    <span class="theme-toggle-thumb"><i id="themeToggleIcon" class="fa-solid fa-sun" aria-hidden="true"></i></span>
+                    <span class="sr-only">Đổi giao diện sáng/tối</span>
+                </button>
+            </div>
+            <button id="btnStats" type="button" onclick="window.closeAccountSettingsMenu(); window.openStatsModal()" class="hidden w-full px-3 py-2.5 rounded-lg bg-slate-50 hover:bg-teal-50 border border-slate-200 text-slate-700 font-semibold text-left transition flex items-center gap-2">
+                Thống kê
+            </button>
+            <button type="button" onclick="window.logoutGoogle()" class="w-full px-3 py-2.5 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-semibold text-left transition flex items-center gap-2">
+                Đăng xuất
+            </button>
+        </section>
+    </div>
 
     <!-- ========================================== -->
     <!-- MODUN 4: MODAL THÊM / SỬA HỒ SƠ BỆNH NHÂN & CHU KỲ -->
@@ -665,15 +692,21 @@
 <!-- ========================================== -->
 <div id="statsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div id="statsModalContent" class="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
-        <div class="bg-teal-800 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
+        <div class="bg-teal-800 text-white p-4 px-6 flex items-center gap-4 sticky top-0 z-10">
+            <div class="flex items-center gap-2 shrink-0" aria-label="Điều khiển cửa sổ">
+                <button type="button" onclick="window.closeStatsModal()" title="Đóng" aria-label="Đóng cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
+                    <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                </button>
+                <button type="button" onclick="window.minimizeStatsModal()" title="Thu nhỏ" aria-label="Thu nhỏ cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#febc2e] border border-[#dea123] text-[#785000] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
+                    <i class="fa-solid fa-minus text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                </button>
+                <button type="button" id="statsMaximizeBtn" onclick="window.toggleStatsModalSize()" title="Phóng to" aria-label="Phóng to cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#28c840] border border-[#20a833] text-[#075d18] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
+                    <i class="fa-solid fa-up-right-and-down-left-from-center text-[6px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                </button>
+            </div>
             <h3 class="font-bold text-base flex items-center gap-2">
                 <i class="fa-solid fa-chart-pie text-teal-300"></i> THỐNG KÊ
             </h3>
-            <div class="flex items-center gap-1.5">
-                <button type="button" onclick="window.minimizeStatsModal()" title="Thu nhỏ" aria-label="Thu nhỏ" class="w-8 h-8 rounded-lg text-teal-200 hover:text-white hover:bg-teal-700 transition"><i class="fa-solid fa-window-minimize"></i></button>
-                <button type="button" id="statsMaximizeBtn" onclick="window.toggleStatsModalSize()" title="Phóng to" aria-label="Phóng to" class="w-8 h-8 rounded-lg text-teal-200 hover:text-white hover:bg-teal-700 transition"><i class="fa-solid fa-window-maximize"></i></button>
-                <button type="button" onclick="window.closeStatsModal()" title="Đóng" aria-label="Đóng" class="w-8 h-8 rounded-lg text-teal-200 hover:text-white hover:bg-rose-600 transition"><i class="fa-solid fa-xmark"></i></button>
-            </div>
         </div>
 
         <div class="p-6 space-y-5 text-xs">
@@ -859,6 +892,26 @@
             button.title = isDark ? 'Bật giao diện sáng' : 'Bật giao diện tối';
             icon.className = `fa-solid ${isDark ? 'fa-moon' : 'fa-sun'}`;
         };
+        window.toggleAccountSettingsMenu = function() {
+            const menu = document.getElementById('accountSettingsMenu');
+            const toggle = document.getElementById('accountSettingsToggle');
+            const willOpen = menu.classList.contains('hidden');
+            menu.classList.toggle('hidden', !willOpen);
+            toggle.setAttribute('aria-expanded', String(willOpen));
+        };
+        window.closeAccountSettingsMenu = function() {
+            const menu = document.getElementById('accountSettingsMenu');
+            const toggle = document.getElementById('accountSettingsToggle');
+            menu?.classList.add('hidden');
+            toggle?.setAttribute('aria-expanded', 'false');
+        };
+        document.addEventListener('click', (event) => {
+            const profile = document.getElementById('doctorProfile');
+            if (profile && !profile.contains(event.target)) window.closeAccountSettingsMenu();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') window.closeAccountSettingsMenu();
+        });
         window.canManageOncoCareUsers = false;
 
         (() => {
@@ -1503,7 +1556,7 @@
             content.classList.toggle('rounded-none', window.statsModalIsMaximized);
             button.title = window.statsModalIsMaximized ? 'Thu về cửa sổ' : 'Phóng to';
             button.setAttribute('aria-label', button.title);
-            button.innerHTML = `<i class="fa-solid ${window.statsModalIsMaximized ? 'fa-window-restore' : 'fa-window-maximize'}"></i>`;
+            button.innerHTML = `<i class="fa-solid ${window.statsModalIsMaximized ? 'fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center'} text-[6px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>`;
             setTimeout(() => window.statsPieChartInstance?.resize(), 0);
         };
     </script>
@@ -1562,6 +1615,7 @@
 
         let isSavingPatientForm = false;
         let currentUser = null;
+        let currentProfessionalTitle = '';
         let isAdmin = false;
         let isVip = false;
         let isApproved = false;
@@ -1577,6 +1631,10 @@
         window.statsPieChartInstance = null;
         window.currentViewingPatient = null;
 
+        function getCurrentEditorName() {
+            return currentProfessionalTitle || currentUser?.displayName || 'Bác sĩ';
+        }
+
         window.loginWithGoogle = async function() {
             try {
                 await signInWithPopup(auth, provider);
@@ -1589,6 +1647,26 @@
         window.logoutGoogle = async function() {
             await signOut(auth);
             location.reload();
+        };
+
+        window.saveProfessionalTitle = async function() {
+            if (!currentUser) return;
+            const input = document.getElementById('professionalTitleInput');
+            const title = input.value.trim();
+            if (title.length > 100) {
+                alert('Chức danh không được dài quá 100 ký tự.');
+                input.focus();
+                return;
+            }
+            try {
+                await updateDoc(doc(db, 'users', currentUser.uid), { professionalTitle: title });
+                currentProfessionalTitle = title;
+                document.getElementById('settingsAccountName').innerText = title || currentUser.displayName || 'Tài khoản bác sĩ';
+                window.showToast('Đã lưu chức danh hiển thị!');
+            } catch (err) {
+                console.error('Lỗi lưu chức danh:', err);
+                alert('Không thể lưu chức danh: ' + err.message);
+            }
         };
 
         onAuthStateChanged(auth, async (user) => {
@@ -1608,13 +1686,17 @@
 
                 const userDocRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userDocRef);
+                const savedUserData = userSnap.exists() ? userSnap.data() : {};
 
                 let userData = {
                     name: user.displayName || "Thành viên",
                     email: user.email,
-                    role: isAdmin ? "Admin" : (userSnap.exists() ? (userSnap.data().role || "Doctor") : "Doctor"),
-                    isApproved: isAdmin ? true : (userSnap.exists() ? (userSnap.data().isApproved || false) : false),
-                    isBlocked: userSnap.exists() ? (userSnap.data().isBlocked || false) : false,
+                    role: isAdmin ? "Admin" : (savedUserData.role || "Doctor"),
+                    isApproved: isAdmin ? true : (savedUserData.isApproved || false),
+                    isBlocked: savedUserData.isBlocked || false,
+                    professionalTitle: typeof savedUserData.professionalTitle === 'string'
+                        ? savedUserData.professionalTitle
+                        : (user.displayName || ""),
                     lastLogin: serverTimestamp()
                 };
 
@@ -1629,8 +1711,14 @@
                 signInBtn.classList.add('hidden');
                 docProfile.classList.remove('hidden');
                 const avatar = document.getElementById('docAvatar');
+                const settingsAvatar = document.getElementById('settingsAvatar');
                 const adminCrown = document.getElementById('docAdminCrown');
-                if (user.photoURL) avatar.src = user.photoURL;
+                currentProfessionalTitle = userData.professionalTitle;
+                document.getElementById('professionalTitleInput').value = currentProfessionalTitle;
+                document.getElementById('settingsAccountName').innerText = currentProfessionalTitle || user.displayName || 'Tài khoản bác sĩ';
+                document.getElementById('settingsAccountEmail').innerText = user.email || '';
+                avatar.src = user.photoURL || 'https://placehold.co/100x100/0d9488/ffffff?text=Doctor';
+                settingsAvatar.src = avatar.src;
                 avatar.classList.toggle('border-amber-400', isVip);
                 avatar.classList.toggle('border-emerald-500', !isVip);
                 adminCrown.classList.toggle('hidden', !isAdmin);
@@ -1649,6 +1737,7 @@
 
             } else {
                 currentUser = null;
+                currentProfessionalTitle = '';
                 isAdmin = false;
                 isVip = false;
                 isApproved = false;
@@ -1657,6 +1746,10 @@
                 window.canManageOncoCareUsers = false;
                 signInBtn.classList.remove('hidden');
                 docProfile.classList.add('hidden');
+                window.closeAccountSettingsMenu();
+                document.getElementById('professionalTitleInput').value = '';
+                document.getElementById('settingsAccountName').innerText = 'Tài khoản bác sĩ';
+                document.getElementById('settingsAccountEmail').innerText = '';
                 btnStats.classList.add('hidden');
                 btnUserMgmt.classList.add('hidden');
                 searchInput.disabled = true;
@@ -1935,7 +2028,7 @@
                 drugNames: drugNames,
                 doseInput: doseInput,
                 note: note,
-                updatedBy: currentUser ? (currentUser.displayName || currentUser.email) : "Thạch Xuân Tựu"
+                updatedBy: getCurrentEditorName()
             };
 
             if (existingIndex !== -1) {
@@ -1974,7 +2067,7 @@
                 drugNames: document.getElementById('npDrugNamesInput').value,
                 doseInput: document.getElementById('npDoseInput').value,
                 note: document.getElementById('npCycleNote').value,
-                updatedBy: currentUser ? (currentUser.displayName || currentUser.email) : "Thạch Xuân Tựu"
+                updatedBy: getCurrentEditorName()
             }];
             window.renderTempCyclesList();
         };
@@ -2278,7 +2371,7 @@
                     drugNames: drugNames,
                     doseInput: doseInput,
                     note: note,
-                    updatedBy: currentUser ? (currentUser.displayName || currentUser.email) : "Thạch Xuân Tựu"
+                    updatedBy: getCurrentEditorName()
                 };
                 window.renderTempCyclesList();
                 const continueProtocolRadio = document.querySelector('input[name="protocolMode"][value="continue"]');
@@ -2312,7 +2405,7 @@
                     drugNames: document.getElementById('npDrugNamesInput').value,
                     doseInput: document.getElementById('npDoseInput').value,
                     note: document.getElementById('npCycleNote').value,
-                    updatedBy: currentUser ? (currentUser.displayName || currentUser.email) : "Thạch Xuân Tựu"
+                    updatedBy: getCurrentEditorName()
                 };
 
                 const existingCycleIndex = window.tempCurrentCycles.findIndex(
