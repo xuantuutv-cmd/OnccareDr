@@ -1135,9 +1135,16 @@
                 const formulaList = pInfo.formula;
                 let doseCalculatedStr = [];
 
+                if (pInfo.is14Days) {
+                    const drugsForWeek = weekVal === "Tuần 2"
+                        ? formulaList.filter(item => item.drug.toLowerCase() === "capecitabine")
+                        : formulaList;
+                    document.getElementById('npDrugNamesInput').value = drugsForWeek.map(item => item.drug).join(", ");
+                }
+
                 formulaList.forEach(item => {
-                    // Oxaliplatin is administered only in week 1 of 14-day protocols.
-                    if (item.drug.toLowerCase() === "oxaliplatin" && weekVal === "Tuần 2") return;
+                    // Oxaliplatin and irinotecan are administered only in week 1.
+                    if (["oxaliplatin", "irinotecan"].includes(item.drug.toLowerCase()) && weekVal === "Tuần 2") return;
 
                     let totalDose = 0;
                     if (item.unit === "mg/kg") {
