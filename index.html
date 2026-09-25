@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: #f8f9fc; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -35,24 +35,24 @@
     <!-- ========================================== -->
     <!-- MODUN 2: THANH ĐIỀU HƯỚNG HEADER & XÁC THỰC -->
     <!-- ========================================== -->
-    <header class="bg-gradient-to-r from-teal-900 to-teal-800 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+    <header class="bg-white/90 backdrop-blur-xl text-slate-800 border-b border-slate-200/80 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-                <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center border border-amber-300/40 shadow-inner">
-                    <i class="fa-solid fa-leaf text-amber-300 text-2xl"></i>
+                <div class="w-11 h-11 bg-teal-50 rounded-2xl flex items-center justify-center border border-teal-100">
+                    <i class="fa-solid fa-leaf text-teal-700 text-xl"></i>
                 </div>
                 <div class="flex flex-col justify-center">
-                    <h1 class="font-extrabold text-2xl sm:text-3xl tracking-tight leading-none text-white drop-shadow-sm">
+                    <h1 class="font-bold text-xl sm:text-2xl tracking-tight leading-none text-slate-800">
                         OncoCare Pro
                     </h1>
-                    <p class="mt-1 text-[11px] sm:text-xs font-semibold tracking-wide text-amber-300">
+                    <p class="mt-1 text-[11px] sm:text-xs font-medium tracking-wide text-teal-700">
                         Đồng hành - vươn tới
                     </p>
                 </div>
             </div>
 
             <div id="authHeaderSection" class="flex items-center space-x-3">
-                <button id="googleSignInBtn" onclick="window.loginWithGoogle()" class="bg-white hover:bg-teal-50 text-teal-800 font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-2 border border-teal-100">
+                <button id="googleSignInBtn" onclick="window.loginWithGoogle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm px-3.5 py-2.5 rounded-full transition flex items-center space-x-2 border border-slate-200">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -63,12 +63,12 @@
                 </button>
 
                 <div id="doctorProfile" class="hidden flex items-center space-x-3">
-                    <button id="btnStats" onclick="window.openStatsModal()" class="bg-teal-800/80 hover:bg-teal-900 border border-teal-400/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-pie text-teal-300"></i>
+                    <button id="btnStats" onclick="window.openStatsModal()" class="bg-slate-100 hover:bg-teal-50 border border-slate-200 text-slate-700 font-medium text-xs px-3 py-2 rounded-full transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-pie text-teal-700"></i>
                         <span class="hidden md:inline">Thống Kê</span>
                     </button>
-                    <button id="btnUserMgmt" onclick="window.openUserManagementModal()" class="hidden bg-teal-900/50 hover:bg-teal-900/80 border border-teal-500/30 text-teal-100 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-users-gear text-amber-300"></i>
+                    <button id="btnUserMgmt" onclick="window.openUserManagementModal()" class="hidden bg-slate-100 hover:bg-amber-50 border border-slate-200 text-slate-700 font-medium text-xs px-3 py-2 rounded-full transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-users-gear text-amber-600"></i>
                         <span class="hidden md:inline">Quản Lý Thành Viên</span>
                     </button>
                     <div class="text-right hidden sm:block">
@@ -76,7 +76,7 @@
                         <p id="docLevelTag" class="text-[10px] font-bold text-blue-300 uppercase">User</p>
                     </div>
                     <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Doctor" class="w-9 h-9 rounded-full border-2 border-teal-300 object-cover shadow-sm">
-                    <button onclick="window.logoutGoogle()" title="Đăng xuất" class="text-teal-200 hover:text-white text-xs bg-teal-900/40 hover:bg-teal-900/60 p-2 rounded-lg transition">
+                    <button onclick="window.logoutGoogle()" title="Đăng xuất" class="text-slate-500 hover:text-rose-700 text-xs bg-slate-100 hover:bg-rose-50 p-2.5 rounded-full transition">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
@@ -87,35 +87,43 @@
     <!-- ========================================== -->
     <!-- MODUN 3: GIAO DIỆN CHÍNH & TRA CỨU BỆNH NHÂN -->
     <!-- ========================================== -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 flex-1 w-full space-y-7">
 
-        <div id="accountStatusNotice" class="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 flex items-start space-x-3 text-amber-900 text-xs shadow-sm">
-            <i class="fa-solid fa-shield-halved text-amber-600 text-lg mt-0.5"></i>
+        <div class="text-center space-y-2 pb-1">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-50 text-teal-800 text-[11px] font-semibold border border-teal-100">
+                <i class="fa-solid fa-leaf text-teal-600"></i> OncoCare Pro
+            </div>
+            <h2 class="text-2xl sm:text-4xl font-semibold tracking-tight text-slate-800">Tra cứu hồ sơ bệnh nhân</h2>
+            <p class="text-sm text-slate-500">Đồng hành - vươn tới trong chăm sóc và theo dõi điều trị</p>
+        </div>
+
+        <div id="accountStatusNotice" class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start space-x-3 text-slate-700 text-xs shadow-sm">
+            <i class="fa-solid fa-shield-halved text-teal-700 text-lg mt-0.5"></i>
             <div>
                 <p class="font-bold">Chế Độ Bảo Mật Thông Tin Bệnh Nhân (HIPAA/Bảo Mật Y Tế)</p>
-                <p id="noticeSubText" class="text-amber-700/90 mt-0.5">Danh sách bệnh nhân ẩn hoàn toàn khỏi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
+                <p id="noticeSubText" class="text-slate-500 mt-0.5">Danh sách bệnh nhân ẩn hoàn toàn khỏi màn hình chính. Vui lòng đăng nhập và chờ Admin phê duyệt tài khoản để tra cứu.</p>
             </div>
         </div>
 
-        <section class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <section class="bg-white p-5 sm:p-7 rounded-[2rem] shadow-[0_8px_35px_rgba(15,23,42,0.06)] border border-slate-200/80 space-y-4">
             <form onsubmit="window.searchPatientByCode(event)" class="flex flex-col sm:flex-row items-center gap-3">
                 <div class="relative flex-1 w-full">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-key text-slate-400"></i>
                     </div>
-                    <input type="text" id="searchInput" placeholder="Nhập chính xác Mã BN 8 chữ số (VD: 24001234...)" maxlength="8" class="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold tracking-wide transition">
+                    <input type="text" id="searchInput" placeholder="Nhập chính xác Mã BN 8 chữ số (VD: 24001234...)" maxlength="8" class="w-full pl-10 pr-10 py-4 bg-slate-50/80 border border-slate-200/80 text-slate-900 text-sm rounded-full focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 font-semibold tracking-wide transition">
                     <button type="button" onclick="window.clearSearchResult()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                         <i class="fa-solid fa-circle-xmark text-sm"></i>
                     </button>
                 </div>
 
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
-                    <button type="submit" class="flex-1 sm:flex-none bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm px-6 py-3.5 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
+                    <button type="submit" class="flex-1 sm:flex-none bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm px-6 py-4 rounded-full shadow-sm transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <span>Tra Cứu Mã BN</span>
                     </button>
                     
-                    <button type="button" id="btnAddPatient" onclick="window.openNewPatientModal()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm px-4 py-3.5 rounded-xl shadow-sm transition flex items-center space-x-2">
+                    <button type="button" id="btnAddPatient" onclick="window.openNewPatientModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm px-4 py-4 rounded-full transition flex items-center space-x-2 border border-slate-200">
                         <i class="fa-solid fa-user-plus"></i>
                         <span class="hidden sm:inline">Thêm BN Mới</span>
                     </button>
@@ -123,7 +131,7 @@
             </form>
         </section>
 
-        <section id="patientListSection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+        <section id="patientListSection" class="bg-white rounded-[2rem] shadow-[0_8px_35px_rgba(15,23,42,0.05)] border border-slate-200/80 p-5 sm:p-7 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-square-poll-vertical text-teal-600"></i>
@@ -132,9 +140,9 @@
                 <span id="patientCountBadge" class="bg-slate-100 text-slate-600 text-xs px-2.5 py-0.5 rounded-full font-bold">Chưa chọn tra cứu</span>
             </div>
 
-            <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <div class="overflow-x-auto rounded-2xl border border-slate-200/80">
                 <table class="w-full text-left text-xs text-slate-700">
-                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
                         <tr>
                             <th class="p-3">Mã BN</th>
                             <th class="p-3">Họ và Tên</th>
@@ -160,7 +168,7 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-slate-600 text-xs">
+    <footer class="bg-transparent border-t border-slate-200/80 py-6 mt-12 text-slate-500 text-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
                 <div>
@@ -745,9 +753,9 @@
             </div>
 
             <div class="p-6 space-y-4 text-xs">
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <div class="overflow-x-auto rounded-2xl border border-slate-200/80">
                     <table class="w-full text-left text-xs text-slate-700">
-                        <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
                             <tr>
                                 <th class="p-3">Thành Viên</th>
                                 <th class="p-3">Email</th>
