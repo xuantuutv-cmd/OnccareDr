@@ -596,12 +596,16 @@
 <!-- MODUN 6: MODAL THỐNG KÊ (ĐÃ CẬP NHẬT) -->
 <!-- ========================================== -->
 <div id="statsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
+    <div id="statsModalContent" class="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
         <div class="bg-teal-800 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
             <h3 class="font-bold text-base flex items-center gap-2">
-                <i class="fa-solid fa-chart-pie text-teal-300"></i> THỐNG KÊ TOÀN BỘ BỆNH NHÂN THEO THỜI GIAN THỰC
+                <i class="fa-solid fa-chart-pie text-teal-300"></i> THỐNG KÊ
             </h3>
-            <button onclick="window.closeStatsModal()" class="text-teal-200 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex items-center gap-1.5">
+                <button type="button" onclick="window.minimizeStatsModal()" title="Thu nhỏ" aria-label="Thu nhỏ" class="w-8 h-8 rounded-lg text-teal-200 hover:text-white hover:bg-teal-700 transition"><i class="fa-solid fa-window-minimize"></i></button>
+                <button type="button" id="statsMaximizeBtn" onclick="window.toggleStatsModalSize()" title="Phóng to" aria-label="Phóng to" class="w-8 h-8 rounded-lg text-teal-200 hover:text-white hover:bg-teal-700 transition"><i class="fa-solid fa-window-maximize"></i></button>
+                <button type="button" onclick="window.closeStatsModal()" title="Đóng" aria-label="Đóng" class="w-8 h-8 rounded-lg text-teal-200 hover:text-white hover:bg-rose-600 transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
         </div>
 
         <div class="p-6 space-y-5 text-xs">
@@ -721,6 +725,10 @@
         </div>
     </div>
 </div>
+
+<button id="statsMinimizedRestore" type="button" onclick="window.restoreStatsModal()" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[80] px-4 py-2.5 rounded-xl bg-teal-800 hover:bg-teal-900 text-white text-xs font-bold shadow-2xl border border-teal-600 items-center gap-2">
+    <i class="fa-solid fa-chart-pie text-teal-300"></i> THỐNG KÊ <i class="fa-solid fa-up-right-and-down-left-from-center text-[10px]"></i>
+</button>
 
     <!-- ========================================== -->
     <!-- MODUN 7: MODAL QUẢN LÝ THÀNH VIÊN -->
@@ -1292,12 +1300,15 @@
             document.getElementById('userManagementModal').classList.add('hidden');
         };
 
+        window.statsModalIsMaximized = false;
         window.openStatsModal = function() {
             const now = new Date();
             const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
             const today = now.toISOString().split('T')[0];
             document.getElementById('statsStartDate').value = firstDay;
             document.getElementById('statsEndDate').value = today;
+            document.getElementById('statsMinimizedRestore').classList.add('hidden');
+            document.getElementById('statsMinimizedRestore').classList.remove('flex');
             document.getElementById('statsModal').classList.remove('hidden');
             window.switchStatsTab('overview');
             window.runChemoStatistics();
@@ -1322,6 +1333,43 @@
 
         window.closeStatsModal = function() {
             document.getElementById('statsModal').classList.add('hidden');
+            document.getElementById('statsMinimizedRestore').classList.add('hidden');
+            document.getElementById('statsMinimizedRestore').classList.remove('flex');
+            if (window.statsModalIsMaximized) window.toggleStatsModalSize();
+        };
+
+        window.minimizeStatsModal = function() {
+            document.getElementById('statsModal').classList.add('hidden');
+            const restoreButton = document.getElementById('statsMinimizedRestore');
+            restoreButton.classList.remove('hidden');
+            restoreButton.classList.add('flex');
+        };
+
+        window.restoreStatsModal = function() {
+            document.getElementById('statsMinimizedRestore').classList.add('hidden');
+            document.getElementById('statsMinimizedRestore').classList.remove('flex');
+            document.getElementById('statsModal').classList.remove('hidden');
+            setTimeout(() => window.statsPieChartInstance?.resize(), 0);
+        };
+
+        window.toggleStatsModalSize = function() {
+            const modal = document.getElementById('statsModal');
+            const content = document.getElementById('statsModalContent');
+            const button = document.getElementById('statsMaximizeBtn');
+            window.statsModalIsMaximized = !window.statsModalIsMaximized;
+            modal.classList.toggle('p-4', !window.statsModalIsMaximized);
+            modal.classList.toggle('p-0', window.statsModalIsMaximized);
+            content.classList.toggle('max-w-6xl', !window.statsModalIsMaximized);
+            content.classList.toggle('max-w-none', window.statsModalIsMaximized);
+            content.classList.toggle('max-h-[90vh]', !window.statsModalIsMaximized);
+            content.classList.toggle('max-h-none', window.statsModalIsMaximized);
+            content.classList.toggle('h-full', window.statsModalIsMaximized);
+            content.classList.toggle('rounded-2xl', !window.statsModalIsMaximized);
+            content.classList.toggle('rounded-none', window.statsModalIsMaximized);
+            button.title = window.statsModalIsMaximized ? 'Thu về cửa sổ' : 'Phóng to';
+            button.setAttribute('aria-label', button.title);
+            button.innerHTML = `<i class="fa-solid ${window.statsModalIsMaximized ? 'fa-window-restore' : 'fa-window-maximize'}"></i>`;
+            setTimeout(() => window.statsPieChartInstance?.resize(), 0);
         };
     </script>
 
