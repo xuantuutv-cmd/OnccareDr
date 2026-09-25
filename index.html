@@ -208,14 +208,14 @@
                         </div>
 
                         <div id="adminInputFields" class="space-y-3">
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,2.2fr)] gap-3">
                                 <div>
                                     <label class="block text-slate-500 font-semibold mb-1">Mã BN (8 ký tự):</label>
-                                    <input type="text" id="npId" maxlength="8" placeholder="VD: 24001234" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                    <input type="text" id="npId" maxlength="8" class="w-full max-w-36 p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
                                 </div>
                                 <div>
                                     <label class="block text-slate-500 font-semibold mb-1">Họ và tên BN:</label>
-                                    <input type="text" id="npName" placeholder="VD: Nguyễn Văn A" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                    <input type="text" id="npName" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
                                 </div>
                             </div>
 
@@ -230,7 +230,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-slate-500 font-semibold mb-1">Năm sinh:</label>
-                                    <input type="number" id="npBirthYear" min="1900" max="2026" placeholder="VD: 1980" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                    <input type="number" id="npBirthYear" min="1900" max="2026" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-teal-500" required>
                                 </div>
                             </div>
                         </div>
@@ -249,11 +249,11 @@
                         <div class="grid grid-cols-3 gap-2 bg-teal-50/50 p-2.5 rounded-lg border border-teal-100">
                             <div>
                                 <label class="block text-slate-600 font-semibold text-[10px]">Cao (cm):</label>
-                                <input type="number" id="npHeight" oninput="window.calculateBSAandDoses()" placeholder="160" class="w-full p-1.5 bg-white border border-slate-200 rounded text-center font-bold text-slate-800 focus:outline-none">
+                                <input type="number" id="npHeight" oninput="window.calculateBSAandDoses()" class="w-full p-1.5 bg-white border border-slate-200 rounded text-center font-bold text-slate-800 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-slate-600 font-semibold text-[10px]">Nặng (kg):</label>
-                                <input type="number" id="npWeight" oninput="window.calculateBSAandDoses()" placeholder="55" class="w-full p-1.5 bg-white border border-slate-200 rounded text-center font-bold text-slate-800 focus:outline-none">
+                                <input type="number" id="npWeight" oninput="window.calculateBSAandDoses()" class="w-full p-1.5 bg-white border border-slate-200 rounded text-center font-bold text-slate-800 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-teal-800 font-semibold text-[10px]">BSA (m²):</label>
@@ -273,7 +273,7 @@
                             <i class="fa-solid fa-file-medical text-teal-700"></i> ICD CHÍNH & CHẨN ĐOÁN CHÍNH
                         </h4>
                         <div class="relative">
-                            <input type="text" id="npDiagnosis" placeholder="Nhập mã ICD hoặc tên bệnh chính..." autocomplete="off" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium">
+                            <input type="text" id="npDiagnosis" autocomplete="off" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium">
                             <div id="icdDropdownMain" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
                         </div>
                     </div>
@@ -284,12 +284,9 @@
                             <span class="flex items-center gap-1.5"><i class="fa-solid fa-notes-medical text-amber-700"></i> MÃ ICD PHỤ & CHẨN ĐOÁN PHỤ</span>
                         </h4>
                         
-                        <div class="relative flex gap-2">
-                            <input type="text" id="npSubDiagnosisInput" placeholder="Nhập mã ICD hoặc tên chẩn đoán phụ..." autocomplete="off" class="flex-1 p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium">
-                            <button type="button" onclick="window.addSubDiagnosisItem()" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg shrink-0 flex items-center gap-1">
-                                <i class="fa-solid fa-plus"></i> Thêm
-                            </button>
-                            <div id="icdDropdownSub" class="absolute left-0 right-16 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
+                        <div class="relative">
+                            <input type="text" id="npSubDiagnosisInput" autocomplete="off" class="w-full p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium">
+                            <div id="icdDropdownSub" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
                         </div>
 
                         <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
@@ -319,6 +316,7 @@
                             <div>
                                 <label class="block font-semibold text-slate-700 mb-1">Loại Marker:</label>
                                 <select id="npMarkerType" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-semibold text-indigo-900 focus:outline-none">
+                                    <option value="">-- Chọn marker --</option>
                                     <option value="CEA">CEA</option>
                                     <option value="CA 19-9">CA 19-9</option>
                                     <option value="CA 72-4">CA 72-4</option>
@@ -329,16 +327,13 @@
                             </div>
                             <div>
                                 <label class="block font-semibold text-slate-700 mb-1">Giá trị:</label>
-                                <input type="number" step="0.01" id="npMarkerValue" placeholder="VD: 5.4" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-indigo-900 focus:outline-none">
+                                <input type="number" step="0.01" id="npMarkerValue" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-indigo-900 focus:outline-none">
                             </div>
                         </div>
                         <div>
                             <label class="block font-semibold text-slate-700 mb-1">Ngày xét nghiệm:</label>
                             <input type="date" id="npMarkerDate" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium">
                         </div>
-                        <button type="button" onclick="window.addNewMarkerFromForm()" class="w-full py-2 px-3 bg-indigo-700 hover:bg-indigo-800 text-white font-semibold rounded-lg shadow-sm transition text-[11px] flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-plus"></i> Thêm Chỉ Số Marker
-                        </button>
                     </div>
 
                     <!-- MỤC THÔNG TIN ĐIỀU TRỊ & QUẢN LÝ CHU KỲ -->
@@ -405,13 +400,13 @@
 
                             <div id="customProtocolInputContainer" class="hidden space-y-1">
                                 <label class="block font-bold text-indigo-900 text-[10px]">Nhập Tên Phác Đồ Tự Chỉnh:</label>
-                                <input type="text" id="customProtocolNameInput" oninput="window.onCustomProtocolNameInput()" placeholder="VD: Gemcitabine + Cisplatin..." class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-900 focus:outline-none">
+                                <input type="text" id="customProtocolNameInput" oninput="window.onCustomProtocolNameInput()" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-900 focus:outline-none">
                             </div>
 
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block font-semibold text-slate-700 mb-1">Chu kỳ thứ:</label>
-                                    <input type="number" id="npCycleNumber" min="1" value="1" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 text-center focus:outline-none">
+                                    <input type="number" id="npCycleNumber" min="1" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 text-center focus:outline-none">
                                 </div>
                                 <div>
                                     <label class="block font-semibold text-slate-700 mb-1">Ngày thực hiện:</label>
@@ -421,17 +416,17 @@
 
                             <div>
                                 <label class="block font-semibold text-slate-700 mb-1">Thuốc hóa trị:</label>
-                                <input type="text" id="npDrugNamesInput" placeholder="VD: Doxorubicin, Cyclophosphamide" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium text-teal-900">
+                                <input type="text" id="npDrugNamesInput" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium text-teal-900">
                             </div>
 
                             <div>
                                 <label class="block font-semibold text-slate-700 mb-1">Liều dùng (Tự tính theo BSA/Cân nặng):</label>
-                                <input type="text" id="npDoseInput" placeholder="VD: 60mg/m2 (Tự tính: 90mg)" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium">
+                                <input type="text" id="npDoseInput" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium">
                             </div>
 
                             <div>
                                 <label class="block font-semibold text-slate-700 mb-1">Tác dụng phụ / Ghi chú:</label>
-                                <input type="text" id="npCycleNote" placeholder="VD: Buồn nôn nhẹ, dung nạp tốt..." class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                                <input type="text" id="npCycleNote" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
                             </div>
 
                             <div class="pt-2 flex items-center justify-between gap-2">
@@ -844,6 +839,7 @@
                         div.addEventListener('click', () => {
                             input.value = `${m.code}: ${m.desc}`;
                             dropdown.classList.add('hidden');
+                            if (inputId === 'npSubDiagnosisInput') window.addSubDiagnosisItem();
                         });
                         dropdown.appendChild(div);
                     });
@@ -851,6 +847,14 @@
                 } else {
                     dropdown.classList.add('hidden');
                 }
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                const firstSuggestion = dropdown.querySelector('.item-suggestion');
+                if (firstSuggestion && !dropdown.classList.contains('hidden')) firstSuggestion.click();
+                else if (inputId === 'npSubDiagnosisInput') window.addSubDiagnosisItem();
             });
         }
 
@@ -1040,13 +1044,18 @@
         window.openNewPatientModal = function() {
             document.getElementById('editDocId').value = "";
             window.resetFormToAddNewMode();
+            document.getElementById('npMarkerValue').onkeydown = (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    window.addNewMarkerFromForm();
+                }
+            };
             document.getElementById('patientInputPanel').classList.remove('lg:col-span-5'); document.getElementById('patientInputPanel').classList.add('lg:col-span-12'); document.getElementById('patientHistoryPanel').classList.add('hidden'); document.getElementById('btnAddCycleBtn').classList.add('hidden'); document.getElementById('saveBtn').classList.remove('hidden'); document.getElementById('saveBtnText').innerText = "Lưu thông tin"; document.getElementById('dispModalDoc').innerText = "Thạch Xuân Tựu";
             
             document.getElementById('adminInputFields').classList.remove('hidden');
             document.getElementById('nonAdminTextDisplay').classList.add('hidden');
 
-            let autoCode = "24" + Math.floor(100000 + Math.random() * 900000);
-            document.getElementById('npId').value = autoCode;
+            document.getElementById('npId').value = "";
             document.getElementById('npName').value = "";
             document.getElementById('npGender').value = "";
             document.getElementById('npBirthYear').value = "";
@@ -1066,8 +1075,10 @@
             document.getElementById('npWeight').value = "";
             document.getElementById('npBsaDisplay').innerText = "--";
 
-            document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+            document.getElementById('npCycleDate').value = localDate;
+            document.getElementById('npMarkerDate').value = localDate;
             document.getElementById('npCycleNumber').value = "1";
             document.getElementById('npDrugNamesInput').value = "";
             document.getElementById('npDoseInput').value = "";
@@ -1571,8 +1582,10 @@
             
             window.toggleProtocolMode();
 
-            document.getElementById('npCycleDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('npMarkerDate').value = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+            document.getElementById('npCycleDate').value = localDate;
+            document.getElementById('npMarkerDate').value = localDate;
             
             let lastCycleNum = 0;
             if (p.cycles && p.cycles.length > 0) {
@@ -1649,6 +1662,10 @@
             const val = document.getElementById('npMarkerValue').value;
             const date = document.getElementById('npMarkerDate').value;
 
+            if (!type) {
+                alert("Vui lòng chọn loại marker!");
+                return;
+            }
             if (!val || parseFloat(val) < 0) {
                 alert("Vui lòng nhập giá trị marker hợp lệ!");
                 return;
@@ -2083,3 +2100,4 @@
     </script>
 </body>
 </html>
+
