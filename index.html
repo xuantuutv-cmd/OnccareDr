@@ -1876,6 +1876,41 @@
                 window.showToast("Đã cập nhật chu kỳ thành công!");
             }
 
+            // Hồ sơ mới không có nút thêm chu kỳ riêng; khi lưu, đưa phác đồ
+            // và thông tin chu kỳ hiện tại vào danh sách lịch sử trước khi ghi hồ sơ.
+            if (!docId && protocolVal) {
+                const cycleDate = document.getElementById('npCycleDate').value;
+                if (!cycleDate) {
+                    alert("Vui lòng chọn ngày chu kỳ!");
+                    return;
+                }
+
+                const cycleNum = parseInt(document.getElementById('npCycleNumber').value) || 1;
+                const is14Days = chemoProtocolsData[protocolKeyVal]?.is14Days;
+                const cycleEntry = {
+                    branchName: `Chu kỳ ${cycleNum}`,
+                    cycleNum,
+                    week: is14Days ? document.getElementById('npProtocolWeek').value : "",
+                    date: cycleDate,
+                    protocolUsed: protocolVal,
+                    isChangedProtocol: false,
+                    drugNames: document.getElementById('npDrugNamesInput').value,
+                    doseInput: document.getElementById('npDoseInput').value,
+                    note: document.getElementById('npCycleNote').value,
+                    updatedBy: currentUser ? (currentUser.displayName || currentUser.email) : "Thạch Xuân Tựu"
+                };
+
+                const existingCycleIndex = window.tempCurrentCycles.findIndex(
+                    cycle => cycle.date === cycleDate && Number(cycle.cycleNum) === cycleNum
+                );
+                if (existingCycleIndex >= 0) {
+                    window.tempCurrentCycles[existingCycleIndex] = cycleEntry;
+                } else {
+                    window.tempCurrentCycles.push(cycleEntry);
+                }
+                window.renderTempCyclesList();
+            }
+
             const payload = {
                 patientId: patientIdVal,
                 name: nameVal,
@@ -2100,4 +2135,3 @@
     </script>
 </body>
 </html>
-
