@@ -38,16 +38,13 @@
     <header class="bg-white/90 backdrop-blur-xl text-slate-800 border-b border-slate-200/80 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-                <div class="w-11 h-11 bg-teal-50 rounded-2xl flex items-center justify-center border border-teal-100">
-                    <i class="fa-solid fa-leaf text-teal-700 text-xl"></i>
+                <div class="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center border border-teal-100">
+                    <i class="fa-solid fa-leaf text-teal-700 text-3xl"></i>
                 </div>
                 <div class="flex flex-col justify-center">
                     <h1 class="font-bold text-xl sm:text-2xl tracking-tight leading-none text-slate-800">
                         OncoCare Pro
                     </h1>
-                    <p class="mt-1 text-[11px] sm:text-xs font-medium tracking-wide text-teal-700">
-                        Đồng hành - vươn tới
-                    </p>
                 </div>
             </div>
 
@@ -89,12 +86,8 @@
     <!-- ========================================== -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 flex-1 w-full space-y-7">
 
-        <div class="text-center space-y-2 pb-1">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-50 text-teal-800 text-[11px] font-semibold border border-teal-100">
-                <i class="fa-solid fa-leaf text-teal-600"></i> OncoCare Pro
-            </div>
-            <h2 class="text-2xl sm:text-4xl font-semibold tracking-tight text-slate-800">Tra cứu hồ sơ bệnh nhân</h2>
-            <p class="text-sm text-slate-500">Đồng hành - vươn tới trong chăm sóc và theo dõi điều trị</p>
+        <div class="text-center pb-1">
+            <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-800">Tra cứu hồ sơ bệnh nhân</h2>
         </div>
 
         <div id="accountStatusNotice" class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start space-x-3 text-slate-700 text-xs shadow-sm">
@@ -108,24 +101,21 @@
         <section class="bg-white p-5 sm:p-7 rounded-[2rem] shadow-[0_8px_35px_rgba(15,23,42,0.06)] border border-slate-200/80 space-y-4">
             <form onsubmit="window.searchPatientByCode(event)" class="flex flex-col sm:flex-row items-center gap-3">
                 <div class="relative flex-1 w-full">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-key text-slate-400"></i>
-                    </div>
-                    <input type="text" id="searchInput" placeholder="Nhập chính xác Mã BN 8 chữ số (VD: 24001234...)" maxlength="8" class="w-full pl-10 pr-10 py-4 bg-slate-50/80 border border-slate-200/80 text-slate-900 text-sm rounded-full focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 font-semibold tracking-wide transition">
-                    <button type="button" onclick="window.clearSearchResult()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                    <input type="text" id="searchInput" aria-label="Mã bệnh nhân" maxlength="8" inputmode="numeric" class="w-full px-5 py-4 bg-slate-50/80 border border-slate-200/80 text-slate-900 text-sm rounded-full focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 font-semibold tracking-wide transition">
+                    <button type="button" onclick="window.clearSearchResult()" title="Xóa nội dung" aria-label="Xóa nội dung" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600">
                         <i class="fa-solid fa-circle-xmark text-sm"></i>
                     </button>
                 </div>
 
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
-                    <button type="submit" class="flex-1 sm:flex-none bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm px-6 py-4 rounded-full shadow-sm transition flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span>Tra Cứu Mã BN</span>
+                    <button type="submit" title="Tra cứu mã bệnh nhân" aria-label="Tra cứu mã bệnh nhân" class="w-12 h-12 bg-teal-700 hover:bg-teal-800 text-white text-base rounded-full shadow-sm transition flex items-center justify-center">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <span class="sr-only">Tra cứu mã bệnh nhân</span>
                     </button>
                     
-                    <button type="button" id="btnAddPatient" onclick="window.openNewPatientModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm px-4 py-4 rounded-full transition flex items-center space-x-2 border border-slate-200">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span class="hidden sm:inline">Thêm BN Mới</span>
+                    <button type="button" id="btnAddPatient" onclick="window.openNewPatientModal()" title="Thêm bệnh nhân mới" aria-label="Thêm bệnh nhân mới" class="w-12 h-12 bg-slate-100 hover:bg-slate-200 text-slate-700 text-base rounded-full transition flex items-center justify-center border border-slate-200">
+                        <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                        <span class="sr-only">Thêm bệnh nhân mới</span>
                     </button>
                 </div>
             </form>
