@@ -840,6 +840,7 @@
             button.title = isDark ? 'Bật giao diện sáng' : 'Bật giao diện tối';
             icon.className = `fa-solid ${isDark ? 'fa-sun' : 'fa-moon'}`;
         };
+        window.canManageOncoCareUsers = false;
 
         (() => {
             const isDark = document.documentElement.dataset.theme === 'dark';
@@ -1374,7 +1375,7 @@
         };
 
         window.openUserManagementModal = function() {
-            if (!isAdmin || !window.canUseOncoCare) return;
+            if (!window.canManageOncoCareUsers) return;
             document.getElementById('userManagementModal').classList.remove('hidden');
             if (window.loadUsersManagementTable) window.loadUsersManagementTable();
         };
@@ -1569,6 +1570,7 @@
                 isBlocked = userData.isBlocked;
                 isVip = (userData.role === "VIP");
                 window.canUseOncoCare = !isBlocked && (isAdmin || isVip || isApproved);
+                window.canManageOncoCareUsers = isAdmin && window.canUseOncoCare;
 
                 signInBtn.classList.add('hidden');
                 docProfile.classList.remove('hidden');
@@ -1598,6 +1600,7 @@
                 isApproved = false;
                 isBlocked = false;
                 window.canUseOncoCare = false;
+                window.canManageOncoCareUsers = false;
                 signInBtn.classList.remove('hidden');
                 docProfile.classList.add('hidden');
                 btnStats.classList.add('hidden');
