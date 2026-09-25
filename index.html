@@ -1513,6 +1513,7 @@
     <!-- ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
         import { 
             getAuth, 
             GoogleAuthProvider, 
@@ -1550,6 +1551,10 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaEnterpriseProvider("6Lf6m84tAAAAAH9Q5E9_LsQR6EHk6aKecmBx9IxU"),
+            isTokenAutoRefreshEnabled: true
+        });
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
