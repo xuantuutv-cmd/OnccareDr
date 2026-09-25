@@ -445,7 +445,7 @@
                                     <optgroup label="Nhánh ung thư Vú">
                                         <option value="EC">EC (Epirubicin + Cyclophosphamide - 21 ngày)</option>
                                         <option value="4EC-4P-Trastuzumab">4EC - 4P + Trastuzumab (HER2+)</option>
-                                        <option value="AC-T">AC-T / AC-P (Anthracycline -> Taxane)</option>
+                                        <option value="AC-T">AC-T</option>
                                         <option value="AC-T-Trastuzumab">AC-T + Trastuzumab (HER2 dương tính)</option>
                                         <option value="Vinorelbine-Capecitabine">Vinorelbine - Capecitabine (Ung thư vú)</option>
                                         <option value="Metronomic-Breast">Metronomic Ung Thư Vú</option>
@@ -1069,7 +1069,7 @@
             "Capecitabine-Bevacizumab": { name: "Capecitabine + Bevacizumab", drugs: "Bevacizumab, Capecitabine", is14Days: true, formula: [ {drug: "Bevacizumab", std: 7.5, unit: "mg/kg"}, {drug: "Capecitabine", std: 1000, unit: "mg/m2 bid"} ] },
             "Capecitabine-Mono": { name: "Capecitabine đơn Trị", drugs: "Capecitabine", is14Days: true, formula: [ {drug: "Capecitabine", std: 1250, unit: "mg/m2 bid"} ] },
             "Vinorelbine-Capecitabine": { name: "Vinorelbine - Capecitabine", drugs: "Vinorelbine, Capecitabine", is14Days: true, formula: [ {drug: "Vinorelbine", std: 25, unit: "mg/m2"}, {drug: "Capecitabine", std: 1000, unit: "mg/m2 bid"} ] },
-            "AC-T": { name: "AC-T (Anthracycline -> Taxane)", drugs: "Doxorubicin, Cyclophosphamide, Paclitaxel", is14Days: false, formula: [ {drug: "Doxorubicin", std: 60, unit: "mg/m2"}, {drug: "Cyclophosphamide", std: 600, unit: "mg/m2"}, {drug: "Paclitaxel", std: 175, unit: "mg/m2"} ] },
+            "AC-T": { name: "AC-T", drugs: "Doxorubicin, Cyclophosphamide, Paclitaxel", is14Days: false, formula: [ {drug: "Doxorubicin", std: 60, unit: "mg/m2"}, {drug: "Cyclophosphamide", std: 600, unit: "mg/m2"}, {drug: "Paclitaxel", std: 175, unit: "mg/m2"} ] },
             "AC-T-Trastuzumab": { name: "AC-T + Trastuzumab", drugs: "Doxorubicin, Cyclophosphamide, Paclitaxel, Trastuzumab", is14Days: false, formula: [ {drug: "Doxorubicin", std: 60, unit: "mg/m2"}, {drug: "Cyclophosphamide", std: 600, unit: "mg/m2"}, {drug: "Paclitaxel", std: 175, unit: "mg/m2"}, {drug: "Trastuzumab", std: 6, unit: "mg/kg"} ] },
             "Paclitaxel-Mono": { name: "Paclitaxel đơn Trị", drugs: "Paclitaxel", is14Days: false, formula: [ {drug: "Paclitaxel", std: 175, unit: "mg/m2"} ] }
         };
@@ -1116,6 +1116,7 @@
             const doseInput = document.getElementById('npDoseInput');
             const protoKey = document.getElementById('protocolSelectList').value;
             const weekVal = document.getElementById('npProtocolWeek').value;
+            const cycleNumber = parseInt(document.getElementById('npCycleNumber').value, 10) || 1;
 
             let bsa = 0;
             if (!isNaN(h) && !isNaN(w) && h > 0 && w > 0) {
@@ -1123,6 +1124,13 @@
                 bsaDisplay.innerText = bsa.toFixed(2) + " m²";
             } else {
                 bsaDisplay.innerText = "--";
+                if (protoKey === "AC-T") {
+                    const drugsForCycle = cycleNumber === 1
+                        ? ["Doxorubicin", "Cyclophosphamide"]
+                        : (cycleNumber >= 2 && cycleNumber <= 5 ? ["Paclitaxel"] : []);
+                    document.getElementById('npDrugNamesInput').value = drugsForCycle.join(", ");
+                    doseInput.value = "";
+                }
                 if (!protoKey || !chemoProtocolsData[protoKey]) {
                     doseInput.value = "";
                 }
@@ -1132,7 +1140,14 @@
 
             if (protoKey && chemoProtocolsData[protoKey] && chemoProtocolsData[protoKey].formula) {
                 const pInfo = chemoProtocolsData[protoKey];
-                const formulaList = pInfo.formula;
+                let formulaList = pInfo.formula;
+                if (protoKey === "AC-T") {
+                    const cycleDrugs = cycleNumber === 1
+                        ? ["doxorubicin", "cyclophosphamide"]
+                        : (cycleNumber >= 2 && cycleNumber <= 5 ? ["paclitaxel"] : []);
+                    formulaList = formulaList.filter(item => cycleDrugs.includes(item.drug.toLowerCase()));
+                    document.getElementById('npDrugNamesInput').value = formulaList.map(item => item.drug).join(", ");
+                }
                 let doseCalculatedStr = [];
 
                 if (pInfo.is14Days) {
@@ -1271,8 +1286,8 @@
             window.tempCurrentMarkers = [];
             ['npCycleNumber', 'npCycleDate', 'npDrugNamesInput', 'npDoseInput', 'npCycleNote'].forEach((id) => {
                 const field = document.getElementById(id);
-                field.oninput = window.previewNewPatientCycle;
-                field.onchange = window.previewNewPatientCycle;
+                field.oninput = id === 'npCycleNumber' ? window.calculateBSAandDoses : window.previewNewPatientCycle;
+                field.onchange = id === 'npCycleNumber' ? window.calculateBSAandDoses : window.previewNewPatientCycle;
             });
             window.renderTempCyclesList();
             window.renderTempMarkersList();
