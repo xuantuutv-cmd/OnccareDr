@@ -1143,8 +1143,8 @@
                 }
 
                 formulaList.forEach(item => {
-                    // Oxaliplatin and irinotecan are administered only in week 1.
-                    if (["oxaliplatin", "irinotecan"].includes(item.drug.toLowerCase()) && weekVal === "Tuần 2") return;
+                    // Oxaliplatin, irinotecan, and bevacizumab are recorded only in week 1.
+                    if (["oxaliplatin", "irinotecan", "bevacizumab"].includes(item.drug.toLowerCase()) && weekVal === "Tuần 2") return;
 
                     let totalDose = 0;
                     if (item.unit === "mg/kg") {
