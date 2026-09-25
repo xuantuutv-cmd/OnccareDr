@@ -74,13 +74,12 @@
         html[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
         html[data-theme="dark"] footer { color: #a8b4c7; }
         html[data-theme="dark"] footer p { color: inherit; }
-        html[data-theme="dark"] #themeToggleButton { background: #1e293b; border-color: #334155; color: #fbbf24; }
-        #themeToggleButton { width: 3.25rem; height: 1.85rem; padding: 0.2rem; border: 1px solid #cbd5e1; border-radius: 9999px; background: #e2e8f0; transition: background-color 200ms ease, border-color 200ms ease; }
-        #themeToggleButton .theme-toggle-thumb { width: 1.35rem; height: 1.35rem; border-radius: 9999px; background: white; box-shadow: 0 1px 3px rgba(15,23,42,.25); display: flex; align-items: center; justify-content: center; transform: translateX(0); transition: transform 200ms ease; }
-        #themeToggleButton[aria-pressed="true"] { background: #0f172a; border-color: #334155; }
-        #themeToggleButton[aria-pressed="true"] .theme-toggle-thumb { transform: translateX(1.35rem); background: #334155; }
-        #themeToggleButton .theme-toggle-thumb i { font-size: .7rem; color: #f59e0b; }
-        #themeToggleButton[aria-pressed="true"] .theme-toggle-thumb i { color: #f8fafc; }
+        #themeToggleButton { width: 3.25rem; height: 1.85rem; padding: 0.2rem; border: 1px solid #34363d; border-radius: 9999px; background: #202124; color: #d1d5db; transition: background-color 200ms ease, border-color 200ms ease; }
+        #themeToggleButton .theme-toggle-thumb { width: 1.35rem; height: 1.35rem; border-radius: 9999px; background: #303238; box-shadow: none; display: flex; align-items: center; justify-content: center; transform: translateX(0); transition: transform 200ms ease, background-color 200ms ease; }
+        #themeToggleButton[aria-pressed="true"] { background: #202124; border-color: #34363d; }
+        #themeToggleButton[aria-pressed="true"] .theme-toggle-thumb { transform: translateX(1.35rem); background: #303238; }
+        #themeToggleButton .theme-toggle-thumb i { font-size: .7rem; color: #d1d5db; }
+        #themeToggleButton[aria-pressed="true"] .theme-toggle-thumb i { color: #e5e7eb; }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
