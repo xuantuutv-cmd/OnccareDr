@@ -42,10 +42,9 @@
                     <i class="fa-solid fa-dna text-amber-300 text-2xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-xl sm:text-2xl tracking-tight leading-none text-amber-300 drop-shadow-sm">
+                    <h1 class="font-extrabold text-2xl sm:text-3xl tracking-tight leading-none text-amber-300 drop-shadow-sm">
                         OncoCare Pro
                     </h1>
-                    <p class="text-xs text-teal-100/90 font-medium mt-1">Khoa Ung Bướu - Bệnh Viện Đa Khoa An Giang</p>
                 </div>
             </div>
 
@@ -693,7 +692,7 @@
                     <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">DANH SÁCH BỆNH NHÂN TRONG KHOẢNG THỜI GIAN:</h4>
                     <span class="text-[10px] text-slate-500">Sắp xếp theo ngày hóa trị mới nhất</span>
                 </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <div class="max-h-[55vh] overflow-auto rounded-xl border border-slate-200 custom-scrollbar">
                     <table class="w-full text-left text-xs text-slate-700">
                         <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
                             <tr>
@@ -2351,7 +2350,7 @@
                 const dateB = latestChemoDate(patientB);
                 if (!dateA && dateB) return 1;
                 if (dateA && !dateB) return -1;
-                return dateB.localeCompare(dateA);
+                return dateA.localeCompare(dateB);
             });
 
             document.getElementById('statTotalPatients').innerText = filtered.length;
