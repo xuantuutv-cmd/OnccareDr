@@ -211,7 +211,7 @@
                             <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,2.2fr)] gap-3">
                                 <div>
                                     <label class="block text-slate-500 font-semibold mb-1">Mã BN (8 ký tự):</label>
-                                    <input type="text" id="npId" maxlength="8" class="w-full max-w-36 p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                    <input type="text" id="npId" maxlength="8" inputmode="numeric" pattern="[0-9]{8}" title="Mã bệnh nhân phải gồm đúng 8 chữ số" class="w-full max-w-36 p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
                                 </div>
                                 <div>
                                     <label class="block text-slate-500 font-semibold mb-1">Họ và tên BN:</label>
@@ -817,7 +817,9 @@
             const dropdown = document.getElementById(dropdownId);
             if (!input || !dropdown) return;
 
+            let activeSuggestionIndex = -1;
             input.addEventListener('input', (e) => {
+                activeSuggestionIndex = -1;
                 const val = e.target.value.trim().toLowerCase();
                 if (!val) {
                     dropdown.classList.add('hidden');
@@ -850,13 +852,53 @@
             });
 
             input.addEventListener('keydown', (event) => {
+                const suggestions = [...dropdown.querySelectorAll('.item-suggestion')];
+                if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && suggestions.length && !dropdown.classList.contains('hidden')) {
+                    event.preventDefault();
+                    const direction = event.key === 'ArrowDown' ? 1 : -1;
+                    activeSuggestionIndex = (activeSuggestionIndex + direction + suggestions.length) % suggestions.length;
+                    suggestions.forEach((item, index) => item.classList.toggle('bg-teal-100', index === activeSuggestionIndex));
+                    suggestions[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
+                    return;
+                }
                 if (event.key !== 'Enter') return;
                 event.preventDefault();
-                const firstSuggestion = dropdown.querySelector('.item-suggestion');
-                if (firstSuggestion && !dropdown.classList.contains('hidden')) firstSuggestion.click();
+                const chosen = activeSuggestionIndex >= 0 ? suggestions[activeSuggestionIndex] : suggestions[0];
+                if (chosen && !dropdown.classList.contains('hidden')) {
+                    chosen.click();
+                    if (inputId === 'npDiagnosis') focusNextPatientInput(input);
+                }
                 else if (inputId === 'npSubDiagnosisInput') window.addSubDiagnosisItem();
+                else focusNextPatientInput(input);
             });
         }
+
+        function focusNextPatientInput(current) {
+            const candidates = [...document.querySelectorAll('#patientForm input:not([type="hidden"]), #patientForm select, #patientForm textarea')]
+                .filter((field) => !field.disabled && field.offsetParent !== null && !field.closest('.hidden'));
+            const next = candidates[candidates.indexOf(current) + 1];
+            if (next) next.focus();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('patientForm');
+            form?.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' || event.defaultPrevented || event.shiftKey) return;
+                const field = event.target;
+                if (!(field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement)) return;
+                event.preventDefault();
+                focusNextPatientInput(field);
+            });
+            document.getElementById('protocolSelectList')?.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                window.onProtocolSelectChanged();
+                const nextId = document.getElementById('protocolSelectList').value === 'CUSTOM'
+                    ? 'customProtocolNameInput'
+                    : (!document.getElementById('weekSelectContainer').classList.contains('hidden') ? 'npProtocolWeek' : 'npCycleNumber');
+                document.getElementById(nextId)?.focus();
+            });
+        });
 
         window.addSubDiagnosisItem = function() {
             const val = document.getElementById('npSubDiagnosisInput').value.trim();
@@ -1268,6 +1310,8 @@
             getDocs,
             onSnapshot, 
             query, 
+            where,
+            runTransaction,
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -1867,7 +1911,7 @@
 
             let patientIdVal, nameVal, genderVal, birthYearVal;
 
-            if (isAdmin && !docId) {
+            if (!docId) {
                 patientIdVal = document.getElementById('npId').value.trim();
                 nameVal = document.getElementById('npName').value.trim();
                 genderVal = document.getElementById('npGender').value;
@@ -1892,6 +1936,14 @@
             const protocolKeyVal = document.getElementById('protocolSelectList').value;
             const heightVal = parseFloat(document.getElementById('npHeight').value) || 0;
             const weightVal = parseFloat(document.getElementById('npWeight').value) || 0;
+
+            if (!/^\d{8}$/.test(patientIdVal || '')) {
+                alert("Mã bệnh nhân phải gồm đúng 8 chữ số.");
+                isSavingPatientForm = false;
+                saveButton.disabled = false;
+                document.getElementById('npId').focus();
+                return;
+            }
 
             if (editCycleIndexStr !== "") {
                 const idx = parseInt(editCycleIndexStr);
@@ -1976,12 +2028,29 @@
             };
 
             try {
+                const duplicateSnapshot = await getDocs(query(
+                    collection(db, "patients"),
+                    where("patientId", "==", patientIdVal)
+                ));
+                const duplicate = duplicateSnapshot.docs.find((patientDoc) => patientDoc.id !== docId);
+                if (duplicate) {
+                    alert(`Mã BN ${patientIdVal} đã có hồ sơ. Vui lòng kiểm tra lại mã bệnh nhân.`);
+                    return;
+                }
+
                 if (docId) {
                     await updateDoc(doc(db, "patients", docId), payload);
                     window.showToast("Đã lưu và cập nhật hồ sơ bệnh nhân thành công!");
                 } else {
                     payload.createdAt = serverTimestamp();
-                    const createdPatientRef = await addDoc(collection(db, "patients"), payload);
+                    const createdPatientRef = doc(db, "patients", patientIdVal);
+                    await runTransaction(db, async (transaction) => {
+                        const existingPatient = await transaction.get(createdPatientRef);
+                        if (existingPatient.exists()) {
+                            throw new Error("PATIENT_CODE_EXISTS");
+                        }
+                        transaction.set(createdPatientRef, payload);
+                    });
                     cachedPatientsList.push({ id: createdPatientRef.id, ...payload });
                     window.showToast("Đã thêm mới hồ sơ bệnh nhân thành công!");
                 }
@@ -1992,7 +2061,11 @@
                 }
             } catch (err) {
                 console.error("Lỗi lưu dữ liệu:", err);
-                alert("Lỗi khi lưu dữ liệu lên hệ thống: " + err.message);
+                if (err.message === "PATIENT_CODE_EXISTS") {
+                    alert(`Mã BN ${patientIdVal} đã có hồ sơ. Vui lòng tra cứu hồ sơ hiện có.`);
+                } else {
+                    alert("Lỗi khi lưu dữ liệu lên hệ thống: " + err.message);
+                }
             } finally {
                 isSavingPatientForm = false;
                 saveButton.disabled = false;
@@ -2022,8 +2095,13 @@
             if (confirm("CẢNH BÁO: Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân này khỏi hệ thống không?")) {
                 try {
                     await deleteDoc(doc(db, "patients", docId));
+                    cachedPatientsList = cachedPatientsList.filter((patient) => patient.id !== docId);
                     window.showToast("Đã xóa hồ sơ bệnh nhân thành công!");
-                    window.clearSearchResult();
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput.value.trim()) window.searchPatientByCode();
+                    else window.clearSearchResult();
+                    const statsModal = document.getElementById('statsModal');
+                    if (statsModal && !statsModal.classList.contains('hidden')) window.runChemoStatistics();
                 } catch (err) {
                     console.error("Lỗi xóa hồ sơ:", err);
                     alert("Không thể xóa hồ sơ: " + err.message);
