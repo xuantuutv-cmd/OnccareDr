@@ -118,7 +118,7 @@
     <!-- ========================================== -->
     <!-- MODUN 2: THANH ĐIỀU HƯỚNG HEADER & XÁC THỰC -->
     <!-- ========================================== -->
-    <header class="bg-white/90 backdrop-blur-xl text-slate-800 border-b border-slate-200/80 sticky top-0 z-40">
+    <header class="bg-transparent backdrop-blur-xl text-slate-800 sticky top-0 z-40">
         <div class="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-6 2xl:px-10 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
                 <div class="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center border border-teal-100">
@@ -219,7 +219,7 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-transparent border-t border-slate-200/80 py-6 mt-12 text-slate-500 text-xs">
+    <footer class="bg-transparent py-6 mt-12 text-slate-500 text-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center text-center">
             <div class="flex items-center space-x-3">
                 <div>
@@ -236,10 +236,10 @@
                 <i class="fa-solid fa-crown" aria-hidden="true"></i>
             </span>
         </div>
-        <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="w-9 h-9 rounded-full bg-[#1f1f1f] hover:bg-[#303134] text-[#c4c7c5] hover:text-white border border-[#303134] shadow-lg flex items-center justify-center transition">
+        <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="w-9 h-9 rounded-full bg-[#1f1f1f] hover:bg-[#303134] text-[#c4c7c5] hover:text-white border-0 shadow-lg flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
             <i class="fa-solid fa-gear" aria-hidden="true"></i>
         </button>
-        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full bg-[#1f1f1f] hover:bg-[#303134] border border-[#303134] text-[#c4c7c5] hover:text-white shadow-lg flex items-center justify-center transition">
+        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full bg-[#1f1f1f] hover:bg-[#303134] border-0 text-[#c4c7c5] hover:text-white shadow-lg flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
             <i class="fa-solid fa-users-gear text-sm" aria-hidden="true"></i>
         </button>
         <section id="accountSettingsMenu" class="hidden absolute left-0 bottom-[calc(100%+0.75rem)] w-80 max-w-[calc(100vw-2.5rem)] max-h-[78vh] overflow-y-auto custom-scrollbar bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 space-y-3 text-xs">
