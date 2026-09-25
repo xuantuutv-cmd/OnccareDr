@@ -1136,6 +1136,9 @@
                 let doseCalculatedStr = [];
 
                 formulaList.forEach(item => {
+                    // Oxaliplatin is administered only in week 1 of 14-day protocols.
+                    if (item.drug.toLowerCase() === "oxaliplatin" && weekVal === "Tuần 2") return;
+
                     let totalDose = 0;
                     if (item.unit === "mg/kg") {
                         totalDose = Math.round(item.std * w);
