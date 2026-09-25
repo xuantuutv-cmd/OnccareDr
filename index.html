@@ -11,8 +11,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- QRCode.js Generator Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Chart.js for Marker Tracking Chart & Pie Chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -221,8 +219,8 @@
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-slate-500 font-semibold mb-1">Giới tính:</label>
-                                    <select id="npGender" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                    <label class="block text-slate-500 font-semibold mb-1 text-center">Giới tính:</label>
+                                    <select id="npGender" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium text-center focus:outline-none focus:ring-1 focus:ring-teal-500" required>
                                         <option value="">-- Chọn --</option>
                                         <option value="Nữ">Nữ</option>
                                         <option value="Nam">Nam</option>
@@ -314,8 +312,8 @@
                         </h4>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block font-semibold text-slate-700 mb-1">Loại Marker:</label>
-                                <select id="npMarkerType" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-semibold text-indigo-900 focus:outline-none">
+                                <label class="block font-semibold text-slate-700 mb-1 text-center">Loại Marker:</label>
+                                <select id="npMarkerType" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-semibold text-center text-indigo-900 focus:outline-none">
                                     <option value="">-- Chọn marker --</option>
                                     <option value="CEA">CEA</option>
                                     <option value="CA 19-9">CA 19-9</option>
@@ -326,13 +324,13 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block font-semibold text-slate-700 mb-1">Giá trị:</label>
-                                <input type="number" step="0.01" id="npMarkerValue" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-indigo-900 focus:outline-none">
+                                <label class="block font-semibold text-slate-700 mb-1 text-center">Giá trị:</label>
+                                <input type="number" step="0.01" id="npMarkerValue" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-center text-indigo-900 focus:outline-none">
                             </div>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Ngày xét nghiệm:</label>
-                            <input type="date" id="npMarkerDate" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium">
+                            <label class="block font-semibold text-slate-700 mb-1 text-center">Ngày xét nghiệm:</label>
+                            <input type="date" id="npMarkerDate" class="block w-full max-w-48 mx-auto p-2 bg-white border border-slate-200 rounded-lg font-medium text-center">
                         </div>
                     </div>
 
@@ -343,7 +341,7 @@
                         </h4>
 
                         <div id="protocolModeContainer" class="hidden bg-white p-2.5 rounded-lg border border-teal-100 space-y-1">
-                            <label class="block font-bold text-slate-700 text-[10px]">Tùy chọn phác đồ điều trị:</label>
+                            <label class="block text-center font-bold text-slate-700 text-[10px]">Tùy chọn phác đồ điều trị:</label>
                             <div class="flex items-center space-x-4">
                                 <label class="flex items-center space-x-1.5 cursor-pointer font-semibold text-teal-800">
                                     <input type="radio" name="protocolMode" value="continue" checked onchange="window.toggleProtocolMode()" class="text-teal-600">
@@ -358,8 +356,8 @@
 
                         <div class="space-y-2.5">
                             <div>
-                                <label class="block font-semibold text-slate-700 mb-1">Lựa chọn phác đồ điều trị <span class="text-rose-500">*</span>:</label>
-                                <select id="protocolSelectList" onchange="window.onProtocolSelectChanged()" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
+                                <label class="block font-semibold text-slate-700 mb-1 text-center">Lựa chọn phác đồ điều trị <span class="text-rose-500">*</span>:</label>
+                                <select id="protocolSelectList" onchange="window.onProtocolSelectChanged()" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-semibold text-center text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-500" required>
                                     <option value="">-- Chọn phác đồ hóa trị --</option>
                                     <optgroup label="Nhánh tiêu hóa (Dạ dày - Đại trực tràng)">
                                         <option value="CapeOx">CapeOx / XELOX (Oxaliplatin + Capecitabine - 21 ngày)</option>
@@ -409,8 +407,8 @@
                                     <input type="number" id="npCycleNumber" min="1" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-800 text-center focus:outline-none">
                                 </div>
                                 <div>
-                                    <label class="block font-semibold text-slate-700 mb-1">Ngày thực hiện:</label>
-                                    <input type="date" id="npCycleDate" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-medium">
+                                    <label class="block font-semibold text-slate-700 mb-1 text-center">Ngày thực hiện:</label>
+                                    <input type="date" id="npCycleDate" class="block w-full max-w-48 mx-auto p-2 bg-white border border-slate-200 rounded-lg font-medium text-center">
                                 </div>
                             </div>
 
@@ -464,8 +462,8 @@
 
                     <div class="bg-white p-3 rounded-xl border border-indigo-200 space-y-3">
                         <div class="flex items-center justify-between gap-2">
-                            <h4 class="font-bold text-indigo-900 text-[11px] uppercase">Biểu đồ marker theo thời gian</h4>
-                            <select id="historyMarkerSelect" onchange="window.renderHistoryMarkerChart()" class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-indigo-900" autocomplete="off">
+                            <h4 class="flex-1 text-center font-bold text-indigo-900 text-[11px] uppercase">Biểu đồ marker theo thời gian</h4>
+                            <select id="historyMarkerSelect" onchange="window.renderHistoryMarkerChart()" class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-center text-indigo-900" autocomplete="off">
                                 <option value="">Chọn marker</option>
                             </select>
                         </div>
@@ -482,7 +480,7 @@
     <!-- ========================================== -->
     <!-- MODUN 5: MODAL TÓM TẮT CHI TIẾT BỆNH NHÂN -->
     <!-- ========================================== -->
-    <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-5 px-6 flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center space-x-3">
@@ -498,8 +496,8 @@
             </div>
 
             <div class="p-6 space-y-6 text-xs">
-                <div class="bg-teal-50/50 p-4 rounded-2xl border border-teal-200/80 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                    <div class="md:col-span-2 space-y-3">
+                <div class="bg-teal-50/50 p-4 rounded-2xl border border-teal-200/80 shadow-sm">
+                    <div class="space-y-3">
                         <div class="flex items-center gap-2 pb-2 border-b border-teal-200/60">
                             <span class="font-bold text-teal-900 uppercase text-[11px]"><i class="fa-solid fa-file-medical"></i> Form Tóm Tắt Hồ Sơ Bệnh Nhân</span>
                         </div>
@@ -519,12 +517,6 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col items-center justify-center space-y-2 text-center shadow-inner">
-                        <div class="bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
-                            <div id="patientQrCodeContainer" class="flex justify-center"></div>
-                        </div>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Mã QR Tra Cứu BN</p>
-                    </div>
                 </div>
 
                 <div class="bg-slate-100 p-1.5 rounded-xl flex space-x-1 border border-slate-200">
@@ -548,7 +540,7 @@
                         <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
                             <i class="fa-solid fa-chart-line text-teal-600"></i> Biểu Đồ Theo Dõi Marker Ung Thư Theo Thời Gian
                         </h4>
-                        <select id="chartMarkerSelect" onchange="window.renderMarkerChart()" class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-indigo-900 focus:outline-none">
+                        <select id="chartMarkerSelect" onchange="window.renderMarkerChart()" class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-center text-indigo-900 focus:outline-none">
                             <option value="CEA">CEA</option>
                             <option value="CA 19-9">CA 19-9</option>
                             <option value="CA 72-4">CA 72-4</option>
@@ -1536,16 +1528,6 @@
             document.getElementById('detProtocol').querySelector('span').innerText = p.protocol || 'Chưa cập nhật';
             document.getElementById('detCreatedBy').innerText = p.createdByEmail || 'Thạch Xuân Tựu';
 
-            const qrContainer = document.getElementById('patientQrCodeContainer');
-            qrContainer.innerHTML = "";
-            new QRCode(qrContainer, {
-                text: `ONCOCARE_PATIENT_ID:${p.patientId} | NAME:${p.name}`,
-                width: 110,
-                height: 110,
-                colorDark: "#0f766e",
-                colorLight: "#ffffff"
-            });
-
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
             const cycles = p.cycles || [];
@@ -1713,6 +1695,7 @@
                 week: weekVal,
                 date: cycleDate,
                 protocolUsed: proto,
+                protocolKeyUsed: document.getElementById('protocolSelectList').value,
                 isChangedProtocol: isChangedProtocol,
                 drugNames: drugNames,
                 doseInput: doseInput,
@@ -1751,6 +1734,7 @@
                 week: is14Days ? document.getElementById('npProtocolWeek').value : "",
                 date: cycleDate,
                 protocolUsed: protocol,
+                protocolKeyUsed: protocolKey,
                 isChangedProtocol: false,
                 drugNames: document.getElementById('npDrugNamesInput').value,
                 doseInput: document.getElementById('npDoseInput').value,
@@ -1956,15 +1940,27 @@
             
             window.resetFormToEditMode(idx);
 
+            const changeProtocolRadio = document.querySelector('input[name="protocolMode"][value="change"]');
+            if (changeProtocolRadio) changeProtocolRadio.checked = true;
+            window.toggleProtocolMode();
+
+            const protocolSelect = document.getElementById('protocolSelectList');
+            const matchingProtocolKey = c.protocolKeyUsed || Object.keys(chemoProtocolsData).find((key) =>
+                chemoProtocolsData[key].name === c.protocolUsed
+            );
+            const protocolKey = matchingProtocolKey || (c.protocolUsed ? 'CUSTOM' : '');
+            protocolSelect.value = protocolKey;
+            if (protocolKey === 'CUSTOM') {
+                document.getElementById('customProtocolNameInput').value = c.protocolUsed || '';
+            }
+            window.onProtocolSelectChanged();
+
             document.getElementById('npCycleDate').value = c.date || '';
             document.getElementById('npCycleNumber').value = c.cycleNum || (idx + 1);
             document.getElementById('npDrugNamesInput').value = c.drugNames || '';
             document.getElementById('npDoseInput').value = c.doseInput || '';
             document.getElementById('npCycleNote').value = c.note || '';
-            
-            if (c.protocolUsed) {
-                document.getElementById('npProtocol').value = c.protocolUsed;
-            }
+            document.getElementById('npProtocol').value = c.protocolUsed || '';
             if (c.week) {
                 document.getElementById('npProtocolWeek').value = c.week;
             }
@@ -2041,12 +2037,17 @@
                     week: weekVal,
                     date: cycleDate,
                     protocolUsed: protocolVal || window.tempCurrentCycles[idx].protocolUsed,
+                    protocolKeyUsed: protocolKeyVal || window.tempCurrentCycles[idx].protocolKeyUsed || '',
+                    isChangedProtocol: window.tempCurrentCycles[idx].isChangedProtocol || protocolVal !== window.tempCurrentCycles[idx].protocolUsed,
                     drugNames: drugNames,
                     doseInput: doseInput,
                     note: note,
                     updatedBy: currentUser ? (currentUser.displayName || currentUser.email) : "Thạch Xuân Tựu"
                 };
                 window.renderTempCyclesList();
+                const continueProtocolRadio = document.querySelector('input[name="protocolMode"][value="continue"]');
+                if (continueProtocolRadio) continueProtocolRadio.checked = true;
+                window.toggleProtocolMode();
                 window.resetFormToAddNewMode();
                 window.showToast("Đã cập nhật chu kỳ thành công!");
             }
@@ -2070,6 +2071,7 @@
                     week: is14Days ? document.getElementById('npProtocolWeek').value : "",
                     date: cycleDate,
                     protocolUsed: protocolVal,
+                    protocolKeyUsed: protocolKeyVal,
                     isChangedProtocol: false,
                     drugNames: document.getElementById('npDrugNamesInput').value,
                     doseInput: document.getElementById('npDoseInput').value,
