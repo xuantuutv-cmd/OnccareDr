@@ -633,6 +633,16 @@
                 </div>
             </div>
 
+            <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex gap-1">
+                <button type="button" id="btnStatsOverviewTab" onclick="window.switchStatsTab('overview')" class="flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition">
+                    <i class="fa-solid fa-chart-pie mr-1.5"></i>Tổng quan
+                </button>
+                <button type="button" id="btnStatsPatientsTab" onclick="window.switchStatsTab('patients')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition">
+                    <i class="fa-solid fa-hospital-user mr-1.5"></i>Danh sách bệnh
+                </button>
+            </div>
+
+            <div id="statsOverviewPanel" class="space-y-5">
             <!-- Tổng quan số liệu -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl flex items-center justify-between">
@@ -671,10 +681,14 @@
                     <canvas id="statsPieChart"></canvas>
                 </div>
             </div>
+            </div>
 
             <!-- Danh sách bệnh nhân thống kê cho phép Admin sửa/xoá trực tiếp -->
-            <div class="space-y-2">
-                <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">DANH SÁCH BỆNH NHÂN TRONG KHOẢNG THỜI GIAN:</h4>
+            <div id="statsPatientsPanel" class="hidden space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">DANH SÁCH BỆNH NHÂN TRONG KHOẢNG THỜI GIAN:</h4>
+                    <span class="text-[10px] text-slate-500">Sắp xếp theo ngày hóa trị mới nhất</span>
+                </div>
                 <div class="overflow-x-auto rounded-xl border border-slate-200">
                     <table class="w-full text-left text-xs text-slate-700">
                         <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
@@ -1285,7 +1299,25 @@
             document.getElementById('statsStartDate').value = firstDay;
             document.getElementById('statsEndDate').value = today;
             document.getElementById('statsModal').classList.remove('hidden');
+            window.switchStatsTab('overview');
             window.runChemoStatistics();
+        };
+
+        window.switchStatsTab = function(tabName) {
+            const showOverview = tabName === 'overview';
+            document.getElementById('statsOverviewPanel').classList.toggle('hidden', !showOverview);
+            document.getElementById('statsPatientsPanel').classList.toggle('hidden', showOverview);
+
+            const overviewButton = document.getElementById('btnStatsOverviewTab');
+            const patientsButton = document.getElementById('btnStatsPatientsTab');
+            overviewButton.className = showOverview
+                ? 'flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition'
+                : 'flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition';
+            patientsButton.className = showOverview
+                ? 'flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition'
+                : 'flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition';
+
+            if (showOverview) setTimeout(() => window.statsPieChartInstance?.resize(), 0);
         };
 
         window.closeStatsModal = function() {
@@ -2260,6 +2292,18 @@
                     }
                 }
                 return true;
+            });
+
+            const latestChemoDate = (patient) => (patient.cycles || []).reduce((latest, cycle) => {
+                const cycleDate = cycle.date || '';
+                return cycleDate > latest ? cycleDate : latest;
+            }, '');
+            filtered.sort((patientA, patientB) => {
+                const dateA = latestChemoDate(patientA);
+                const dateB = latestChemoDate(patientB);
+                if (!dateA && dateB) return 1;
+                if (dateA && !dateB) return -1;
+                return dateB.localeCompare(dateA);
             });
 
             document.getElementById('statTotalPatients').innerText = filtered.length;
