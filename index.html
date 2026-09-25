@@ -838,6 +838,16 @@
     <!-- MODUN 8: LOGIC JAVASCRIPT & XỬ LÝ DỮ LIỆU -->
     <!-- ========================================== -->
     <script>
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
         window.toggleTheme = function() {
             const isDark = document.documentElement.dataset.theme !== 'dark';
             document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
@@ -1045,7 +1055,7 @@
                 tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
                     <td class="p-2 font-bold text-slate-500 text-center">${idx + 1}</td>
-                    <td class="p-2 font-semibold text-slate-800">${item}</td>
+                    <td class="p-2 font-semibold text-slate-800">${escapeHtml(item)}</td>
                     <td class="p-2 text-center">
                         <button type="button" onclick="window.removeSubDiagnosisItem(${idx})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
@@ -1340,8 +1350,8 @@
                 .sort((a, b) => new Date(a.date) - new Date(b.date));
 
             if (filtered.length === 0) {
-                analysisCard.innerHTML = `<span>Không tìm thấy dữ liệu cho chỉ số <strong>${markerType}</strong>.</span>`;
-                detailBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">Không có dữ liệu cho ${markerType}.</td></tr>`;
+                analysisCard.innerHTML = `<span>Không tìm thấy dữ liệu cho chỉ số <strong>${escapeHtml(markerType)}</strong>.</span>`;
+                detailBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">Không có dữ liệu cho ${escapeHtml(markerType)}.</td></tr>`;
                 if (window.activeMarkerChart) window.activeMarkerChart.destroy();
                 return;
             }
@@ -1386,7 +1396,7 @@
                 statusText = `Lần đo đầu tiên ghi nhận`;
             }
 
-            analysisCard.innerHTML = `<span>Mới nhất (${labels[labels.length - 1]}): <strong>${lastVal}</strong> - ${statusText}</span>`;
+            analysisCard.innerHTML = `<span>Mới nhất (${escapeHtml(labels[labels.length - 1])}): <strong>${lastVal}</strong> - ${statusText}</span>`;
 
             detailBody.innerHTML = "";
             filtered.forEach((m, idx) => {
@@ -1399,9 +1409,9 @@
                 }
                 detailBody.innerHTML += `
                     <tr>
-                        <td class="p-2 font-medium">${m.date}</td>
-                        <td class="p-2 font-bold text-indigo-900">${m.type}</td>
-                        <td class="p-2 font-bold">${m.value}</td>
+                        <td class="p-2 font-medium">${escapeHtml(m.date)}</td>
+                        <td class="p-2 font-bold text-indigo-900">${escapeHtml(m.type)}</td>
+                        <td class="p-2 font-bold">${escapeHtml(m.value)}</td>
                         <td class="p-2 font-semibold ${diffStr.startsWith('+') ? 'text-rose-600' : (diffStr.startsWith('-') ? 'text-emerald-600' : 'text-slate-600')}">${diffStr}</td>
                     </tr>
                 `;
@@ -1682,7 +1692,7 @@
             document.getElementById('patientListSection').classList.remove('hidden');
             const matched = cachedPatientsList.filter(p => p.patientId && p.patientId === code);
             if (matched.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${code}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${escapeHtml(code)}</td></tr>`;
                 countBadge.innerText = "0 kết quả";
                 return;
             }
@@ -1694,21 +1704,28 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">${p.patientId || '-'}</td>
-                    <td class="p-3 font-semibold text-slate-900">${p.name || '-'}</td>
-                    <td class="p-3 text-center">${p.gender || '-'}</td>
-                    <td class="p-3 font-bold text-slate-700">${p.birthYear || '-'}</td>
+                    <td class="p-3 font-bold text-teal-800">${escapeHtml(p.patientId || '-')}</td>
+                    <td class="p-3 font-semibold text-slate-900">${escapeHtml(p.name || '-')}</td>
+                    <td class="p-3 text-center">${escapeHtml(p.gender || '-')}</td>
+                    <td class="p-3 font-bold text-slate-700">${escapeHtml(p.birthYear || '-')}</td>
                     <td class="p-3 font-medium text-slate-800">
-                        <strong class="text-teal-800">Chính:</strong> ${p.diagnosis || '-'}<br>
-                        <strong class="text-amber-800">Phụ:</strong> ${p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(', ') : 'Không có')}
+                        <strong class="text-teal-800">Chính:</strong> ${escapeHtml(p.diagnosis || '-')}<br>
+                        <strong class="text-amber-800">Phụ:</strong> ${escapeHtml(p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(', ') : 'Không có'))}
                     </td>
-                    <td class="p-3 font-bold text-amber-800">${p.protocol || 'Chưa cập nhật'}</td>
+                    <td class="p-3 font-bold text-amber-800">${escapeHtml(p.protocol || 'Chưa cập nhật')}</td>
                     <td class="p-3 text-center space-x-1">
-                        <button onclick="window.viewPatientDetail('${p.id}')" title="Form tóm tắt & Marker" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
-                        <button onclick="window.openEditPatientModal('${p.id}')" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
-                        ${(isAdmin || isVip) ? `<button onclick="window.deletePatientDoc('${p.id}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <button type="button" data-patient-action="view" title="Form tóm tắt & Marker" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
+                        <button type="button" data-patient-action="edit" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                        ${(isAdmin || isVip) ? `<button type="button" data-patient-action="delete" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </td>
                 `;
+                tr.querySelectorAll('[data-patient-action]').forEach((button) => {
+                    button.addEventListener('click', () => {
+                        if (button.dataset.patientAction === 'view') window.viewPatientDetail(p.id);
+                        if (button.dataset.patientAction === 'edit') window.openEditPatientModal(p.id);
+                        if (button.dataset.patientAction === 'delete') window.deletePatientDoc(p.id);
+                    });
+                });
                 tbody.appendChild(tr);
             });
         };
@@ -1767,7 +1784,7 @@
                     protoHeader.className = "mt-4 mb-2 pb-1 border-b-2 border-teal-600 flex items-center justify-between";
                     protoHeader.innerHTML = `
                         <span class="font-bold text-teal-900 text-sm uppercase flex items-center gap-2">
-                            <i class="fa-solid fa-vial text-teal-700"></i> PHÁC ĐỒ: ${group.protocolUsed}
+                            <i class="fa-solid fa-vial text-teal-700"></i> PHÁC ĐỒ: ${escapeHtml(group.protocolUsed)}
                             ${group.isChanged ? '<span class="text-xs text-rose-600 font-bold bg-rose-100 px-2 py-0.5 rounded ml-2"><i class="fa-solid fa-right-left"></i> Đổi phác đồ</span>' : ''}
                         </span>
                     `;
@@ -1778,11 +1795,11 @@
                         cDiv.className = "p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs ml-3 my-2 space-y-1";
                         cDiv.innerHTML = `
                             <div class="font-bold text-teal-800 text-xs flex justify-between items-center">
-                                <span>${c.branchName || 'Chu kỳ'} - Ngày: ${c.date || 'N/A'}</span>
-                                ${c.week ? `<span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300">${c.week}</span>` : ''}
+                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} - Ngày: ${escapeHtml(c.date || 'N/A')}</span>
+                                ${c.week ? `<span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300">${escapeHtml(c.week)}</span>` : ''}
                             </div>
-                            <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${c.drugNames || 'N/A'} - <strong class="text-slate-900">Liều dùng:</strong> ${c.doseInput || 'N/A'}</p>
-                            <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${c.note || 'Không có'}</p>
+                            <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${escapeHtml(c.drugNames || 'N/A')} - <strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'N/A')}</p>
+                            <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${escapeHtml(c.note || 'Không có')}</p>
                         `;
                         cyclesContainer.appendChild(cDiv);
                     });
@@ -2018,7 +2035,7 @@
                 headerDiv.className = "mt-3 mb-1 pb-1 border-b border-teal-600 flex items-center justify-between";
                 headerDiv.innerHTML = `
                     <span class="font-bold text-teal-900 text-xs uppercase flex items-center gap-1.5">
-                        <i class="fa-solid fa-vial text-teal-700"></i> PHÁC ĐỒ: ${group.protocolUsed}
+                        <i class="fa-solid fa-vial text-teal-700"></i> PHÁC ĐỒ: ${escapeHtml(group.protocolUsed)}
                         ${group.isChanged ? '<span class="text-[10px] text-rose-600 font-bold bg-rose-100 px-1.5 py-0.5 rounded"><i class="fa-solid fa-right-left"></i> Đổi phác đồ</span>' : ''}
                     </span>
                 `;
@@ -2034,7 +2051,7 @@
                                 <button type="button" class="w-5 h-5 rounded bg-teal-100 text-teal-800 flex items-center justify-center text-xs">
                                     <i id="cycleIcon_${idx}" class="fa-solid fa-plus text-teal-600"></i>
                                 </button>
-                                <span>${c.branchName || 'Chu kỳ'} (Ngày: ${c.date || 'N/A'}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${c.week}]</span>` : ''}</span>
+                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date || 'N/A')}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
                             </div>
                             <div class="flex items-center space-x-1">
                                 <button type="button" onclick="window.editTempCycle(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[10px] border border-amber-200"><i class="fa-solid fa-pen"></i> Sửa</button>
@@ -2043,11 +2060,11 @@
                         </div>
                         
                         <div id="cycleDetail_${idx}" class="hidden p-3 bg-slate-50 border-t border-slate-100 space-y-1.5 text-[11px] text-slate-700">
-                            <div><strong class="text-slate-900">Phác đồ áp dụng:</strong> ${c.protocolUsed || 'Chưa cập nhật'}</div>
-                            <div><strong class="text-slate-900">Thuốc hóa trị:</strong> ${c.drugNames || 'Chưa cập nhật'}</div>
-                            <div><strong class="text-slate-900">Liều dùng:</strong> ${c.doseInput || 'Chưa cập nhật'}</div>
-                            <div><strong class="text-slate-900">Tác dụng phụ / Ghi chú:</strong> ${c.note || 'Không ghi nhận'}</div>
-                            <div class="text-[10px] text-slate-400 pt-1">Cập nhật bởi: ${c.updatedBy || 'Thạch Xuân Tựu'}</div>
+                            <div><strong class="text-slate-900">Phác đồ áp dụng:</strong> ${escapeHtml(c.protocolUsed || 'Chưa cập nhật')}</div>
+                            <div><strong class="text-slate-900">Thuốc hóa trị:</strong> ${escapeHtml(c.drugNames || 'Chưa cập nhật')}</div>
+                            <div><strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'Chưa cập nhật')}</div>
+                            <div><strong class="text-slate-900">Tác dụng phụ / Ghi chú:</strong> ${escapeHtml(c.note || 'Không ghi nhận')}</div>
+                            <div class="text-[10px] text-slate-400 pt-1">Cập nhật bởi: ${escapeHtml(c.updatedBy || 'Thạch Xuân Tựu')}</div>
                         </div>
                     `;
                     listDiv.appendChild(div);
@@ -2066,7 +2083,7 @@
                 const markerTypes = [...new Set(window.tempCurrentMarkers.map(marker => marker.type).filter(Boolean))];
                 const previousType = markerSelect.value;
                 markerSelect.innerHTML = '<option value="">Chọn marker</option>' + markerTypes.map(type =>
-                    `<option value="${type}">${type}</option>`
+                    `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`
                 ).join('');
                 markerSelect.value = markerTypes.includes(previousType) ? previousType : (markerTypes[0] || '');
                 window.renderHistoryMarkerChart();
@@ -2082,9 +2099,9 @@
                 div.className = "bg-white p-2.5 rounded-xl border border-indigo-100 shadow-sm flex items-center justify-between text-xs";
                 div.innerHTML = `
                     <div>
-                        <span class="font-bold text-indigo-900">[${m.type}]</span> 
-                        <span class="font-bold text-slate-800">${m.value}</span> 
-                        <span class="text-slate-500 text-[10px]">(${m.date})</span>
+                        <span class="font-bold text-indigo-900">[${escapeHtml(m.type)}]</span> 
+                        <span class="font-bold text-slate-800">${escapeHtml(m.value)}</span> 
+                        <span class="text-slate-500 text-[10px]">(${escapeHtml(m.date)})</span>
                     </div>
                     <button type="button" onclick="window.deleteTempMarker(${idx})" class="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-[10px] border border-rose-200"><i class="fa-solid fa-trash"></i> Xóa</button>
                 `;
@@ -2375,7 +2392,8 @@
                 await updateDoc(doc(db, "patients", docId), {
                     cycles: window.tempCurrentCycles,
                     markers: window.tempCurrentMarkers,
-                    updatedAt: serverTimestamp()
+                    updatedAt: serverTimestamp(),
+                    updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
                 window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
             } catch (err) {
@@ -2422,17 +2440,29 @@
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition';
                     tr.innerHTML = `
-                        <td class="p-3 font-bold text-teal-800">${p.patientId || '-'}</td>
-                        <td class="p-3 font-semibold text-slate-900">${p.name || '-'}</td>
-                        <td class="p-3 text-center">${p.gender || '-'}</td>
-                        <td class="p-3">${p.birthYear || ''}</td>
-                        <td class="p-3"><strong class="text-teal-800">Chính:</strong> ${p.diagnosis || '-'}</td>
-                        <td class="p-3 font-bold text-amber-800">${p.protocol || 'Chưa cập nhật'}</td>
+                        <td class="p-3 font-bold text-teal-800">${escapeHtml(p.patientId || '-')}</td>
+                        <td class="p-3 font-semibold text-slate-900">${escapeHtml(p.name || '-')}</td>
+                        <td class="p-3 text-center">${escapeHtml(p.gender || '-')}</td>
+                        <td class="p-3">${escapeHtml(p.birthYear || '')}</td>
+                        <td class="p-3"><strong class="text-teal-800">Chính:</strong> ${escapeHtml(p.diagnosis || '-')}</td>
+                        <td class="p-3 font-bold text-amber-800">${escapeHtml(p.protocol || 'Chưa cập nhật')}</td>
                         <td class="p-3 text-center font-bold text-teal-700">${p.cycles ? p.cycles.length : 0} chu kỳ</td>
                         <td class="p-3 text-center">
-                            <button onclick="window.viewPatientDetail('${p.id}')" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button> <button onclick="window.closeStatsModal(); window.openEditPatientModal('${p.id}')" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button> ${(isAdmin || isVip) ? `<button onclick="window.deletePatientDoc('${p.id}')" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            <button type="button" data-patient-action="view" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
+                            <button type="button" data-patient-action="edit" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                            ${(isAdmin || isVip) ? `<button type="button" data-patient-action="delete" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
                         </td>
                     `;
+                    tr.querySelectorAll('[data-patient-action]').forEach((button) => {
+                        button.addEventListener('click', () => {
+                            if (button.dataset.patientAction === 'view') window.viewPatientDetail(p.id);
+                            if (button.dataset.patientAction === 'edit') {
+                                window.closeStatsModal();
+                                window.openEditPatientModal(p.id);
+                            }
+                            if (button.dataset.patientAction === 'delete') window.deletePatientDoc(p.id);
+                        });
+                    });
                     tbody.appendChild(tr);
                 });
             }
@@ -2562,18 +2592,21 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 transition";
                     tr.innerHTML = `
-                        <td class="p-3 font-bold text-slate-800">${u.name || 'Thành viên'}</td>
-                        <td class="p-3 text-slate-600">${u.email || '-'}</td>
-                        <td class="p-3 font-semibold text-teal-800">${u.role || 'Doctor'}</td>
+                        <td class="p-3 font-bold text-slate-800">${escapeHtml(u.name || 'Thành viên')}</td>
+                        <td class="p-3 text-slate-600">${escapeHtml(u.email || '-')}</td>
+                        <td class="p-3 font-semibold text-teal-800">${escapeHtml(u.role || 'Doctor')}</td>
                         <td class="p-3">
                             ${u.isBlocked ? '<span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded font-bold">Đã khóa</span>' : (u.isApproved ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded font-bold">Đã duyệt</span>' : '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold">Chờ duyệt</span>')}
                         </td>
                         <td class="p-3 text-center space-x-1">
-                            <button onclick="window.adminApproveUser('${uId}', true)" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[10px]">Duyệt</button>
-                            <button onclick="window.adminToggleBlockUser('${uId}', ${!u.isBlocked})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px]">${u.isBlocked ? 'Mở khóa' : 'Khóa'}</button>
-                            ${u.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase() ? `<button onclick="window.adminToggleVip('${uId}', ${u.role !== 'VIP'})" title="${u.role === 'VIP' ? 'Bỏ quyền VIP' : 'Cấp quyền VIP'}" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded font-semibold text-[10px]"><i class="fa-solid ${u.role === 'VIP' ? 'fa-crown' : 'fa-crown'}"></i> ${u.role === 'VIP' ? 'Bỏ VIP' : 'Cấp VIP'}</button>` : ''}
+                            <button type="button" data-user-action="approve" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[10px]">Duyệt</button>
+                            <button type="button" data-user-action="block" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px]">${u.isBlocked ? 'Mở khóa' : 'Khóa'}</button>
+                            ${u.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase() ? `<button type="button" data-user-action="vip" title="${u.role === 'VIP' ? 'Bỏ quyền VIP' : 'Cấp quyền VIP'}" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded font-semibold text-[10px]"><i class="fa-solid fa-crown"></i> ${u.role === 'VIP' ? 'Bỏ VIP' : 'Cấp VIP'}</button>` : ''}
                         </td>
                     `;
+                    tr.querySelector('[data-user-action="approve"]')?.addEventListener('click', () => window.adminApproveUser(uId, true));
+                    tr.querySelector('[data-user-action="block"]')?.addEventListener('click', () => window.adminToggleBlockUser(uId, !u.isBlocked));
+                    tr.querySelector('[data-user-action="vip"]')?.addEventListener('click', () => window.adminToggleVip(uId, u.role !== 'VIP'));
                     tbody.appendChild(tr);
                 });
             } catch (err) {
