@@ -74,6 +74,8 @@
         html[data-theme="dark"] input:not([type="radio"]),
         html[data-theme="dark"] select,
         html[data-theme="dark"] textarea { background-color: #111a2b; color: #e2e8f0; border-color: #334155; }
+        html[data-theme="dark"] #accountSettingsMenu { background-color: #1f1f1f !important; border-color: #303134 !important; }
+        html[data-theme="dark"] #accountSettingsMenu input { background-color: #131314 !important; color: #e3e3e3 !important; border-color: #3c4043 !important; }
         html[data-theme="dark"] input::placeholder,
         html[data-theme="dark"] textarea::placeholder { color: #94a3b8; }
         html[data-theme="dark"] table thead { background-color: #111a2b; }
@@ -227,18 +229,18 @@
         </div>
     </footer>
 
-    <div id="doctorProfile" class="hidden fixed bottom-5 left-5 z-[90] flex flex-row items-center gap-2">
+    <div id="doctorProfile" class="hidden fixed bottom-5 left-5 z-[90] flex flex-col-reverse items-center gap-2.5">
         <div class="relative inline-flex shrink-0">
             <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Ảnh đại diện" class="w-9 h-9 rounded-full border-2 border-emerald-500 object-cover shadow-lg bg-white">
             <span id="docAdminCrown" class="hidden absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-amber-400 text-amber-950 border-2 border-white items-center justify-center text-[9px] shadow" title="Admin" aria-label="Admin">
                 <i class="fa-solid fa-crown" aria-hidden="true"></i>
             </span>
         </div>
-        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-700 shadow-lg flex items-center justify-center transition">
-            <i class="fa-solid fa-users-gear text-sm" aria-hidden="true"></i>
-        </button>
-        <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-teal-800 text-slate-200 hover:text-white border border-slate-600 shadow-lg flex items-center justify-center transition">
+        <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="w-9 h-9 rounded-full bg-[#1f1f1f] hover:bg-[#303134] text-[#c4c7c5] hover:text-white border border-[#303134] shadow-lg flex items-center justify-center transition">
             <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        </button>
+        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full bg-[#1f1f1f] hover:bg-[#303134] border border-[#303134] text-[#c4c7c5] hover:text-white shadow-lg flex items-center justify-center transition">
+            <i class="fa-solid fa-users-gear text-sm" aria-hidden="true"></i>
         </button>
         <section id="accountSettingsMenu" class="hidden absolute left-0 bottom-[calc(100%+0.75rem)] w-80 max-w-[calc(100vw-2.5rem)] max-h-[78vh] overflow-y-auto custom-scrollbar bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 space-y-3 text-xs">
             <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
