@@ -257,13 +257,23 @@
             animation: tabPanelEnter 360ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
             transform-origin: top center;
         }
+        .panel-opening { animation: panelOpening 260ms cubic-bezier(0.2, 0.75, 0.25, 1) both; }
+        .panel-closing { animation: panelClosing 180ms cubic-bezier(0.4, 0, 1, 1) both; pointer-events: none; }
+        @keyframes panelOpening {
+            from { opacity: 0; transform: translateY(12px) scale(0.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes panelClosing {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(8px) scale(0.99); }
+        }
         @keyframes tabPanelEnter {
             from { opacity: 0; transform: translateY(10px) scale(0.992); filter: blur(3px); }
             to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
         @media (prefers-reduced-motion: reduce) {
             .splash-slogan { animation: none; background-position: 50% 0; }
-            .tab-panel-enter { animation: none; }
+            .tab-panel-enter, .panel-opening, .panel-closing { animation: none; }
         }
     </style>
 </head>
@@ -1084,13 +1094,13 @@
             const menu = document.getElementById('accountSettingsMenu');
             const toggle = document.getElementById('accountSettingsToggle');
             const willOpen = menu.classList.contains('hidden');
-            menu.classList.toggle('hidden', !willOpen);
+            window.setPanelVisibility(menu, willOpen);
             toggle.setAttribute('aria-expanded', String(willOpen));
         };
         window.closeAccountSettingsMenu = function() {
             const menu = document.getElementById('accountSettingsMenu');
             const toggle = document.getElementById('accountSettingsToggle');
-            menu?.classList.add('hidden');
+            window.setPanelVisibility(menu, false);
             toggle?.setAttribute('aria-expanded', 'false');
         };
         document.addEventListener('click', (event) => {
@@ -1103,6 +1113,24 @@
         window.canManageOncoCareUsers = false;
         window.currentUserSignedIn = false;
         window.accountAccessBlocked = false;
+
+        window.setPanelVisibility = function(panel, isVisible) {
+            if (!panel) return;
+            clearTimeout(panel._visibilityTimer);
+            panel.classList.remove('panel-opening', 'panel-closing');
+            if (isVisible) {
+                panel.classList.remove('hidden');
+                void panel.offsetWidth;
+                panel.classList.add('panel-opening');
+                panel.addEventListener('animationend', () => panel.classList.remove('panel-opening'), { once: true });
+            } else if (!panel.classList.contains('hidden')) {
+                panel.classList.add('panel-closing');
+                panel._visibilityTimer = setTimeout(() => {
+                    panel.classList.add('hidden');
+                    panel.classList.remove('panel-closing');
+                }, 180);
+            }
+        };
 
         (() => {
             const isDark = document.documentElement.dataset.theme === 'dark';
@@ -1552,16 +1580,16 @@
             window.renderTempCyclesList();
             window.renderTempMarkersList();
             window.previewNewPatientCycle();
-            document.getElementById('patientFormModal').classList.remove('hidden');
+            window.setPanelVisibility(document.getElementById('patientFormModal'), true);
             window.renderTempMarkersList();
         };
 
         window.closePatientFormModal = function() {
-            document.getElementById('patientFormModal').classList.add('hidden');
+            window.setPanelVisibility(document.getElementById('patientFormModal'), false);
         };
 
         window.closePatientDetailModal = function() {
-            document.getElementById('patientDetailModal').classList.add('hidden');
+            window.setPanelVisibility(document.getElementById('patientDetailModal'), false);
             if (window.activeMarkerChart) {
                 window.activeMarkerChart.destroy();
                 window.activeMarkerChart = null;
@@ -1685,12 +1713,12 @@
 
         window.openUserManagementModal = function() {
             if (!window.canManageOncoCareUsers) return;
-            document.getElementById('userManagementModal').classList.remove('hidden');
+            window.setPanelVisibility(document.getElementById('userManagementModal'), true);
             if (window.loadUsersManagementTable) window.loadUsersManagementTable();
         };
 
         window.closeUserManagementModal = function() {
-            document.getElementById('userManagementModal').classList.add('hidden');
+            window.setPanelVisibility(document.getElementById('userManagementModal'), false);
         };
 
         window.statsModalIsMaximized = false;
@@ -1708,7 +1736,7 @@
             document.getElementById('statsEndDate').value = today;
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
-            document.getElementById('statsModal').classList.remove('hidden');
+            window.setPanelVisibility(document.getElementById('statsModal'), true);
             window.switchStatsTab('overview');
             window.runChemoStatistics();
         };
@@ -1738,14 +1766,14 @@
         };
 
         window.closeStatsModal = function() {
-            document.getElementById('statsModal').classList.add('hidden');
+            window.setPanelVisibility(document.getElementById('statsModal'), false);
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
             if (window.statsModalIsMaximized) window.toggleStatsModalSize();
         };
 
         window.minimizeStatsModal = function() {
-            document.getElementById('statsModal').classList.add('hidden');
+            window.setPanelVisibility(document.getElementById('statsModal'), false);
             const restoreButton = document.getElementById('statsMinimizedRestore');
             restoreButton.classList.remove('hidden');
             restoreButton.classList.add('flex');
@@ -1754,7 +1782,7 @@
         window.restoreStatsModal = function() {
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
-            document.getElementById('statsModal').classList.remove('hidden');
+            window.setPanelVisibility(document.getElementById('statsModal'), true);
             setTimeout(() => window.statsPieChartInstance?.resize(), 0);
         };
 
@@ -2064,7 +2092,7 @@
                 return;
             }
 
-            document.getElementById('patientListSection').classList.remove('hidden');
+            window.setPanelVisibility(document.getElementById('patientListSection'), true);
             const matched = cachedPatientsList.filter(p => p.patientId && p.patientId === code);
             if (matched.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${escapeHtml(code)}</td></tr>`;
@@ -2107,7 +2135,7 @@
 
         window.clearSearchResult = function() {
             document.getElementById('searchInput').value = "";
-            document.getElementById('patientListSection').classList.add('hidden');
+            window.setPanelVisibility(document.getElementById('patientListSection'), false);
             document.getElementById('patientCountBadge').innerText = "Chưa chọn tra cứu";
             document.getElementById('allPatientsTableBody').innerHTML = `
                 <tr>
@@ -2181,7 +2209,7 @@
                 });
             }
 
-            document.getElementById('patientDetailModal').classList.remove('hidden');
+            window.setPanelVisibility(document.getElementById('patientDetailModal'), true);
             window.switchDetailTab('timeline');
         };
 
@@ -2263,7 +2291,7 @@
             window.renderTempCyclesList();
             window.renderTempMarkersList();
 
-            document.getElementById('patientFormModal').classList.remove('hidden');
+            window.setPanelVisibility(document.getElementById('patientFormModal'), true);
             window.renderTempMarkersList();
         };
 
