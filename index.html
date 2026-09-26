@@ -22,6 +22,15 @@
             document.documentElement.dataset.theme = savedTheme || 'dark';
         })();
     </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+                    .then((registration) => registration.update())
+                    .catch((error) => console.error('Không thể cập nhật bộ nhớ ứng dụng:', error));
+            });
+        }
+    </script>
     
     <style>
         body { font-family: 'Inter', sans-serif; background: #e9edf2; }
@@ -398,12 +407,13 @@
                             <th class="p-3">Năm Sinh</th>
                             <th class="p-3">Chẩn Đoán Chính / Phụ</th>
                             <th class="p-3">Phác Đồ</th>
+                            <th class="p-3 text-center">Chu Kỳ Gần Nhất</th>
                             <th class="p-3 text-center">Thao Tác</th>
                         </tr>
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
                         <tr>
-                            <td colspan="7" class="p-8 text-center text-slate-400 font-medium">
+                            <td colspan="8" class="p-8 text-center text-slate-400 font-medium">
                                 <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
                                 Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
                             </td>
@@ -1002,7 +1012,7 @@
                                 <th class="p-3">Năm Sinh</th>
                                 <th class="p-3">Chẩn đoán (Chính / Phụ)</th>
                                 <th class="p-3">Phác đồ</th>
-                                <th class="p-3">Số Chu Kỳ</th>
+                                <th class="p-3">Chu Kỳ Gần Nhất</th>
                                 <th class="p-3 text-center">Thao Tác Trực Tiếp</th>
                             </tr>
                         </thead>
@@ -2144,7 +2154,7 @@
             window.setPanelVisibility(document.getElementById('patientListSection'), true);
             const matched = cachedPatientsList.filter(p => p.patientId && p.patientId === code);
             if (matched.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${escapeHtml(code)}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${escapeHtml(code)}</td></tr>`;
                 countBadge.innerText = "0 kết quả";
                 return;
             }
@@ -2164,7 +2174,8 @@
                         <strong class="text-teal-800">Chính:</strong> ${escapeHtml(p.diagnosis || '-')}<br>
                         <strong class="text-amber-800">Phụ:</strong> ${escapeHtml(p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(', ') : 'Không có'))}
                     </td>
-                    <td class="p-3 font-bold text-amber-800">${escapeHtml(p.protocol || 'Chưa cập nhật')}</td>
+                    <td class="p-3 font-bold text-amber-800">${escapeHtml(window.getLatestTreatmentSummary(p).protocol)}</td>
+                    <td class="p-3 text-center font-semibold text-teal-700">${escapeHtml(window.getLatestTreatmentSummary(p).cycle)}</td>
                     <td class="p-3 text-center space-x-1">
                         <button type="button" data-patient-action="view" title="Form tóm tắt & Marker" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
                         <button type="button" data-patient-action="edit" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -2188,7 +2199,7 @@
             document.getElementById('patientCountBadge').innerText = "Chưa chọn tra cứu";
             document.getElementById('allPatientsTableBody').innerHTML = `
                 <tr>
-                    <td colspan="7" class="p-8 text-center text-slate-400 font-medium">
+                    <td colspan="8" class="p-8 text-center text-slate-400 font-medium">
                         <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
                         Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
                     </td>
@@ -2278,6 +2289,26 @@
             });
             orphanWeekParents.forEach(({ week, placeholder }) => prepared.splice(prepared.indexOf(week), 0, placeholder));
             return prepared;
+        };
+
+        window.getLatestTreatmentSummary = function(patient) {
+            const cycles = (patient?.cycles || [])
+                .map((cycle, index) => ({ cycle, index }))
+                .filter(({ cycle }) => cycle && !cycle.isCycleGroup && (cycle.date || cycle.cycleNum || cycle.week));
+            cycles.sort((a, b) => {
+                const byDate = String(b.cycle.date || '').localeCompare(String(a.cycle.date || ''));
+                if (byDate) return byDate;
+                const byNumber = (Number(b.cycle.cycleNum) || 0) - (Number(a.cycle.cycleNum) || 0);
+                return byNumber || b.index - a.index;
+            });
+            const latest = cycles[0]?.cycle;
+            const protocol = latest?.protocolUsed || patient?.protocol || 'Chưa cập nhật';
+            if (!latest) return { protocol, cycle: 'Chưa cập nhật' };
+            const cycleNumber = Number(latest.cycleNum);
+            const cycleLabel = Number.isFinite(cycleNumber) && cycleNumber > 0
+                ? `Chu kỳ ${cycleNumber}`
+                : (latest.branchName || 'Chu kỳ gần nhất');
+            return { protocol, cycle: latest.week ? `${cycleLabel} (${latest.week})` : cycleLabel };
         };
 
         window.viewPatientDetail = function(docId) {
@@ -3076,8 +3107,8 @@
                         <td class="p-3 text-center">${escapeHtml(p.gender || '-')}</td>
                         <td class="p-3">${escapeHtml(p.birthYear || '')}</td>
                         <td class="p-3"><strong class="text-teal-800">Chính:</strong> ${escapeHtml(p.diagnosis || '-')}</td>
-                        <td class="p-3 font-bold text-amber-800">${escapeHtml(p.protocol || 'Chưa cập nhật')}</td>
-                        <td class="p-3 text-center font-bold text-teal-700">${window.prepareCyclesWithWeekParents(p.cycles || []).filter(cycle => !cycle.parentCycleId).length} chu kỳ</td>
+                        <td class="p-3 font-bold text-amber-800">${escapeHtml(window.getLatestTreatmentSummary(p).protocol)}</td>
+                        <td class="p-3 text-center font-bold text-teal-700">${escapeHtml(window.getLatestTreatmentSummary(p).cycle)}</td>
                         <td class="p-3 text-center">
                             <button type="button" data-patient-action="view" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
                             <button type="button" data-patient-action="edit" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
