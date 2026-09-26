@@ -1731,7 +1731,7 @@
                     btnAddPatient.disabled = false;
                     btnSearchPatient.disabled = false;
                     searchInput.disabled = false;
-                    accountStatusNotice.classList.add(hidden);
+                    accountStatusNotice.classList.add('hidden');
                 }
                 const userDocRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userDocRef);
