@@ -912,17 +912,18 @@
 
         <div class="p-3 sm:p-5 space-y-3 flex-1 min-h-0 overflow-hidden flex flex-col text-xs">
             <!-- Bộ lọc khoảng thời gian thực -->
-            <div id="statsFilters" class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end shrink-0">
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Từ ngày</label>
-                    <input type="date" id="statsStartDate" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium">
+            <div id="statsFilters" class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 flex flex-wrap justify-center items-end gap-3 shrink-0">
+                <div class="w-full sm:w-56">
+                    <label for="statsStartDate" class="block text-center font-semibold text-slate-700 mb-1">Từ ngày</label>
+                    <input type="date" id="statsStartDate" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium text-center">
                 </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Đến ngày</label>
-                    <input type="date" id="statsEndDate" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium">
+                <div class="w-full sm:w-56">
+                    <label for="statsEndDate" class="block text-center font-semibold text-slate-700 mb-1">Đến ngày</label>
+                    <input type="date" id="statsEndDate" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium text-center">
                 </div>
-                <div>
-                    <select id="statsIcdFilter" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800">
+                <div class="w-full sm:w-52">
+                    <label for="statsIcdFilter" class="sr-only">Lọc theo nhóm ICD</label>
+                    <select id="statsIcdFilter" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 text-center">
                         <option value="ALL">Tất cả (All)</option>
                         <option value="C16">C16 (Dạ dày)</option>
                         <option value="C18">C18 (Đại tràng)</option>
@@ -931,19 +932,14 @@
                         <option value="C50">C50 (Vú)</option>
                     </select>
                 </div>
-                <div>
-                    <button onclick="window.runChemoStatistics()" class="w-full px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-filter"></i> Xem Thống Kê
-                    </button>
-                </div>
             </div>
 
             <div id="statsTabs" class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex gap-1 shrink-0">
-                <button type="button" id="btnStatsOverviewTab" onclick="window.switchStatsTab('overview')" class="flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition">
-                    <i class="fa-solid fa-chart-pie mr-1.5"></i>Tổng quan
-                </button>
-                <button type="button" id="btnStatsPatientsTab" onclick="window.switchStatsTab('patients')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition">
+                <button type="button" id="btnStatsPatientsTab" onclick="window.switchStatsTab('patients')" class="flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition">
                     <i class="fa-solid fa-hospital-user mr-1.5"></i>Danh sách bệnh
+                </button>
+                <button type="button" id="btnStatsOverviewTab" onclick="window.switchStatsTab('overview')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition">
+                    <i class="fa-solid fa-chart-pie mr-1.5"></i>Thống kê
                 </button>
             </div>
 
@@ -1011,7 +1007,7 @@
                         <tbody id="statsTableBody" class="divide-y divide-slate-200">
                             <tr>
                                 <td colspan="8" class="p-6 text-center text-slate-400 font-medium">
-                                    Vui lòng chọn khoảng thời gian và nhấn "Xem Thống Kê".
+                                    Chọn khoảng thời gian để hiển thị danh sách bệnh nhân.
                                 </td>
                             </tr>
                         </tbody>
@@ -1755,8 +1751,16 @@
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
             window.setPanelVisibility(document.getElementById('statsModal'), true);
-            window.switchStatsTab('overview');
+            window.switchStatsTab('patients');
             window.runChemoStatistics();
+        };
+
+        window.handleStatsDateRangeChange = function() {
+            const startDate = document.getElementById('statsStartDate').value;
+            const endDate = document.getElementById('statsEndDate').value;
+            if (!startDate || !endDate || startDate > endDate) return;
+            window.runChemoStatistics();
+            window.switchStatsTab('patients');
         };
 
         window.switchStatsTab = function(tabName) {
