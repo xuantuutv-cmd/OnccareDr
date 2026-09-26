@@ -427,7 +427,7 @@
         <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="w-9 h-9 rounded-full text-[#c4c7c5] hover:text-white border-0 flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
             <svg class="profile-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2h4l.5 2.2 1.5.6 1.9-1.2 2.8 2.8-1.2 1.9.6 1.5L22 10v4l-2.2.5-.6 1.5 1.2 1.9-2.8 2.8-1.9-1.2-1.5.6L14 22h-4l-.5-2.2-1.5-.6-1.9 1.2-2.8-2.8 1.2-1.9-.6-1.5L2 14v-4l2.2-.5.6-1.5-1.2-1.9 2.8-2.8 1.9 1.2 1.5-.6z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
-        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full border-0 text-[#c4c7c5] hover:text-white flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
+        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.toggleUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full border-0 text-[#c4c7c5] hover:text-white flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
             <svg class="profile-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 8v6m-3-3h6"/></svg>
         </button>
         <section id="accountSettingsMenu" class="hidden absolute left-0 bottom-[calc(100%+0.75rem)] w-80 max-w-[calc(100vw-2.5rem)] max-h-[78vh] overflow-y-auto custom-scrollbar bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 space-y-3 text-xs">
@@ -1715,6 +1715,16 @@
             if (!window.canManageOncoCareUsers) return;
             window.setPanelVisibility(document.getElementById('userManagementModal'), true);
             if (window.loadUsersManagementTable) window.loadUsersManagementTable();
+        };
+
+        window.toggleUserManagementModal = function() {
+            if (!window.canManageOncoCareUsers) return;
+            const modal = document.getElementById('userManagementModal');
+            if (modal.classList.contains('hidden') || modal.classList.contains('panel-closing')) {
+                window.openUserManagementModal();
+            } else {
+                window.closeUserManagementModal();
+            }
         };
 
         window.closeUserManagementModal = function() {
