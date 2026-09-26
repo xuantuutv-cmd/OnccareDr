@@ -119,6 +119,13 @@
         #accountSettingsToggle:hover,
         #btnUserMgmt:hover { background: transparent !important; }
         .profile-action-icon { width: 1.4rem; height: 1.4rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .brand-leaf {
+            color: transparent;
+            background: linear-gradient(145deg, #4285f4 8%, #a142f4 35%, #ea4335 53%, #fbbc04 70%, #34a853 92%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            filter: drop-shadow(0 0 8px rgba(66, 133, 244, 0.28));
+        }
         html[data-theme="dark"] #accountSettingsMenu {
             background: #1f1f1f !important;
             color: #e3e3e3;
@@ -201,8 +208,8 @@
 
     <section id="loginSplash" class="fixed inset-0 z-[120] flex items-center justify-center px-6 py-12" aria-label="Đăng nhập OncoCare Pro">
         <div class="w-full max-w-lg text-center">
-            <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-[1.7rem] border border-teal-300/20 bg-teal-400/10 shadow-[0_0_60px_rgba(45,212,191,0.12)]">
-                <i class="fa-solid fa-leaf text-4xl text-teal-300" aria-hidden="true"></i>
+            <div class="mx-auto mb-6 flex items-center justify-center">
+                <i class="brand-leaf fa-solid fa-leaf text-6xl" aria-hidden="true"></i>
             </div>
             <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-100">OncoCare Pro</h1>
             <p class="splash-slogan mt-4 text-lg sm:text-xl font-medium tracking-wide">Luôn đồng hành cùng bạn</p>
@@ -232,8 +239,8 @@
     <header class="bg-transparent backdrop-blur-xl text-slate-800 sticky top-0 z-40">
         <div class="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-6 2xl:px-10 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-                <div class="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center border border-teal-100">
-                    <i class="fa-solid fa-leaf text-teal-700 text-3xl"></i>
+                <div class="w-14 h-14 flex items-center justify-center">
+                    <i class="brand-leaf fa-solid fa-leaf text-4xl" aria-hidden="true"></i>
                 </div>
                 <div class="flex flex-col justify-center">
                     <h1 class="font-bold text-xl sm:text-2xl tracking-tight leading-none text-slate-800">
