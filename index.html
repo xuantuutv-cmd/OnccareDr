@@ -3268,3 +3268,34 @@
                 alert("Lỗi: " + err.message);
             }
         };
+
+        window.adminToggleBlockUser = async function(userId, status) {
+            if (!isAdmin || !window.canUseOncoCare) return;
+            try {
+                await updateDoc(doc(db, "users", userId), { isBlocked: status });
+                window.showToast("Đã cập nhật trạng thái khóa tài khoản!");
+                window.loadUsersManagementTable();
+            } catch (err) {
+                alert("Lỗi: " + err.message);
+            }
+        };
+
+        window.adminToggleVip = async function(userId, status) {
+            if (!isAdmin || !window.canUseOncoCare) return;
+            try {
+                const targetRef = doc(db, "users", userId);
+                const targetSnapshot = await getDoc(targetRef);
+                if (!targetSnapshot.exists() || targetSnapshot.data().email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return;
+                await updateDoc(targetRef, {
+                    role: status ? "VIP" : "Doctor",
+                    isApproved: true
+                });
+                window.showToast(status ? "Đã cấp quyền VIP cho thành viên!" : "Đã hủy quyền VIP của thành viên!");
+                window.loadUsersManagementTable();
+            } catch (err) {
+                alert("Lỗi: " + err.message);
+            }
+        };
+    </script>
+</body>
+</html>
