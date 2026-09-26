@@ -1837,7 +1837,6 @@
     <!-- ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
         import { 
             getAuth, 
             GoogleAuthProvider, 
@@ -1877,16 +1876,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        // App Check must not prevent Firebase Auth from starting. A bad/missing
-        // App Check key or domain configuration should leave login usable.
-        try {
-            initializeAppCheck(app, {
-                provider: new ReCaptchaEnterpriseProvider("6Lf6m84tAAAAAH9Q5E9_LsQR6EHk6aKecmBx9IxU"),
-                isTokenAutoRefreshEnabled: true
-            });
-        } catch (appCheckError) {
-            console.error("Không thể khởi tạo Firebase App Check:", appCheckError);
-        }
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -1932,6 +1921,19 @@
                 alert(`Đăng nhập thất bại (${errorCode}): ${helpText}`);
             }
         };
+
+        // Load App Check after Auth has started so its CDN or configuration
+        // cannot stop the login handler from being registered.
+        import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js")
+            .then(({ initializeAppCheck, ReCaptchaEnterpriseProvider }) => {
+                initializeAppCheck(app, {
+                    provider: new ReCaptchaEnterpriseProvider("6Lf6m84tAAAAAH9Q5E9_LsQR6EHk6aKecmBx9IxU"),
+                    isTokenAutoRefreshEnabled: true
+                });
+            })
+            .catch((appCheckError) => {
+                console.error("Không thể khởi tạo Firebase App Check:", appCheckError);
+            });
 
         window.logoutGoogle = async function() {
             await signOut(auth);
@@ -3262,3 +3264,7 @@
             } catch (err) {
                 alert("Lỗi: " + err.message);
             }
+        };
+    </script>
+</body>
+</html>
