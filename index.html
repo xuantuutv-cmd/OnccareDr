@@ -1337,7 +1337,7 @@
                     window.addNewMarkerFromForm();
                 }
             };
-            document.getElementById('patientInputPanel').classList.remove('lg:col-span-12'); document.getElementById('patientInputPanel').classList.add('lg:col-span-5'); document.getElementById('patientHistoryPanel').classList.remove('hidden'); document.getElementById('btnAddCycleBtn').classList.add('hidden'); document.getElementById('saveBtn').classList.remove('hidden'); document.getElementById('saveBtnText').innerText = "Lưu thông tin"; document.getElementById('dispModalDoc').innerText = "Thạch Xuân Tựu";
+            document.getElementById('patientInputPanel').classList.remove('lg:col-span-12'); document.getElementById('patientInputPanel').classList.add('lg:col-span-5'); document.getElementById('patientHistoryPanel').classList.remove('hidden'); document.getElementById('btnAddCycleBtn').classList.add('hidden'); document.getElementById('saveBtn').classList.remove('hidden'); document.getElementById('saveBtnText').innerText = "Lưu thông tin"; document.getElementById('dispModalDoc').innerText = getCurrentProfessionalDisplayName();
             
             document.getElementById('adminInputFields').classList.remove('hidden');
             document.getElementById('nonAdminTextDisplay').classList.add('hidden');
@@ -1668,6 +1668,10 @@
             return currentProfessionalTitle || currentUser?.displayName || 'Bác sĩ';
         }
 
+        function getCurrentProfessionalDisplayName() {
+            return currentProfessionalTitle || currentUser?.displayName || 'Thạch Xuân Tựu';
+        }
+
         window.loginWithGoogle = async function() {
             try {
                 await signInWithPopup(auth, provider);
@@ -1695,6 +1699,8 @@
                 await updateDoc(doc(db, 'users', currentUser.uid), { professionalTitle: title });
                 currentProfessionalTitle = title;
                 document.getElementById('settingsAccountName').innerText = title || currentUser.displayName || 'Tài khoản bác sĩ';
+                const responsibleDoctor = document.getElementById('dispModalDoc');
+                if (responsibleDoctor) responsibleDoctor.innerText = getCurrentProfessionalDisplayName();
                 window.showToast('Đã lưu chức danh hiển thị!');
             } catch (err) {
                 console.error('Lỗi lưu chức danh:', err);
@@ -1948,7 +1954,7 @@
 
             document.getElementById('editDocId').value = p.id;
             window.resetFormToAddNewMode();
-            document.getElementById('patientInputPanel').classList.remove('lg:col-span-12'); document.getElementById('patientInputPanel').classList.add('lg:col-span-5'); document.getElementById('patientHistoryPanel').classList.remove('hidden'); document.getElementById('dispModalDoc').innerText = p.createdByEmail || 'Thạch Xuân Tựu';
+            document.getElementById('patientInputPanel').classList.remove('lg:col-span-12'); document.getElementById('patientInputPanel').classList.add('lg:col-span-5'); document.getElementById('patientHistoryPanel').classList.remove('hidden'); document.getElementById('dispModalDoc').innerText = getCurrentProfessionalDisplayName();
 
             const adminFields = document.getElementById('adminInputFields');
             const nonAdminFields = document.getElementById('nonAdminTextDisplay');
