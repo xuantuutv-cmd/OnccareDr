@@ -16,13 +16,26 @@
     <script>
         (() => {
             const savedTheme = localStorage.getItem('oncocare-theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            document.documentElement.dataset.theme = savedTheme || 'dark';
         })();
     </script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f8f9fc; }
+        body { font-family: 'Inter', sans-serif; background: #e9edf2; }
+        html[data-theme="light"] body { background: #e9edf2; color: #263244; }
+        html[data-theme="light"] .bg-white,
+        html[data-theme="light"] .bg-white\/90 { background-color: #f1f3f6 !important; }
+        html[data-theme="light"] .bg-slate-50,
+        html[data-theme="light"] .bg-slate-50\/80 { background-color: #e5e9ef !important; }
+        html[data-theme="light"] .bg-slate-100,
+        html[data-theme="light"] .bg-slate-100\/80 { background-color: #dde3ea !important; }
+        html[data-theme="light"] .bg-slate-200 { background-color: #d3dae3 !important; }
+        html[data-theme="light"] [class*="border-slate-"],
+        html[data-theme="light"] [class*="border-teal-"],
+        html[data-theme="light"] [class*="border-indigo-"],
+        html[data-theme="light"] [class*="border-amber-"],
+        html[data-theme="light"] [class*="border-rose-"],
+        html[data-theme="light"] [class*="border-emerald-"] { border-color: #cbd3dd !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
