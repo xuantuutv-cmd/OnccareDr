@@ -1,15 +1,17 @@
 {
-  "name": "OncoCare Pro - Quản Lý Hóa Trị",
+  "name": "OncoCare Pro",
   "short_name": "OncoCare",
-  "start_url": "./index.html",
+  "description": "Quản lý hóa trị ung bướu và thống kê",
+  "start_url": "./OnccareDr-index-fixed.html",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#07111f",
   "theme_color": "#0d9488",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2966/2966327.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "./favicon.svg?v=2",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }
