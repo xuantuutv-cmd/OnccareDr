@@ -108,6 +108,12 @@
         html[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
         html[data-theme="dark"] footer { color: #a8b4c7; }
         html[data-theme="dark"] footer p { color: inherit; }
+        #docAvatar.admin-avatar {
+            width: 2.75rem;
+            height: 2.75rem;
+            border: 3px solid #3b82f6;
+            box-shadow: 0 0 0 3px #818cf8, 0 0 14px rgba(59, 130, 246, 0.45);
+        }
         #themeToggleButton { width: 3.25rem; height: 1.85rem; padding: 0.2rem; border: 1px solid #34363d; border-radius: 9999px; background: #202124; color: #d1d5db; transition: background-color 200ms ease, border-color 200ms ease; }
         #themeToggleButton .theme-toggle-thumb { width: 1.35rem; height: 1.35rem; border-radius: 9999px; background: #303238; box-shadow: none; display: flex; align-items: center; justify-content: center; transform: translateX(0); transition: transform 200ms ease, background-color 200ms ease; }
         #themeToggleButton[aria-pressed="true"] { background: #202124; border-color: #34363d; }
@@ -1829,10 +1835,11 @@
                 avatar.src = user.photoURL || 'https://placehold.co/100x100/0d9488/ffffff?text=Doctor';
                 settingsAvatar.src = avatar.src;
                 const applyAccessState = () => {
+                    avatar.classList.toggle('admin-avatar', isAdmin);
                     avatar.classList.toggle('border-amber-400', isVip);
                     avatar.classList.toggle('border-emerald-500', !isVip);
-                    adminCrown.classList.toggle('hidden', !isAdmin);
-                    adminCrown.classList.toggle('flex', isAdmin);
+                    adminCrown.classList.add('hidden');
+                    adminCrown.classList.remove('flex');
                     btnStats.classList.toggle('hidden', !window.canUseOncoCare);
                     btnUserMgmt.classList.toggle('hidden', !isAdmin);
                     searchInput.disabled = !window.canUseOncoCare;
