@@ -2172,6 +2172,24 @@
             `;
         };
 
+        window.prepareCyclesWithWeekParents = function(cycles) {
+            const prepared = JSON.parse(JSON.stringify(cycles || []));
+            prepared.forEach(cycle => {
+                if (!cycle.parentCycleId && !cycle.cycleEntryId && cycle.week !== 'Tuần 2') cycle.cycleEntryId = crypto.randomUUID();
+            });
+            prepared.forEach(week => {
+                if (week.week !== 'Tuần 2' || week.parentCycleId) return;
+                const possibleParents = prepared.filter(cycle =>
+                    !cycle.parentCycleId && cycle.week !== 'Tuần 2' &&
+                    Number(cycle.cycleNum) === Number(week.cycleNum) &&
+                    (cycle.protocolKeyUsed || '') === (week.protocolKeyUsed || '')
+                );
+                const parent = possibleParents.find(cycle => cycle.week === 'Tuần 1') || possibleParents[0];
+                if (parent && parent !== week) week.parentCycleId = parent.cycleEntryId;
+            });
+            return prepared;
+        };
+
         window.viewPatientDetail = function(docId) {
             if (!window.canUseOncoCare) return;
             const p = cachedPatientsList.find(item => item.id === docId);
@@ -2187,14 +2205,14 @@
 
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
-            const cycles = p.cycles || [];
+            const cycles = window.prepareCyclesWithWeekParents(p.cycles || []);
             if (cycles.length === 0) {
                 cyclesContainer.innerHTML = `<p class="text-slate-400 italic text-xs">Chưa có lịch sử chu kỳ.</p>`;
             } else {
                 let groupedCycles = [];
                 cycles.forEach((c) => {
                     let protoName = c.protocolUsed || p.protocol || 'Phác đồ';
-                    let isChanged = c.isChangedProtocol || false;
+                    let isChanged = !c.parentCycleId && (c.isChangedProtocol || false);
                     
                     if (groupedCycles.length === 0 || isChanged) {
                         groupedCycles.push({
@@ -2218,7 +2236,8 @@
                     `;
                     cyclesContainer.appendChild(protoHeader);
 
-                    group.items.forEach((c) => {
+                    const roots = group.items.filter(c => !c.parentCycleId);
+                    roots.forEach((c) => {
                         let cDiv = document.createElement('div');
                         cDiv.className = "p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs ml-3 my-2 space-y-1";
                         cDiv.innerHTML = `
@@ -2230,6 +2249,21 @@
                             <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${escapeHtml(c.note || 'Không có')}</p>
                         `;
                         cyclesContainer.appendChild(cDiv);
+                        const childKey = c.cycleEntryId;
+                        if (childKey) {
+                            group.items.filter(child => child.parentCycleId === childKey).forEach(child => {
+                                const childDiv = document.createElement('div');
+                                childDiv.className = "p-3 bg-amber-50/60 rounded-lg border border-amber-200 text-xs ml-8 my-2 space-y-1";
+                                childDiv.innerHTML = `
+                                    <div class="font-bold text-amber-800 text-xs flex justify-between items-center">
+                                        <span><i class="fa-solid fa-turn-down mr-1"></i>${escapeHtml(child.week || 'Tuần điều trị')} - Ngày: ${escapeHtml(child.date || 'N/A')}</span>
+                                    </div>
+                                    <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${escapeHtml(child.drugNames || 'N/A')} - <strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(child.doseInput || 'N/A')}</p>
+                                    <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${escapeHtml(child.note || 'Không có')}</p>
+                                `;
+                                cyclesContainer.appendChild(childDiv);
+                            });
+                        }
                     });
                 });
             }
@@ -2300,16 +2334,10 @@
             document.getElementById('npCycleDate').value = localDate;
             document.getElementById('npMarkerDate').value = localDate;
             
-            let lastCycleNum = 0;
-            if (p.cycles && p.cycles.length > 0) {
-                let lastCycle = p.cycles[p.cycles.length - 1];
-                if (lastCycle.cycleNum) {
-                    lastCycleNum = lastCycle.cycleNum;
-                }
-            }
+            let lastCycleNum = Math.max(0, ...(p.cycles || []).map(c => Number(c.cycleNum) || 0));
             document.getElementById('npCycleNumber').value = lastCycleNum + 1;
             
-            window.tempCurrentCycles = JSON.parse(JSON.stringify(p.cycles || []));
+            window.tempCurrentCycles = window.prepareCyclesWithWeekParents(p.cycles || []);
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
 
             window.onProtocolSelectChanged();
@@ -2318,6 +2346,39 @@
 
             window.setPanelVisibility(document.getElementById('patientFormModal'), true);
             window.renderTempMarkersList();
+        };
+
+        window.appendCycleToHistory = function(cycleData) {
+            if (cycleData.week === 'Tuần 2') {
+                let parent = [...window.tempCurrentCycles].reverse().find(c =>
+                    !c.parentCycleId && c.week !== 'Tuần 2' && Number(c.cycleNum) === Number(cycleData.cycleNum) &&
+                    (c.protocolKeyUsed || '') === (cycleData.protocolKeyUsed || '')
+                );
+                if (!parent) {
+                    parent = {
+                        branchName: `Chu kỳ ${cycleData.cycleNum}`,
+                        cycleNum: cycleData.cycleNum,
+                        date: cycleData.date,
+                        protocolUsed: cycleData.protocolUsed,
+                        protocolKeyUsed: cycleData.protocolKeyUsed || '',
+                        isChangedProtocol: cycleData.isChangedProtocol || false,
+                        cycleEntryId: crypto.randomUUID(),
+                        isCycleGroup: true,
+                        updatedBy: cycleData.updatedBy
+                    };
+                    window.tempCurrentCycles.push(parent);
+                }
+                parent.cycleEntryId ||= crypto.randomUUID();
+                cycleData.parentCycleId = parent.cycleEntryId;
+                // Week 2 belongs to the protocol group of its parent cycle.
+                cycleData.isChangedProtocol = false;
+                const parentIndex = window.tempCurrentCycles.indexOf(parent);
+                let insertAt = parentIndex + 1;
+                while (insertAt < window.tempCurrentCycles.length && window.tempCurrentCycles[insertAt].parentCycleId === parent.cycleEntryId) insertAt++;
+                window.tempCurrentCycles.splice(insertAt, 0, cycleData);
+                return;
+            }
+            window.tempCurrentCycles.push(cycleData);
         };
 
         window.addNewCycleFromForm = function() {
@@ -2345,13 +2406,12 @@
                 }
             }
 
-            const existingIndex = window.tempCurrentCycles.findIndex(c => c.date === cycleDate);
-
             const cycleData = {
                 branchName: `Chu kỳ ${cycleNum}`,
                 cycleNum: cycleNum,
                 week: weekVal,
                 date: cycleDate,
+                cycleEntryId: crypto.randomUUID(),
                 protocolUsed: proto,
                 protocolKeyUsed: document.getElementById('protocolSelectList').value,
                 isChangedProtocol: isChangedProtocol,
@@ -2361,11 +2421,11 @@
                 updatedBy: window.getCurrentEditorName()
             };
 
-            if (existingIndex !== -1) {
-                window.tempCurrentCycles[existingIndex] = cycleData;
-                window.showToast(`Đã tự động cập nhật chu kỳ ngày ${cycleDate}!`);
+            if (weekVal === 'Tuần 2') {
+                window.appendCycleToHistory(cycleData);
+                window.showToast(`Đã thêm ${weekVal} vào chu kỳ ${cycleNum}!`);
             } else {
-                window.tempCurrentCycles.push(cycleData);
+                window.appendCycleToHistory(cycleData);
                 window.showToast("Đã thêm chu kỳ mới thành công!");
             }
 
@@ -2436,7 +2496,8 @@
             const listDiv = document.getElementById('existingCyclesList');
             if (!listDiv) return;
             listDiv.innerHTML = "";
-            document.getElementById('existingCyclesCount').innerText = `${window.tempCurrentCycles.length} chu kỳ`;
+            const rootCycles = window.tempCurrentCycles.filter(c => !c.parentCycleId);
+            document.getElementById('existingCyclesCount').innerText = `${rootCycles.length} chu kỳ`;
 
             if (window.tempCurrentCycles.length === 0) {
                 listDiv.innerHTML = `<div class="p-4 bg-slate-50 text-slate-400 text-center text-xs rounded-xl">Chưa có chu kỳ hóa trị nào được ghi nhận.</div>`;
@@ -2446,10 +2507,11 @@
             let grouped = [];
             window.tempCurrentCycles.forEach((c) => {
                 let protoName = c.protocolUsed || "Phác đồ";
-                if (grouped.length === 0 || c.isChangedProtocol) {
+                const isNewProtocolGroup = !c.parentCycleId && c.isChangedProtocol;
+                if (grouped.length === 0 || isNewProtocolGroup) {
                     grouped.push({
                         protocolUsed: protoName,
-                        isChanged: c.isChangedProtocol || false,
+                        isChanged: isNewProtocolGroup || false,
                         items: [c]
                     });
                 } else {
@@ -2457,7 +2519,6 @@
                 }
             });
 
-            let globalIndex = 0;
             grouped.forEach((group) => {
                 const headerDiv = document.createElement('div');
                 headerDiv.className = "mt-3 mb-1 pb-1 border-b border-teal-600 flex items-center justify-between";
@@ -2469,17 +2530,20 @@
                 `;
                 listDiv.appendChild(headerDiv);
 
-                group.items.forEach((c) => {
-                    const idx = globalIndex++;
+                const roots = group.items.filter(c => !c.parentCycleId);
+                const orderedItems = roots.flatMap(root => [root, ...(root.cycleEntryId ? group.items.filter(child => child.parentCycleId === root.cycleEntryId) : [])]);
+                orderedItems.forEach((c) => {
+                    const idx = window.tempCurrentCycles.indexOf(c);
                     const div = document.createElement('div');
-                    div.className = "bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-xs my-1.5 ml-2";
+                    const isWeekChild = Boolean(c.parentCycleId);
+                    div.className = `bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-xs my-1.5 ${isWeekChild ? 'ml-8 border-amber-200' : 'ml-2'}`;
                     div.innerHTML = `
                         <div class="bg-slate-100/80 p-2.5 px-3 flex items-center justify-between border-b border-slate-200/80">
                             <div class="flex items-center gap-2 cursor-pointer font-bold text-teal-800" onclick="window.toggleCycleCollapse(${idx})">
                                 <button type="button" class="w-5 h-5 rounded bg-teal-100 text-teal-800 flex items-center justify-center text-xs">
                                     <i id="cycleIcon_${idx}" class="fa-solid fa-plus text-teal-600"></i>
                                 </button>
-                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date || 'N/A')}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
+                                <span>${isWeekChild ? `<i class="fa-solid fa-turn-down text-amber-600 mr-1"></i>${escapeHtml(c.week || 'Tuần điều trị')} · ` : ''}${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date || 'N/A')}) ${c.week && !isWeekChild ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
                             </div>
                             <div class="flex items-center space-x-1">
                                 <button type="button" onclick="window.editTempCycle(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[10px] border border-amber-200"><i class="fa-solid fa-pen"></i> Sửa</button>
@@ -2489,7 +2553,7 @@
                         
                         <div id="cycleDetail_${idx}" class="hidden p-3 bg-slate-50 border-t border-slate-100 space-y-1.5 text-[11px] text-slate-700">
                             <div><strong class="text-slate-900">Phác đồ áp dụng:</strong> ${escapeHtml(c.protocolUsed || 'Chưa cập nhật')}</div>
-                            <div><strong class="text-slate-900">Thuốc hóa trị:</strong> ${escapeHtml(c.drugNames || 'Chưa cập nhật')}</div>
+                            <div><strong class="text-slate-900">Thuốc hóa trị:</strong> ${escapeHtml(c.drugNames || (c.isCycleGroup ? 'Tuần chưa được ghi nhận' : 'Chưa cập nhật'))}</div>
                             <div><strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'Chưa cập nhật')}</div>
                             <div><strong class="text-slate-900">Tác dụng phụ / Ghi chú:</strong> ${escapeHtml(c.note || 'Không ghi nhận')}</div>
                             <div class="text-[10px] text-slate-400 pt-1">Cập nhật bởi: ${escapeHtml(c.updatedBy || 'Thạch Xuân Tựu')}</div>
@@ -2627,7 +2691,11 @@
 
         window.deleteTempCycle = function(idx) {
             if (confirm("Bạn có chắc chắn muốn xóa chu kỳ này không?")) {
-                window.tempCurrentCycles.splice(idx, 1);
+                const cycle = window.tempCurrentCycles[idx];
+                const removedIds = cycle && cycle.cycleEntryId ? [cycle.cycleEntryId] : [];
+                window.tempCurrentCycles = window.tempCurrentCycles.filter((item, itemIndex) =>
+                    itemIndex !== idx && !removedIds.includes(item.parentCycleId)
+                );
                 window.renderTempCyclesList();
                 window.showToast("Đã xóa chu kỳ thành công.");
             }
@@ -2738,14 +2806,7 @@
                     updatedBy: window.getCurrentEditorName()
                 };
 
-                const existingCycleIndex = window.tempCurrentCycles.findIndex(
-                    cycle => cycle.date === cycleDate && Number(cycle.cycleNum) === cycleNum
-                );
-                if (existingCycleIndex >= 0) {
-                    window.tempCurrentCycles[existingCycleIndex] = cycleEntry;
-                } else {
-                    window.tempCurrentCycles.push(cycleEntry);
-                }
+                window.appendCycleToHistory(cycleEntry);
                 window.renderTempCyclesList();
             }
 
