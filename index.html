@@ -71,6 +71,37 @@
                 radial-gradient(ellipse 58% 52% at 50% 46%, rgba(168, 211, 250, 0.62) 0%, rgba(210, 231, 250, 0.38) 42%, rgba(248, 249, 251, 0) 78%),
                 #f8f9fb;
         }
+        #patientSearchForm {
+            background: #111a2b;
+            border-color: #334155;
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.16);
+        }
+        #patientSearchForm input { background: transparent !important; }
+        .search-action {
+            width: 3rem;
+            height: 3rem;
+            flex: 0 0 3rem;
+            border: 0;
+            border-radius: 9999px;
+            background: transparent;
+            color: #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 160ms ease, background-color 160ms ease;
+        }
+        .search-action:hover { color: #fff; background: rgba(148, 163, 184, 0.12); }
+        .search-action i { font-size: 1.25rem; }
+        html[data-theme="light"] #patientSearchForm {
+            background: #fff;
+            border-color: rgba(203, 213, 225, 0.55);
+            box-shadow: 0 8px 24px rgba(53, 105, 153, 0.16);
+        }
+        html[data-theme="light"] #patientSearchForm input { color: #202124 !important; }
+        html[data-theme="light"] #patientSearchForm input::placeholder { color: #666a73 !important; }
+        html[data-theme="light"] .search-action { color: #202124; }
+        html[data-theme="light"] .search-action:hover { color: #111827; background: #f1f3f4; }
+        .search-plus { font-size: 2rem; font-weight: 300; line-height: 1; }
         .item-suggestion:hover,
         .item-suggestion.suggestion-active {
             background-color: #1d5fc4 !important;
@@ -314,18 +345,15 @@
         </div>
 
         <section class="w-full flex justify-center">
-            <form onsubmit="window.searchPatientByCode(event)" class="relative flex items-center w-full max-w-2xl min-h-[4.5rem] rounded-full bg-slate-900 px-3 sm:px-5 shadow-[0_8px_32px_rgba(15,23,42,0.16)] border border-slate-800">
-                <input type="text" id="searchInput" aria-label="Mã bệnh nhân" maxlength="8" inputmode="numeric" placeholder="Nhập mã bệnh nhân" disabled class="min-w-0 flex-1 px-3 sm:px-5 py-4 bg-transparent border-0 text-slate-100 placeholder:text-slate-400 text-base rounded-full focus:outline-none focus:ring-0 font-medium tracking-wide transition disabled:opacity-50">
+            <form id="patientSearchForm" onsubmit="window.searchPatientByCode(event)" class="relative flex items-center w-full max-w-2xl min-h-[4.5rem] rounded-full px-3 sm:px-5 border transition-colors">
+                <input type="text" id="searchInput" aria-label="Mã bệnh nhân" maxlength="8" inputmode="numeric" placeholder="Nhập mã bệnh nhân" disabled class="min-w-0 flex-1 px-3 sm:px-5 py-4 border-0 text-slate-100 placeholder:text-slate-400 text-base rounded-full focus:outline-none focus:ring-0 font-medium tracking-wide transition disabled:opacity-70">
                 <div class="flex items-center gap-1 sm:gap-2 shrink-0">
-                    <button type="button" onclick="window.clearSearchResult()" title="Xóa nội dung" aria-label="Xóa nội dung" class="w-9 h-9 text-slate-300 hover:text-white transition flex items-center justify-center">
-                        <i class="fa-solid fa-circle-xmark text-sm"></i>
-                    </button>
-                    <button id="btnSearchPatient" type="submit" title="Tra cứu mã bệnh nhân" aria-label="Tra cứu mã bệnh nhân" disabled class="w-11 h-11 bg-slate-700 hover:bg-slate-600 text-slate-100 text-base rounded-full transition flex items-center justify-center disabled:opacity-50">
+                    <button id="btnSearchPatient" type="submit" title="Tra cứu mã bệnh nhân" aria-label="Tra cứu mã bệnh nhân" disabled class="search-action disabled:opacity-50">
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         <span class="sr-only">Tra cứu mã bệnh nhân</span>
                     </button>
-                    <button type="button" id="btnAddPatient" onclick="window.openNewPatientModal()" title="Thêm bệnh nhân mới" aria-label="Thêm bệnh nhân mới" disabled class="w-11 h-11 bg-slate-700 hover:bg-slate-600 text-slate-100 text-base rounded-full transition flex items-center justify-center disabled:opacity-50">
-                        <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                    <button type="button" id="btnAddPatient" onclick="window.openNewPatientModal()" title="Thêm bệnh nhân mới" aria-label="Thêm bệnh nhân mới" disabled class="search-action disabled:opacity-50">
+                        <span class="search-plus" aria-hidden="true">+</span>
                         <span class="sr-only">Thêm bệnh nhân mới</span>
                     </button>
                 </div>
