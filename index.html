@@ -1209,8 +1209,14 @@
             "Capecitabine-Bevacizumab": { name: "Capecitabine + Bevacizumab", drugs: "Bevacizumab, Capecitabine", is14Days: true, formula: [ {drug: "Bevacizumab", std: 7.5, unit: "mg/kg"}, {drug: "Capecitabine", std: 1000, unit: "mg/m2 bid"} ] },
             "Capecitabine-Mono": { name: "Capecitabine đơn Trị", drugs: "Capecitabine", is14Days: true, formula: [ {drug: "Capecitabine", std: 1250, unit: "mg/m2 bid"} ] },
             "Vinorelbine-Capecitabine": { name: "Vinorelbine - Capecitabine", drugs: "Vinorelbine, Capecitabine", is14Days: true, formula: [ {drug: "Vinorelbine", std: 25, unit: "mg/m2"}, {drug: "Capecitabine", std: 1000, unit: "mg/m2 bid"} ] },
-            "AC-T": { name: "AC-T", drugs: "Doxorubicin, Cyclophosphamide, Paclitaxel", is14Days: false, formula: [ {drug: "Doxorubicin", std: 60, unit: "mg/m2"}, {drug: "Cyclophosphamide", std: 600, unit: "mg/m2"}, {drug: "Paclitaxel", std: 175, unit: "mg/m2"} ] },
-            "AC-T-Trastuzumab": { name: "AC-T + Trastuzumab", drugs: "Doxorubicin, Cyclophosphamide, Paclitaxel, Trastuzumab", is14Days: false, formula: [ {drug: "Doxorubicin", std: 60, unit: "mg/m2"}, {drug: "Cyclophosphamide", std: 600, unit: "mg/m2"}, {drug: "Paclitaxel", std: 175, unit: "mg/m2"}, {drug: "Trastuzumab", std: 6, unit: "mg/kg"} ] },
+            "AC-T": { name: "AC-T", drugs: "Doxorubicin, Cyclophosphamide, Paclitaxel", is14Days: false, cyclePhases: [
+                { minCycle: 1, maxCycle: 4, drugs: ["doxorubicin", "cyclophosphamide"] },
+                { minCycle: 5, maxCycle: 8, drugs: ["paclitaxel"] }
+            ], formula: [ {drug: "Doxorubicin", std: 60, unit: "mg/m2"}, {drug: "Cyclophosphamide", std: 600, unit: "mg/m2"}, {drug: "Paclitaxel", std: 175, unit: "mg/m2"} ] },
+            "AC-T-Trastuzumab": { name: "AC-T + Trastuzumab", drugs: "Doxorubicin, Cyclophosphamide, Paclitaxel, Trastuzumab", is14Days: false, cyclePhases: [
+                { minCycle: 1, maxCycle: 4, drugs: ["doxorubicin", "cyclophosphamide"] },
+                { minCycle: 5, maxCycle: 8, drugs: ["paclitaxel", "trastuzumab"] }
+            ], formula: [ {drug: "Doxorubicin", std: 60, unit: "mg/m2"}, {drug: "Cyclophosphamide", std: 600, unit: "mg/m2"}, {drug: "Paclitaxel", std: 175, unit: "mg/m2"}, {drug: "Trastuzumab", std: 6, unit: "mg/kg"} ] },
             "Paclitaxel-Mono": { name: "Paclitaxel đơn Trị", drugs: "Paclitaxel", is14Days: false, formula: [ {drug: "Paclitaxel", std: 175, unit: "mg/m2"} ] }
         };
 
@@ -1257,6 +1263,18 @@
             const protoKey = document.getElementById('protocolSelectList').value;
             const weekVal = document.getElementById('npProtocolWeek').value;
             const cycleNumber = parseInt(document.getElementById('npCycleNumber').value, 10) || 1;
+            const pInfo = chemoProtocolsData[protoKey];
+            let formulaList = pInfo?.formula ? [...pInfo.formula] : [];
+
+            // Các phác đồ AC-T được ghi nhận theo đúng pha: 4 chu kỳ AC, sau đó 4 chu kỳ T.
+            const activePhase = pInfo?.cyclePhases?.find(phase => cycleNumber >= phase.minCycle && cycleNumber <= phase.maxCycle);
+            if (activePhase) {
+                formulaList = formulaList.filter(item => activePhase.drugs.includes(item.drug.toLowerCase()));
+                document.getElementById('npDrugNamesInput').value = formulaList.map(item => item.drug).join(", ");
+            } else if (pInfo?.cyclePhases) {
+                formulaList = [];
+                document.getElementById('npDrugNamesInput').value = "";
+            }
 
             let bsa = 0;
             if (!isNaN(h) && !isNaN(w) && h > 0 && w > 0) {
@@ -1264,13 +1282,7 @@
                 bsaDisplay.innerText = bsa.toFixed(2) + " m²";
             } else {
                 bsaDisplay.innerText = "--";
-                if (protoKey === "AC-T") {
-                    const drugsForCycle = cycleNumber === 1
-                        ? ["Doxorubicin", "Cyclophosphamide"]
-                        : (cycleNumber >= 2 && cycleNumber <= 5 ? ["Paclitaxel"] : []);
-                    document.getElementById('npDrugNamesInput').value = drugsForCycle.join(", ");
-                    doseInput.value = "";
-                }
+                doseInput.value = "";
                 if (!protoKey || !chemoProtocolsData[protoKey]) {
                     doseInput.value = "";
                 }
@@ -1279,28 +1291,20 @@
             }
 
             if (protoKey && chemoProtocolsData[protoKey] && chemoProtocolsData[protoKey].formula) {
-                const pInfo = chemoProtocolsData[protoKey];
-                let formulaList = pInfo.formula;
-                if (protoKey === "AC-T") {
-                    const cycleDrugs = cycleNumber === 1
-                        ? ["doxorubicin", "cyclophosphamide"]
-                        : (cycleNumber >= 2 && cycleNumber <= 5 ? ["paclitaxel"] : []);
-                    formulaList = formulaList.filter(item => cycleDrugs.includes(item.drug.toLowerCase()));
-                    document.getElementById('npDrugNamesInput').value = formulaList.map(item => item.drug).join(", ");
-                }
                 let doseCalculatedStr = [];
 
                 if (pInfo.is14Days) {
-                    const drugsForWeek = weekVal === "Tuần 2"
+                    const hasWeek1OnlyDrugs = formulaList.some(item =>
+                        ["oxaliplatin", "irinotecan", "bevacizumab"].includes(item.drug.toLowerCase())
+                    );
+                    const drugsForWeek = weekVal === "Tuần 2" && hasWeek1OnlyDrugs
                         ? formulaList.filter(item => item.drug.toLowerCase() === "capecitabine")
                         : formulaList;
+                    formulaList = drugsForWeek;
                     document.getElementById('npDrugNamesInput').value = drugsForWeek.map(item => item.drug).join(", ");
                 }
 
                 formulaList.forEach(item => {
-                    // Oxaliplatin, irinotecan, and bevacizumab are recorded only in week 1.
-                    if (["oxaliplatin", "irinotecan", "bevacizumab"].includes(item.drug.toLowerCase()) && weekVal === "Tuần 2") return;
-
                     let totalDose = 0;
                     if (item.unit === "mg/kg") {
                         totalDose = Math.round(item.std * w);
