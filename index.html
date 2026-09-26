@@ -259,6 +259,13 @@
         }
         .panel-opening { animation: panelOpening 260ms cubic-bezier(0.2, 0.75, 0.25, 1) both; }
         .panel-closing { animation: panelClosing 180ms cubic-bezier(0.4, 0, 1, 1) both; pointer-events: none; }
+        #statsTableBody td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #statsTableBody tr { height: 3rem; }
+        html[data-theme="dark"] #statsModalContent { background: #252526 !important; border-color: #3c4043 !important; }
+        html[data-theme="dark"] #statsModalHeader { background: #2b2b2b !important; border-color: #3c4043 !important; }
+        html[data-theme="dark"] #statsFilters,
+        html[data-theme="dark"] #statsTabs,
+        html[data-theme="dark"] #statsModalContent .stats-card { background: #2b2b2b !important; border-color: #45464a !important; }
         @keyframes panelOpening {
             from { opacity: 0; transform: translateY(12px) scale(0.985); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -884,9 +891,9 @@
     <!-- ========================================== -->
 <!-- MODUN 6: MODAL THỐNG KÊ (ĐÃ CẬP NHẬT) -->
 <!-- ========================================== -->
-<div id="statsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div id="statsModalContent" class="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
-        <div class="bg-teal-800 text-white p-4 px-6 flex items-center gap-4 sticky top-0 z-10">
+<div id="statsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-0">
+    <div id="statsModalContent" class="bg-white rounded-none max-w-none w-full h-full max-h-none overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
+        <div id="statsModalHeader" class="bg-[#2b2b2b] text-white p-4 px-6 flex items-center gap-4 shrink-0 border-b border-slate-200">
             <div class="flex items-center gap-2 shrink-0" aria-label="Điều khiển cửa sổ">
                 <button type="button" onclick="window.closeStatsModal()" title="Đóng" aria-label="Đóng cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
                     <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
@@ -894,8 +901,8 @@
                 <button type="button" onclick="window.minimizeStatsModal()" title="Thu nhỏ" aria-label="Thu nhỏ cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#febc2e] border border-[#dea123] text-[#785000] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
                     <i class="fa-solid fa-minus text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                 </button>
-                <button type="button" id="statsMaximizeBtn" onclick="window.toggleStatsModalSize()" title="Phóng to" aria-label="Phóng to cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#28c840] border border-[#20a833] text-[#075d18] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
-                    <i class="fa-solid fa-up-right-and-down-left-from-center text-[6px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                <button type="button" id="statsMaximizeBtn" onclick="window.toggleStatsModalSize()" title="Thu về cửa sổ" aria-label="Thu về cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#28c840] border border-[#20a833] text-[#075d18] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
+                    <i class="fa-solid fa-down-left-and-up-right-to-center text-[6px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                 </button>
             </div>
             <h3 class="font-bold text-base flex items-center gap-2">
@@ -903,9 +910,9 @@
             </h3>
         </div>
 
-        <div class="p-6 space-y-5 text-xs">
+        <div class="p-3 sm:p-5 space-y-3 flex-1 min-h-0 overflow-hidden flex flex-col text-xs">
             <!-- Bộ lọc khoảng thời gian thực -->
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            <div id="statsFilters" class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end shrink-0">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Từ ngày</label>
                     <input type="date" id="statsStartDate" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium">
@@ -931,7 +938,7 @@
                 </div>
             </div>
 
-            <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex gap-1">
+            <div id="statsTabs" class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex gap-1 shrink-0">
                 <button type="button" id="btnStatsOverviewTab" onclick="window.switchStatsTab('overview')" class="flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition">
                     <i class="fa-solid fa-chart-pie mr-1.5"></i>Tổng quan
                 </button>
@@ -940,10 +947,10 @@
                 </button>
             </div>
 
-            <div id="statsOverviewPanel" class="space-y-5">
+            <div id="statsOverviewPanel" class="flex-1 min-h-0 flex flex-col space-y-3 overflow-hidden">
             <!-- Tổng quan số liệu -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl flex items-center justify-between">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
+                <div class="stats-card bg-teal-50 border border-teal-200 p-3 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-teal-700 font-semibold uppercase text-[10px]">Tổng BN nhập trong khoảng thời gian</p>
                         <h4 id="statTotalPatients" class="text-2xl font-bold text-teal-900 mt-1">0</h4>
@@ -952,7 +959,7 @@
                         <i class="fa-solid fa-hospital-user"></i>
                     </div>
                 </div>
-                <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl flex items-center justify-between">
+                <div class="stats-card bg-indigo-50 border border-indigo-200 p-3 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-indigo-700 font-semibold uppercase text-[10px]">Phân bố Giới Tính</p>
                         <div id="statGenderSummary" class="text-xs font-bold text-indigo-900 mt-1 space-x-2">Nam: 0 | Nữ: 0</div>
@@ -961,7 +968,7 @@
                         <i class="fa-solid fa-venus-mars"></i>
                     </div>
                 </div>
-                <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
+                <div class="stats-card bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-amber-700 font-semibold uppercase text-[10px]">Phân bố Nhóm Tuổi</p>
                         <div id="statAgeSummary" class="text-[11px] font-bold text-amber-900 mt-1">Trẻ: 0 | Trung niên: 0 | Già: 0</div>
@@ -973,22 +980,22 @@
             </div>
 
             <!-- Biểu đồ -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center">
-                <h4 class="font-bold text-slate-700 uppercase text-[11px] mb-3 self-start">TỶ LỆ PHÂN BỐ NHÓM BỆNH ICD CHÍNH:</h4>
-                <div class="w-full max-w-xs h-64 relative flex justify-center">
+            <div class="stats-card bg-white p-3 rounded-xl border border-slate-200 flex-1 min-h-0 flex flex-col items-center">
+                <h4 class="font-bold text-slate-700 uppercase text-[11px] mb-2 self-start shrink-0">TỶ LỆ PHÂN BỐ NHÓM BỆNH ICD CHÍNH:</h4>
+                <div class="w-full max-w-xs flex-1 min-h-0 relative flex justify-center">
                     <canvas id="statsPieChart"></canvas>
                 </div>
             </div>
             </div>
 
             <!-- Danh sách bệnh nhân thống kê cho phép Admin sửa/xoá trực tiếp -->
-            <div id="statsPatientsPanel" class="hidden space-y-2">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+            <div id="statsPatientsPanel" class="hidden flex-1 min-h-0 flex-col space-y-2 overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 shrink-0">
                     <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">DANH SÁCH BỆNH NHÂN TRONG KHOẢNG THỜI GIAN:</h4>
                     <span class="text-[10px] text-slate-500">Sắp xếp theo ngày hóa trị mới nhất</span>
                 </div>
-                <div class="max-h-[55vh] overflow-auto rounded-xl border border-slate-200 custom-scrollbar">
-                    <table class="w-full text-left text-xs text-slate-700">
+                <div id="statsTableViewport" class="flex-1 min-h-0 overflow-hidden rounded-xl border border-slate-200">
+                    <table class="w-full h-full table-fixed text-left text-xs text-slate-700">
                         <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
                             <tr>
                                 <th class="p-3">Mã BN</th>
@@ -1010,11 +1017,11 @@
                         </tbody>
                     </table>
                 </div>
-                <div id="statsPagination" class="flex flex-wrap items-center justify-center gap-1 pt-2" aria-label="Phân trang danh sách bệnh nhân"></div>
+                <div id="statsPagination" class="flex flex-wrap items-center justify-center gap-1 pt-1 shrink-0" aria-label="Phân trang danh sách bệnh nhân"></div>
             </div>
         </div>
 
-        <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
             <button onclick="window.closeStatsModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl transition">Đóng</button>
         </div>
     </div>
@@ -1731,7 +1738,7 @@
             window.setPanelVisibility(document.getElementById('userManagementModal'), false);
         };
 
-        window.statsModalIsMaximized = false;
+        window.statsModalIsMaximized = true;
         window.openStatsModal = function() {
             if (!window.canUseOncoCare) return;
             const now = new Date();
@@ -1744,6 +1751,7 @@
             const today = localDateString(now);
             document.getElementById('statsStartDate').value = localDateString(sevenDaysAgo);
             document.getElementById('statsEndDate').value = today;
+            if (!window.statsModalIsMaximized) window.toggleStatsModalSize();
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
             window.setPanelVisibility(document.getElementById('statsModal'), true);
@@ -1758,6 +1766,7 @@
             const patientsPanel = document.getElementById('statsPatientsPanel');
             overviewPanel.classList.toggle('hidden', !showOverview);
             patientsPanel.classList.toggle('hidden', showOverview);
+            patientsPanel.classList.toggle('flex', !showOverview);
             const activePanel = showOverview ? overviewPanel : patientsPanel;
             activePanel.classList.remove('tab-panel-enter');
             void activePanel.offsetWidth;
@@ -1772,6 +1781,7 @@
                 ? 'flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition'
                 : 'flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition';
 
+            if (!showOverview) window.renderStatsPatientPage();
             if (showOverview) setTimeout(() => window.statsPieChartInstance?.resize(), 0);
         };
 
@@ -1779,7 +1789,6 @@
             window.setPanelVisibility(document.getElementById('statsModal'), false);
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
-            if (window.statsModalIsMaximized) window.toggleStatsModalSize();
         };
 
         window.minimizeStatsModal = function() {
@@ -1880,7 +1889,7 @@
         let cachedPatientsList = [];
         let statsFilteredPatients = [];
         let statsCurrentPage = 1;
-        const statsPageSize = 10;
+        let statsPageSize = Math.max(1, Math.floor((window.innerHeight - 430) / 48));
         window.tempCurrentCycles = []; 
         window.tempCurrentMarkers = [];
         window.activeMarkerChart = null;
@@ -2841,6 +2850,10 @@
             const pagination = document.getElementById('statsPagination');
             if (!tbody || !pagination) return;
 
+            const tableViewportHeight = document.getElementById('statsTableViewport')?.clientHeight || 0;
+            statsPageSize = tableViewportHeight
+                ? Math.max(1, Math.floor((tableViewportHeight - 44) / 48))
+                : Math.max(1, Math.floor((window.innerHeight - 430) / 48));
             const totalPages = Math.max(1, Math.ceil(statsFilteredPatients.length / statsPageSize));
             statsCurrentPage = Math.min(Math.max(statsCurrentPage, 1), totalPages);
             const pageStart = (statsCurrentPage - 1) * statsPageSize;
@@ -2895,9 +2908,21 @@
                 pagination.appendChild(button);
             };
             addPageButton('‹', statsCurrentPage - 1, { disabled: statsCurrentPage === 1 });
-            for (let page = 1; page <= totalPages; page++) {
-                addPageButton(String(page), page, { active: page === statsCurrentPage });
+            const visiblePages = new Set([1, totalPages]);
+            for (let page = Math.max(1, statsCurrentPage - 2); page <= Math.min(totalPages, statsCurrentPage + 2); page++) {
+                visiblePages.add(page);
             }
+            let previousPage = 0;
+            [...visiblePages].sort((a, b) => a - b).forEach((page) => {
+                if (previousPage && page - previousPage > 1) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.className = 'px-1 text-slate-400';
+                    ellipsis.textContent = '…';
+                    pagination.appendChild(ellipsis);
+                }
+                addPageButton(String(page), page, { active: page === statsCurrentPage });
+                previousPage = page;
+            });
             addPageButton('›', statsCurrentPage + 1, { disabled: statsCurrentPage === totalPages });
         };
 
