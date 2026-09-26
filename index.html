@@ -2178,6 +2178,35 @@
                 cycle.protocolUsed || '';
         };
 
+        window.getActiveCycleProtocol = function(cycles, fallbackProtocol, fallbackKey) {
+            const latestCycle = [...(cycles || [])]
+                .filter(cycle => !cycle.parentCycleId && !cycle.isCycleGroup && window.getCycleProtocolIdentity(cycle))
+                .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')))
+                .at(-1);
+            if (!latestCycle) return { protocol: fallbackProtocol || '', protocolKey: fallbackKey || '' };
+            return {
+                protocol: latestCycle.protocolUsed || fallbackProtocol || '',
+                protocolKey: latestCycle.protocolKeyUsed || Object.keys(chemoProtocolsData).find(key => chemoProtocolsData[key].name === latestCycle.protocolUsed) || fallbackKey || ''
+            };
+        };
+
+        window.groupCyclesByProtocol = function(cycles, fallbackProtocol) {
+            const groups = [];
+            (cycles || []).filter(cycle => !cycle.parentCycleId).forEach(cycle => {
+                const protocol = cycle.protocolUsed || fallbackProtocol || 'Phác đồ';
+                const identity = window.getCycleProtocolIdentity(cycle) || protocol;
+                let group = groups[groups.length - 1];
+                if (!group || group.identity !== identity) {
+                    group = { identity, protocolUsed: protocol, isChanged: Boolean(cycle.isChangedProtocol), items: [] };
+                    groups.push(group);
+                }
+                group.items.push(cycle);
+                const children = (cycles || []).filter(child => child.parentCycleId && child.parentCycleId === cycle.cycleEntryId);
+                group.items.push(...children);
+            });
+            return groups;
+        };
+
         window.prepareCyclesWithWeekParents = function(cycles) {
             const source = JSON.parse(JSON.stringify(cycles || []));
             // Gộp các bản ghi lặp do những lần bấm thêm trước đây; giữ bản ghi mới nhất.
@@ -2243,21 +2272,7 @@
             if (cycles.length === 0) {
                 cyclesContainer.innerHTML = `<p class="text-slate-400 italic text-xs">Chưa có lịch sử chu kỳ.</p>`;
             } else {
-                let groupedCycles = [];
-                cycles.forEach((c) => {
-                    let protoName = c.protocolUsed || p.protocol || 'Phác đồ';
-                    let isChanged = !c.parentCycleId && (c.isChangedProtocol || false);
-                    
-                    if (groupedCycles.length === 0 || isChanged) {
-                        groupedCycles.push({
-                            protocolUsed: protoName,
-                            isChanged: isChanged,
-                            items: [c]
-                        });
-                    } else {
-                        groupedCycles[groupedCycles.length - 1].items.push(c);
-                    }
-                });
+                const groupedCycles = window.groupCyclesByProtocol(cycles, p.protocol);
 
                 groupedCycles.forEach((group) => {
                     let protoHeader = document.createElement('div');
@@ -2353,13 +2368,14 @@
             window.renderSubDiagnosisTable();
 
             document.getElementById('protocolModeContainer').classList.remove('hidden');
-            document.getElementById('currentActiveProtoLabel').innerText = p.protocol || "Chưa có";
+            const activeProtocol = window.getActiveCycleProtocol(p.cycles, p.protocol, p.protocolKey);
+            document.getElementById('currentActiveProtoLabel').innerText = activeProtocol.protocol || "Chưa có";
             
             const radioContinue = document.querySelector('input[name="protocolMode"][value="continue"]');
             if (radioContinue) radioContinue.checked = true;
 
-            document.getElementById('protocolSelectList').value = p.protocolKey || '';
-            document.getElementById('npProtocol').value = p.protocol || '';
+            document.getElementById('protocolSelectList').value = activeProtocol.protocolKey || '';
+            document.getElementById('npProtocol').value = activeProtocol.protocol || '';
             
             window.toggleProtocolMode();
 
@@ -2476,9 +2492,10 @@
             let isChangedProtocol = false;
             if (!modeContainer.classList.contains('hidden')) {
                 let mode = document.querySelector('input[name="protocolMode"]:checked').value;
-                if (mode === 'change') {
-                    isChangedProtocol = true;
-                }
+                const active = window.getActiveCycleProtocol(window.tempCurrentCycles);
+                const nextProtocolIdentity = document.getElementById('protocolSelectList').value || proto;
+                const activeIdentity = active.protocolKey || active.protocol;
+                isChangedProtocol = mode === 'change' && Boolean(activeIdentity) && nextProtocolIdentity !== activeIdentity;
             }
 
             const cycleData = {
@@ -2584,20 +2601,7 @@
                 return;
             }
 
-            let grouped = [];
-            window.tempCurrentCycles.forEach((c) => {
-                let protoName = c.protocolUsed || "Phác đồ";
-                const isNewProtocolGroup = !c.parentCycleId && c.isChangedProtocol;
-                if (grouped.length === 0 || isNewProtocolGroup) {
-                    grouped.push({
-                        protocolUsed: protoName,
-                        isChanged: isNewProtocolGroup || false,
-                        items: [c]
-                    });
-                } else {
-                    grouped[grouped.length - 1].items.push(c);
-                }
-            });
+            const grouped = window.groupCyclesByProtocol(window.tempCurrentCycles);
 
             grouped.forEach((group) => {
                 const headerDiv = document.createElement('div');
@@ -2902,8 +2906,8 @@
                 diagnosis: diagnosisVal,
                 subDiagnosesList: [...window.tempSubDiagnoses],
                 subDiagnosis: window.tempSubDiagnoses.join(' | '),
-                protocol: protocolVal,
-                protocolKey: protocolKeyVal,
+                protocol: window.getActiveCycleProtocol(window.tempCurrentCycles, protocolVal, protocolKeyVal).protocol || protocolVal,
+                protocolKey: window.getActiveCycleProtocol(window.tempCurrentCycles, protocolVal, protocolKeyVal).protocolKey || protocolKeyVal,
                 cycles: window.tempCurrentCycles,
                 markers: window.tempCurrentMarkers,
                 updatedAt: serverTimestamp(),
@@ -3246,7 +3250,3 @@
             } catch (err) {
                 alert("Lỗi: " + err.message);
             }
-        };
-    </script>
-</body>
-</html>
