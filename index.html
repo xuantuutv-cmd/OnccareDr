@@ -1875,12 +1875,18 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const appCheck = initializeAppCheck(app, {
-            provider: new ReCaptchaEnterpriseProvider("6Lf6m84tAAAAAH9Q5E9_LsQR6EHk6aKecmBx9IxU"),
-            isTokenAutoRefreshEnabled: true
-        });
         const auth = getAuth(app);
         const db = getFirestore(app);
+        // App Check must not prevent Firebase Auth from starting. A bad/missing
+        // App Check key or domain configuration should leave login usable.
+        try {
+            initializeAppCheck(app, {
+                provider: new ReCaptchaEnterpriseProvider("6Lf6m84tAAAAAH9Q5E9_LsQR6EHk6aKecmBx9IxU"),
+                isTokenAutoRefreshEnabled: true
+            });
+        } catch (appCheckError) {
+            console.error("Không thể khởi tạo Firebase App Check:", appCheckError);
+        }
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -1917,7 +1923,13 @@
                 await signInWithPopup(auth, provider);
             } catch (error) {
                 console.error("Lỗi đăng nhập:", error);
-                alert("Đăng nhập thất bại: " + error.message);
+                const errorCode = error.code || "unknown";
+                const helpText = errorCode === "auth/unauthorized-domain"
+                    ? "Tên miền đang mở trang chưa được thêm vào Firebase Authentication > Settings > Authorized domains."
+                    : errorCode === "auth/popup-blocked"
+                        ? "Trình duyệt đã chặn cửa sổ đăng nhập. Hãy cho phép popup và thử lại."
+                        : error.message;
+                alert(`Đăng nhập thất bại (${errorCode}): ${helpText}`);
             }
         };
 
