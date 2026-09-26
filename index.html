@@ -118,7 +118,35 @@
         #btnUserMgmt { background: transparent !important; box-shadow: none !important; }
         #accountSettingsToggle:hover,
         #btnUserMgmt:hover { background: transparent !important; }
-        .profile-action-icon { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .profile-action-icon { width: 1.4rem; height: 1.4rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        html[data-theme="dark"] #accountSettingsMenu {
+            background: #1f1f1f !important;
+            color: #e3e3e3;
+            border-color: #303134 !important;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.48);
+        }
+        html[data-theme="dark"] #accountSettingsMenu [class*="border-slate-"] { border-color: #3c4043 !important; }
+        html[data-theme="dark"] #accountSettingsMenu .text-slate-800,
+        html[data-theme="dark"] #accountSettingsMenu .text-slate-700,
+        html[data-theme="dark"] #accountSettingsMenu .text-slate-600 { color: #e3e3e3 !important; }
+        html[data-theme="dark"] #accountSettingsMenu .text-slate-500,
+        html[data-theme="dark"] #accountSettingsMenu .text-slate-400 { color: #aeb0b4 !important; }
+        html[data-theme="dark"] #accountSettingsMenu button:not(#themeToggleButton) {
+            border-color: #3c4043 !important;
+            border-radius: 0.75rem;
+        }
+        html[data-theme="dark"] #accountSettingsMenu #btnStats {
+            background: #28292a !important;
+            color: #e3e3e3 !important;
+        }
+        html[data-theme="dark"] #accountSettingsMenu button[onclick*="saveProfessionalTitle"] {
+            background: #303134 !important;
+            color: #e3e3e3 !important;
+        }
+        html[data-theme="dark"] #accountSettingsMenu button[onclick*="logoutGoogle"] {
+            background: #28292a !important;
+            color: #f2b8b5 !important;
+        }
         #themeToggleButton { width: 3.25rem; height: 1.85rem; padding: 0.2rem; border: 1px solid #34363d; border-radius: 9999px; background: #202124; color: #d1d5db; transition: background-color 200ms ease, border-color 200ms ease; }
         #themeToggleButton .theme-toggle-thumb { width: 1.35rem; height: 1.35rem; border-radius: 9999px; background: #303238; box-shadow: none; display: flex; align-items: center; justify-content: center; transform: translateX(0); transition: transform 200ms ease, background-color 200ms ease; }
         #themeToggleButton[aria-pressed="true"] { background: #202124; border-color: #34363d; }
@@ -320,7 +348,7 @@
             </span>
         </div>
         <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="w-9 h-9 rounded-full text-[#c4c7c5] hover:text-white border-0 flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
-            <svg class="profile-action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.6a7.8 7.8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a7.8 7.8 0 0 1-1.7-1l-1.7.6-1.4-2.4 1.4-1.1a7.3 7.3 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.6a7.8 7.8 0 0 1 1.7-1l.3-1.8h2.8l.3 1.8a7.8 7.8 0 0 1 1.7 1l1.7-.6 1.4 2.4-1.4 1.1a7.3 7.3 0 0 1-.1 1.9Z" transform="translate(-1 -1)"/></svg>
+            <svg class="profile-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2h4l.5 2.2 1.5.6 1.9-1.2 2.8 2.8-1.2 1.9.6 1.5L22 10v4l-2.2.5-.6 1.5 1.2 1.9-2.8 2.8-1.9-1.2-1.5.6L14 22h-4l-.5-2.2-1.5-.6-1.9 1.2-2.8-2.8 1.2-1.9-.6-1.5L2 14v-4l2.2-.5.6-1.5-1.2-1.9 2.8-2.8 1.9 1.2 1.5-.6z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.openUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full border-0 text-[#c4c7c5] hover:text-white flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
             <svg class="profile-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 8v6m-3-3h6"/></svg>
