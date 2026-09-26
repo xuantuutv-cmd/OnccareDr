@@ -1721,11 +1721,23 @@
 
             if (user) {
                 currentUser = user;
-                isAdmin = (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
-
+                // Let the configured Admin enter immediately; profile sync must not keep
+                // the add-patient button disabled if the user document read is delayed.
+                const signedInEmail = (user.email || "").toLowerCase();
+                const configuredAdmin = signedInEmail === ADMIN_EMAIL.toLowerCase();
+                if (configuredAdmin) {
+                    isAdmin = true;
+                    window.canUseOncoCare = true;
+                    btnAddPatient.disabled = false;
+                    btnSearchPatient.disabled = false;
+                    searchInput.disabled = false;
+                    accountStatusNotice.classList.add(hidden);
+                }
                 const userDocRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userDocRef);
                 const savedUserData = userSnap.exists() ? userSnap.data() : {};
+                isAdmin = (user.email || "").toLowerCase() === ADMIN_EMAIL.toLowerCase()
+                    || (savedUserData.role || "").toLowerCase() === "admin";
 
                 let userData = {
                     name: user.displayName || "Thành viên",
@@ -1742,9 +1754,9 @@
                 await setDoc(userDocRef, userData, { merge: true });
 
                 isApproved = userData.isApproved;
-                isBlocked = userData.isBlocked;
+                isBlocked = !isAdmin && userData.isBlocked;
                 isVip = (userData.role === "VIP");
-                window.canUseOncoCare = !isBlocked && (isAdmin || isVip || isApproved);
+                window.canUseOncoCare = isAdmin || (!isBlocked && (isVip || isApproved));
                 window.canManageOncoCareUsers = isAdmin && window.canUseOncoCare;
 
                 signInBtn.classList.add('hidden');
