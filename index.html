@@ -36,6 +36,13 @@
         html[data-theme="light"] [class*="border-amber-"],
         html[data-theme="light"] [class*="border-rose-"],
         html[data-theme="light"] [class*="border-emerald-"] { border-color: #cbd3dd !important; }
+        .item-suggestion:hover,
+        .item-suggestion.suggestion-active {
+            background-color: #1d5fc4 !important;
+            color: #ffffff !important;
+        }
+        .item-suggestion:hover span,
+        .item-suggestion.suggestion-active span { color: #ffffff !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -1038,7 +1045,7 @@
                     dropdown.innerHTML = "";
                     matches.forEach((m) => {
                         const div = document.createElement('div');
-                        div.className = "p-2.5 hover:bg-teal-50 cursor-pointer border-b border-slate-100 text-xs flex flex-col transition item-suggestion";
+                        div.className = "p-2.5 cursor-pointer border-b border-slate-100 text-xs flex flex-col transition item-suggestion";
                         div.innerHTML = `
                             <span class="font-bold text-teal-800 text-xs">${m.code}</span>
                             <span class="text-slate-600 text-xs mt-0.5">${m.desc}</span>
@@ -1062,7 +1069,7 @@
                     event.preventDefault();
                     const direction = event.key === 'ArrowDown' ? 1 : -1;
                     activeSuggestionIndex = (activeSuggestionIndex + direction + suggestions.length) % suggestions.length;
-                    suggestions.forEach((item, index) => item.classList.toggle('bg-teal-100', index === activeSuggestionIndex));
+                    suggestions.forEach((item, index) => item.classList.toggle('suggestion-active', index === activeSuggestionIndex));
                     suggestions[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
                     return;
                 }
