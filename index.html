@@ -1721,70 +1721,96 @@
 
             if (user) {
                 currentUser = user;
-                // Let the configured Admin enter immediately; profile sync must not keep
-                // the add-patient button disabled if the user document read is delayed.
                 const signedInEmail = (user.email || "").toLowerCase();
                 const configuredAdmin = signedInEmail === ADMIN_EMAIL.toLowerCase();
-                if (configuredAdmin) {
-                    isAdmin = true;
-                    window.canUseOncoCare = true;
-                    btnAddPatient.disabled = false;
-                    btnSearchPatient.disabled = false;
-                    searchInput.disabled = false;
-                    accountStatusNotice.classList.add('hidden');
-                }
-                const userDocRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userDocRef);
-                const savedUserData = userSnap.exists() ? userSnap.data() : {};
-                isAdmin = (user.email || "").toLowerCase() === ADMIN_EMAIL.toLowerCase()
-                    || (savedUserData.role || "").toLowerCase() === "admin";
-
-                let userData = {
-                    name: user.displayName || "Thành viên",
-                    email: user.email,
-                    role: isAdmin ? "Admin" : (savedUserData.role || "Doctor"),
-                    isApproved: isAdmin ? true : (savedUserData.isApproved || false),
-                    isBlocked: savedUserData.isBlocked || false,
-                    professionalTitle: typeof savedUserData.professionalTitle === 'string'
-                        ? savedUserData.professionalTitle
-                        : (user.displayName || ""),
-                    lastLogin: serverTimestamp()
-                };
-
-                await setDoc(userDocRef, userData, { merge: true });
-
-                isApproved = userData.isApproved;
-                isBlocked = !isAdmin && userData.isBlocked;
-                isVip = (userData.role === "VIP");
-                window.canUseOncoCare = isAdmin || (!isBlocked && (isVip || isApproved));
-                window.canManageOncoCareUsers = isAdmin && window.canUseOncoCare;
-
+                // Apply the configured Admin's access before Firestore profile sync.
+                // A slow or unavailable users document must not leave the add button
+                // disabled after this Admin has signed in.
+                isAdmin = configuredAdmin;
+                isVip = false;
+                isApproved = configuredAdmin;
+                isBlocked = false;
+                window.canUseOncoCare = configuredAdmin;
+                window.canManageOncoCareUsers = configuredAdmin;
                 signInBtn.classList.add('hidden');
                 docProfile.classList.remove('hidden');
                 const avatar = document.getElementById('docAvatar');
                 const settingsAvatar = document.getElementById('settingsAvatar');
                 const adminCrown = document.getElementById('docAdminCrown');
-                currentProfessionalTitle = userData.professionalTitle;
+                currentProfessionalTitle = user.displayName || '';
                 document.getElementById('professionalTitleInput').value = currentProfessionalTitle;
-                document.getElementById('settingsAccountName').innerText = currentProfessionalTitle || user.displayName || 'Tài khoản bác sĩ';
+                document.getElementById('settingsAccountName').innerText = currentProfessionalTitle || 'Tài khoản bác sĩ';
                 document.getElementById('settingsAccountEmail').innerText = user.email || '';
                 avatar.src = user.photoURL || 'https://placehold.co/100x100/0d9488/ffffff?text=Doctor';
                 settingsAvatar.src = avatar.src;
-                avatar.classList.toggle('border-amber-400', isVip);
-                avatar.classList.toggle('border-emerald-500', !isVip);
-                adminCrown.classList.toggle('hidden', !isAdmin);
-                adminCrown.classList.toggle('flex', isAdmin);
+                const applyAccessState = () => {
+                    avatar.classList.toggle('border-amber-400', isVip);
+                    avatar.classList.toggle('border-emerald-500', !isVip);
+                    adminCrown.classList.toggle('hidden', !isAdmin);
+                    adminCrown.classList.toggle('flex', isAdmin);
+                    btnStats.classList.toggle('hidden', !window.canUseOncoCare);
+                    btnUserMgmt.classList.toggle('hidden', !isAdmin);
+                    searchInput.disabled = !window.canUseOncoCare;
+                    btnSearchPatient.disabled = !window.canUseOncoCare;
+                    btnAddPatient.disabled = !window.canUseOncoCare;
+                    accountStatusNotice.classList.toggle('hidden', window.canUseOncoCare);
+                    if (isBlocked) noticeSubText.innerText = 'Tài khoản đã bị khóa. Vui lòng liên hệ Admin để được hỗ trợ.';
+                    else if (!window.canUseOncoCare) noticeSubText.innerText = 'Tài khoản đang chờ Admin phê duyệt. Các chức năng tra cứu, thêm hồ sơ và thống kê hiện chưa khả dụng.';
+                };
+                applyAccessState();
 
-                btnStats.classList.toggle('hidden', !window.canUseOncoCare);
-                btnUserMgmt.classList.toggle('hidden', !isAdmin);
-                searchInput.disabled = !window.canUseOncoCare;
-                btnSearchPatient.disabled = !window.canUseOncoCare;
-                btnAddPatient.disabled = !window.canUseOncoCare;
-                accountStatusNotice.classList.toggle('hidden', window.canUseOncoCare);
-                if (isBlocked) noticeSubText.innerText = 'Tài khoản đã bị khóa. Vui lòng liên hệ Admin để được hỗ trợ.';
-                else if (!window.canUseOncoCare) noticeSubText.innerText = 'Tài khoản đang chờ Admin phê duyệt. Các chức năng tra cứu, thêm hồ sơ và thống kê hiện chưa khả dụng.';
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userDocRef);
+                    const savedUserData = userSnap.exists() ? userSnap.data() : {};
+                    isAdmin = configuredAdmin || (savedUserData.role || "").toLowerCase() === "admin";
 
-                if (window.canUseOncoCare) loadAllPatientsRealtime();
+                    const userData = {
+                        name: user.displayName || "Thành viên",
+                        email: user.email,
+                        role: isAdmin ? "Admin" : (savedUserData.role || "Doctor"),
+                        isApproved: isAdmin ? true : (savedUserData.isApproved || false),
+                        isBlocked: savedUserData.isBlocked || false,
+                        professionalTitle: typeof savedUserData.professionalTitle === 'string'
+                            ? savedUserData.professionalTitle
+                            : (user.displayName || ""),
+                        lastLogin: serverTimestamp()
+                    };
+                    isApproved = userData.isApproved;
+                    isBlocked = !isAdmin && userData.isBlocked;
+                    isVip = userData.role === "VIP";
+                    window.canUseOncoCare = isAdmin || (!isBlocked && (isVip || isApproved));
+                    window.canManageOncoCareUsers = isAdmin && window.canUseOncoCare;
+                    currentProfessionalTitle = userData.professionalTitle;
+                    document.getElementById('professionalTitleInput').value = currentProfessionalTitle;
+                    document.getElementById('settingsAccountName').innerText = currentProfessionalTitle || user.displayName || 'Tài khoản bác sĩ';
+                    applyAccessState();
+
+                    try {
+                        await setDoc(userDocRef, userData, { merge: true });
+                    } catch (syncError) {
+                        // Profile metadata sync is optional for using already-approved access.
+                        console.error('Lỗi đồng bộ hồ sơ tài khoản:', syncError);
+                    }
+                    if (window.canUseOncoCare) loadAllPatientsRealtime();
+                } catch (err) {
+                    console.error('Lỗi đồng bộ hồ sơ/quyền tài khoản:', err);
+                    // Preserve verified Admin access; non-Admin accounts require the
+                    // Firestore approval record before patient tools become available.
+                    if (configuredAdmin) {
+                        isAdmin = true;
+                        isApproved = true;
+                        isBlocked = false;
+                        window.canUseOncoCare = true;
+                        window.canManageOncoCareUsers = true;
+                        applyAccessState();
+                    } else {
+                        window.canUseOncoCare = false;
+                        window.canManageOncoCareUsers = false;
+                        applyAccessState();
+                        noticeSubText.innerText = 'Không thể xác minh quyền tài khoản. Vui lòng tải lại trang hoặc liên hệ Admin.';
+                    }
+                }
 
             } else {
                 currentUser = null;
