@@ -1328,7 +1328,17 @@
         };
 
         window.openNewPatientModal = function() {
-            if (!window.canUseOncoCare) return;
+            if (!currentUser) {
+                alert('Vui lòng đăng nhập trước khi thêm hồ sơ bệnh nhân.');
+                return;
+            }
+            if (!window.canUseOncoCare) {
+                const message = isBlocked
+                    ? 'Tài khoản của bạn đang bị khóa. Vui lòng liên hệ Admin.'
+                    : 'Tài khoản đã đăng nhập nhưng chưa được Admin phê duyệt. Vui lòng liên hệ Admin để được cấp quyền nhập hồ sơ.';
+                alert(message);
+                return;
+            }
             document.getElementById('editDocId').value = "";
             window.resetFormToAddNewMode();
             document.getElementById('npMarkerValue').onkeydown = (event) => {
@@ -1752,7 +1762,9 @@
                     btnUserMgmt.classList.toggle('hidden', !isAdmin);
                     searchInput.disabled = !window.canUseOncoCare;
                     btnSearchPatient.disabled = !window.canUseOncoCare;
-                    btnAddPatient.disabled = !window.canUseOncoCare;
+                    // Keep the button clickable for signed-in users so the handler can
+                    // explain when approval is still pending instead of failing silently.
+                    btnAddPatient.disabled = !currentUser;
                     accountStatusNotice.classList.toggle('hidden', window.canUseOncoCare);
                     if (isBlocked) noticeSubText.innerText = 'Tài khoản đã bị khóa. Vui lòng liên hệ Admin để được hỗ trợ.';
                     else if (!window.canUseOncoCare) noticeSubText.innerText = 'Tài khoản đang chờ Admin phê duyệt. Các chức năng tra cứu, thêm hồ sơ và thống kê hiện chưa khả dụng.';
