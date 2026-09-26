@@ -2172,21 +2172,55 @@
             `;
         };
 
+        window.getCycleProtocolIdentity = function(cycle) {
+            return cycle.protocolKeyUsed ||
+                Object.keys(chemoProtocolsData).find(key => chemoProtocolsData[key].name === cycle.protocolUsed) ||
+                cycle.protocolUsed || '';
+        };
+
         window.prepareCyclesWithWeekParents = function(cycles) {
-            const prepared = JSON.parse(JSON.stringify(cycles || []));
+            const source = JSON.parse(JSON.stringify(cycles || []));
+            // Gộp các bản ghi lặp do những lần bấm thêm trước đây; giữ bản ghi mới nhất.
+            const latestByCycleWeek = new Map();
+            source.forEach(cycle => {
+                const protocol = window.getCycleProtocolIdentity(cycle);
+                const key = `${Number(cycle.cycleNum) || 0}|${cycle.week || ''}|${protocol}`;
+                latestByCycleWeek.set(key, cycle);
+            });
+            const prepared = [...latestByCycleWeek.values()];
             prepared.forEach(cycle => {
                 if (!cycle.parentCycleId && !cycle.cycleEntryId && cycle.week !== 'Tuần 2') cycle.cycleEntryId = crypto.randomUUID();
             });
+            const orphanWeekParents = [];
             prepared.forEach(week => {
-                if (week.week !== 'Tuần 2' || week.parentCycleId) return;
+                if (week.week !== 'Tuần 2') return;
+                const existingParent = prepared.some(cycle => cycle.cycleEntryId === week.parentCycleId);
+                if (week.parentCycleId && existingParent) return;
+                delete week.parentCycleId;
                 const possibleParents = prepared.filter(cycle =>
                     !cycle.parentCycleId && cycle.week !== 'Tuần 2' &&
                     Number(cycle.cycleNum) === Number(week.cycleNum) &&
-                    (cycle.protocolKeyUsed || '') === (week.protocolKeyUsed || '')
+                    window.getCycleProtocolIdentity(cycle) === window.getCycleProtocolIdentity(week)
                 );
                 const parent = possibleParents.find(cycle => cycle.week === 'Tuần 1') || possibleParents[0];
-                if (parent && parent !== week) week.parentCycleId = parent.cycleEntryId;
+                if (parent && parent !== week) {
+                    week.parentCycleId = parent.cycleEntryId;
+                } else {
+                    const placeholder = {
+                        branchName: `Chu kỳ ${week.cycleNum || ''}`.trim(),
+                        cycleNum: week.cycleNum,
+                        date: week.date,
+                        protocolUsed: week.protocolUsed,
+                        protocolKeyUsed: week.protocolKeyUsed || '',
+                        cycleEntryId: crypto.randomUUID(),
+                        isCycleGroup: true,
+                        updatedBy: week.updatedBy
+                    };
+                    week.parentCycleId = placeholder.cycleEntryId;
+                    orphanWeekParents.push({ week, placeholder });
+                }
             });
+            orphanWeekParents.forEach(({ week, placeholder }) => prepared.splice(prepared.indexOf(week), 0, placeholder));
             return prepared;
         };
 
@@ -2348,11 +2382,47 @@
             window.renderTempMarkersList();
         };
 
+        window.attachOrphanWeek2Children = function(parent) {
+            if (!parent || parent.week !== 'Tuần 1') return;
+            parent.cycleEntryId ||= crypto.randomUUID();
+            const children = window.tempCurrentCycles.filter(cycle =>
+                cycle !== parent && cycle.week === 'Tuần 2' && !cycle.parentCycleId &&
+                Number(cycle.cycleNum) === Number(parent.cycleNum) &&
+                window.getCycleProtocolIdentity(cycle) === window.getCycleProtocolIdentity(parent)
+            );
+            children.forEach(child => {
+                child.parentCycleId = parent.cycleEntryId;
+                child.isChangedProtocol = false;
+                const childIndex = window.tempCurrentCycles.indexOf(child);
+                if (childIndex >= 0) window.tempCurrentCycles.splice(childIndex, 1);
+            });
+            const parentIndex = window.tempCurrentCycles.indexOf(parent);
+            window.tempCurrentCycles.splice(parentIndex + 1, 0, ...children);
+        };
+
         window.appendCycleToHistory = function(cycleData) {
+            const protocolIdentity = window.getCycleProtocolIdentity(cycleData);
+            const existingIndex = [...window.tempCurrentCycles].map((cycle, index) => ({ cycle, index })).reverse().find(({ cycle }) =>
+                Number(cycle.cycleNum) === Number(cycleData.cycleNum) &&
+                (cycle.week || '') === (cycleData.week || '') &&
+                window.getCycleProtocolIdentity(cycle) === protocolIdentity
+            )?.index;
+            if (existingIndex !== undefined) {
+                const existing = window.tempCurrentCycles[existingIndex];
+                window.tempCurrentCycles[existingIndex] = {
+                    ...cycleData,
+                    cycleEntryId: existing.cycleEntryId || cycleData.cycleEntryId || crypto.randomUUID(),
+                    parentCycleId: existing.parentCycleId,
+                    isCycleGroup: existing.isCycleGroup
+                };
+                window.attachOrphanWeek2Children(window.tempCurrentCycles[existingIndex]);
+                return 'updated';
+            }
+
             if (cycleData.week === 'Tuần 2') {
                 let parent = [...window.tempCurrentCycles].reverse().find(c =>
                     !c.parentCycleId && c.week !== 'Tuần 2' && Number(c.cycleNum) === Number(cycleData.cycleNum) &&
-                    (c.protocolKeyUsed || '') === (cycleData.protocolKeyUsed || '')
+                    window.getCycleProtocolIdentity(c) === window.getCycleProtocolIdentity(cycleData)
                 );
                 if (!parent) {
                     parent = {
@@ -2376,12 +2446,16 @@
                 let insertAt = parentIndex + 1;
                 while (insertAt < window.tempCurrentCycles.length && window.tempCurrentCycles[insertAt].parentCycleId === parent.cycleEntryId) insertAt++;
                 window.tempCurrentCycles.splice(insertAt, 0, cycleData);
-                return;
+                return 'added-child';
             }
             window.tempCurrentCycles.push(cycleData);
+            window.attachOrphanWeek2Children(cycleData);
+            return 'added';
         };
 
-        window.addNewCycleFromForm = function() {
+        window.addNewCycleFromForm = async function() {
+            const addButton = document.getElementById('btnAddCycleBtn');
+            if (addButton.disabled) return;
             const cycleDate = document.getElementById('npCycleDate').value;
             const cycleNum = parseInt(document.getElementById('npCycleNumber').value) || 1;
             const drugNames = document.getElementById('npDrugNamesInput').value;
@@ -2393,6 +2467,7 @@
                 alert("Vui lòng chọn ngày chu kỳ!");
                 return;
             }
+            addButton.disabled = true;
 
             const is14Days = chemoProtocolsData[document.getElementById('protocolSelectList').value]?.is14Days;
             const weekVal = is14Days ? document.getElementById('npProtocolWeek').value : "";
@@ -2421,15 +2496,20 @@
                 updatedBy: window.getCurrentEditorName()
             };
 
-            if (weekVal === 'Tuần 2') {
-                window.appendCycleToHistory(cycleData);
-                window.showToast(`Đã thêm ${weekVal} vào chu kỳ ${cycleNum}!`);
-            } else {
-                window.appendCycleToHistory(cycleData);
-                window.showToast("Đã thêm chu kỳ mới thành công!");
+            try {
+                const action = window.appendCycleToHistory(cycleData);
+                window.renderTempCyclesList();
+                const saved = await window.autoSyncChangesToDatabase({ showToast: false });
+                if (!saved) {
+                    window.showToast('Không thể lưu lịch sử. Vui lòng thử lại.');
+                    return;
+                }
+                if (action === 'updated') window.showToast(`Đã cập nhật ${weekVal || `chu kỳ ${cycleNum}`} trong lịch sử.`);
+                else if (weekVal === 'Tuần 2') window.showToast(`Đã thêm ${weekVal} vào chu kỳ ${cycleNum}!`);
+                else window.showToast("Đã thêm chu kỳ mới thành công!");
+            } finally {
+                addButton.disabled = false;
             }
-
-            window.renderTempCyclesList();
         };
 
         window.previewNewPatientCycle = function() {
@@ -2689,7 +2769,7 @@
             window.showToast(`Đang chỉnh sửa chu kỳ thứ ${c.cycleNum || (idx + 1)}. Nhấn "Lưu thông tin" để hoàn tất.`);
         };
 
-        window.deleteTempCycle = function(idx) {
+        window.deleteTempCycle = async function(idx) {
             if (confirm("Bạn có chắc chắn muốn xóa chu kỳ này không?")) {
                 const cycle = window.tempCurrentCycles[idx];
                 const removedIds = cycle && cycle.cycleEntryId ? [cycle.cycleEntryId] : [];
@@ -2697,7 +2777,8 @@
                     itemIndex !== idx && !removedIds.includes(item.parentCycleId)
                 );
                 window.renderTempCyclesList();
-                window.showToast("Đã xóa chu kỳ thành công.");
+                const saved = await window.autoSyncChangesToDatabase({ showToast: false });
+                window.showToast(saved ? "Đã xóa chu kỳ thành công." : "Không thể lưu thay đổi. Vui lòng thử lại.");
             }
         };
 
@@ -2806,6 +2887,7 @@
                     updatedBy: window.getCurrentEditorName()
                 };
 
+                window.tempCurrentCycles = [];
                 window.appendCycleToHistory(cycleEntry);
                 window.renderTempCyclesList();
             }
@@ -2873,10 +2955,10 @@
             }
         };
 
-        window.autoSyncChangesToDatabase = async function() {
-            if (!window.canUseOncoCare) return;
+        window.autoSyncChangesToDatabase = async function({ showToast = true } = {}) {
+            if (!window.canUseOncoCare) return false;
             const docId = document.getElementById('editDocId').value;
-            if (!docId) return;
+            if (!docId) return false;
             try {
                 await updateDoc(doc(db, "patients", docId), {
                     cycles: window.tempCurrentCycles,
@@ -2884,9 +2966,16 @@
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
-                window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
+                const patient = cachedPatientsList.find(item => item.id === docId);
+                if (patient) {
+                    patient.cycles = JSON.parse(JSON.stringify(window.tempCurrentCycles));
+                    patient.markers = JSON.parse(JSON.stringify(window.tempCurrentMarkers));
+                }
+                if (showToast) window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
+                return true;
             } catch (err) {
                 console.error("Lỗi đồng bộ tự động:", err);
+                return false;
             }
         };
 
@@ -2939,7 +3028,7 @@
                         <td class="p-3">${escapeHtml(p.birthYear || '')}</td>
                         <td class="p-3"><strong class="text-teal-800">Chính:</strong> ${escapeHtml(p.diagnosis || '-')}</td>
                         <td class="p-3 font-bold text-amber-800">${escapeHtml(p.protocol || 'Chưa cập nhật')}</td>
-                        <td class="p-3 text-center font-bold text-teal-700">${p.cycles ? p.cycles.length : 0} chu kỳ</td>
+                        <td class="p-3 text-center font-bold text-teal-700">${window.prepareCyclesWithWeekParents(p.cycles || []).filter(cycle => !cycle.parentCycleId).length} chu kỳ</td>
                         <td class="p-3 text-center">
                             <button type="button" data-patient-action="view" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
                             <button type="button" data-patient-action="edit" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
