@@ -23,23 +23,54 @@
     
     <style>
         body { font-family: 'Inter', sans-serif; background: #e9edf2; }
-        html[data-theme="light"] body { background: #e9e5dc; color: #302f2b; color-scheme: light; }
+        html[data-theme="light"] body {
+            background:
+                radial-gradient(ellipse 58% 52% at 50% 46%, rgba(168, 211, 250, 0.62) 0%, rgba(210, 231, 250, 0.38) 42%, rgba(248, 249, 251, 0) 78%),
+                #f8f9fb;
+            background-attachment: fixed;
+            color: #202124;
+            color-scheme: light;
+        }
         html[data-theme="light"] .bg-white,
-        html[data-theme="light"] .bg-white\/90 { background-color: #f1eee5 !important; }
-        html[data-theme="light"] .bg-white { background-color: #f1eee5 !important; }
+        html[data-theme="light"] .bg-white\/90 { background-color: #ffffff !important; }
         html[data-theme="light"] .bg-slate-50,
-        html[data-theme="light"] .bg-slate-50\/80 { background-color: #e7e2d8 !important; }
-        html[data-theme="light"] .bg-slate-50 { background-color: #e7e2d8 !important; }
+        html[data-theme="light"] .bg-slate-50\/80 { background-color: #f7f8fa !important; }
         html[data-theme="light"] .bg-slate-100,
-        html[data-theme="light"] .bg-slate-100\/80 { background-color: #ded8cd !important; }
-        html[data-theme="light"] .bg-slate-100 { background-color: #ded8cd !important; }
-        html[data-theme="light"] .bg-slate-200 { background-color: #d3ccbf !important; }
+        html[data-theme="light"] .bg-slate-100\/80 { background-color: #f0f2f5 !important; }
+        html[data-theme="light"] .bg-slate-200 { background-color: #e5e7eb !important; }
         html[data-theme="light"] [class*="border-slate-"],
         html[data-theme="light"] [class*="border-teal-"],
         html[data-theme="light"] [class*="border-indigo-"],
         html[data-theme="light"] [class*="border-amber-"],
         html[data-theme="light"] [class*="border-rose-"],
-        html[data-theme="light"] [class*="border-emerald-"] { border-color: #c9c1b3 !important; }
+        html[data-theme="light"] [class*="border-emerald-"] { border-color: #e1e5ea !important; }
+        html[data-theme="light"] [class*="bg-teal-50"],
+        html[data-theme="light"] [class*="bg-indigo-50"],
+        html[data-theme="light"] [class*="bg-amber-50"],
+        html[data-theme="light"] [class*="bg-rose-50"],
+        html[data-theme="light"] [class*="bg-emerald-50"] { background-color: #f4f6f8 !important; }
+        html[data-theme="light"] [class*="bg-teal-100"],
+        html[data-theme="light"] [class*="bg-indigo-100"],
+        html[data-theme="light"] [class*="bg-amber-100"],
+        html[data-theme="light"] [class*="bg-rose-100"],
+        html[data-theme="light"] [class*="bg-emerald-100"] { background-color: #eceff3 !important; }
+        html[data-theme="light"] #accountSettingsMenu {
+            background: #ffffff !important;
+            color: #202124;
+            border-color: #e5e7eb !important;
+            box-shadow: 0 12px 36px rgba(32, 33, 36, 0.14);
+        }
+        html[data-theme="light"] #accountSettingsMenu button:not(#themeToggleButton) {
+            background: #f5f6f7 !important;
+            color: #30343b !important;
+            border-color: #e2e5e9 !important;
+        }
+        html[data-theme="light"] #accountSettingsMenu button:not(#themeToggleButton):hover { background: #eceff3 !important; }
+        html[data-theme="light"] #loginSplash {
+            background:
+                radial-gradient(ellipse 58% 52% at 50% 46%, rgba(168, 211, 250, 0.62) 0%, rgba(210, 231, 250, 0.38) 42%, rgba(248, 249, 251, 0) 78%),
+                #f8f9fb;
+        }
         .item-suggestion:hover,
         .item-suggestion.suggestion-active {
             background-color: #1d5fc4 !important;
