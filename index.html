@@ -1476,6 +1476,16 @@
             const mode = document.querySelector('input[name="protocolMode"]:checked').value;
             const protoSelect = document.getElementById('protocolSelectList');
             if (mode === 'continue') {
+                const activeProtocol = window.getActiveCycleProtocol?.(window.tempCurrentCycles || []);
+                if (activeProtocol?.protocol) {
+                    protoSelect.value = activeProtocol.protocolKey || '';
+                    document.getElementById('npProtocol').value = activeProtocol.protocol;
+                    if (protoSelect.value === 'CUSTOM') {
+                        document.getElementById('customProtocolNameInput').value = activeProtocol.protocol;
+                    }
+                    document.getElementById('currentActiveProtoLabel').innerText = activeProtocol.protocol;
+                    window.onProtocolSelectChanged?.();
+                }
                 protoSelect.disabled = true;
                 protoSelect.classList.add('bg-slate-100');
             } else {
@@ -2193,10 +2203,13 @@
         };
 
         window.getActiveCycleProtocol = function(cycles, fallbackProtocol, fallbackKey) {
+            // The array is maintained in entry order. Use its latest root record so
+            // a newly changed protocol becomes the default even when its date is
+            // earlier than a previously entered cycle. Week-2-only placeholders
+            // also carry the active protocol and must participate here.
             const latestCycle = [...(cycles || [])]
-                .filter(cycle => !cycle.parentCycleId && !cycle.isCycleGroup && window.getCycleProtocolIdentity(cycle))
-                .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')))
-                .at(-1);
+                .reverse()
+                .find(cycle => !cycle.parentCycleId && window.getCycleProtocolIdentity(cycle));
             if (!latestCycle) return { protocol: fallbackProtocol || '', protocolKey: fallbackKey || '' };
             return {
                 protocol: latestCycle.protocolUsed || fallbackProtocol || '',
@@ -2384,6 +2397,7 @@
             document.getElementById('protocolModeContainer').classList.remove('hidden');
             const activeProtocol = window.getActiveCycleProtocol(p.cycles, p.protocol, p.protocolKey);
             document.getElementById('currentActiveProtoLabel').innerText = activeProtocol.protocol || "Chưa có";
+            window.tempCurrentCycles = window.prepareCyclesWithWeekParents(p.cycles || []);
             
             const radioContinue = document.querySelector('input[name="protocolMode"][value="continue"]');
             if (radioContinue) radioContinue.checked = true;
@@ -2401,7 +2415,6 @@
             let lastCycleNum = Math.max(0, ...(p.cycles || []).map(c => Number(c.cycleNum) || 0));
             document.getElementById('npCycleNumber').value = lastCycleNum + 1;
             
-            window.tempCurrentCycles = window.prepareCyclesWithWeekParents(p.cycles || []);
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
 
             window.onProtocolSelectChanged();
@@ -2491,7 +2504,19 @@
             const drugNames = document.getElementById('npDrugNamesInput').value;
             const doseInput = document.getElementById('npDoseInput').value;
             const note = document.getElementById('npCycleNote').value;
-            const proto = document.getElementById('npProtocol').value || "AC-T";
+            const modeContainer = document.getElementById('protocolModeContainer');
+            const isEditingExistingPatient = !modeContainer.classList.contains('hidden');
+            const protocolMode = isEditingExistingPatient
+                ? document.querySelector('input[name="protocolMode"]:checked')?.value
+                : 'change';
+            const activeProtocol = window.getActiveCycleProtocol(window.tempCurrentCycles || []);
+            const selectedProtocolKey = document.getElementById('protocolSelectList').value;
+            const protocolKey = protocolMode === 'continue'
+                ? (activeProtocol.protocolKey || selectedProtocolKey)
+                : selectedProtocolKey;
+            const proto = (protocolMode === 'continue' && activeProtocol.protocol)
+                ? activeProtocol.protocol
+                : (document.getElementById('npProtocol').value || "AC-T");
 
             if (!cycleDate) {
                 alert("Vui lòng chọn ngày chu kỳ!");
@@ -2499,17 +2524,14 @@
             }
             addButton.disabled = true;
 
-            const is14Days = chemoProtocolsData[document.getElementById('protocolSelectList').value]?.is14Days;
+            const is14Days = chemoProtocolsData[protocolKey]?.is14Days;
             const weekVal = is14Days ? document.getElementById('npProtocolWeek').value : "";
 
-            let modeContainer = document.getElementById('protocolModeContainer');
             let isChangedProtocol = false;
-            if (!modeContainer.classList.contains('hidden')) {
-                let mode = document.querySelector('input[name="protocolMode"]:checked').value;
-                const active = window.getActiveCycleProtocol(window.tempCurrentCycles);
-                const nextProtocolIdentity = document.getElementById('protocolSelectList').value || proto;
-                const activeIdentity = active.protocolKey || active.protocol;
-                isChangedProtocol = mode === 'change' && Boolean(activeIdentity) && nextProtocolIdentity !== activeIdentity;
+            if (isEditingExistingPatient) {
+                const nextProtocolIdentity = protocolKey || proto;
+                const activeIdentity = activeProtocol.protocolKey || activeProtocol.protocol;
+                isChangedProtocol = protocolMode === 'change' && Boolean(activeIdentity) && nextProtocolIdentity !== activeIdentity;
             }
 
             const cycleData = {
@@ -2519,7 +2541,7 @@
                 date: cycleDate,
                 cycleEntryId: crypto.randomUUID(),
                 protocolUsed: proto,
-                protocolKeyUsed: document.getElementById('protocolSelectList').value,
+                protocolKeyUsed: protocolKey,
                 isChangedProtocol: isChangedProtocol,
                 drugNames: drugNames,
                 doseInput: doseInput,
@@ -2977,17 +2999,26 @@
             if (!window.canUseOncoCare) return false;
             const docId = document.getElementById('editDocId').value;
             if (!docId) return false;
+            const patient = cachedPatientsList.find(item => item.id === docId);
+            const activeProtocol = window.getActiveCycleProtocol(
+                window.tempCurrentCycles,
+                patient?.protocol,
+                patient?.protocolKey
+            );
             try {
                 await updateDoc(doc(db, "patients", docId), {
                     cycles: window.tempCurrentCycles,
                     markers: window.tempCurrentMarkers,
+                    protocol: activeProtocol.protocol,
+                    protocolKey: activeProtocol.protocolKey,
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
-                const patient = cachedPatientsList.find(item => item.id === docId);
                 if (patient) {
                     patient.cycles = JSON.parse(JSON.stringify(window.tempCurrentCycles));
                     patient.markers = JSON.parse(JSON.stringify(window.tempCurrentMarkers));
+                    patient.protocol = activeProtocol.protocol;
+                    patient.protocolKey = activeProtocol.protocolKey;
                 }
                 if (showToast) window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
                 return true;
@@ -3237,34 +3268,3 @@
                 alert("Lỗi: " + err.message);
             }
         };
-
-        window.adminToggleBlockUser = async function(userId, status) {
-            if (!isAdmin || !window.canUseOncoCare) return;
-            try {
-                await updateDoc(doc(db, "users", userId), { isBlocked: status });
-                window.showToast("Đã cập nhật trạng thái khóa tài khoản!");
-                window.loadUsersManagementTable();
-            } catch (err) {
-                alert("Lỗi: " + err.message);
-            }
-        };
-
-        window.adminToggleVip = async function(userId, status) {
-            if (!isAdmin || !window.canUseOncoCare) return;
-            try {
-                const targetRef = doc(db, "users", userId);
-                const targetSnapshot = await getDoc(targetRef);
-                if (!targetSnapshot.exists() || targetSnapshot.data().email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return;
-                await updateDoc(targetRef, {
-                    role: status ? "VIP" : "Doctor",
-                    isApproved: true
-                });
-                window.showToast(status ? "Đã cấp quyền VIP cho thành viên!" : "Đã hủy quyền VIP của thành viên!");
-                window.loadUsersManagementTable();
-            } catch (err) {
-                alert("Lỗi: " + err.message);
-            }
-        };
-    </script>
-</body>
-</html>
