@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oncocare-v3';
+const CACHE_NAME = 'oncocare-v5';
 const APP_SHELL = [
     './',
     './index.html',
@@ -6,6 +6,7 @@ const APP_SHELL = [
     './favicon.svg',
     './favicon.ico',
     './favicon.png',
+    './favicon-48x48.png',
     './favicon-32x32.png',
     './favicon-16x16.png',
     './apple-touch-icon.png',
