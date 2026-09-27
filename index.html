@@ -1224,6 +1224,20 @@
         ];
 
         window.tempSubDiagnoses = [];
+        window.normalizeProtocolHistory = function(cycles) {
+            const ordered = [...(cycles || [])].sort((a, b) =>
+                String(a.date || '').localeCompare(String(b.date || '')) ||
+                (Number(a.cycleNum) || 0) - (Number(b.cycleNum) || 0)
+            );
+            let previousProtocol = '';
+            ordered.forEach((cycle, index) => {
+                const protocolId = cycle.protocolKeyUsed || cycle.protocolUsed || '';
+                cycle.isChangedProtocol = index > 0 && protocolId !== previousProtocol;
+                previousProtocol = protocolId;
+            });
+            cycles.splice(0, cycles.length, ...ordered);
+            return cycles;
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             setupIcdAutocomplete('npDiagnosis', 'icdDropdownMain');
@@ -2231,9 +2245,13 @@
             `;
         };
 
-        window.viewPatientDetail = function(docId) {
+        window.viewPatientDetail = async function(docId) {
             if (!window.canUseOncoCare) return;
-            const p = cachedPatientsList.find(item => item.id === docId);
+            let p = cachedPatientsList.find(item => item.id === docId);
+            try {
+                const freshSnapshot = await getDoc(doc(db, 'patients', docId));
+                if (freshSnapshot.exists()) p = { id: freshSnapshot.id, ...freshSnapshot.data() };
+            } catch (error) { console.warn('Không tải được hồ sơ mới nhất, dùng dữ liệu cache:', error); }
             if (!p) return;
             window.currentViewingPatient = p;
 
@@ -2246,7 +2264,7 @@
 
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
-            const cycles = p.cycles || [];
+            const cycles = window.normalizeProtocolHistory((p.cycles || []).map(cycle => ({ ...cycle })));
             if (cycles.length === 0) {
                 cyclesContainer.innerHTML = `<p class="text-slate-400 italic text-xs">Chưa có lịch sử chu kỳ.</p>`;
             } else {
@@ -2297,9 +2315,13 @@
             window.switchDetailTab('timeline');
         };
 
-        window.openEditPatientModal = function(docId) {
+        window.openEditPatientModal = async function(docId) {
             if (!window.canUseOncoCare) return;
-            const p = cachedPatientsList.find(item => item.id === docId);
+            let p = cachedPatientsList.find(item => item.id === docId);
+            try {
+                const freshSnapshot = await getDoc(doc(db, 'patients', docId));
+                if (freshSnapshot.exists()) p = { id: freshSnapshot.id, ...freshSnapshot.data() };
+            } catch (error) { console.warn('Không tải được hồ sơ mới nhất, dùng dữ liệu cache:', error); }
             if (!p) return;
 
             document.getElementById('editDocId').value = p.id;
@@ -2359,16 +2381,10 @@
             document.getElementById('npCycleDate').value = localDate;
             document.getElementById('npMarkerDate').value = localDate;
             
-            let lastCycleNum = 0;
-            if (p.cycles && p.cycles.length > 0) {
-                let lastCycle = p.cycles[p.cycles.length - 1];
-                if (lastCycle.cycleNum) {
-                    lastCycleNum = lastCycle.cycleNum;
-                }
-            }
+            const lastCycleNum = (p.cycles || []).reduce((max, cycle) => Math.max(max, Number(cycle.cycleNum) || 0), 0);
             document.getElementById('npCycleNumber').value = lastCycleNum + 1;
             
-            window.tempCurrentCycles = JSON.parse(JSON.stringify(p.cycles || []));
+            window.tempCurrentCycles = window.normalizeProtocolHistory(JSON.parse(JSON.stringify(p.cycles || [])));
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
 
             window.onProtocolSelectChanged();
@@ -2428,7 +2444,15 @@
                 window.showToast("Đã thêm chu kỳ mới thành công!");
             }
 
+            window.normalizeProtocolHistory(window.tempCurrentCycles);
             window.renderTempCyclesList();
+            if (document.getElementById('editDocId').value) window.autoSyncChangesToDatabase();
+            if (!modeContainer.classList.contains('hidden')) {
+                const continueRadio = document.querySelector('input[name="protocolMode"][value="continue"]');
+                if (continueRadio) continueRadio.checked = true;
+                document.getElementById('currentActiveProtoLabel').innerText = proto;
+                window.toggleProtocolMode();
+            }
         };
 
         window.previewNewPatientCycle = function() {
@@ -2684,10 +2708,12 @@
             window.showToast(`Đang chỉnh sửa chu kỳ thứ ${c.cycleNum || (idx + 1)}. Nhấn "Lưu thông tin" để hoàn tất.`);
         };
 
-        window.deleteTempCycle = function(idx) {
+        window.deleteTempCycle = async function(idx) {
             if (confirm("Bạn có chắc chắn muốn xóa chu kỳ này không?")) {
                 window.tempCurrentCycles.splice(idx, 1);
+                window.normalizeProtocolHistory(window.tempCurrentCycles);
                 window.renderTempCyclesList();
+                await window.autoSyncChangesToDatabase();
                 window.showToast("Đã xóa chu kỳ thành công.");
             }
         };
@@ -2808,6 +2834,15 @@
                 window.renderTempCyclesList();
             }
 
+            window.normalizeProtocolHistory(window.tempCurrentCycles);
+            const latestProtocolCycle = window.tempCurrentCycles[window.tempCurrentCycles.length - 1];
+            const effectiveProtocol = latestProtocolCycle?.protocolUsed || protocolVal;
+            const effectiveProtocolKey = latestProtocolCycle?.protocolKeyUsed || protocolKeyVal;
+            if (latestProtocolCycle) {
+                document.getElementById('protocolSelectList').value = effectiveProtocolKey;
+                document.getElementById('npProtocol').value = effectiveProtocol;
+                document.getElementById('currentActiveProtoLabel').innerText = effectiveProtocol;
+            }
             const payload = {
                 patientId: patientIdVal,
                 name: nameVal,
@@ -2818,8 +2853,8 @@
                 diagnosis: diagnosisVal,
                 subDiagnosesList: [...window.tempSubDiagnoses],
                 subDiagnosis: window.tempSubDiagnoses.join(' | '),
-                protocol: protocolVal,
-                protocolKey: protocolKeyVal,
+                protocol: effectiveProtocol,
+                protocolKey: effectiveProtocolKey,
                 cycles: window.tempCurrentCycles,
                 markers: window.tempCurrentMarkers,
                 updatedAt: serverTimestamp(),
@@ -2839,6 +2874,10 @@
 
                 if (docId) {
                     await updateDoc(doc(db, "patients", docId), payload);
+                    const cacheIndex = cachedPatientsList.findIndex(patient => patient.id === docId);
+                    const updatedPatient = { ...(cacheIndex >= 0 ? cachedPatientsList[cacheIndex] : {}), id: docId, ...payload };
+                    if (cacheIndex >= 0) cachedPatientsList[cacheIndex] = updatedPatient;
+                    else cachedPatientsList.push(updatedPatient);
                     window.showToast("Đã lưu và cập nhật hồ sơ bệnh nhân thành công!");
                 } else {
                     payload.createdAt = serverTimestamp();
@@ -2850,7 +2889,9 @@
                         }
                         transaction.set(createdPatientRef, payload);
                     });
-                    cachedPatientsList.push({ id: createdPatientRef.id, ...payload });
+                    const createdPatient = { id: createdPatientRef.id, ...payload };
+                    cachedPatientsList = cachedPatientsList.filter(patient => patient.id !== createdPatient.id);
+                    cachedPatientsList.push(createdPatient);
                     window.showToast("Đã thêm mới hồ sơ bệnh nhân thành công!");
                 }
                 window.closePatientFormModal();
@@ -2876,12 +2917,22 @@
             const docId = document.getElementById('editDocId').value;
             if (!docId) return;
             try {
-                await updateDoc(doc(db, "patients", docId), {
+                window.normalizeProtocolHistory(window.tempCurrentCycles);
+                const latestCycle = window.tempCurrentCycles[window.tempCurrentCycles.length - 1];
+                const cachedPatient = cachedPatientsList.find(patient => patient.id === docId) || {};
+                const update = {
                     cycles: window.tempCurrentCycles,
                     markers: window.tempCurrentMarkers,
+                    protocol: latestCycle?.protocolUsed || cachedPatient.protocol || '',
+                    protocolKey: latestCycle?.protocolKeyUsed || cachedPatient.protocolKey || '',
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
-                });
+                };
+                await updateDoc(doc(db, "patients", docId), update);
+                const cacheIndex = cachedPatientsList.findIndex(patient => patient.id === docId);
+                const updatedPatient = { ...cachedPatient, ...update, id: docId };
+                if (cacheIndex >= 0) cachedPatientsList[cacheIndex] = updatedPatient;
+                else cachedPatientsList.push(updatedPatient);
                 window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
             } catch (err) {
                 console.error("Lỗi đồng bộ tự động:", err);
