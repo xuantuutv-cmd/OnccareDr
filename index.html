@@ -1071,13 +1071,18 @@
                 <div class="w-full sm:w-52">
                     <label for="statsIcdFilter" class="sr-only">Lọc theo nhóm ICD</label>
                     <select id="statsIcdFilter" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 text-center">
-                        <option value="ALL">Tất cả (All)</option>
+                        <option value="ALL">Tất cả ICD</option>
                         <option value="C16">C16 (Dạ dày)</option>
                         <option value="C18">C18 (Đại tràng)</option>
                         <option value="C19">C19 (Đoạn nối trực - đại tràng)</option>
                         <option value="C20">C20 (Trực tràng)</option>
                         <option value="C50">C50 (Vú)</option>
                     </select>
+                </div>
+                <div>
+                    <button type="button" onclick="window.resetStatsDateRange()" class="w-full sm:w-auto p-2.5 px-4 bg-white hover:bg-teal-50 text-teal-800 font-bold border border-slate-200 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5" title="Xem tất cả (Xóa lọc ngày)">
+                        <i class="fa-solid fa-arrows-rotate text-teal-600"></i> Tất cả
+                    </button>
                 </div>
             </div>
 
@@ -2120,22 +2125,23 @@
         window.statsModalIsMaximized = true;
         window.openStatsModal = function() {
             if (!window.canUseOncoCare) return;
-            const now = new Date();
-            const localDateString = (date) => {
-                const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-                return localDate.toISOString().split('T')[0];
-            };
-            const thirtyDaysAgo = new Date(now);
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            const today = localDateString(now);
-            document.getElementById('statsStartDate').value = localDateString(thirtyDaysAgo);
-            document.getElementById('statsEndDate').value = today;
+            document.getElementById('statsStartDate').value = '';
+            document.getElementById('statsEndDate').value = '';
+            document.getElementById('statsIcdFilter').value = 'ALL';
             if (!window.statsModalIsMaximized) window.toggleStatsModalSize();
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
             window.setPanelVisibility(document.getElementById('statsModal'), true);
             window.switchStatsTab('patients');
             window.runChemoStatistics();
+        };
+
+        window.resetStatsDateRange = function() {
+            document.getElementById('statsStartDate').value = '';
+            document.getElementById('statsEndDate').value = '';
+            document.getElementById('statsIcdFilter').value = 'ALL';
+            window.runChemoStatistics();
+            window.switchStatsTab('patients');
         };
 
         window.handleStatsDateRangeChange = function() {
@@ -2503,6 +2509,10 @@
                 snapshot.forEach((docSnap) => {
                     cachedPatientsList.push({ id: docSnap.id, ...docSnap.data() });
                 });
+                const statsModal = document.getElementById('statsModal');
+                if (statsModal && !statsModal.classList.contains('hidden') && typeof window.runChemoStatistics === 'function') {
+                    window.runChemoStatistics();
+                }
             }, (error) => {
                 console.error("Lỗi tải dữ liệu:", error);
             });
@@ -2538,6 +2548,8 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 const fullDiag = window.getFullDiagnosisDisplay ? window.getFullDiagnosisDisplay(p) : (p.diagnosis || '-');
+                const subDiag = p.subDiagnosis || (p.subDiagnosesList && p.subDiagnosesList.length ? p.subDiagnosesList.join(', ') : 'Không có');
+                const treatmentSummary = window.getLatestTreatmentSummary ? window.getLatestTreatmentSummary(p) : { protocol: p.protocol || 'Chưa cập nhật', cycle: 'Chưa cập nhật' };
                 tr.innerHTML = `
                     <td class="p-2.5 font-bold text-teal-800 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
                     <td class="p-2.5 font-semibold text-slate-900 truncate" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
@@ -3409,15 +3421,26 @@
             return false;
         };
 
+        window.getLatestTreatmentSummary = function(p) {
+            if (!p) return { protocol: 'Chưa cập nhật', cycle: 'Chưa cập nhật' };
+            const cycles = p.cycles || [];
+            const latestCycle = cycles.length > 0 ? cycles[cycles.length - 1] : null;
+            const protocol = (latestCycle && latestCycle.protocolUsed) || p.protocol || 'Chưa cập nhật';
+            const cycle = latestCycle
+                ? `${latestCycle.branchName || ('Chu kỳ ' + (latestCycle.cycleNum || cycles.length))}`
+                : (cycles.length > 0 ? `${cycles.length} chu kỳ` : 'Chưa có chu kỳ');
+            return { protocol, cycle };
+        };
+
         window.renderStatsPatientPage = function() {
             const tbody = document.getElementById('statsTableBody');
             const pagination = document.getElementById('statsPagination');
             if (!tbody || !pagination) return;
 
             const tableViewportHeight = document.getElementById('statsTableViewport')?.clientHeight || 0;
-            statsPageSize = tableViewportHeight
-                ? Math.max(1, Math.floor((tableViewportHeight - 44) / 48))
-                : Math.max(1, Math.floor((window.innerHeight - 430) / 48));
+            statsPageSize = tableViewportHeight > 100
+                ? Math.max(5, Math.floor((tableViewportHeight - 44) / 52))
+                : 10;
             const totalPages = Math.max(1, Math.ceil(statsFilteredPatients.length / statsPageSize));
             statsCurrentPage = Math.min(Math.max(statsCurrentPage, 1), totalPages);
             const pageStart = (statsCurrentPage - 1) * statsPageSize;
@@ -3431,6 +3454,7 @@
                     tr.className = 'hover:bg-slate-50 transition';
                     const fullDiag = window.getFullDiagnosisDisplay(p);
                     const subDiag = p.subDiagnosis || (p.subDiagnosesList && p.subDiagnosesList.length ? p.subDiagnosesList.join(', ') : 'Không có');
+                    const treatmentSummary = window.getLatestTreatmentSummary(p);
                     tr.innerHTML = `
                         <td class="p-2.5 font-bold text-teal-800 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
                         <td class="p-2.5 font-semibold text-slate-900 truncate" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
