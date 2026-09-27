@@ -272,9 +272,10 @@
             transform-origin: top center;
         }
         .panel-opening { animation: panelOpening 260ms cubic-bezier(0.2, 0.75, 0.25, 1) both; }
-        .panel-closing { animation: panelClosing 180ms cubic-bezier(0.4, 0, 1, 1) both; pointer-events: none; }
-        #statsTableBody td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        #statsTableBody tr { height: 3rem; }
+        #statsTableBody td { overflow: hidden; text-overflow: ellipsis; }
+        #statsTableBody tr { height: 3.25rem; }
+        html[data-theme="dark"] #statsTableViewport { background: #1e1e1e !important; border-color: #3c4043 !important; }
+        html[data-theme="dark"] #statsTableViewport thead { background: #2d2d2d !important; color: #d1d5db !important; }
         html[data-theme="dark"] #statsModalContent { background: #252526 !important; border-color: #3c4043 !important; }
         html[data-theme="dark"] #statsModalHeader { background: #2b2b2b !important; border-color: #3c4043 !important; }
         html[data-theme="dark"] #statsFilters,
@@ -378,7 +379,7 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <section id="loginSplash" class="fixed inset-0 z-[120] flex items-center justify-center px-6 py-12" aria-label="Đăng nhập OncoCare Pro">
+    <section id="loginSplash" class="fixed inset-0 z-[130] flex items-center justify-center px-6 py-12" aria-label="Đăng nhập OncoCare Pro">
         <div class="w-full max-w-lg text-center">
             <div class="mx-auto mb-6 flex items-center justify-center">
                 <i class="brand-leaf fa-solid fa-leaf text-6xl" aria-hidden="true"></i>
@@ -478,22 +479,33 @@
                 <span id="patientCountBadge" class="bg-slate-100 text-slate-600 text-xs px-2.5 py-0.5 rounded-full font-bold">Chưa chọn tra cứu</span>
             </div>
 
-            <div class="overflow-x-auto rounded-2xl border border-slate-200/80">
-                <table class="w-full text-left text-xs text-slate-700">
+            <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white">
+                <table class="w-full min-w-[760px] table-fixed text-left text-xs text-slate-700">
+                    <colgroup>
+                        <col style="width: 9%;">
+                        <col style="width: 15%;">
+                        <col style="width: 6%;">
+                        <col style="width: 6%;">
+                        <col style="width: 32%;">
+                        <col style="width: 14%;">
+                        <col style="width: 9%;">
+                        <col style="width: 9%;">
+                    </colgroup>
                     <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
                         <tr>
-                            <th class="p-3">Mã BN</th>
-                            <th class="p-3">Họ và Tên</th>
-                            <th class="p-3 text-center">Giới Tính</th>
-                            <th class="p-3">Năm Sinh</th>
-                            <th class="p-3">Chẩn Đoán Chính / Phụ</th>
-                            <th class="p-3">Phác Đồ</th>
-                            <th class="p-3 text-center">Thao Tác</th>
+                            <th class="p-3 w-[9%]">Mã BN</th>
+                            <th class="p-3 w-[15%]">Họ và Tên</th>
+                            <th class="p-3 text-center w-[6%]">Giới Tính</th>
+                            <th class="p-3 text-center w-[6%]">Năm Sinh</th>
+                            <th class="p-3 w-[32%]">Chẩn Đoán (Chính / Phụ)</th>
+                            <th class="p-3 w-[14%]">Phác Đồ</th>
+                            <th class="p-3 text-center w-[9%]">Chu Kỳ Gần Nhất</th>
+                            <th class="p-3 text-center w-[9%]">Thao Tác</th>
                         </tr>
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
                         <tr>
-                            <td colspan="7" class="p-8 text-center text-slate-400 font-medium">
+                            <td colspan="8" class="p-8 text-center text-slate-400 font-medium">
                                 <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
                                 Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
                             </td>
@@ -561,7 +573,7 @@
     <!-- ========================================== -->
     <!-- MODUN 4: MODAL THÊM / SỬA HỒ SƠ BỆNH NHÂN & CHU KỲ -->
     <!-- ========================================== -->
-    <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
+    <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[115] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
             <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between shrink-0 border-b border-slate-800">
                 <div class="flex items-center space-x-3">
@@ -907,7 +919,7 @@
     <!-- ========================================== -->
     <!-- MODUN 5: MODAL TÓM TẮT CHI TIẾT BỆNH NHÂN -->
     <!-- ========================================== -->
-    <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+    <div id="patientDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[120] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col custom-scrollbar">
             <div class="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-5 px-6 flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center space-x-3">
@@ -1125,18 +1137,28 @@
                     <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">DANH SÁCH BỆNH NHÂN TRONG KHOẢNG THỜI GIAN:</h4>
                     <span class="text-[10px] text-slate-500">Sắp xếp theo ngày hóa trị mới nhất</span>
                 </div>
-                <div id="statsTableViewport" class="flex-1 min-h-0 overflow-hidden rounded-xl border border-slate-200">
-                    <table class="w-full h-full table-fixed text-left text-xs text-slate-700">
-                        <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
+                <div id="statsTableViewport" class="flex-1 min-h-0 overflow-x-auto overflow-y-auto rounded-xl border border-slate-200 bg-white">
+                    <table class="w-full min-w-[850px] table-fixed text-left text-xs text-slate-700">
+                        <colgroup>
+                            <col style="width: 9%;">
+                            <col style="width: 15%;">
+                            <col style="width: 6%;">
+                            <col style="width: 6%;">
+                            <col style="width: 32%;">
+                            <col style="width: 14%;">
+                            <col style="width: 9%;">
+                            <col style="width: 9%;">
+                        </colgroup>
+                        <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th class="p-3">Mã BN</th>
-                                <th class="p-3">Họ và Tên</th>
-                                <th class="p-3 text-center">Giới Tính</th>
-                                <th class="p-3">Năm Sinh</th>
-                                <th class="p-3">Chẩn đoán (Chính / Phụ)</th>
-                                <th class="p-3">Phác đồ</th>
-                                <th class="p-3 text-center">Chu Kỳ Gần Nhất</th>
-                                <th class="p-3 text-center">Thao Tác Trực Tiếp</th>
+                                <th class="p-3 w-[9%]">Mã BN</th>
+                                <th class="p-3 w-[15%]">Họ và Tên</th>
+                                <th class="p-3 text-center w-[6%]">Giới Tính</th>
+                                <th class="p-3 text-center w-[6%]">Năm Sinh</th>
+                                <th class="p-3 w-[32%]">Chẩn đoán (Chính / Phụ)</th>
+                                <th class="p-3 w-[14%]">Phác đồ</th>
+                                <th class="p-3 text-center w-[9%]">Chu Kỳ Gần Nhất</th>
+                                <th class="p-3 text-center w-[9%]">Thao Tác Trực Tiếp</th>
                             </tr>
                         </thead>
                         <tbody id="statsTableBody" class="divide-y divide-slate-200">
@@ -2516,22 +2538,23 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 const fullDiag = window.getFullDiagnosisDisplay ? window.getFullDiagnosisDisplay(p) : (p.diagnosis || '-');
-                const treatmentSummary = window.getLatestTreatmentSummary ? window.getLatestTreatmentSummary(p) : { protocol: p.protocol || 'Chưa cập nhật', cycle: 'Chưa cập nhật' };
                 tr.innerHTML = `
-                    <td class="p-3 font-bold text-teal-800">${escapeHtml(p.patientId || '-')}</td>
-                    <td class="p-3 font-semibold text-slate-900">${escapeHtml(p.name || '-')}</td>
-                    <td class="p-3 text-center">${escapeHtml(p.gender || '-')}</td>
-                    <td class="p-3 font-bold text-slate-700">${escapeHtml(p.birthYear || '-')}</td>
-                    <td class="p-3 font-medium text-slate-800">
-                        <strong class="text-teal-800">Chính:</strong> ${escapeHtml(fullDiag)}<br>
-                        <strong class="text-amber-800">Phụ:</strong> ${escapeHtml(p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(', ') : 'Không có'))}
+                    <td class="p-2.5 font-bold text-teal-800 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
+                    <td class="p-2.5 font-semibold text-slate-900 truncate" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
+                    <td class="p-2.5 text-center truncate">${escapeHtml(p.gender || '-')}</td>
+                    <td class="p-2.5 text-center font-bold text-slate-700 truncate">${escapeHtml(p.birthYear || '-')}</td>
+                    <td class="p-2.5 font-medium text-slate-800 text-[11px] leading-tight">
+                        <div class="truncate" title="${escapeHtml(fullDiag)}"><strong class="text-teal-800">Chính:</strong> ${escapeHtml(fullDiag)}</div>
+                        <div class="truncate text-[10px] text-slate-500" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
                     </td>
-                    <td class="p-3 font-bold text-amber-800">${escapeHtml(treatmentSummary.protocol)}</td>
-                    <td class="p-3 text-center font-semibold text-teal-700">${escapeHtml(treatmentSummary.cycle)}</td>
-                    <td class="p-3 text-center space-x-1">
-                        <button type="button" data-patient-action="view" title="Form tóm tắt & Marker" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
-                        <button type="button" data-patient-action="edit" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
-                        ${(isAdmin || isVip) ? `<button type="button" data-patient-action="delete" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    <td class="p-2.5 font-bold text-amber-800 truncate" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
+                    <td class="p-2.5 text-center font-semibold text-teal-700 truncate" title="${escapeHtml(treatmentSummary.cycle)}">${escapeHtml(treatmentSummary.cycle)}</td>
+                    <td class="p-2.5 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button type="button" data-patient-action="view" title="Form tóm tắt & Marker" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg transition"><i class="fa-solid fa-eye"></i></button>
+                            <button type="button" data-patient-action="edit" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                            ${(isAdmin || isVip) ? `<button type="button" data-patient-action="delete" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        </div>
                     </td>
                 `;
                 tr.querySelectorAll('[data-patient-action]').forEach((button) => {
@@ -3408,22 +3431,23 @@
                     tr.className = 'hover:bg-slate-50 transition';
                     const fullDiag = window.getFullDiagnosisDisplay(p);
                     const subDiag = p.subDiagnosis || (p.subDiagnosesList && p.subDiagnosesList.length ? p.subDiagnosesList.join(', ') : 'Không có');
-                    const treatmentSummary = window.getLatestTreatmentSummary ? window.getLatestTreatmentSummary(p) : { protocol: p.protocol || 'Chưa cập nhật', cycle: `${p.cycles ? p.cycles.length : 0} chu kỳ` };
                     tr.innerHTML = `
-                        <td class="p-3 font-bold text-teal-800">${escapeHtml(p.patientId || '-')}</td>
-                        <td class="p-3 font-semibold text-slate-900">${escapeHtml(p.name || '-')}</td>
-                        <td class="p-3 text-center">${escapeHtml(p.gender || '-')}</td>
-                        <td class="p-3 font-bold text-slate-700">${escapeHtml(p.birthYear || '-')}</td>
-                        <td class="p-3 font-medium text-slate-800">
-                            <strong class="text-teal-800">Chính:</strong> ${escapeHtml(fullDiag)}<br>
-                            <strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}
+                        <td class="p-2.5 font-bold text-teal-800 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
+                        <td class="p-2.5 font-semibold text-slate-900 truncate" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
+                        <td class="p-2.5 text-center truncate">${escapeHtml(p.gender || '-')}</td>
+                        <td class="p-2.5 text-center font-bold text-slate-700 truncate">${escapeHtml(p.birthYear || '-')}</td>
+                        <td class="p-2.5 font-medium text-slate-800 text-[11px] leading-tight">
+                            <div class="truncate" title="${escapeHtml(fullDiag)}"><strong class="text-teal-800">Chính:</strong> ${escapeHtml(fullDiag)}</div>
+                            <div class="truncate text-[10px] text-slate-500" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
                         </td>
-                        <td class="p-3 font-bold text-amber-800">${escapeHtml(treatmentSummary.protocol)}</td>
-                        <td class="p-3 text-center font-semibold text-teal-700">${escapeHtml(treatmentSummary.cycle)}</td>
-                        <td class="p-3 text-center">
-                            <button type="button" data-patient-action="view" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
-                            <button type="button" data-patient-action="edit" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
-                            ${(isAdmin || isVip) ? `<button type="button" data-patient-action="delete" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <td class="p-2.5 font-bold text-amber-800 truncate" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
+                        <td class="p-2.5 text-center font-semibold text-teal-700 truncate" title="${escapeHtml(treatmentSummary.cycle)}">${escapeHtml(treatmentSummary.cycle)}</td>
+                        <td class="p-2.5 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button type="button" data-patient-action="view" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg transition"><i class="fa-solid fa-eye"></i></button>
+                                <button type="button" data-patient-action="edit" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                                ${(isAdmin || isVip) ? `<button type="button" data-patient-action="delete" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            </div>
                         </td>
                     `;
                     tr.querySelectorAll('[data-patient-action]').forEach((button) => {
