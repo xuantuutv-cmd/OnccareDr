@@ -648,7 +648,10 @@
                             <input type="text" id="npDiagnosis" autocomplete="off" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium">
                             <div id="icdDropdownMain" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
                         </div>
-                        <div class="grid grid-cols-3 gap-2" aria-label="Phân loại TNM">
+                        <div class="grid grid-cols-4 gap-2" aria-label="Phân loại TNM">
+                            <label class="block text-[10px] font-semibold text-slate-600">Tiền tố
+                                <select id="npTNMPrefix" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="c">c</option><option value="p">p</option><option value="yp">yp</option></select>
+                            </label>
                             <label class="block text-[10px] font-semibold text-slate-600">T
                                 <select id="npTNMT" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="">Chọn T</option></select>
                             </label>
@@ -722,6 +725,10 @@
                             <label class="block font-semibold text-slate-700 mb-1 text-center">Ngày xét nghiệm:</label>
                             <input type="date" id="npMarkerDate" class="block w-full max-w-48 mx-auto p-2 bg-white border border-slate-200 rounded-lg font-medium text-center">
                         </div>
+                        <button type="button" onclick="window.addNewMarkerFromForm()" class="w-full py-2 px-3 rounded-lg bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Thêm vào lịch sử marker
+                        </button>
+                        <p class="text-[10px] text-slate-500">Loại marker và ngày xét nghiệm có thể để trống; giá trị vẫn được lưu vào nhóm “Chưa phân loại”.</p>
                     </div>
 
                     <!-- MỤC THÔNG TIN ĐIỀU TRỊ & QUẢN LÝ CHU KỲ -->
@@ -790,11 +797,13 @@
                                 <label class="block font-bold text-amber-900 text-[11px]">
                                     <i class="fa-solid fa-calendar-week text-amber-700"></i> Phân tuần dùng thuốc (Thuốc uống 14 ngày):
                                 </label>
-                                <select id="npProtocolWeek" onchange="window.calculateBSAandDoses()" class="w-full p-2 bg-white border border-amber-300 rounded-lg font-semibold text-amber-900 focus:outline-none">
+                                <select id="npProtocolWeek" onchange="window.handleProtocolWeekChange()" class="w-full p-2 bg-white border border-amber-300 rounded-lg font-semibold text-amber-900 focus:outline-none">
                                     <option value="Tuần 1">Tuần 1 (N1-7)</option>
                                     <option value="Tuần 2">Tuần 2 (N8-14)</option>
                                     <option value="Cả chu kỳ">Cả chu kỳ (N1-14)</option>
+                                    <option value="__CUSTOM__">Tùy chỉnh...</option>
                                 </select>
+                                <input id="npProtocolWeekCustom" type="text" maxlength="40" placeholder="Ví dụ: Ngày 10-14" oninput="window.calculateBSAandDoses()" class="hidden w-full p-2 bg-white border border-amber-300 rounded-lg font-semibold text-amber-900" aria-label="Khoảng ngày dùng thuốc tùy chỉnh">
                             </div>
 
                             <div id="protocolDoseOverrides" class="hidden bg-indigo-50/60 p-2.5 rounded-lg border border-indigo-200 space-y-2">
@@ -950,6 +959,7 @@
                             <i class="fa-solid fa-chart-line text-teal-600"></i> Biểu Đồ Theo Dõi Marker Ung Thư Theo Thời Gian
                         </h4>
                         <select id="chartMarkerSelect" onchange="window.renderMarkerChart()" class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-center text-indigo-900 focus:outline-none">
+                            <option value="__UNSPECIFIED__">Chưa phân loại</option>
                             <option value="CEA">CEA</option>
                             <option value="CA 19-9">CA 19-9</option>
                             <option value="CA 72-4">CA 72-4</option>
@@ -1195,6 +1205,13 @@
             })[character]);
         }
 
+        function formatDisplayDate(value) {
+            if (!value) return 'Không rõ ngày';
+            const dateText = typeof value === 'string' ? value : (value.toDate ? value.toDate().toISOString().slice(0, 10) : '');
+            const match = dateText.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            return match ? `${match[3]}/${match[2]}/${match[1]}` : dateText;
+        }
+
         window.toggleTheme = function() {
             const isDark = document.documentElement.dataset.theme !== 'dark';
             document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
@@ -1316,13 +1333,23 @@
             { code: "C79.7", desc: "U ác thứ phát của tuyến thượng thận" },
             { code: "C79.8", desc: "U ác thứ phát của vị trí xác định khác" },
             { code: "C79.9", desc: "U ác thứ phát của vị trí không xác định" }
+            ,{ code: "D64.9", desc: "Thiếu máu, không đặc hiệu (có thể ghi nhận liên quan hóa trị)", supportive: true }
+            ,{ code: "D70", desc: "Giảm bạch cầu trung tính / mất bạch cầu hạt (bao gồm do thuốc)", supportive: true }
+            ,{ code: "D69.6", desc: "Giảm tiểu cầu, không đặc hiệu", supportive: true }
+            ,{ code: "R74", desc: "Bất thường men huyết thanh (ví dụ tăng men gan)", supportive: true }
+            ,{ code: "R73", desc: "Tăng glucose máu / bất thường đường huyết", supportive: true }
+            ,{ code: "L27.1", desc: "Viêm da khu trú do thuốc; có thể ghi hội chứng bàn tay-bàn chân (ghi thêm độ 3/4 trong mô tả)", supportive: true }
+            ,{ code: "R11.2", desc: "Buồn nôn và nôn, không đặc hiệu (có thể liên quan hóa trị)", supportive: true }
+            ,{ code: "K52.1", desc: "Viêm dạ dày-ruột và đại tràng nhiễm độc do thuốc", supportive: true }
+            ,{ code: "G62.0", desc: "Bệnh đa dây thần kinh do thuốc", supportive: true }
+            ,{ code: "T45.1", desc: "Ngộ độc/tác dụng không mong muốn của thuốc chống ung thư và ức chế miễn dịch", supportive: true }
         ];
 
         window.tempSubDiagnoses = [];
         const tnmGroups = {
-            colorectal: { label: 'Đại trực tràng (C18/C20)', T: ['Tis','T1','T2','T3','T4a','T4b'], N: ['N0','N1','N1c','N2a','N2b'], M: ['M0','M1a','M1b','M1c'] },
-            gastric: { label: 'Dạ dày (C16)', T: ['Tis','T1','T2','T3','T4a','T4b'], N: ['N0','N1','N2','N3'], M: ['M0','M1'] },
-            breast: { label: 'Vú (C50)', T: ['T0','Tis','T1mi','T1a','T1b','T1c','T2','T3','T4'], N: ['N0','N1mi','N1','N2','N3'], M: ['M0','M1'] }
+            colorectal: { label: 'Đại trực tràng (C18/C20)', T: ['Tis','T1','T2','T3','T4a','T4b'], N: ['N0','N1','N1c','N2a','N2b','Nx'], M: ['M0','M1a','M1b','M1c','Mx'] },
+            gastric: { label: 'Dạ dày (C16)', T: ['Tis','T1','T2','T3','T4a','T4b'], N: ['N0','N1','N2','N3','Nx'], M: ['M0','M1','Mx'] },
+            breast: { label: 'Vú (C50)', T: ['T0','Tis','T1mi','T1a','T1b','T1c','T2','T3','T4','T4a','T4b','T4c','T4d'], N: ['N0','N1mi','N1','N2','N3','Nx'], M: ['M0','M1','Mx'] }
         };
         function getTNMGroup() {
             const diagnosis = document.getElementById('npDiagnosis')?.value || '';
@@ -1339,7 +1366,7 @@
             select.value = values.includes(previous) ? previous : '';
         }
         function stageForTNM(group, T, N, M) {
-            const tNum = value => ({ T0: 0, Tis: 0, T1mi: 1, T1a: 1, T1b: 1, T1c: 1, T1: 1, T2: 2, T3: 3, T4: 4, T4a: 4, T4b: 4 }[value] ?? -1);
+            const tNum = value => ({ T0: 0, Tis: 0, T1mi: 1, T1a: 1, T1b: 1, T1c: 1, T1: 1, T2: 2, T3: 3, T4: 4, T4a: 4, T4b: 4, T4c: 4, T4d: 4 }[value] ?? -1);
             const nNum = value => ({ N0: 0, N1mi: 1, N1: 1, N1c: 1, N2: 2, N2a: 2, N2b: 2, N3: 3 }[value] ?? -1);
             const t = tNum(T), n = nNum(N);
             if (group === 'colorectal') {
@@ -1371,7 +1398,7 @@
                 if (((T === 'T0' || t === 1) && N === 'N1') || (T === 'T2' && N === 'N0')) return 'IIA';
                 if ((T === 'T2' && N === 'N1') || (T === 'T3' && N === 'N0')) return 'IIB';
                 if (((t <= 2 && t >= 0) && N === 'N2') || (T === 'T3' && (N === 'N1' || N === 'N2'))) return 'IIIA';
-                if (T === 'T4' && n <= 2) return 'IIIB';
+                if (t === 4 && n >= 0 && n <= 2) return 'IIIB';
                 if (N === 'N3') return 'IIIC';
             }
             return '';
@@ -1383,6 +1410,8 @@
             const hint = document.getElementById('tnmGroupHint');
             const group = groupKey ? tnmGroups[groupKey] : null;
             selects.forEach(select => { select.disabled = !group; });
+            const prefixSelect = document.getElementById('npTNMPrefix');
+            if (prefixSelect) prefixSelect.disabled = !group;
             if (!group) {
                 selects.forEach((select, index) => tnmOptionList(select, [], ['Chọn T','Chọn N','Chọn M'][index]));
                 stage.textContent = '—';
@@ -1394,6 +1423,18 @@
             const [T,N,M] = selects.map(select => select.value);
             stage.textContent = T && N && M ? (stageForTNM(groupKey, T, N, M) || 'Không phân loại') : '—';
         };
+        window.handleProtocolWeekChange = function() {
+            const preset = document.getElementById('npProtocolWeek');
+            const custom = document.getElementById('npProtocolWeekCustom');
+            const isCustom = preset.value === '__CUSTOM__';
+            custom.classList.toggle('hidden', !isCustom);
+            if (isCustom && !custom.value) custom.value = 'Ngày 10-14';
+            window.calculateBSAandDoses();
+        };
+        function getProtocolWeekValue() {
+            const preset = document.getElementById('npProtocolWeek').value;
+            return preset === '__CUSTOM__' ? document.getElementById('npProtocolWeekCustom').value.trim() : preset;
+        }
         window.normalizeProtocolHistory = function(cycles) {
             const ordered = [...(cycles || [])].sort((a, b) =>
                 String(a.date || '').localeCompare(String(b.date || '')) ||
@@ -1432,9 +1473,9 @@
                     dropdown.classList.add('hidden');
                     return;
                 }
-                const matches = icdDatabase.filter(item => 
+                const matches = icdDatabase.filter(item => (inputId !== 'npDiagnosis' || !item.supportive) && (
                     item.code.toLowerCase().includes(val) || item.desc.toLowerCase().includes(val)
-                );
+                ));
 
                 if (matches.length > 0) {
                     dropdown.innerHTML = "";
@@ -1646,7 +1687,7 @@
             const bsaDisplay = document.getElementById('npBsaDisplay');
             const doseInput = document.getElementById('npDoseInput');
             const protoKey = document.getElementById('protocolSelectList').value;
-            const weekVal = document.getElementById('npProtocolWeek').value;
+            const weekVal = getProtocolWeekValue();
             const cycleNumber = parseInt(document.getElementById('npCycleNumber').value, 10) || 1;
             const pInfo = chemoProtocolsData[protoKey];
             let formulaList = pInfo?.formula ? [...pInfo.formula] : [];
@@ -1797,6 +1838,7 @@
             document.getElementById('npGender').value = "";
             document.getElementById('npBirthYear').value = "";
             document.getElementById('npDiagnosis').value = "";
+            document.getElementById('npTNMPrefix').value = 'c';
             ['npTNMT','npTNMN','npTNMM'].forEach(id => { document.getElementById(id).value = ''; });
             window.updateTNMStage();
             
@@ -1818,6 +1860,9 @@
             const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
             document.getElementById('npCycleDate').value = localDate;
             document.getElementById('npMarkerDate').value = localDate;
+            document.getElementById('npProtocolWeek').value = 'Tuần 1';
+            document.getElementById('npProtocolWeekCustom').value = '';
+            document.getElementById('npProtocolWeekCustom').classList.add('hidden');
             document.getElementById('npCycleNumber').value = "1";
             document.getElementById('npDrugNamesInput').value = "";
             document.getElementById('npDoseInput').value = "";
@@ -1880,7 +1925,8 @@
         };
 
         window.renderMarkerChart = function() {
-            const markerType = document.getElementById('chartMarkerSelect').value;
+            const markerTypeSelection = document.getElementById('chartMarkerSelect').value;
+            const markerType = markerTypeSelection === '__UNSPECIFIED__' ? '' : markerTypeSelection;
             const ctx = document.getElementById('markerCanvas').getContext('2d');
             const analysisCard = document.getElementById('markerAnalysisCard');
             const detailBody = document.getElementById('markerDetailTableBody');
@@ -1892,17 +1938,18 @@
             }
 
             const filtered = window.currentViewingPatient.markers
-                .filter(m => m.type === markerType)
-                .sort((a, b) => new Date(a.date) - new Date(b.date));
+                .filter(m => (m.type || '') === markerType && Number.isFinite(Number(m.value)))
+                .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
 
             if (filtered.length === 0) {
-                analysisCard.innerHTML = `<span>Không tìm thấy dữ liệu cho chỉ số <strong>${escapeHtml(markerType)}</strong>.</span>`;
-                detailBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">Không có dữ liệu cho ${escapeHtml(markerType)}.</td></tr>`;
+                const markerLabel = markerType || 'chưa phân loại';
+                analysisCard.innerHTML = `<span>Không tìm thấy dữ liệu cho chỉ số <strong>${escapeHtml(markerLabel)}</strong>.</span>`;
+                detailBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">Không có dữ liệu cho ${escapeHtml(markerLabel)}.</td></tr>`;
                 if (window.activeMarkerChart) window.activeMarkerChart.destroy();
                 return;
             }
 
-            const labels = filtered.map(m => m.date);
+            const labels = filtered.map(m => formatDisplayDate(m.date));
             const dataValues = filtered.map(m => parseFloat(m.value));
 
             if (window.activeMarkerChart) window.activeMarkerChart.destroy();
@@ -1912,7 +1959,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: `Chỉ số ${markerType}`,
+                        label: `Chỉ số ${markerType || 'chưa phân loại'}`,
                         data: dataValues,
                         borderColor: '#4f46e5',
                         backgroundColor: 'rgba(79, 70, 229, 0.1)',
@@ -1955,8 +2002,8 @@
                 }
                 detailBody.innerHTML += `
                     <tr>
-                        <td class="p-2 font-medium">${escapeHtml(m.date)}</td>
-                        <td class="p-2 font-bold text-indigo-900">${escapeHtml(m.type)}</td>
+                        <td class="p-2 font-medium">${escapeHtml(formatDisplayDate(m.date))}</td>
+                        <td class="p-2 font-bold text-indigo-900">${escapeHtml(m.type || 'Chưa phân loại')}</td>
                         <td class="p-2 font-bold">${escapeHtml(m.value)}</td>
                         <td class="p-2 font-semibold ${diffStr.startsWith('+') ? 'text-rose-600' : (diffStr.startsWith('-') ? 'text-emerald-600' : 'text-slate-600')}">${diffStr}</td>
                     </tr>
@@ -2435,7 +2482,7 @@
             document.getElementById('detDiagMain').innerText = p.diagnosis || '-';
             const tnm = p.tnm || {};
             document.getElementById('detTNM').innerText = tnm.T && tnm.N && tnm.M
-                ? `${tnm.T} ${tnm.N} ${tnm.M} — Giai đoạn ${tnm.stage || '—'}`
+                ? `${tnm.prefix || 'c'}${tnm.T} ${tnm.prefix || 'c'}${tnm.N} ${tnm.prefix || 'c'}${tnm.M} — Giai đoạn ${tnm.stage || '—'}`
                 : '-';
             document.getElementById('detDiagSub').innerText = p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(' | ') : 'Không có');
             document.getElementById('detProtocol').querySelector('span').innerText = p.protocol || 'Chưa cập nhật';
@@ -2479,7 +2526,7 @@
                         cDiv.className = "p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs ml-3 my-2 space-y-1";
                         cDiv.innerHTML = `
                             <div class="font-bold text-teal-800 text-xs flex justify-between items-center">
-                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} - Ngày: ${escapeHtml(c.date || 'N/A')}</span>
+                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} - Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}</span>
                                 ${c.week ? `<span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300">${escapeHtml(c.week)}</span>` : ''}
                             </div>
                             <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${escapeHtml(c.drugNames || 'N/A')} - <strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'N/A')}</p>
@@ -2536,6 +2583,7 @@
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
             window.updateTNMStage();
             const savedTNM = p.tnm || { T: p.tnmT, N: p.tnmN, M: p.tnmM, stage: p.stage };
+            document.getElementById('npTNMPrefix').value = savedTNM.prefix || 'c';
             document.getElementById('npTNMT').value = savedTNM.T || '';
             document.getElementById('npTNMN').value = savedTNM.N || '';
             document.getElementById('npTNMM').value = savedTNM.M || '';
@@ -2594,7 +2642,7 @@
             }
 
             const is14Days = chemoProtocolsData[document.getElementById('protocolSelectList').value]?.is14Days;
-            const weekVal = is14Days ? document.getElementById('npProtocolWeek').value : "";
+            const weekVal = is14Days ? getProtocolWeekValue() : "";
 
             let modeContainer = document.getElementById('protocolModeContainer');
             let isChangedProtocol = false;
@@ -2657,7 +2705,7 @@
             window.tempCurrentCycles = [{
                 branchName: `Chu kỳ ${cycleNum}`,
                 cycleNum,
-                week: is14Days ? document.getElementById('npProtocolWeek').value : "",
+                week: is14Days ? getProtocolWeekValue() : "",
                 date: cycleDate,
                 protocolUsed: protocol,
                 protocolKeyUsed: protocolKey,
@@ -2675,29 +2723,27 @@
             const val = document.getElementById('npMarkerValue').value;
             const date = document.getElementById('npMarkerDate').value;
 
-            if (!type) {
-                alert("Vui lòng chọn loại marker!");
-                return;
-            }
-            if (!val || parseFloat(val) < 0) {
+            if (!val.trim()) return true;
+            if (!Number.isFinite(Number(val)) || Number(val) < 0) {
                 alert("Vui lòng nhập giá trị marker hợp lệ!");
-                return;
+                document.getElementById('npMarkerValue').focus();
+                return false;
             }
-
             const existingIndex = window.tempCurrentMarkers.findIndex(m => m.type === type && m.date === date);
             if (existingIndex !== -1) {
-                window.tempCurrentMarkers[existingIndex].value = parseFloat(val).toFixed(2);
+                window.tempCurrentMarkers[existingIndex].value = Number(val).toFixed(2);
             } else {
                 window.tempCurrentMarkers.push({
                     type: type,
-                    value: parseFloat(val).toFixed(2),
+                    value: Number(val).toFixed(2),
                     date: date
                 });
             }
 
             document.getElementById('npMarkerValue').value = "";
             window.renderTempMarkersList();
-            window.showToast(`Đã cập nhật chỉ số ${type}: ${val}`);
+            window.showToast(`Đã lưu ${type || 'marker chưa phân loại'}: ${val}`);
+            return true;
         };
 
         window.renderTempCyclesList = function() {
@@ -2747,7 +2793,7 @@
                                 <button type="button" class="w-5 h-5 rounded bg-teal-100 text-teal-800 flex items-center justify-center text-xs">
                                     <i id="cycleIcon_${idx}" class="fa-solid fa-plus text-teal-600"></i>
                                 </button>
-                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date || 'N/A')}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
+                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
                             </div>
                             <div class="flex items-center space-x-1">
                                 <button type="button" onclick="window.editTempCycle(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[10px] border border-amber-200"><i class="fa-solid fa-pen"></i> Sửa</button>
@@ -2776,10 +2822,10 @@
 
             const markerSelect = document.getElementById('historyMarkerSelect');
             if (markerSelect) {
-                const markerTypes = [...new Set(window.tempCurrentMarkers.map(marker => marker.type).filter(Boolean))];
+                const markerTypes = [...new Set(window.tempCurrentMarkers.map(marker => marker.type || '__UNSPECIFIED__'))];
                 const previousType = markerSelect.value;
                 markerSelect.innerHTML = '<option value="">Chọn marker</option>' + markerTypes.map(type =>
-                    `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`
+                    `<option value="${escapeHtml(type)}">${type === '__UNSPECIFIED__' ? 'Chưa phân loại' : escapeHtml(type)}</option>`
                 ).join('');
                 markerSelect.value = markerTypes.includes(previousType) ? previousType : (markerTypes[0] || '');
                 window.renderHistoryMarkerChart();
@@ -2795,9 +2841,9 @@
                 div.className = "bg-white p-2.5 rounded-xl border border-indigo-100 shadow-sm flex items-center justify-between text-xs";
                 div.innerHTML = `
                     <div>
-                        <span class="font-bold text-indigo-900">[${escapeHtml(m.type)}]</span> 
+                        <span class="font-bold text-indigo-900">[${escapeHtml(m.type || 'Chưa phân loại')}]</span> 
                         <span class="font-bold text-slate-800">${escapeHtml(m.value)}</span> 
-                        <span class="text-slate-500 text-[10px]">(${escapeHtml(m.date)})</span>
+                        <span class="text-slate-500 text-[10px]">(${escapeHtml(formatDisplayDate(m.date))})</span>
                     </div>
                     <button type="button" onclick="window.deleteTempMarker(${idx})" class="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-[10px] border border-rose-200"><i class="fa-solid fa-trash"></i> Xóa</button>
                 `;
@@ -2813,10 +2859,10 @@
             const canvas = document.getElementById('historyMarkerCanvas');
             if (!select || !canvas) return;
 
-            const markerType = select.value;
+            const markerType = select.value === '__UNSPECIFIED__' ? '' : select.value;
             const points = (window.tempCurrentMarkers || [])
-                .filter(marker => marker.type === markerType && marker.date && Number.isFinite(Number(marker.value)))
-                .sort((a, b) => new Date(a.date) - new Date(b.date));
+                .filter(marker => (marker.type || '') === markerType && Number.isFinite(Number(marker.value)))
+                .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
 
             if (window.historyMarkerChartInstance) {
                 window.historyMarkerChartInstance.destroy();
@@ -2834,7 +2880,7 @@
             window.historyMarkerChartInstance = new Chart(canvas.getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: points.map(marker => marker.date),
+                        labels: points.map(marker => formatDisplayDate(marker.date)),
                     datasets: [{
                         label: markerType,
                         data: points.map(marker => Number(marker.value)),
@@ -2887,8 +2933,15 @@
             document.getElementById('npDoseInput').value = c.doseInput || '';
             document.getElementById('npCycleNote').value = c.note || '';
             document.getElementById('npProtocol').value = c.protocolUsed || '';
-            if (c.week) {
-                document.getElementById('npProtocolWeek').value = c.week;
+            const weekSelect = document.getElementById('npProtocolWeek');
+            const knownWeeks = ['Tuần 1', 'Tuần 2', 'Cả chu kỳ'];
+            if (c.week && knownWeeks.includes(c.week)) {
+                weekSelect.value = c.week;
+                document.getElementById('npProtocolWeekCustom').classList.add('hidden');
+            } else if (c.week) {
+                weekSelect.value = '__CUSTOM__';
+                document.getElementById('npProtocolWeekCustom').value = c.week;
+                document.getElementById('npProtocolWeekCustom').classList.remove('hidden');
             }
             window.showToast(`Đang chỉnh sửa chu kỳ thứ ${c.cycleNum || (idx + 1)}. Nhấn "Lưu thông tin" để hoàn tất.`);
         };
@@ -2910,6 +2963,12 @@
             isSavingPatientForm = true;
             const saveButton = document.getElementById('saveBtn');
             saveButton.disabled = true;
+            // Link giá trị marker đang nhập vào lịch sử trước khi tạo payload lưu.
+            if (!window.addNewMarkerFromForm()) {
+                isSavingPatientForm = false;
+                saveButton.disabled = false;
+                return;
+            }
             const docId = document.getElementById('editDocId').value;
             const editCycleIndexStr = document.getElementById('editCycleIndex').value;
 
@@ -2936,6 +2995,7 @@
             }
 
             const diagnosisVal = document.getElementById('npDiagnosis').value.trim();
+            const tnmPrefix = document.getElementById('npTNMPrefix').value || 'c';
             const tnmT = document.getElementById('npTNMT').value;
             const tnmN = document.getElementById('npTNMN').value;
             const tnmM = document.getElementById('npTNMM').value;
@@ -2961,7 +3021,7 @@
                 const doseInput = document.getElementById('npDoseInput').value;
                 const note = document.getElementById('npCycleNote').value;
                 const is14Days = chemoProtocolsData[protocolKeyVal]?.is14Days;
-                const weekVal = is14Days ? document.getElementById('npProtocolWeek').value : "";
+                const weekVal = is14Days ? getProtocolWeekValue() : "";
 
                 window.tempCurrentCycles[idx] = {
                     ...window.tempCurrentCycles[idx],
@@ -3001,7 +3061,7 @@
                 const cycleEntry = {
                     branchName: `Chu kỳ ${cycleNum}`,
                     cycleNum,
-                    week: is14Days ? document.getElementById('npProtocolWeek').value : "",
+                    week: is14Days ? getProtocolWeekValue() : "",
                     date: cycleDate,
                     protocolUsed: protocolVal,
                     protocolKeyUsed: protocolKeyVal,
@@ -3040,7 +3100,7 @@
                 height: heightVal,
                 weight: weightVal,
                 diagnosis: diagnosisVal,
-                tnm: tnmT && tnmN && tnmM ? { T: tnmT, N: tnmN, M: tnmM, stage: tnmStage === 'Không phân loại' ? '' : tnmStage } : null,
+                tnm: tnmT && tnmN && tnmM ? { prefix: tnmPrefix, T: tnmT, N: tnmN, M: tnmM, stage: tnmStage === 'Không phân loại' ? '' : tnmStage } : null,
                 subDiagnosesList: [...window.tempSubDiagnoses],
                 subDiagnosis: window.tempSubDiagnoses.join(' | '),
                 protocol: effectiveProtocol,
@@ -3389,14 +3449,3 @@
                 if (!targetSnapshot.exists() || targetSnapshot.data().email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return;
                 await updateDoc(targetRef, {
                     role: status ? "VIP" : "Doctor",
-                    isApproved: true
-                });
-                window.showToast(status ? "Đã cấp quyền VIP cho thành viên!" : "Đã hủy quyền VIP của thành viên!");
-                window.loadUsersManagementTable();
-            } catch (err) {
-                alert("Lỗi: " + err.message);
-            }
-        };
-    </script>
-</body>
-</html>
