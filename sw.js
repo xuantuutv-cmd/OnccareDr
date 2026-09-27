@@ -1,5 +1,17 @@
-const CACHE_NAME = 'oncocare-v2';
-const APP_SHELL = ['./', './index.html', './manifest.json'];
+const CACHE_NAME = 'oncocare-v3';
+const APP_SHELL = [
+    './',
+    './index.html',
+    './manifest.json',
+    './favicon.svg',
+    './favicon.ico',
+    './favicon.png',
+    './favicon-32x32.png',
+    './favicon-16x16.png',
+    './apple-touch-icon.png',
+    './icon-192.png',
+    './icon-512.png'
+];
 
 self.addEventListener('install', (event) => {
     event.waitUntil((async () => {

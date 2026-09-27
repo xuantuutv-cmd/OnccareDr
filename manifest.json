@@ -2,7 +2,7 @@
   "name": "OncoCare Pro",
   "short_name": "OncoCare",
   "description": "Quản lý hóa trị ung bướu và thống kê",
-  "start_url": "./OnccareDr-index-fixed.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#07111f",
   "theme_color": "#0d9488",
