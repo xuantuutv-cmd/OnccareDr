@@ -284,6 +284,84 @@
             .splash-slogan { animation: none; background-position: 50% 0; }
             .tab-panel-enter, .panel-opening, .panel-closing { animation: none; }
         }
+        @media (max-width: 640px) {
+            body { min-height: 100dvh; }
+            header > div { min-height: 3.75rem; padding-top: .45rem; padding-bottom: .45rem; }
+            header .w-14, header .h-14 { width: 2.75rem; height: 2.75rem; }
+            header .fa-leaf { font-size: 1.8rem; }
+            header h1 { font-size: 1.05rem; }
+            #googleSignInBtn { padding: .55rem .8rem; }
+            main { padding-top: 1.75rem !important; padding-bottom: 1rem !important; margin-top: 0; transform: none !important; }
+            main h2 { font-size: 1.65rem; line-height: 1.25; }
+            #accountStatusNotice { padding: .8rem; }
+            #patientSearchForm { min-height: 3.75rem; padding-left: .5rem; padding-right: .5rem; }
+            #searchInput { padding: .75rem .65rem; font-size: .9rem; }
+            .search-action { width: 2.65rem; height: 2.65rem; flex-basis: 2.65rem; }
+            .search-action i { font-size: 1.05rem; }
+            .search-plus { font-size: 1.75rem; }
+
+            #patientFormModal { padding: 0 !important; align-items: stretch; }
+            #patientFormModal > div {
+                width: 100%;
+                height: 100%;
+                max-height: 100dvh;
+                border-radius: 0;
+            }
+            #patientFormModal > div > div:first-child { padding: .75rem 1rem; }
+            #patientForm {
+                display: block;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: .85rem;
+                -webkit-overflow-scrolling: touch;
+            }
+            #patientInputPanel, #patientHistoryPanel {
+                max-height: none;
+                overflow: visible;
+                padding-right: 0;
+            }
+            #patientHistoryPanel { margin-top: 1.25rem; }
+            #patientInputPanel .grid { min-width: 0; }
+            #patientInputPanel input, #patientInputPanel select, #patientInputPanel textarea { font-size: 16px; }
+            #patientInputPanel button, #patientHistoryPanel button { min-height: 2.5rem; }
+            #patientInputPanel .bg-slate-50.p-4,
+            #patientInputPanel .bg-teal-900\/5.p-4 { padding: .85rem; }
+            #protocolModeContainer .flex.items-center.space-x-4 { flex-direction: column; align-items: flex-start; gap: .55rem; }
+
+            #patientDetailModal { padding: 0 !important; align-items: stretch; }
+            #patientDetailModal > div {
+                width: 100%;
+                height: 100%;
+                max-height: 100dvh;
+                border-radius: 0;
+            }
+            #patientDetailModal > div > .p-6 { padding: 1rem; }
+            #patientDetailModal #btnTabTimeline,
+            #patientDetailModal #btnTabChart { padding: .65rem .4rem; font-size: .68rem; line-height: 1.2; }
+            #patientDetailModal #tabContentChart > div:first-child { align-items: flex-start; gap: .5rem; }
+            #patientDetailModal #tabContentChart h4 { line-height: 1.4; }
+            #patientDetailModal #tabContentChart select { max-width: 7.5rem; }
+
+            #statsModalHeader { padding: .75rem 1rem; }
+            #statsModalContent > .p-3.sm\:p-5 { padding: .65rem; }
+            #statsFilters { padding: .65rem; gap: .5rem; }
+            #statsFilters > div { width: calc(50% - .25rem); }
+            #statsFilters > div:nth-child(3) { width: 100%; }
+            #statsFilters input, #statsFilters select { padding: .55rem; font-size: 16px; }
+            #statsTabs button { padding: .65rem .35rem; font-size: .7rem; }
+            #statsOverviewPanel .grid { grid-template-columns: 1fr; }
+            #statsPatientsPanel { overflow: visible; }
+            #statsTableViewport { overflow: auto; -webkit-overflow-scrolling: touch; }
+            #statsTableViewport table { min-width: 900px; height: auto; }
+            #statsTableViewport th, #statsTableViewport td { padding: .55rem; }
+            #statsPagination { padding-bottom: .25rem; }
+
+            #userManagementModal { padding: .5rem; }
+            #userManagementModal > div { max-height: calc(100dvh - 1rem); }
+            #userManagementModal th, #userManagementModal td { padding: .55rem; }
+            #doctorProfile { left: .65rem; bottom: .65rem; }
+            footer { margin-top: 1rem; padding-top: 1rem; padding-bottom: 1rem; }
+        }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
