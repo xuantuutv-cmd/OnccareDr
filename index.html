@@ -21,6 +21,18 @@
             const savedTheme = localStorage.getItem('oncocare-theme');
             document.documentElement.dataset.theme = savedTheme || 'dark';
         })();
+        window.loginWithGoogle = window.loginWithGoogle || function() {
+            alert("Hệ thống đang tải thư viện đăng nhập, vui lòng bấm lại sau 1-2 giây...");
+        };
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+                    .then((registration) => registration.update())
+                    .catch((error) => console.error('Không thể cập nhật bộ nhớ ứng dụng:', error));
+            });
+        }
     </script>
     
     <style>
@@ -2132,7 +2144,6 @@
     <!-- ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
         import { 
             getAuth, 
             GoogleAuthProvider, 
@@ -2170,10 +2181,6 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const appCheck = initializeAppCheck(app, {
-            provider: new ReCaptchaEnterpriseProvider("6Lf6m84tAAAAAH9Q5E9_LsQR6EHk6aKecmBx9IxU"),
-            isTokenAutoRefreshEnabled: true
-        });
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
@@ -2212,9 +2219,36 @@
                 await signInWithPopup(auth, provider);
             } catch (error) {
                 console.error("Lỗi đăng nhập:", error);
-                alert("Đăng nhập thất bại: " + error.message);
+                const errorCode = error.code || "unknown";
+                const currentHostname = window.location.hostname;
+                let helpText = error.message;
+
+                if (errorCode === "auth/unauthorized-domain") {
+                    helpText = `Tên miền "${currentHostname}" chưa được thêm vào Firebase Authentication.\n\nCách khắc phục: Vào Firebase Console > Authentication > Settings > Authorized domains > Thêm "${currentHostname}".`;
+                } else if (errorCode === "auth/popup-blocked") {
+                    helpText = "Trình duyệt đã chặn cửa sổ đăng nhập popup. Vui lòng cho phép mở popup trên thanh địa chỉ và thử lại.";
+                } else if (errorCode === "auth/popup-closed-by-user") {
+                    helpText = "Cửa sổ đăng nhập đã bị đóng trước khi hoàn tất.";
+                } else if (errorCode === "auth/cancelled-popup-request") {
+                    helpText = "Yêu cầu đăng nhập đã bị hủy.";
+                } else if (errorCode === "auth/operation-not-supported-in-this-environment") {
+                    helpText = "Firebase Auth không thể chạy trực tiếp từ giao thức file://. Vui lòng mở trang web qua https://onccare-dr.vercel.app hoặc qua web server.";
+                }
+                alert(`Đăng nhập thất bại (${errorCode}):\n${helpText}`);
             }
         };
+
+        // Khởi tạo App Check bất đồng bộ để tránh chặn hoặc dừng tiến trình Auth nếu reCAPTCHA bị chặn
+        import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js")
+            .then(({ initializeAppCheck, ReCaptchaEnterpriseProvider }) => {
+                initializeAppCheck(app, {
+                    provider: new ReCaptchaEnterpriseProvider("6Lf6m84tAAAAAH9Q5E9_LsQR6EHk6aKecmBx9IxU"),
+                    isTokenAutoRefreshEnabled: true
+                });
+            })
+            .catch((appCheckError) => {
+                console.warn("Không thể khởi tạo Firebase App Check:", appCheckError);
+            });
 
         window.logoutGoogle = async function() {
             await signOut(auth);
@@ -3446,6 +3480,16 @@
             try {
                 const targetRef = doc(db, "users", userId);
                 const targetSnapshot = await getDoc(targetRef);
-                if (!targetSnapshot.exists() || targetSnapshot.data().email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return;
                 await updateDoc(targetRef, {
                     role: status ? "VIP" : "Doctor",
+                    isApproved: true
+                });
+                window.showToast(status ? "Đã cấp quyền VIP cho thành viên!" : "Đã hủy quyền VIP của thành viên!");
+                window.loadUsersManagementTable();
+            } catch (err) {
+                alert("Lỗi: " + err.message);
+            }
+        };
+    </script>
+</body>
+</html>
