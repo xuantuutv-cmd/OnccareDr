@@ -648,6 +648,22 @@
                             <input type="text" id="npDiagnosis" autocomplete="off" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium">
                             <div id="icdDropdownMain" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
                         </div>
+                        <div class="grid grid-cols-3 gap-2" aria-label="Phân loại TNM">
+                            <label class="block text-[10px] font-semibold text-slate-600">T
+                                <select id="npTNMT" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="">Chọn T</option></select>
+                            </label>
+                            <label class="block text-[10px] font-semibold text-slate-600">N
+                                <select id="npTNMN" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="">Chọn N</option></select>
+                            </label>
+                            <label class="block text-[10px] font-semibold text-slate-600">M
+                                <select id="npTNMM" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="">Chọn M</option></select>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 rounded-lg border border-teal-200 bg-white px-3 py-2">
+                            <span class="text-xs font-semibold text-slate-600">Giai đoạn theo bảng TNM</span>
+                            <strong id="npTNMStage" class="text-sm font-bold text-teal-800" aria-live="polite">—</strong>
+                        </div>
+                        <p id="tnmGroupHint" class="text-[10px] text-slate-500">Nhập/chọn chẩn đoán ICD C16, C18/C20 hoặc C50 để bật phân loại TNM.</p>
                     </div>
 
                     <!-- BẢNG MÃ ICD PHỤ & CHẨN ĐOÁN PHỤ -->
@@ -897,6 +913,7 @@
                             <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-0.5">Chẩn Đoán Lâm Sàng (Chính & Phụ)</label>
                             <div id="detDiagnosis" class="p-2.5 bg-white rounded-xl font-semibold text-slate-800 text-xs border border-slate-200/60 space-y-1">
                                 <div><strong class="text-teal-800">Chính:</strong> <span id="detDiagMain">-</span></div>
+                                <div><strong class="text-indigo-800">TNM / Giai đoạn:</strong> <span id="detTNM">-</span></div>
                                 <div><strong class="text-amber-800">Phụ:</strong> <span id="detDiagSub">-</span></div>
                             </div>
                         </div>
@@ -1302,6 +1319,81 @@
         ];
 
         window.tempSubDiagnoses = [];
+        const tnmGroups = {
+            colorectal: { label: 'Đại trực tràng (C18/C20)', T: ['Tis','T1','T2','T3','T4a','T4b'], N: ['N0','N1','N1c','N2a','N2b'], M: ['M0','M1a','M1b','M1c'] },
+            gastric: { label: 'Dạ dày (C16)', T: ['Tis','T1','T2','T3','T4a','T4b'], N: ['N0','N1','N2','N3'], M: ['M0','M1'] },
+            breast: { label: 'Vú (C50)', T: ['T0','Tis','T1mi','T1a','T1b','T1c','T2','T3','T4'], N: ['N0','N1mi','N1','N2','N3'], M: ['M0','M1'] }
+        };
+        function getTNMGroup() {
+            const diagnosis = document.getElementById('npDiagnosis')?.value || '';
+            const code = diagnosis.match(/\bC\s*\d{2}(?:\.\d)?/i)?.[0]?.replace(/\s/g, '').toUpperCase();
+            if (!code) return null;
+            if (code.startsWith('C16')) return 'gastric';
+            if (code.startsWith('C18') || code.startsWith('C20')) return 'colorectal';
+            if (code.startsWith('C50')) return 'breast';
+            return null;
+        }
+        function tnmOptionList(select, values, placeholder) {
+            const previous = select.value;
+            select.innerHTML = `<option value="">${placeholder}</option>` + values.map(value => `<option value="${value}">${value}</option>`).join('');
+            select.value = values.includes(previous) ? previous : '';
+        }
+        function stageForTNM(group, T, N, M) {
+            const tNum = value => ({ T0: 0, Tis: 0, T1mi: 1, T1a: 1, T1b: 1, T1c: 1, T1: 1, T2: 2, T3: 3, T4: 4, T4a: 4, T4b: 4 }[value] ?? -1);
+            const nNum = value => ({ N0: 0, N1mi: 1, N1: 1, N1c: 1, N2: 2, N2a: 2, N2b: 2, N3: 3 }[value] ?? -1);
+            const t = tNum(T), n = nNum(N);
+            if (group === 'colorectal') {
+                if (M !== 'M0') return ({ M1a: 'IVA', M1b: 'IVB', M1c: 'IVC' }[M] || '');
+                if (N === 'N0') return ({ Tis: '0', T1: 'I', T2: 'I', T3: 'IIA', T4a: 'IIB', T4b: 'IIC' }[T] || '');
+                if (N === 'N1' || N === 'N1c') return (t >= 1 && t <= 2) ? 'IIIA' : (t === 3 || T === 'T4a' ? 'IIIB' : (T === 'T4b' ? 'IIIC' : ''));
+                if (N === 'N2a') return (T === 'T1' ? 'IIIA' : (T === 'T2' || T === 'T3' ? 'IIIB' : (T === 'T4a' || T === 'T4b' ? 'IIIC' : '')));
+                if (N === 'N2b') return (T === 'T1' || T === 'T2' ? 'IIIB' : (T === 'T3' || T === 'T4a' || T === 'T4b' ? 'IIIC' : ''));
+            }
+            if (group === 'gastric') {
+                if (M === 'M1') return 'IV';
+                if (M !== 'M0') return '';
+                if (T === 'Tis' && N === 'N0') return '0';
+                if (T === 'T1' && N === 'N0') return 'IA';
+                if ((T === 'T1' && N === 'N1') || (T === 'T2' && N === 'N0')) return 'IB';
+                if ((T === 'T1' && N === 'N2') || (T === 'T2' && N === 'N1') || (T === 'T3' && N === 'N0')) return 'IIA';
+                if ((T === 'T1' && N === 'N3') || (T === 'T2' && N === 'N2') || (T === 'T3' && N === 'N1') || (T === 'T4a' && N === 'N0')) return 'IIB';
+                if (T === 'T2' && N === 'N3') return 'IIIA';
+                if ((T === 'T3' && N === 'N2') || (T === 'T4a' && (N === 'N1' || N === 'N2'))) return 'IIIA';
+                if ((T === 'T3' && N === 'N3') || (T === 'T4a' && N === 'N3') || (T === 'T4b' && (N === 'N1' || N === 'N2'))) return 'IIIB';
+                if (T === 'T4b' && N === 'N3') return 'IIIC';
+            }
+            if (group === 'breast') {
+                if (M === 'M1') return 'IV';
+                if (M !== 'M0') return '';
+                if (T === 'Tis' && N === 'N0') return '0';
+                if (t === 1 && N === 'N0') return 'IA';
+                if ((T === 'T1mi' || T === 'T1a' || T === 'T1b') && N === 'N1mi') return 'IB';
+                if (((T === 'T0' || t === 1) && N === 'N1') || (T === 'T2' && N === 'N0')) return 'IIA';
+                if ((T === 'T2' && N === 'N1') || (T === 'T3' && N === 'N0')) return 'IIB';
+                if (((t <= 2 && t >= 0) && N === 'N2') || (T === 'T3' && (N === 'N1' || N === 'N2'))) return 'IIIA';
+                if (T === 'T4' && n <= 2) return 'IIIB';
+                if (N === 'N3') return 'IIIC';
+            }
+            return '';
+        }
+        window.updateTNMStage = function() {
+            const groupKey = getTNMGroup();
+            const selects = ['npTNMT','npTNMN','npTNMM'].map(id => document.getElementById(id));
+            const stage = document.getElementById('npTNMStage');
+            const hint = document.getElementById('tnmGroupHint');
+            const group = groupKey ? tnmGroups[groupKey] : null;
+            selects.forEach(select => { select.disabled = !group; });
+            if (!group) {
+                selects.forEach((select, index) => tnmOptionList(select, [], ['Chọn T','Chọn N','Chọn M'][index]));
+                stage.textContent = '—';
+                hint.textContent = 'Mã ICD này chưa có bảng TNM trong dữ liệu cung cấp.';
+                return;
+            }
+            ['T','N','M'].forEach((key, index) => tnmOptionList(selects[index], group[key], `Chọn ${key}`));
+            hint.textContent = `Nhóm áp dụng: ${group.label}.`;
+            const [T,N,M] = selects.map(select => select.value);
+            stage.textContent = T && N && M ? (stageForTNM(groupKey, T, N, M) || 'Không phân loại') : '—';
+        };
         window.normalizeProtocolHistory = function(cycles) {
             const ordered = [...(cycles || [])].sort((a, b) =>
                 String(a.date || '').localeCompare(String(b.date || '')) ||
@@ -1319,6 +1411,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             setupIcdAutocomplete('npDiagnosis', 'icdDropdownMain');
+            document.getElementById('npDiagnosis')?.addEventListener('input', window.updateTNMStage);
+            window.updateTNMStage();
             setupIcdAutocomplete('npSubDiagnosisInput', 'icdDropdownSub');
             document.querySelectorAll('input, select, textarea').forEach((field) => {
                 if (!field.hasAttribute('autocomplete')) field.setAttribute('autocomplete', 'off');
@@ -1354,6 +1448,7 @@
                         div.addEventListener('click', () => {
                             input.value = `${m.code}: ${m.desc}`;
                             dropdown.classList.add('hidden');
+                            if (inputId === 'npDiagnosis') window.updateTNMStage();
                             if (inputId === 'npSubDiagnosisInput') window.addSubDiagnosisItem();
                         });
                         dropdown.appendChild(div);
@@ -1702,6 +1797,8 @@
             document.getElementById('npGender').value = "";
             document.getElementById('npBirthYear').value = "";
             document.getElementById('npDiagnosis').value = "";
+            ['npTNMT','npTNMN','npTNMM'].forEach(id => { document.getElementById(id).value = ''; });
+            window.updateTNMStage();
             
             window.tempSubDiagnoses = [];
             window.renderSubDiagnosisTable();
@@ -2336,6 +2433,10 @@
             document.getElementById('detName').innerText = `${p.name} (Năm sinh: ${p.birthYear || '-'})`;
             document.getElementById('detPatientId').innerText = `Mã BN: ${p.patientId} | Giới tính: ${p.gender || '-'}`;
             document.getElementById('detDiagMain').innerText = p.diagnosis || '-';
+            const tnm = p.tnm || {};
+            document.getElementById('detTNM').innerText = tnm.T && tnm.N && tnm.M
+                ? `${tnm.T} ${tnm.N} ${tnm.M} — Giai đoạn ${tnm.stage || '—'}`
+                : '-';
             document.getElementById('detDiagSub').innerText = p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(' | ') : 'Không có');
             document.getElementById('detProtocol').querySelector('span').innerText = p.protocol || 'Chưa cập nhật';
             document.getElementById('detCreatedBy').innerText = p.createdByEmail || 'Thạch Xuân Tựu';
@@ -2433,6 +2534,12 @@
             document.getElementById('npHeight').value = p.height || '';
             document.getElementById('npWeight').value = p.weight || '';
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
+            window.updateTNMStage();
+            const savedTNM = p.tnm || { T: p.tnmT, N: p.tnmN, M: p.tnmM, stage: p.stage };
+            document.getElementById('npTNMT').value = savedTNM.T || '';
+            document.getElementById('npTNMN').value = savedTNM.N || '';
+            document.getElementById('npTNMM').value = savedTNM.M || '';
+            window.updateTNMStage();
 
             if (p.subDiagnosesList && Array.isArray(p.subDiagnosesList)) {
                 window.tempSubDiagnoses = [...p.subDiagnosesList];
@@ -2829,6 +2936,10 @@
             }
 
             const diagnosisVal = document.getElementById('npDiagnosis').value.trim();
+            const tnmT = document.getElementById('npTNMT').value;
+            const tnmN = document.getElementById('npTNMN').value;
+            const tnmM = document.getElementById('npTNMM').value;
+            const tnmStage = document.getElementById('npTNMStage').textContent;
             const protocolVal = document.getElementById('npProtocol').value.trim();
             const protocolKeyVal = document.getElementById('protocolSelectList').value;
             const heightVal = parseFloat(document.getElementById('npHeight').value) || 0;
@@ -2929,6 +3040,7 @@
                 height: heightVal,
                 weight: weightVal,
                 diagnosis: diagnosisVal,
+                tnm: tnmT && tnmN && tnmM ? { T: tnmT, N: tnmN, M: tnmM, stage: tnmStage === 'Không phân loại' ? '' : tnmStage } : null,
                 subDiagnosesList: [...window.tempSubDiagnoses],
                 subDiagnosis: window.tempSubDiagnoses.join(' | '),
                 protocol: effectiveProtocol,
