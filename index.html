@@ -1135,7 +1135,7 @@
                                 <th class="p-3">Năm Sinh</th>
                                 <th class="p-3">Chẩn đoán (Chính / Phụ)</th>
                                 <th class="p-3">Phác đồ</th>
-                                <th class="p-3">Số Chu Kỳ</th>
+                                <th class="p-3 text-center">Chu Kỳ Gần Nhất</th>
                                 <th class="p-3 text-center">Thao Tác Trực Tiếp</th>
                             </tr>
                         </thead>
@@ -1364,14 +1364,60 @@
             breast: { label: 'Vú (C50)', T: ['T0','Tis','T1mi','T1a','T1b','T1c','T2','T3','T4','T4a','T4b','T4c','T4d'], N: ['N0','N1mi','N1','N2','N3','Nx'], M: ['M0','M1','Mx'] }
         };
         function getTNMGroup() {
-            const diagnosis = document.getElementById('npDiagnosis')?.value || '';
-            const code = diagnosis.match(/\bC\s*\d{2}(?:\.\d)?/i)?.[0]?.replace(/\s/g, '').toUpperCase();
-            if (!code) return null;
-            if (code.startsWith('C16')) return 'gastric';
-            if (code.startsWith('C18') || code.startsWith('C20')) return 'colorectal';
-            if (code.startsWith('C50')) return 'breast';
+            const rawDiag = (document.getElementById('npDiagnosis')?.value || '').trim();
+            const diagnosis = rawDiag.toLowerCase();
+            const codeMatch = diagnosis.match(/\bc\s*\d{2}(?:\.\d)?/i)?.[0]?.replace(/\s/g, '').toUpperCase();
+            if (codeMatch) {
+                if (codeMatch.startsWith('C16')) return 'gastric';
+                if (codeMatch.startsWith('C18') || codeMatch.startsWith('C19') || codeMatch.startsWith('C20')) return 'colorectal';
+                if (codeMatch.startsWith('C50')) return 'breast';
+            }
+            if (diagnosis.includes('vú') || diagnosis.includes('breast')) return 'breast';
+            if (diagnosis.includes('dạ dày') || diagnosis.includes('gastric') || diagnosis.includes('bao tử')) return 'gastric';
+            if (diagnosis.includes('đại tràng') || diagnosis.includes('trực tràng') || diagnosis.includes('colon') || diagnosis.includes('rectal') || diagnosis.includes('colorectal')) return 'colorectal';
             return null;
         }
+
+        window.stripTnmSuffix = function(text) {
+            if (!text) return '';
+            return text.replace(/\s*[-–—]\s*(?:c|p|yp)?(?:T(?:is|0|[1-4][a-z0-9]*))?(?:N(?:[0-3][a-z0-9]*|x))?(?:M(?:[0-1][a-z0-9]*|x))?(?:\s*[-–—]?\s*(?:giai đoạn|gd|stage)\s*[IV0-4ABCa-c]+)?\s*$/i, '').trim();
+        };
+
+        window.buildTnmSuffix = function(prefix, T, N, M, stage) {
+            if (!T && !N && !M) return '';
+            const p = prefix || 'c';
+            let tnmParts = p;
+            if (T) tnmParts += T;
+            if (N) tnmParts += N;
+            if (M) tnmParts += M;
+            if (stage && stage !== '—' && stage !== 'Không phân loại') {
+                tnmParts += ` - Giai đoạn ${stage}`;
+            }
+            return tnmParts;
+        };
+
+        window.syncDiagnosisWithTNM = function() {
+            const diagInput = document.getElementById('npDiagnosis');
+            if (!diagInput) return;
+            const currentVal = diagInput.value.trim();
+            const baseDiag = window.stripTnmSuffix(currentVal);
+            if (!baseDiag) return;
+
+            const prefix = document.getElementById('npTNMPrefix')?.value || 'c';
+            const T = document.getElementById('npTNMT')?.value || '';
+            const N = document.getElementById('npTNMN')?.value || '';
+            const M = document.getElementById('npTNMM')?.value || '';
+            const stageElem = document.getElementById('npTNMStage');
+            const stage = stageElem ? stageElem.textContent.trim() : '';
+
+            if (T || N || M) {
+                const tnmSuffix = window.buildTnmSuffix(prefix, T, N, M, stage);
+                diagInput.value = `${baseDiag} - ${tnmSuffix}`;
+            } else {
+                diagInput.value = baseDiag;
+            }
+        };
+
         function tnmOptionList(select, values, placeholder) {
             const previous = select.value;
             select.innerHTML = `<option value="">${placeholder}</option>` + values.map(value => `<option value="${value}">${value}</option>`).join('');
@@ -1415,7 +1461,7 @@
             }
             return '';
         }
-        window.updateTNMStage = function() {
+        window.updateTNMStage = function({ syncDiagnosis = true } = {}) {
             const groupKey = getTNMGroup();
             const selects = ['npTNMT','npTNMN','npTNMM'].map(id => document.getElementById(id));
             const stage = document.getElementById('npTNMStage');
@@ -1428,12 +1474,14 @@
                 selects.forEach((select, index) => tnmOptionList(select, [], ['Chọn T','Chọn N','Chọn M'][index]));
                 stage.textContent = '—';
                 hint.textContent = 'Mã ICD này chưa có bảng TNM trong dữ liệu cung cấp.';
+                if (syncDiagnosis) window.syncDiagnosisWithTNM();
                 return;
             }
             ['T','N','M'].forEach((key, index) => tnmOptionList(selects[index], group[key], `Chọn ${key}`));
             hint.textContent = `Nhóm áp dụng: ${group.label}.`;
             const [T,N,M] = selects.map(select => select.value);
             stage.textContent = T && N && M ? (stageForTNM(groupKey, T, N, M) || 'Không phân loại') : '—';
+            if (syncDiagnosis) window.syncDiagnosisWithTNM();
         };
         window.handleProtocolWeekChange = function() {
             const preset = document.getElementById('npProtocolWeek');
@@ -1464,8 +1512,12 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             setupIcdAutocomplete('npDiagnosis', 'icdDropdownMain');
-            document.getElementById('npDiagnosis')?.addEventListener('input', window.updateTNMStage);
-            window.updateTNMStage();
+            const diagInput = document.getElementById('npDiagnosis');
+            if (diagInput) {
+                diagInput.addEventListener('input', () => window.updateTNMStage({ syncDiagnosis: false }));
+                diagInput.addEventListener('blur', () => window.updateTNMStage({ syncDiagnosis: true }));
+            }
+            window.updateTNMStage({ syncDiagnosis: false });
             setupIcdAutocomplete('npSubDiagnosisInput', 'icdDropdownSub');
             document.querySelectorAll('input, select, textarea').forEach((field) => {
                 if (!field.hasAttribute('autocomplete')) field.setAttribute('autocomplete', 'off');
@@ -2051,10 +2103,10 @@
                 const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
                 return localDate.toISOString().split('T')[0];
             };
-            const sevenDaysAgo = new Date(now);
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            const thirtyDaysAgo = new Date(now);
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
             const today = localDateString(now);
-            document.getElementById('statsStartDate').value = localDateString(sevenDaysAgo);
+            document.getElementById('statsStartDate').value = localDateString(thirtyDaysAgo);
             document.getElementById('statsEndDate').value = today;
             if (!window.statsModalIsMaximized) window.toggleStatsModalSize();
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
@@ -2067,7 +2119,10 @@
         window.handleStatsDateRangeChange = function() {
             const startDate = document.getElementById('statsStartDate').value;
             const endDate = document.getElementById('statsEndDate').value;
-            if (!startDate || !endDate || startDate > endDate) return;
+            if (startDate && endDate && startDate > endDate) {
+                alert("Ngày bắt đầu không được lớn hơn ngày kết thúc!");
+                return;
+            }
             window.runChemoStatistics();
             window.switchStatsTab('patients');
         };
@@ -2449,7 +2504,7 @@
             window.setPanelVisibility(document.getElementById('patientListSection'), true);
             const matched = cachedPatientsList.filter(p => p.patientId && p.patientId === code);
             if (matched.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${escapeHtml(code)}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation text-2xl mb-1 block"></i> Không tìm thấy hồ sơ cho mã BN: ${escapeHtml(code)}</td></tr>`;
                 countBadge.innerText = "0 kết quả";
                 return;
             }
@@ -2460,16 +2515,19 @@
             matched.forEach(p => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
+                const fullDiag = window.getFullDiagnosisDisplay ? window.getFullDiagnosisDisplay(p) : (p.diagnosis || '-');
+                const treatmentSummary = window.getLatestTreatmentSummary ? window.getLatestTreatmentSummary(p) : { protocol: p.protocol || 'Chưa cập nhật', cycle: 'Chưa cập nhật' };
                 tr.innerHTML = `
                     <td class="p-3 font-bold text-teal-800">${escapeHtml(p.patientId || '-')}</td>
                     <td class="p-3 font-semibold text-slate-900">${escapeHtml(p.name || '-')}</td>
                     <td class="p-3 text-center">${escapeHtml(p.gender || '-')}</td>
                     <td class="p-3 font-bold text-slate-700">${escapeHtml(p.birthYear || '-')}</td>
                     <td class="p-3 font-medium text-slate-800">
-                        <strong class="text-teal-800">Chính:</strong> ${escapeHtml(p.diagnosis || '-')}<br>
+                        <strong class="text-teal-800">Chính:</strong> ${escapeHtml(fullDiag)}<br>
                         <strong class="text-amber-800">Phụ:</strong> ${escapeHtml(p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(', ') : 'Không có'))}
                     </td>
-                    <td class="p-3 font-bold text-amber-800">${escapeHtml(p.protocol || 'Chưa cập nhật')}</td>
+                    <td class="p-3 font-bold text-amber-800">${escapeHtml(treatmentSummary.protocol)}</td>
+                    <td class="p-3 text-center font-semibold text-teal-700">${escapeHtml(treatmentSummary.cycle)}</td>
                     <td class="p-3 text-center space-x-1">
                         <button type="button" data-patient-action="view" title="Form tóm tắt & Marker" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
                         <button type="button" data-patient-action="edit" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -2615,13 +2673,24 @@
             document.getElementById('npHeight').value = p.height || '';
             document.getElementById('npWeight').value = p.weight || '';
             document.getElementById('npDiagnosis').value = p.diagnosis || '';
-            window.updateTNMStage();
-            const savedTNM = p.tnm || { T: p.tnmT, N: p.tnmN, M: p.tnmM, stage: p.stage };
+            let savedTNM = p.tnm || { prefix: p.tnmPrefix, T: p.tnmT, N: p.tnmN, M: p.tnmM, stage: p.stage } || {};
+            if (!savedTNM.T && p.diagnosis) {
+                const parsed = (p.diagnosis).match(/\b(c|p|yp)?(T(?:is|0|[1-4][a-z0-9]*))(N(?:[0-3][a-z0-9]*|x))(M(?:[0-1][a-z0-9]*|x))\b/i);
+                if (parsed) {
+                    savedTNM = {
+                        prefix: (parsed[1] || 'c').toLowerCase(),
+                        T: parsed[2],
+                        N: parsed[3],
+                        M: parsed[4]
+                    };
+                }
+            }
+            window.updateTNMStage({ syncDiagnosis: false });
             document.getElementById('npTNMPrefix').value = savedTNM.prefix || 'c';
             document.getElementById('npTNMT').value = savedTNM.T || '';
             document.getElementById('npTNMN').value = savedTNM.N || '';
             document.getElementById('npTNMM').value = savedTNM.M || '';
-            window.updateTNMStage();
+            window.updateTNMStage({ syncDiagnosis: false });
 
             if (p.subDiagnosesList && Array.isArray(p.subDiagnosesList)) {
                 window.tempSubDiagnoses = [...p.subDiagnosesList];
@@ -3245,6 +3314,78 @@
             }
         };
 
+        window.getFullDiagnosisDisplay = function(p) {
+            if (!p) return '-';
+            let diag = (p.diagnosis || '').trim() || '-';
+            const tnm = p.tnm;
+            if (tnm && (tnm.T || tnm.N || tnm.M)) {
+                const prefix = tnm.prefix || 'c';
+                const tnmCode = `${prefix}${tnm.T || ''}${tnm.N || ''}${tnm.M || ''}`;
+                const stageStr = tnm.stage && tnm.stage !== '—' && tnm.stage !== 'Không phân loại'
+                    ? ` - Giai đoạn ${tnm.stage}`
+                    : '';
+                const fullTnm = `${tnmCode}${stageStr}`;
+                if (tnm.T && !diag.includes(tnm.T)) {
+                    diag = diag === '-' ? fullTnm : `${diag} - ${fullTnm}`;
+                }
+            }
+            return diag;
+        };
+
+        window.getPatientChemoOrEntryDate = function(patient) {
+            if (!patient) return '';
+            const cycleDates = (patient.cycles || []).map(c => c && c.date).filter(Boolean);
+            if (cycleDates.length > 0) {
+                cycleDates.sort();
+                return cycleDates[cycleDates.length - 1];
+            }
+            const parseTs = (ts) => {
+                if (!ts) return '';
+                if (typeof ts === 'string') return ts.split('T')[0];
+                if (ts.toDate && typeof ts.toDate === 'function') {
+                    try { return ts.toDate().toISOString().split('T')[0]; } catch(e){}
+                }
+                if (ts.seconds) {
+                    try { return new Date(ts.seconds * 1000).toISOString().split('T')[0]; } catch(e){}
+                }
+                return '';
+            };
+            return parseTs(patient.createdAt) || parseTs(patient.updatedAt) || '';
+        };
+
+        window.isPatientInDateRange = function(patient, startDate, endDate) {
+            if (!startDate && !endDate) return true;
+            // 1. Kiểm tra tất cả các chu kỳ hóa trị
+            const cycleDates = (patient.cycles || []).map(c => c && c.date).filter(Boolean);
+            const hasCycleInRange = cycleDates.some(d => (!startDate || d >= startDate) && (!endDate || d <= endDate));
+            if (hasCycleInRange) return true;
+
+            const parseTs = (ts) => {
+                if (!ts) return '';
+                if (typeof ts === 'string') return ts.split('T')[0];
+                if (ts.toDate && typeof ts.toDate === 'function') {
+                    try { return ts.toDate().toISOString().split('T')[0]; } catch(e){}
+                }
+                if (ts.seconds) {
+                    try { return new Date(ts.seconds * 1000).toISOString().split('T')[0]; } catch(e){}
+                }
+                return '';
+            };
+            // 2. Kiểm tra ngày tạo hồ sơ
+            const created = parseTs(patient.createdAt);
+            if (created && (!startDate || created >= startDate) && (!endDate || created <= endDate)) {
+                return true;
+            }
+            // 3. Nếu chưa có chu kỳ nào, kiểm tra ngày cập nhật
+            if (cycleDates.length === 0) {
+                const updated = parseTs(patient.updatedAt);
+                if (updated && (!startDate || updated >= startDate) && (!endDate || updated <= endDate)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         window.renderStatsPatientPage = function() {
             const tbody = document.getElementById('statsTableBody');
             const pagination = document.getElementById('statsPagination');
@@ -3265,14 +3406,20 @@
                 pagePatients.forEach((p) => {
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition';
+                    const fullDiag = window.getFullDiagnosisDisplay(p);
+                    const subDiag = p.subDiagnosis || (p.subDiagnosesList && p.subDiagnosesList.length ? p.subDiagnosesList.join(', ') : 'Không có');
+                    const treatmentSummary = window.getLatestTreatmentSummary ? window.getLatestTreatmentSummary(p) : { protocol: p.protocol || 'Chưa cập nhật', cycle: `${p.cycles ? p.cycles.length : 0} chu kỳ` };
                     tr.innerHTML = `
                         <td class="p-3 font-bold text-teal-800">${escapeHtml(p.patientId || '-')}</td>
                         <td class="p-3 font-semibold text-slate-900">${escapeHtml(p.name || '-')}</td>
                         <td class="p-3 text-center">${escapeHtml(p.gender || '-')}</td>
-                        <td class="p-3">${escapeHtml(p.birthYear || '')}</td>
-                        <td class="p-3"><strong class="text-teal-800">Chính:</strong> ${escapeHtml(p.diagnosis || '-')}</td>
-                        <td class="p-3 font-bold text-amber-800">${escapeHtml(p.protocol || 'Chưa cập nhật')}</td>
-                        <td class="p-3 text-center font-bold text-teal-700">${p.cycles ? p.cycles.length : 0} chu kỳ</td>
+                        <td class="p-3 font-bold text-slate-700">${escapeHtml(p.birthYear || '-')}</td>
+                        <td class="p-3 font-medium text-slate-800">
+                            <strong class="text-teal-800">Chính:</strong> ${escapeHtml(fullDiag)}<br>
+                            <strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}
+                        </td>
+                        <td class="p-3 font-bold text-amber-800">${escapeHtml(treatmentSummary.protocol)}</td>
+                        <td class="p-3 text-center font-semibold text-teal-700">${escapeHtml(treatmentSummary.cycle)}</td>
                         <td class="p-3 text-center">
                             <button type="button" data-patient-action="view" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg"><i class="fa-solid fa-eye"></i></button>
                             <button type="button" data-patient-action="edit" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -3333,29 +3480,24 @@
             const icdFilter = document.getElementById('statsIcdFilter').value;
 
             let filtered = cachedPatientsList.filter(p => {
-                if (!p.createdAt) return true;
-                let cDate = p.createdAt.toDate ? p.createdAt.toDate().toISOString().split('T')[0] : (p.createdAt.seconds ? new Date(p.createdAt.seconds * 1000).toISOString().split('T')[0] : null);
-                if (cDate && startDate && endDate) {
-                    if (cDate < startDate || cDate > endDate) return false;
+                if (!window.isPatientInDateRange(p, startDate, endDate)) {
+                    return false;
                 }
                 if (icdFilter !== 'ALL') {
-                    if (!p.diagnosis || !p.diagnosis.toUpperCase().includes(icdFilter.toUpperCase())) {
+                    const diag = (p.diagnosis || '').toUpperCase();
+                    if (!diag.includes(icdFilter.toUpperCase())) {
                         return false;
                     }
                 }
                 return true;
             });
 
-            const latestChemoDate = (patient) => (patient.cycles || []).reduce((latest, cycle) => {
-                const cycleDate = cycle.date || '';
-                return cycleDate > latest ? cycleDate : latest;
-            }, '');
             filtered.sort((patientA, patientB) => {
-                const dateA = latestChemoDate(patientA);
-                const dateB = latestChemoDate(patientB);
+                const dateA = window.getPatientChemoOrEntryDate(patientA);
+                const dateB = window.getPatientChemoOrEntryDate(patientB);
                 if (!dateA && dateB) return 1;
                 if (dateA && !dateB) return -1;
-                return dateA.localeCompare(dateB);
+                return dateB.localeCompare(dateA); // Ngày mới nhất lên trước
             });
 
             document.getElementById('statTotalPatients').innerText = filtered.length;
