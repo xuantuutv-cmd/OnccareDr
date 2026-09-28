@@ -1,0 +1,70 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isConfiguredAdmin() {
+      return signedIn()
+        && (request.auth.token.email.matches('(?i)^xuantuutv@gmail[.]com$')
+            || request.auth.token.email.lower() == 'xuantuutv@gmail.com');
+    }
+
+    function userRecordExists(uid) {
+      return exists(/databases/$(database)/documents/users/$(uid));
+    }
+
+    function userRecord(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function isAdmin() {
+      return isConfiguredAdmin()
+        || (signedIn() && userRecordExists(request.auth.uid)
+          && userRecord(request.auth.uid).get('role', '') == 'Admin');
+    }
+
+    function isBlocked() {
+      return !isAdmin() && userRecordExists(request.auth.uid)
+        && userRecord(request.auth.uid).get('isBlocked', false) == true;
+    }
+
+    function isVip() {
+      return userRecordExists(request.auth.uid)
+        && userRecord(request.auth.uid).get('role', '') == 'VIP';
+    }
+
+    function isApproved() {
+      return userRecordExists(request.auth.uid)
+        && userRecord(request.auth.uid).get('isApproved', false) == true;
+    }
+
+    function canUseOncoCare() {
+      return signedIn() && !isBlocked()
+        && (isAdmin() || isVip() || isApproved());
+    }
+
+    match /patients/{patientId} {
+      allow read: if canUseOncoCare();
+      allow create, update: if canUseOncoCare();
+      allow delete: if canUseOncoCare() && (isAdmin() || isVip());
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAdmin()
+        || (signedIn() && request.auth.uid == userId
+          && request.resource.data.get('role', 'Doctor') == 'Doctor'
+          && request.resource.data.get('isApproved', false) == false
+          && request.resource.data.get('isBlocked', false) == false
+          && request.resource.data.get('email', '') == request.auth.token.email);
+      allow update: if isAdmin()
+        || (signedIn() && request.auth.uid == userId
+          && request.resource.data.get('email', '') == request.auth.token.email
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isApproved', 'isBlocked']));
+      allow delete: if isAdmin();
+    }
+  }
+}
