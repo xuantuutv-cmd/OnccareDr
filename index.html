@@ -703,13 +703,23 @@
                             <div class="flex items-center justify-between shrink-0"><div class="flex items-center gap-3"><button type="button" onclick="window.closeExtendedAssessment()" title="Đóng" aria-label="Đóng cửa sổ đánh giá mở rộng" class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-teal-400"><i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity"></i></button><h3 class="font-bold text-teal-900">ĐÁNH GIÁ MỞ RỘNG</h3></div></div>
                             <div class="flex gap-2"><button type="button" onclick="window.switchExtendedTab('response')" id="extendedResponseTab" class="rounded-lg bg-teal-700 px-4 py-2 text-white font-bold text-xs">Đánh giá đáp ứng</button><button type="button" onclick="window.switchExtendedTab('toxicity')" id="extendedToxicityTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">Đánh giá độc tính</button></div>
                             <section id="extendedResponsePanel" class="space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
-                                <p class="text-xs text-slate-600">Nhập hai kích thước vuông góc (mm) cho từng cơ quan. Hệ thống so sánh tích hai kích thước với lần ghi nhận gần nhất của chính cơ quan đó.</p>
-                                <label class="block text-xs font-semibold text-slate-600">Thời điểm ghi nhận <input id="responseAssessmentDate" type="date" class="ml-2 rounded-lg border p-2 text-xs"></label>
+                                <p class="text-xs text-slate-600">RECIST 1.1 dùng một chiều đo: đường kính lớn nhất của tổn thương thường và trục ngắn của hạch. Tối đa 5 target lesion, không quá 2 trong cùng một cơ quan. Số đo theo CT/MRI.</p>
+                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="responseAssessmentDate" type="date" class="ml-2 rounded-lg border p-2 text-xs"></label>
                                 <div id="responseLesions" class="space-y-2"></div>
-                                <button type="button" onclick="window.addResponseLesion()" class="rounded-lg border px-3 py-2 text-xs font-semibold">+ Thêm cơ quan</button>
-                                <label class="flex items-center gap-2 text-xs"><input id="responseAllGone" type="checkbox"> Tất cả tổn thương mục tiêu đã biến mất; hạch bệnh lý có trục ngắn &lt; 10 mm</label>
-                                <label class="flex items-center gap-2 text-xs"><input id="responseNewLesion" type="checkbox"> Xuất hiện tổn thương mới hoàn toàn</label>
-                                <div class="rounded-lg bg-indigo-50 p-3 text-sm"><strong>Kết luận theo cơ quan</strong><div id="responseConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div><p id="responseComparison" class="mt-1 text-xs text-slate-600"></p></div>
+                                <button type="button" id="addResponseLesionButton" onclick="window.addResponseLesion()" class="rounded-lg border px-3 py-2 text-xs font-semibold">+ Thêm target lesion</button>
+                                <div class="grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
+                                    <label class="text-xs font-semibold text-slate-600">Đánh giá tổn thương không đích
+                                        <select id="responseNonTargetStatus" onchange="window.updateResponseConclusion()" class="mt-1 w-full rounded-lg border p-2 text-xs"><option value="not_assessed">Chưa đánh giá</option><option value="none">Không có tổn thương không đích</option><option value="non_cr_non_pd">Còn tổn thương, không CR/không PD</option><option value="cr">Đã biến mất</option><option value="pd">Tiến triển rõ</option></select>
+                                    </label>
+                                    <label class="text-xs font-semibold text-slate-600">Tổn thương mới
+                                        <select id="responseNewLesionStatus" onchange="window.toggleNewLesionFields(); window.updateResponseConclusion()" class="mt-1 w-full rounded-lg border p-2 text-xs"><option value="no">Không</option><option value="suspected">Nghi ngờ, chưa xác nhận</option><option value="confirmed">Có, đã xác nhận</option></select>
+                                    </label>
+                                    <div id="responseNewLesionFields" class="hidden space-y-1 sm:col-span-2">
+                                        <div class="grid gap-2 sm:grid-cols-2"><input id="responseNewLesionOrgan" class="rounded-lg border p-2 text-xs" placeholder="Cơ quan / vị trí"><input id="responseNewLesionDescription" class="rounded-lg border p-2 text-xs" placeholder="Mô tả tổn thương mới"></div>
+                                        <input id="responseNewLesionSize" type="number" min="0.1" step="0.1" class="w-full rounded-lg border p-2 text-xs" placeholder="Kích thước (mm, nếu có)">
+                                    </div>
+                                </div>
+                                <div class="rounded-lg bg-indigo-50 p-3 text-sm"><div class="flex items-center justify-between gap-2"><strong>Kết quả RECIST 1.1</strong><button type="button" onclick="window.toggleResponseCalculation()" class="rounded-md border px-2 py-1 text-[11px] font-semibold">Xem cách tính</button></div><div id="responseConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div><div id="responseCalculation" class="hidden mt-2 space-y-1 border-t border-indigo-200 pt-2 text-xs"></div></div>
                                 <button type="button" id="responseRecordButton" onclick="window.recordResponseAssessment()" class="rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận đánh giá đáp ứng</button>
                                 <div id="responseHistoryPreview" class="text-xs text-slate-600"></div>
                             </section>
@@ -991,6 +1001,17 @@
                                 <i class="fa-solid fa-vial text-amber-600"></i>
                                 <span>-</span>
                             </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                            <section class="rounded-xl border border-indigo-200 bg-white p-3" aria-labelledby="summaryMarkerHeading">
+                                <div class="flex items-center justify-between gap-2"><h4 id="summaryMarkerHeading" class="font-bold text-indigo-900">MARKER</h4><button type="button" onclick="window.switchDetailTab('chart')" class="text-[11px] font-semibold text-indigo-700 underline">Xem biểu đồ Marker</button></div>
+                                <div id="summaryMarkerList" class="mt-2 space-y-1 text-xs text-slate-700">Chưa ghi nhận</div>
+                            </section>
+                            <section id="summaryResponseCard" class="rounded-xl border border-violet-200 bg-white p-3" aria-labelledby="summaryResponseHeading">
+                                <h4 id="summaryResponseHeading" class="font-bold text-violet-900">ĐÁP ỨNG U</h4>
+                                <div id="summaryResponseContent" class="mt-2 text-xs text-slate-700">Chưa ghi nhận</div>
+                                <button type="button" onclick="window.openResponseAssessmentFromSummary()" class="mt-3 rounded-lg border border-violet-300 px-3 py-2 text-xs font-semibold text-violet-800 hover:bg-violet-50">Xem chi tiết →</button>
+                            </section>
                         </div>
                     </div>
 
@@ -2022,8 +2043,12 @@
             document.querySelectorAll('[data-toxicity-index]').forEach(select => { select.value = ''; });
             window.updateToxicityAlert();
             const assessmentToday = new Date(); document.getElementById('responseAssessmentDate').value = new Date(assessmentToday.getTime() - assessmentToday.getTimezoneOffset()*60000).toISOString().slice(0,10);
-            document.getElementById('responseAllGone').checked = false;
-            document.getElementById('responseNewLesion').checked = false;
+            document.getElementById('responseNonTargetStatus').value = 'not_assessed';
+            document.getElementById('responseNewLesionStatus').value = 'no';
+            document.getElementById('responseNewLesionOrgan').value = '';
+            document.getElementById('responseNewLesionDescription').value = '';
+            document.getElementById('responseNewLesionSize').value = '';
+            window.toggleNewLesionFields();
             window.renderResponseInputs();
             window.refreshExtendedAssessment();
             ['npCycleNumber', 'npCycleDate', 'npDrugNamesInput', 'npDoseInput', 'npCycleNote'].forEach((id) => {
@@ -2613,79 +2638,194 @@
             document.getElementById('extendedResponseTab').className = `rounded-lg px-4 py-2 font-bold text-xs ${response ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-700'}`;
             document.getElementById('extendedToxicityTab').className = `rounded-lg px-4 py-2 font-bold text-xs ${!response ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-700'}`;
         };
-        window.responseOrgans = ['gan','phổi','xương','thận','tuyến thượng thận','não','phúc mạc','hạch','khác'];
-        window.responseRecordedOrgans = function() { return [...new Set((window.tempResponseAssessments || []).flatMap(a => (a.lesions || []).map(x => x.organ).filter(Boolean)))]; };
-        window.renderResponseInputs = function() {
-            const container = document.getElementById('responseLesions'); container.innerHTML = '';
-            const known = window.responseRecordedOrgans();
-            known.forEach(organ => window.addResponseLesion(organ, true));
-            if (!known.length) window.addResponseLesion();
+        window.responseOrgans = ['gan','phổi','xương','hạch nách','hạch trung thất','hạch ổ bụng','hạch chậu','não','phúc mạc','thận','tuyến thượng thận','khác'];
+        window.calculateSOD = function(lesions) {
+            if (!Array.isArray(lesions) || !lesions.length || lesions.length > 5 || lesions.some(item => !item.notSeen && !(Number.isFinite(Number(item.measurementMm)) && Number(item.measurementMm) > 0))) return null;
+            return lesions.reduce((sum, item) => sum + (item.notSeen ? 0 : Number(item.measurementMm)), 0);
         };
-        window.addResponseLesion = function(organ = '', fixed = false) {
-            const container = document.getElementById('responseLesions');
-            const row = document.createElement('div'); row.className = 'response-lesion grid w-full max-w-[34rem] grid-cols-1 sm:grid-cols-[minmax(0,13rem)_minmax(0,14rem)_auto] gap-2 items-start';
-            const opts = window.responseOrgans;
-            row.innerHTML = `<select class="lesion-organ rounded-lg border p-2 text-xs"><option value="">Chọn cơ quan</option>${opts.map(o => `<option>${o}</option>`).join('')}</select><div class="space-y-1"><input class="lesion-size1 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" placeholder="Kích thước 1 (mm)"><input class="lesion-size2 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" placeholder="Kích thước 2 (mm)"><p class="text-[10px] text-rose-600">Đơn vị mm — Theo kích thước đo trên CT/MRI</p><p class="lesion-live-result text-[10px] font-semibold text-slate-600"></p></div><button type="button" class="rounded-lg px-2 text-rose-600" aria-label="Xóa cơ quan">Xóa</button>`;
-            const select = row.querySelector('.lesion-organ'); select.value = opts.includes(organ) ? organ : (organ ? 'khác' : '');
-            if (organ && !opts.includes(organ)) select.dataset.custom = organ;
-            if (fixed) { select.disabled = true; row.querySelector('button').classList.add('hidden'); }
-            select.addEventListener('change', () => {
-                if (select.value && [...container.querySelectorAll('.lesion-organ')].some(other => other !== select && (other.dataset.custom || other.value) === (select.value === 'khác' ? select.dataset.custom || 'khác' : select.value))) { alert('Mỗi cơ quan chỉ được ghi nhận một lần trong cùng lần nhập.'); select.value = ''; return; }
-                if (select.value === 'khác') {
-                    const custom = prompt('Nhập tên cơ quan khác:');
-                    const normalized = custom?.trim().toLocaleLowerCase('vi');
-                    const usedCustom = [...container.querySelectorAll('.lesion-organ')].some(other => other !== select && (other.dataset.custom || '').toLocaleLowerCase('vi') === normalized);
-                    if (!normalized) select.value = '';
-                    else if (usedCustom) { alert('Cơ quan này đã có trong danh sách theo dõi.'); select.value = ''; }
-                    else select.dataset.custom = custom.trim();
-                }
-                window.refreshAvailableResponseOrgans(); window.updateResponseConclusion();
-            });
-            row.querySelector('button').onclick = () => { row.remove(); window.refreshAvailableResponseOrgans(); window.updateResponseConclusion(); };
-            row.querySelectorAll('input').forEach(el => el.addEventListener('input', window.updateResponseConclusion));
-            container.appendChild(row); window.refreshAvailableResponseOrgans();
-        };
-        window.refreshAvailableResponseOrgans = function() {
-            const selects = [...document.querySelectorAll('#responseLesions .lesion-organ:not(:disabled)')];
-            const selected = selects.map(s => s.value).filter(Boolean); const used = new Set(selected);
-            selects.forEach(select => [...select.options].forEach(option => { if (option.value) option.disabled = used.has(option.value) && option.value !== select.value; }));
-        };
-        window.getResponseLesions = function() { return [...document.querySelectorAll('#responseLesions .response-lesion')].map(row => { const select = row.querySelector('.lesion-organ'); const size1Mm = Number(row.querySelector('.lesion-size1').value); const size2Mm = Number(row.querySelector('.lesion-size2').value); return { organ: select.value === 'khác' ? (select.dataset.custom || 'khác') : select.value, size1Mm, size2Mm, areaMm2: size1Mm * size2Mm }; }).filter(x => x.organ && x.size1Mm > 0 && x.size2Mm > 0); };
-        window.lastResponseMeasurement = function(organ, beforeIndex = Infinity) {
-            const history = window.tempResponseAssessments || [];
-            for (let i = Math.min(beforeIndex - 1, history.length - 1); i >= 0; i--) {
-                const previous = (history[i].lesions || []).find(x => x.organ === organ && Number(x.size1Mm) > 0 && Number(x.size2Mm) > 0);
-                if (previous) return previous;
+        window.validateTargetLesions = function(lesions, { baseline = false } = {}) {
+            if (!Array.isArray(lesions) || !lesions.length) return 'Thêm ít nhất một target lesion để tính SOD.';
+            if (lesions.length > 5) return 'RECIST 1.1 cho phép tối đa 5 target lesions.';
+            for (const item of lesions) {
+                if (!item.name || !item.organ) return 'Mỗi target lesion cần có tên/mô tả và cơ quan.';
+                if (!item.notSeen && !(Number.isFinite(Number(item.measurementMm)) && Number(item.measurementMm) > 0)) return `Thiếu số đo của Target lesion ${item.name} – chưa đủ dữ liệu để tính RECIST.`;
+                if (baseline && item.notSeen) return 'Baseline cần số đo ban đầu hiện diện; không đánh dấu tổn thương là đã biến mất.';
+                if (baseline && !item.notSeen && Number(item.measurementMm) < (item.type === 'node' ? 15 : 10)) return `${item.type === 'node' ? 'Hạch target cần trục ngắn từ 15 mm' : 'Target lesion thông thường cần đường kính từ 10 mm'} theo RECIST 1.1 (${item.name}).`;
             }
-            return null;
+            const counts = new Map(); lesions.forEach(item => { const organ = item.organ.trim().toLocaleLowerCase('vi'); counts.set(organ, (counts.get(organ) || 0) + 1); });
+            return [...counts.values()].some(count => count > 2) ? 'RECIST 1.1 cho phép tối đa 2 target lesions trong cùng một cơ quan.' : '';
         };
-        window.classForResponseConclusion = function(value) { return value.includes('(PD)') ? 'text-rose-700 bg-rose-100' : value.includes('(PR)') ? 'text-emerald-700 bg-emerald-100' : value.includes('(CR)') ? 'text-teal-700 bg-teal-100' : value.includes('(SD)') ? 'text-amber-800 bg-amber-100' : 'text-slate-600 bg-slate-100'; };
-        window.recalculateResponseAssessments = function() {
-            (window.tempResponseAssessments || []).forEach((assessment, index) => (assessment.lesions || []).forEach(item => {
-                if (assessment.newLesion) { item.conclusion = 'Bệnh tiến triển (PD)'; return; }
-                if (assessment.allGone) { item.conclusion = 'Đáp ứng hoàn toàn (CR)'; return; }
-                const prior = window.lastResponseMeasurement(item.organ, index); const area = Number(item.size1Mm) * Number(item.size2Mm);
-                if (!prior || !Number(prior.areaMm2)) { item.areaMm2 = area; item.conclusion = 'Mốc ban đầu'; return; }
-                const delta = area - Number(prior.areaMm2); const pct = delta / Number(prior.areaMm2) * 100;
-                item.areaMm2 = area; item.changePct = pct;
-                item.conclusion = pct <= -30 ? 'Đáp ứng một phần (PR)' : (pct >= 20 && delta >= 5 ? 'Bệnh tiến triển (PD)' : 'Bệnh ổn định (SD)');
+        window.calculateNadir = function(assessments) {
+            const sods = (assessments || []).map(item => Number(item.sod)).filter(Number.isFinite);
+            return sods.length ? Math.min(...sods) : null;
+        };
+        window.calculateBaselineChange = function(sod, baselineSod) {
+            return Number.isFinite(Number(sod)) && Number(baselineSod) > 0 ? ((Number(sod) - Number(baselineSod)) / Number(baselineSod)) * 100 : null;
+        };
+        window.calculateNadirChange = function(sod, nadir) {
+            return Number.isFinite(Number(sod)) && Number(nadir) > 0 ? ((Number(sod) - Number(nadir)) / Number(nadir)) * 100 : null;
+        };
+        window.checkCR = function(lesions) {
+            return Array.isArray(lesions) && lesions.length > 0 && lesions.every(item => item.type === 'node'
+                ? (item.notSeen || Number(item.measurementMm) < 10)
+                : Boolean(item.notSeen));
+        };
+        window.checkPR = function(baselineChangePct) { return Number(baselineChangePct) <= -30; };
+        window.checkPD = function(sod, nadir, newLesionStatus, nonTargetStatus) {
+            const absoluteIncrease = Number(sod) - Number(nadir);
+            const relativeIncrease = Number(nadir) > 0 ? absoluteIncrease / Number(nadir) : 0;
+            return newLesionStatus === 'confirmed' || nonTargetStatus === 'pd'
+                || (relativeIncrease >= 0.20 && absoluteIncrease >= 5);
+        };
+        window.calculateRECIST = function(assessments, currentAssessment) {
+            const storedHistory = (assessments || []).filter(item => item && item.recistVersion === '1.1');
+            if (storedHistory.some(item => window.calculateSOD(item.lesions) === null)) return { valid: false, response: 'Chưa đủ dữ liệu để đánh giá' };
+            const ordered = [...(assessments || []), ...(currentAssessment ? [currentAssessment] : [])]
+                .filter(item => item && item.recistVersion === '1.1')
+                .map(item => ({ ...item, sod: window.calculateSOD(item.lesions) }))
+                .filter(item => Number.isFinite(Number(item.sod)))
+                .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0));
+            const current = currentAssessment ? { ...currentAssessment, sod: window.calculateSOD(currentAssessment.lesions) } : ordered.at(-1);
+            if (!current || window.calculateSOD(current.lesions) === null) return { valid: false, response: 'Chưa đủ dữ liệu để đánh giá' };
+            const index = ordered.findIndex(item => item.assessmentId && item.assessmentId === current.assessmentId);
+            const prior = ordered.slice(0, index >= 0 ? index : -1);
+            const baselineSod = prior.length ? Number(prior[0].sod) : Number(current.sod);
+            const currentAndPrior = [...prior, current];
+            const nadir = window.calculateNadir(currentAndPrior);
+            const baselineChangePct = window.calculateBaselineChange(current.sod, baselineSod);
+            const nadirChangePct = currentAndPrior.length === 1 ? null : window.calculateNadirChange(current.sod, nadir);
+            const newStatus = current.newLesion?.status || current.newLesionStatus || 'no';
+            const nonTarget = current.nonTargetStatus || 'not_assessed';
+            let response = 'SD';
+            let targetResponse = 'SD';
+            let responseNote = '';
+            if (currentAndPrior.length === 1) {
+                response = targetResponse = 'Baseline';
+                responseNote = 'Đánh giá đầu tiên trong hồ sơ được lưu làm Baseline.';
+            } else if (window.checkPD(current.sod, nadir, newStatus, nonTarget)) {
+                response = targetResponse = 'PD';
+            } else if (window.checkCR(current.lesions)) {
+                targetResponse = 'CR';
+                if (nonTarget === 'none' || nonTarget === 'cr') response = 'CR';
+                else if (nonTarget === 'non_cr_non_pd') response = targetResponse = 'PR';
+                else { response = 'Chưa đủ dữ liệu'; responseNote = 'Target lesion đạt CR; cần đánh giá tổn thương không đích để xác định đáp ứng tổng thể.'; }
+            } else if (window.checkPR(baselineChangePct)) {
+                response = targetResponse = 'PR';
+            }
+            return { valid: true, sod: Number(current.sod), baselineSod, nadir, baselineChangePct, nadirChangePct, response, targetResponse, responseNote, newLesionStatus: newStatus, absoluteIncrease: Number(current.sod) - Number(nadir), relativeIncrease: nadir > 0 ? (Number(current.sod) - Number(nadir)) / nadir : null };
+        };
+        window.recistAssessments = function() { return (window.tempResponseAssessments || []).filter(item => item.recistVersion === '1.1'); };
+        window.getLatestRecistAssessment = function(assessments) {
+            return (assessments || []).filter(item => item.recistVersion === '1.1').slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0)).at(-1) || null;
+        };
+        window.recalculateRecistHistory = function() {
+            const history = window.recistAssessments().slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0));
+            const prior = [];
+            history.forEach(item => { item.sod = window.calculateSOD(item.lesions); Object.assign(item, window.calculateRECIST(prior, item)); prior.push(item); });
+            return history;
+        };
+        window.makeResponseLesionId = function() { return globalThis.crypto?.randomUUID?.() || `target-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`; };
+        window.addResponseLesion = function(lesion = {}, { fixed = false, allowRemove = true } = {}) {
+            const container = document.getElementById('responseLesions');
+            if (container.querySelectorAll('.response-lesion').length >= 5) { alert('RECIST 1.1 cho phép tối đa 5 target lesions.'); return; }
+            const row = document.createElement('div'); row.className = 'response-lesion grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2';
+            row.dataset.lesionId = lesion.id || window.makeResponseLesionId();
+            row.innerHTML = `<div class="space-y-2"><label class="block text-[10px] font-semibold text-slate-600">Tên / mô tả<input class="lesion-name mt-1 w-full rounded-lg border p-2 text-xs" maxlength="100" placeholder="Ví dụ: U gan 1"></label><label class="block text-[10px] font-semibold text-slate-600">Cơ quan<input class="lesion-organ mt-1 w-full rounded-lg border p-2 text-xs" maxlength="60" list="responseOrganOptions" placeholder="Chọn hoặc nhập cơ quan"></label><label class="block text-[10px] font-semibold text-slate-600">Loại tổn thương<select class="lesion-type mt-1 w-full rounded-lg border p-2 text-xs"><option value="lesion">Tổn thương thông thường</option><option value="node">Hạch</option></select></label></div><div class="space-y-2"><label class="lesion-measurement-label block text-[10px] font-semibold text-slate-600">Đường kính lớn nhất (mm)<input class="lesion-measurement mt-1 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" inputmode="decimal"></label><label class="flex items-center gap-2 text-[10px] font-semibold text-slate-600"><input class="lesion-not-seen" type="checkbox"> Không còn thấy / không đo được</label><p class="text-[10px] text-rose-600">Kích thước một chiều theo CT/MRI; hạch đo trục ngắn.</p><p class="lesion-live-result text-[10px] font-semibold text-slate-600"></p><button type="button" class="remove-response-lesion rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-700">Xóa target lesion</button></div>`;
+            const name = row.querySelector('.lesion-name'); const organ = row.querySelector('.lesion-organ'); const type = row.querySelector('.lesion-type'); const measurement = row.querySelector('.lesion-measurement'); const notSeen = row.querySelector('.lesion-not-seen');
+            name.value = lesion.name || ''; organ.value = lesion.organ || ''; type.value = lesion.type === 'node' ? 'node' : 'lesion'; measurement.value = lesion.notSeen ? '' : (lesion.measurementMm ?? ''); notSeen.checked = Boolean(lesion.notSeen);
+            const syncMeasureState = () => { const node = type.value === 'node'; row.querySelector('.lesion-measurement-label').firstChild.textContent = node ? 'Trục ngắn (mm)' : 'Đường kính lớn nhất (mm)'; measurement.disabled = notSeen.checked; if (notSeen.checked) measurement.value = ''; window.updateResponseConclusion(); };
+            type.addEventListener('change', syncMeasureState); notSeen.addEventListener('change', syncMeasureState);
+            [name, organ, measurement].forEach(field => field.addEventListener('input', window.updateResponseConclusion));
+            row.querySelector('.remove-response-lesion').classList.toggle('hidden', fixed || !allowRemove);
+            row.querySelector('.remove-response-lesion').onclick = () => { row.remove(); document.getElementById('addResponseLesionButton').classList.toggle('hidden', !allowRemove || container.querySelectorAll('.response-lesion').length >= 5); window.updateResponseConclusion(); };
+            if (fixed) [name, organ, type].forEach(field => { field.disabled = true; });
+            container.appendChild(row); syncMeasureState();
+            document.getElementById('addResponseLesionButton').classList.toggle('hidden', !allowRemove || container.querySelectorAll('.response-lesion').length >= 5);
+        };
+        if (!document.getElementById('responseOrganOptions')) {
+            const list = document.createElement('datalist'); list.id = 'responseOrganOptions';
+            window.responseOrgans.forEach(organ => { const option = document.createElement('option'); option.value = organ; list.appendChild(option); });
+            document.body.appendChild(list);
+        }
+        window.renderResponseInputs = function(lesions = null, { allowAdd = null, fixedDefinitions = null } = {}) {
+            const container = document.getElementById('responseLesions'); container.innerHTML = '';
+            const saved = lesions || window.getLatestRecistAssessment(window.tempResponseAssessments || [])?.lesions || [];
+            const hasBaseline = window.recistAssessments().length > 0;
+            const allowNewTargets = allowAdd ?? !hasBaseline;
+            const lockDefinitions = fixedDefinitions ?? hasBaseline;
+            saved.forEach(item => window.addResponseLesion(item, { fixed: lockDefinitions, allowRemove: allowNewTargets }));
+            if (!saved.length && allowNewTargets) window.addResponseLesion({}, { allowRemove: true });
+            document.getElementById('addResponseLesionButton').classList.toggle('hidden', !allowNewTargets || container.querySelectorAll('.response-lesion').length >= 5);
+            window.updateResponseConclusion();
+        };
+        window.getResponseLesions = function() {
+            return [...document.querySelectorAll('#responseLesions .response-lesion')].map(row => ({
+                id: row.dataset.lesionId, name: row.querySelector('.lesion-name').value.trim(), organ: row.querySelector('.lesion-organ').value.trim(),
+                type: row.querySelector('.lesion-type').value, measurementMm: row.querySelector('.lesion-not-seen').checked ? 0 : Number(row.querySelector('.lesion-measurement').value),
+                notSeen: row.querySelector('.lesion-not-seen').checked
             }));
         };
+        window.classForResponseConclusion = function(value) { return value === 'PD' ? 'text-rose-700 bg-rose-100' : value === 'PR' ? 'text-emerald-700 bg-emerald-100' : value === 'CR' ? 'text-teal-700 bg-teal-100' : value === 'SD' ? 'text-amber-800 bg-amber-100' : 'text-slate-700 bg-slate-100'; };
         window.updateResponseConclusion = function() {
-            const lesions = window.getResponseLesions(); const allGone = document.getElementById('responseAllGone').checked; const newLesion = document.getElementById('responseNewLesion').checked;
-            const results = lesions.map(item => {
-                const prior = window.lastResponseMeasurement(item.organ); const area = item.areaMm2;
-                if (newLesion) return { ...item, conclusion: 'Bệnh tiến triển (PD)', comparison: 'Xuất hiện tổn thương mới.' };
-                if (allGone) return { ...item, conclusion: 'Đáp ứng hoàn toàn (CR)', comparison: 'Tổn thương mục tiêu biến mất.' };
-                if (!prior || !Number(prior.areaMm2)) return { ...item, conclusion: 'Mốc ban đầu', comparison: 'Chưa có lần đo trước cùng cơ quan để so sánh.' };
-                const delta = area - Number(prior.areaMm2); const pct = delta / Number(prior.areaMm2) * 100;
-                const conclusion = pct <= -30 ? 'Đáp ứng một phần (PR)' : (pct >= 20 && delta >= 5 ? 'Bệnh tiến triển (PD)' : 'Bệnh ổn định (SD)');
-                return { ...item, conclusion, comparison: `Tích kích thước: ${Number(prior.areaMm2).toFixed(1)} → ${area.toFixed(1)} mm² (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%).` };
+            const lesions = window.getResponseLesions();
+            const newStatus = document.getElementById('responseNewLesionStatus')?.value || 'no';
+            const assessment = { recistVersion: '1.1', date: document.getElementById('responseAssessmentDate')?.value || '', lesions, sod: window.calculateSOD(lesions),
+                nonTargetStatus: document.getElementById('responseNonTargetStatus')?.value || 'not_assessed', newLesion: { status: newStatus } };
+            const editingId = Number.isInteger(window.editingResponseAssessmentIndex) ? window.tempResponseAssessments[window.editingResponseAssessmentIndex]?.assessmentId : null;
+            const history = window.recistAssessments().filter(item => item.assessmentId !== editingId);
+            const result = window.calculateRECIST(history, assessment);
+            window.responseCalculationPreview = result;
+            const missing = lesions.filter(item => !item.name || !item.organ || (!item.notSeen && !(item.measurementMm > 0)));
+            const conclusion = document.getElementById('responseConclusion');
+            const hasLegacyOnly = (window.tempResponseAssessments || []).some(item => item.legacy || item.recistVersion !== '1.1') && window.recistAssessments().length === 0;
+            if (missing.length) {
+                conclusion.innerHTML = missing.map(item => `<p class="text-rose-700">Thiếu số đo/thông tin của ${escapeHtml(item.name || 'Target lesion')}${item.name ? ` (${escapeHtml(item.name)})` : ''} – chưa đủ dữ liệu để tính RECIST.</p>`).join('');
+            } else if (!result.valid) conclusion.textContent = 'Chưa đủ dữ liệu để đánh giá';
+            else if (result.response === 'Baseline') conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${window.classForResponseConclusion('Baseline')}">Baseline</span><span class="ml-2">SOD ${result.sod.toFixed(1)} mm</span>`;
+            else conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${window.classForResponseConclusion(result.response)}">${escapeHtml(result.response)}</span><span class="ml-2">${escapeHtml(({CR:'Đáp ứng hoàn toàn',PR:'Đáp ứng một phần',SD:'Bệnh ổn định',PD:'Bệnh tiến triển'})[result.response] || 'Chưa đủ dữ liệu để đánh giá')}</span><p class="mt-1">SOD: ${result.sod.toFixed(1)} mm · Baseline: ${result.baselineSod.toFixed(1)} mm · Nadir: ${result.nadir.toFixed(1)} mm</p>${result.responseNote ? `<p>${escapeHtml(result.responseNote)}</p>` : ''}${newStatus === 'suspected' ? '<p class="text-amber-700">Có tổn thương mới nghi ngờ, chưa xác nhận; chưa kết luận PD do dấu hiệu này.</p>' : ''}`;
+            if (hasLegacyOnly) conclusion.insertAdjacentHTML('beforeend', '<p class="mt-1 text-amber-700">Đánh giá cũ – cần đánh giá lại theo RECIST 1.1. Dữ liệu cũ được giữ nguyên.</p>');
+            document.querySelectorAll('#responseLesions .response-lesion').forEach(row => {
+                const lesion = lesions.find(item => item.id === row.dataset.lesionId);
+                row.querySelector('.lesion-live-result').textContent = !lesion ? '' : lesion.notSeen ? 'Đánh dấu không còn thấy' : lesion.measurementMm > 0 ? `${lesion.measurementMm} mm` : 'Nhập số đo để tính SOD';
             });
-            const newLesionResult = newLesion ? `<div class="flex flex-wrap items-center gap-2"><strong>Tổn thương mới:</strong><span class="rounded-full px-2 py-1 font-bold ${window.classForResponseConclusion('Bệnh tiến triển (PD)')}">Bệnh tiến triển (PD)</span></div>` : '';
-            document.getElementById('responseConclusion').innerHTML = `${newLesionResult}${results.map(x => `<div class="flex flex-wrap items-center gap-2"><strong>${escapeHtml(x.organ)}:</strong><span class="rounded-full px-2 py-1 font-bold ${window.classForResponseConclusion(x.conclusion)}">${escapeHtml(x.conclusion)}</span><span class="text-slate-600">${escapeHtml(x.comparison)}</span></div>`).join('')}` || (allGone ? 'Đáp ứng hoàn toàn (CR)' : 'Chưa đủ dữ liệu: nhập đủ hai kích thước cho ít nhất một cơ quan.');
-            document.getElementById('responseComparison').textContent = allGone ? 'Tổn thương mục tiêu biến mất; hạch bệnh lý có trục ngắn dưới 10 mm.' : '';
-            document.querySelectorAll('#responseLesions .response-lesion').forEach(row => { const organSelect = row.querySelector('.lesion-organ'); const organ = organSelect.value === 'khác' ? (organSelect.dataset.custom || 'khác') : organSelect.value; const item = results.find(x => x.organ === organ); const preview = row.querySelector('.lesion-live-result'); if (preview) preview.textContent = item ? `Tích: ${item.areaMm2.toFixed(1)} mm² · ${item.conclusion}` : 'Nhập đủ 2 kích thước để tính tích.'; });
+        };
+        window.toggleNewLesionFields = function() {
+            document.getElementById('responseNewLesionFields').classList.toggle('hidden', document.getElementById('responseNewLesionStatus').value === 'no');
+        };
+        window.toggleResponseCalculation = function() {
+            const panel = document.getElementById('responseCalculation');
+            panel.classList.toggle('hidden');
+            if (panel.classList.contains('hidden')) return;
+            const r = window.responseCalculationPreview;
+            if (!r?.valid) { panel.textContent = 'Nhập đầy đủ số đo target lesion để xem phép tính.'; return; }
+            const result = window.getResponseLesions();
+            const sums = result.map(item => `${escapeHtml(item.name)} ${item.notSeen ? '0' : item.measurementMm}`).join(' + ');
+            const pBase = r.baselineChangePct === null ? '—' : `${r.baselineChangePct >= 0 ? '+' : ''}${r.baselineChangePct.toFixed(1)}%`;
+            const pNadir = r.nadirChangePct === null ? '—' : `${r.nadirChangePct >= 0 ? '+' : ''}${r.nadirChangePct.toFixed(1)}%`;
+            const abs = Number(r.absoluteIncrease || 0); const rel = Number(r.relativeIncrease || 0) * 100;
+            panel.innerHTML = `<p>SOD hiện tại: ${sums} = ${r.sod.toFixed(1)} mm</p><p>Baseline SOD: ${r.baselineSod.toFixed(1)} mm</p><p>Nadir đến lần này: ${r.nadir.toFixed(1)} mm</p><p>Thay đổi so Baseline: (${r.sod.toFixed(1)} − ${r.baselineSod.toFixed(1)}) / ${r.baselineSod.toFixed(1)} × 100 = ${pBase}</p><p>Thay đổi so Nadir: (${r.sod.toFixed(1)} − ${r.nadir.toFixed(1)}) / ${r.nadir.toFixed(1)} × 100 = ${pNadir}</p><p>PD do SOD: tăng ≥20% ${rel >= 20 ? 'Có' : 'Không'}; tăng tuyệt đối ≥5 mm ${abs >= 5 ? 'Có' : 'Không'}.</p><p>Tổn thương mới xác nhận: ${r.newLesionStatus === 'confirmed' ? 'Có' : 'Không'}.</p><p>Kết luận: ${escapeHtml(r.response)}.</p>`;
+        };
+        window.validateResponseAssessment = function(lesions, date, existingIndex = null) {
+            if (!date) return 'Vui lòng chọn ngày đánh giá.';
+            if (existingIndex !== null) {
+                const currentId = window.tempResponseAssessments[existingIndex]?.assessmentId;
+                if (window.recistAssessments().some(item => item.date === date && item.assessmentId !== currentId)) return 'Đã có một assessment RECIST trong ngày này. Hãy cập nhật assessment đó để giữ một lần đánh giá mỗi ngày.';
+            }
+            const history = window.recistAssessments();
+            const editingAssessmentId = existingIndex !== null ? window.tempResponseAssessments[existingIndex]?.assessmentId : null;
+            const isBaseline = history.length === 0 || (editingAssessmentId && history.find(item => item.assessmentId === editingAssessmentId) === history[0]);
+            const lesionError = window.validateTargetLesions(lesions, { baseline: Boolean(isBaseline) });
+            if (lesionError) return lesionError;
+            if (new Set(lesions.map(item => item.id)).size !== lesions.length) return 'Mỗi target lesion phải có ID riêng.';
+            if (!isBaseline) {
+                const baselineIds = new Set(history[0].lesions.map(item => item.id));
+                if (lesions.length !== baselineIds.size || lesions.some(item => !baselineIds.has(item.id))) return 'Các lần đánh giá sau phải dùng đúng danh sách Target lesion đã xác định ở Baseline.';
+            }
+            const newStatus = document.getElementById('responseNewLesionStatus').value;
+            if (newStatus !== 'no' && (!document.getElementById('responseNewLesionOrgan').value.trim() || !document.getElementById('responseNewLesionDescription').value.trim())) return 'Tổn thương mới cần có cơ quan/vị trí và mô tả.';
+            const newSize = document.getElementById('responseNewLesionSize').value;
+            if (newSize && !(Number(newSize) > 0)) return 'Kích thước tổn thương mới phải lớn hơn 0 mm.';
+            return '';
         };
         window.renderToxicityInputs = function() {
             let previousGroup = '';
@@ -2722,31 +2862,35 @@
             return [...byDate.values()].sort((a, b) => String(a.date).localeCompare(String(b.date)) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0));
         };
         window.refreshExtendedAssessment = function() {
-            window.recalculateResponseAssessments();
-            const previous = (window.tempResponseAssessments || []).at(-1); document.getElementById('responseHistoryPreview').textContent = previous ? `Lần ghi nhận gần nhất: ${window.assessmentDateTime(previous)}` : 'Chưa có đánh giá đáp ứng trước đó.';
-            document.getElementById('responseAllGone').onchange = window.updateResponseConclusion; document.getElementById('responseNewLesion').onchange = window.updateResponseConclusion;
+            const responseHistory = window.tempResponseAssessments || [];
+            const latest = window.getLatestRecistAssessment(responseHistory);
+            document.getElementById('responseHistoryPreview').textContent = latest ? `Đánh giá RECIST gần nhất: ${window.assessmentDateTime(latest)} · ${latest.response || 'Chưa đủ dữ liệu'}` : (responseHistory.length ? 'Có dữ liệu đánh giá cũ; cần đánh giá lại theo RECIST 1.1.' : 'Chưa có đánh giá đáp ứng trước đó.');
             const toxicity = (window.tempToxicityAssessments || []).at(-1); document.getElementById('toxicityHistoryPreview').textContent = toxicity ? `Lần ghi nhận gần nhất: ${formatDisplayDate(toxicity.date)} (${toxicity.items.length} mục).` : 'Chưa có ghi nhận độc tính.';
             const responseList = document.getElementById('existingResponseList');
-            if (responseList) responseList.innerHTML = window.tempResponseAssessments.length ? [...window.tempResponseAssessments].map((item,index) => ({item,index})).reverse().map(({item,index}) => `<div class="rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm"><div class="flex items-center justify-between gap-2"><strong class="text-base text-slate-800">${escapeHtml(window.assessmentDateTime(item))}</strong><span class="flex gap-2"><button type="button" onclick="window.editResponseAssessment(${index})" class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 py-1 font-semibold text-indigo-700 hover:bg-slate-200"><i class="fa-solid fa-pen text-amber-600"></i>Sửa</button><button type="button" onclick="window.deleteResponseAssessment(${index})" class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 py-1 font-semibold text-rose-700 hover:bg-slate-200"><i class="fa-solid fa-trash text-rose-600"></i>Xóa</button></span></div>${(item.lesions || []).map(x => `<div class="response-history-conclusion mt-1 font-bold ${x.conclusion?.includes('(PD)') ? 'text-amber-700' : x.conclusion?.includes('(PR)') ? 'text-emerald-700' : x.conclusion?.includes('(CR)') ? 'text-teal-700' : 'text-slate-700'}">${escapeHtml(x.organ)}: ${escapeHtml(item.allGone ? 'Đáp ứng hoàn toàn (CR)' : (x.conclusion || 'Mốc ban đầu'))}</div>`).join('')}${item.newLesion ? '<div class="response-history-conclusion mt-1 font-bold text-amber-700">Tổn thương mới: Bệnh tiến triển (PD)</div>' : ''}</div>`).join('') : '<p class="text-violet-300">Chưa ghi nhận.</p>';
+            if (responseList) responseList.innerHTML = responseHistory.length ? [...responseHistory].map((item,index) => ({item,index})).reverse().map(({item,index}) => {
+                if (item.recistVersion !== '1.1') return `<div class="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs"><strong>${escapeHtml(window.assessmentDateTime(item))} · Đánh giá cũ – cần đánh giá lại theo RECIST 1.1.</strong><p>Dữ liệu lịch sử được giữ nguyên, không quy đổi từ diện tích sang SOD.</p></div>`;
+                const metrics = window.calculateRECIST(responseHistory.slice(0, index), item);
+                return `<div class="rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm"><div class="flex flex-wrap items-center justify-between gap-2"><strong class="text-sm text-slate-800">${escapeHtml(formatDisplayDate(item.date))} · ${escapeHtml(item.response || 'Chưa đủ dữ liệu')}</strong><span class="flex gap-2"><button type="button" onclick="window.editResponseAssessment(${index})" class="rounded-md border px-2 py-1 font-semibold text-indigo-700">Sửa</button><button type="button" onclick="window.deleteResponseAssessment(${index})" class="rounded-md border px-2 py-1 font-semibold text-rose-700">Xóa</button></span></div><p class="mt-1">SOD ${Number(item.sod).toFixed(1)} mm · Baseline ${Number(item.baselineSod).toFixed(1)} mm · Nadir ${Number(item.nadir).toFixed(1)} mm</p><p>${(item.lesions || []).map(x => `${escapeHtml(x.name)}: ${x.notSeen ? 'không còn thấy' : `${escapeHtml(x.measurementMm)} mm`}`).join(' · ')}</p><p class="text-[10px] text-slate-500">${escapeHtml(metrics.responseNote || '')}</p></div>`;
+            }).join('') : '<p class="text-violet-300">Chưa ghi nhận.</p>';
             const toxicityList = document.getElementById('existingToxicityList');
             if (toxicityList) toxicityList.innerHTML = window.tempToxicityAssessments.length ? window.tempToxicityAssessments.map((item,index) => `<div class="rounded-lg border bg-white p-2"><div class="flex items-center justify-between gap-2"><strong>${escapeHtml(window.assessmentDateTime(item))}</strong><span class="flex gap-1"><button type="button" onclick="window.editToxicityAssessment(${index})" class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 py-1 font-semibold text-indigo-700 hover:bg-slate-200"><i class="fa-solid fa-pen text-amber-600"></i>Sửa</button><button type="button" onclick="window.deleteToxicityAssessment(${index})" class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 py-1 font-semibold text-rose-700 hover:bg-slate-200"><i class="fa-solid fa-trash text-rose-600"></i>Xóa</button></span></div>${item.items.map(x => `<p class="${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-700' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(x.organ)} · Độ ${x.grade}</p>`).join('')}</div>`).join('') : '<p class="text-slate-400">Chưa ghi nhận.</p>';
         };
-        window.deleteResponseAssessment = function(index) { if (!confirm('Xóa lần đánh giá đáp ứng này? Kết luận các lần sau sẽ được tính lại.')) return; window.tempResponseAssessments.splice(index,1); window.prepareAssessmentSave(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); };
+        window.deleteResponseAssessment = function(index) { if (window.tempResponseAssessments[index]?.recistVersion !== '1.1') { alert('Dữ liệu đánh giá cũ được giữ nguyên.'); return; } if (!confirm('Xóa lần đánh giá RECIST này? Các kết quả sau sẽ được tính lại.')) return; window.tempResponseAssessments.splice(index,1); window.recalculateRecistHistory(); window.prepareAssessmentSave(); window.refreshExtendedAssessment(); window.renderResponseInputs(); };
         window.editResponseAssessment = function(index) {
             const item = window.tempResponseAssessments[index]; if (!item) return;
+            if (item.recistVersion !== '1.1') { alert('Đánh giá cũ không thể chuyển đổi chính xác sang RECIST 1.1. Hãy tạo đánh giá RECIST mới; dữ liệu cũ vẫn được giữ.'); return; }
             window.prepareAssessmentSave();
             window.editingResponseAssessmentIndex = index;
-            const rows = document.getElementById('responseLesions'); rows.innerHTML = '';
-            (item.lesions || []).forEach(lesion => {
-                window.addResponseLesion(lesion.organ, true);
-                const row = rows.lastElementChild;
-                row.querySelector('.lesion-size1').value = lesion.size1Mm || '';
-                row.querySelector('.lesion-size2').value = lesion.size2Mm || '';
-            });
-            if (!item.lesions?.length) window.addResponseLesion();
+            const history = window.recistAssessments();
+            const isOnlyBaseline = history.length === 1 && history[0].assessmentId === item.assessmentId;
+            window.renderResponseInputs(item.lesions || [], { allowAdd: isOnlyBaseline, fixedDefinitions: !isOnlyBaseline });
             document.getElementById('responseAssessmentDate').value = item.date || '';
-            document.getElementById('responseAllGone').checked = Boolean(item.allGone);
-            document.getElementById('responseNewLesion').checked = Boolean(item.newLesion);
+            document.getElementById('responseNonTargetStatus').value = item.nonTargetStatus || 'not_assessed';
+            document.getElementById('responseNewLesionStatus').value = item.newLesion?.status || item.newLesionStatus || 'no';
+            document.getElementById('responseNewLesionOrgan').value = item.newLesion?.organ || '';
+            document.getElementById('responseNewLesionDescription').value = item.newLesion?.description || '';
+            document.getElementById('responseNewLesionSize').value = item.newLesion?.sizeMm || '';
+            window.toggleNewLesionFields();
             document.getElementById('responseRecordButton').textContent = 'Lưu thay đổi cho lần ghi nhận';
             window.updateResponseConclusion();
             const root = document.getElementById('extendedAssessmentModal'); root.classList.remove('hidden'); root.classList.add('flex'); window.switchExtendedTab('response');
@@ -2769,35 +2913,44 @@
             const root = document.getElementById('extendedAssessmentModal'); root.classList.remove('hidden'); root.classList.add('flex'); window.switchExtendedTab('toxicity');
         };
         window.recordResponseAssessment = function() {
-            const rows = [...document.querySelectorAll('#responseLesions .response-lesion')];
-            const partial = rows.some(row => { const a=row.querySelector('.lesion-size1').value, b=row.querySelector('.lesion-size2').value; return Boolean(a) !== Boolean(b); });
-            if (partial) { alert('Mỗi cơ quan cần nhập đủ cả hai kích thước.'); return; }
-            const allGone = document.getElementById('responseAllGone').checked; const newLesion = document.getElementById('responseNewLesion').checked;
-            let lesions = window.getResponseLesions();
-            if (allGone) lesions = rows.map(row => row.querySelector('.lesion-organ')).filter(s=>s.value).map(s=>({organ:s.value==='khác'?(s.dataset.custom||'khác'):s.value,size1Mm:0,size2Mm:0,areaMm2:0,conclusion:'Đáp ứng hoàn toàn (CR)'}));
-            if (!lesions.length && !newLesion) { alert(allGone ? 'Chưa có cơ quan đích đã ghi nhận để xác nhận biến mất.' : 'Nhập đủ hai kích thước cho ít nhất một cơ quan.'); return; }
-            const date = document.getElementById('responseAssessmentDate').value || new Date().toISOString().slice(0,10); const assessment = {date, recordedAt:Date.now(), lesions, allGone, newLesion};
-            if (Number.isInteger(window.editingResponseAssessmentIndex)) {
-                window.tempResponseAssessments[window.editingResponseAssessmentIndex] = assessment;
+            const lesions = window.getResponseLesions();
+            const date = document.getElementById('responseAssessmentDate').value;
+            const editingIndex = Number.isInteger(window.editingResponseAssessmentIndex) ? window.editingResponseAssessmentIndex : null;
+            const error = window.validateResponseAssessment(lesions, date, editingIndex);
+            if (error) { alert(error); return; }
+            const matching = window.recistAssessments().find(item => item.date === date && item !== window.tempResponseAssessments[editingIndex]);
+            if (matching && editingIndex === null) {
+                const mergedById = new Map((matching.lesions || []).map(item => [item.id, item]));
+                lesions.forEach(item => mergedById.set(item.id, item));
+                matching.lesions = [...mergedById.values()];
+                matching.recordedAt = Date.now();
+                matching.nonTargetStatus = document.getElementById('responseNonTargetStatus').value;
+                matching.newLesion = { status: document.getElementById('responseNewLesionStatus').value, organ: document.getElementById('responseNewLesionOrgan').value.trim(), description: document.getElementById('responseNewLesionDescription').value.trim(), sizeMm: Number(document.getElementById('responseNewLesionSize').value) || null };
+                matching.sod = window.calculateSOD(matching.lesions);
+                const metrics = window.calculateRECIST(window.recistAssessments().filter(item => item !== matching), matching);
+                Object.assign(matching, metrics);
             } else {
-                const sameDay = window.tempResponseAssessments.find(item => item.date === date);
-                if (sameDay) {
-                    const merged = new Map((sameDay.lesions || []).map(item => [item.organ, item]));
-                    lesions.forEach(item => merged.set(item.organ, item));
-                    sameDay.lesions = [...merged.values()];
-                    sameDay.recordedAt = Date.now();
-                    sameDay.allGone = allGone;
-                    sameDay.newLesion = newLesion;
-                } else window.tempResponseAssessments.push(assessment);
+                const assessment = {
+                    assessmentId: window.makeResponseLesionId(), recistVersion: '1.1', date, recordedAt: Date.now(), lesions,
+                    nonTargetStatus: document.getElementById('responseNonTargetStatus').value,
+                    newLesion: { status: document.getElementById('responseNewLesionStatus').value, organ: document.getElementById('responseNewLesionOrgan').value.trim(), description: document.getElementById('responseNewLesionDescription').value.trim(), sizeMm: Number(document.getElementById('responseNewLesionSize').value) || null }
+                };
+                assessment.sod = window.calculateSOD(lesions);
+                const nextHistory = window.recistAssessments().filter(item => item.assessmentId !== assessment.assessmentId);
+                Object.assign(assessment, window.calculateRECIST(nextHistory, assessment));
+                if (editingIndex !== null) window.tempResponseAssessments[editingIndex] = assessment;
+                else window.tempResponseAssessments.push(assessment);
             }
             window.prepareAssessmentSave();
             window.editingResponseAssessmentIndex = null;
             window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || (a.recordedAt || 0) - (b.recordedAt || 0));
+            window.recalculateRecistHistory();
             document.getElementById('responseRecordButton').textContent = 'Ghi nhận đánh giá đáp ứng';
-            window.recalculateResponseAssessments();
-            document.getElementById('responseAllGone').checked = false; document.getElementById('responseNewLesion').checked = false;
+            document.getElementById('responseNonTargetStatus').value = 'not_assessed';
+            document.getElementById('responseNewLesionStatus').value = 'no';
+            document.getElementById('responseNewLesionOrgan').value = ''; document.getElementById('responseNewLesionDescription').value = ''; document.getElementById('responseNewLesionSize').value = '';
             const now = new Date(); document.getElementById('responseAssessmentDate').value = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
-            window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã lưu đánh giá đáp ứng theo từng cơ quan.');
+            window.toggleNewLesionFields(); window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã lưu đánh giá theo RECIST 1.1.');
         };
         window.recordToxicityAssessment = function() {
             const items = [...document.querySelectorAll('[data-toxicity-index]')].filter(s=>s.value).map(s=>({organ:toxicityCriteria[Number(s.dataset.toxicityIndex)][0], grade:Number(s.value), description:toxicityCriteria[Number(s.dataset.toxicityIndex)][Number(s.value)-1]}));
@@ -2921,6 +3074,11 @@
             document.getElementById('detDiagSub').innerText = p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(' | ') : 'Không có');
             document.getElementById('detProtocol').querySelector('span').innerText = p.protocol || 'Chưa cập nhật';
             document.getElementById('detCreatedBy').innerText = p.createdByEmail || 'Thạch Xuân Tựu';
+            const markerSummary = document.getElementById('summaryMarkerList');
+            const latestMarkers = new Map();
+            [...(p.markers || [])].sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0)).forEach(marker => latestMarkers.set(marker.type || 'Chưa phân loại', marker));
+            markerSummary.innerHTML = latestMarkers.size ? [...latestMarkers.values()].map(marker => `<p class="flex justify-between gap-2"><span>${escapeHtml(marker.type || 'Chưa phân loại')}</span><strong>${escapeHtml(marker.value)} <span class="font-normal text-slate-500">· ${escapeHtml(formatDisplayDate(marker.date))}</span></strong></p>`).join('') : '<p class="text-slate-400">Chưa ghi nhận</p>';
+            window.renderSummaryResponse(p);
 
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
@@ -2972,15 +3130,38 @@
             }
 
             const responseHistory = p.responseAssessments || [];
-            cyclesContainer.insertAdjacentHTML('beforeend', `<div class="mt-6 rounded-2xl border border-violet-200 bg-[#f5f3ff] p-4"><div class="mb-3 border-b-2 border-violet-500 pb-1 font-bold text-violet-900">ĐÁP ỨNG U</div>${responseHistory.length ? [...responseHistory].reverse().map(item => `<div class="my-2 rounded-xl border border-slate-300 bg-white px-4 py-3"><div class="font-bold text-slate-800">${escapeHtml(window.assessmentDateTime(item))}</div>${(item.lesions || []).map(x => `<div class="mt-1 font-bold ${x.conclusion?.includes('(PD)') ? 'text-amber-700' : x.conclusion?.includes('(PR)') ? 'text-emerald-700' : x.conclusion?.includes('(CR)') ? 'text-teal-700' : 'text-slate-700'}">${escapeHtml(x.organ)}: ${escapeHtml(item.allGone ? 'Đáp ứng hoàn toàn (CR)' : (x.conclusion || item.conclusion || 'Mốc ban đầu'))}</div>`).join('')}${item.newLesion ? '<div class="mt-1 font-bold text-amber-700">Tổn thương mới: Bệnh tiến triển (PD)</div>' : ''}</div>`).join('') : '<p class="text-violet-300">Chưa ghi nhận.</p>'}</div>`);
             const toxicityHistory = p.toxicityAssessments || [];
             cyclesContainer.insertAdjacentHTML('beforeend', `<div class="mt-6 border-b-2 border-rose-500 pb-1 font-bold text-rose-900">ĐỘC TÍNH HÓA TRỊ</div>${toxicityHistory.length ? toxicityHistory.map(item => `<div class="ml-3 my-2 rounded-lg border p-3 ${item.items?.some(x => x.grade >= 4) ? 'border-rose-300 bg-rose-50 text-rose-800' : item.items?.some(x => x.grade === 3) ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-slate-200 bg-slate-50'}"><div class="font-bold">${item.items?.some(x => x.grade >= 4) ? '❗ ' : item.items?.some(x => x.grade === 3) ? '⚠ ' : ''}${escapeHtml(formatDisplayDate(item.date))}</div>${(item.items || []).map(x => `<div class="mt-1 ${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-800' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(x.organ)} — Độ ${x.grade}: ${escapeHtml(x.description)}${x.grade === 3 ? ' (Tạm hoãn chu kỳ, cân nhắc giảm liều)' : ''}${x.grade >= 4 ? ' (Ngừng thuốc/đổi phác đồ; cảnh báo)' : ''}</div>`).join('')}</div>`).join('') : '<p class="p-2 text-slate-400">Chưa ghi nhận độc tính.</p>'}`);
-            const responseList = document.getElementById('existingResponseList');
-            responseList.innerHTML = responseHistory.length ? [...responseHistory].reverse().map(item => `<p>${escapeHtml(window.assessmentDateTime(item))} · ${(item.lesions || []).map(x => `${escapeHtml(x.organ)}: ${escapeHtml(x.conclusion || item.conclusion || 'Mốc ban đầu')}`).join(' · ')}${item.newLesion ? ' · Tổn thương mới: PD' : ''}</p>`).join('') : '<p class="text-slate-400">Chưa ghi nhận.</p>';
+            window.tempResponseAssessments = JSON.parse(JSON.stringify(responseHistory));
+            window.tempToxicityAssessments = JSON.parse(JSON.stringify(toxicityHistory));
+            window.refreshExtendedAssessment();
             const toxicityList = document.getElementById('existingToxicityList');
             toxicityList.innerHTML = toxicityHistory.length ? [...toxicityHistory].reverse().map(item => item.items.map(x => `<p class="${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-700' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(formatDisplayDate(item.date))} · ${escapeHtml(x.organ)} · Độ ${x.grade}</p>`).join('')).join('') : '<p class="text-slate-400">Chưa ghi nhận.</p>';
             window.setPanelVisibility(document.getElementById('patientDetailModal'), true);
             window.switchDetailTab('timeline');
+        };
+
+        window.renderSummaryResponse = function(patient) {
+            const container = document.getElementById('summaryResponseContent');
+            const latest = window.getLatestRecistAssessment(patient.responseAssessments || []);
+            if (!latest) { container.innerHTML = '<p class="font-bold text-slate-600">Chưa ghi nhận</p>'; return; }
+            const responseName = ({ CR: 'Đáp ứng hoàn toàn', PR: 'Đáp ứng một phần', SD: 'Bệnh ổn định', PD: 'Bệnh tiến triển', Baseline: 'Baseline', 'Chưa đủ dữ liệu': 'Chưa đủ dữ liệu để đánh giá' })[latest.response] || 'Chưa đủ dữ liệu để đánh giá';
+            const baselineChange = Number(latest.baselineChangePct);
+            const nadirChange = latest.nadirChangePct === null || latest.nadirChangePct === undefined ? NaN : Number(latest.nadirChangePct);
+            const baselinePct = Number.isFinite(baselineChange) ? `${baselineChange < 0 ? '↓ ' : baselineChange > 0 ? '↑ +' : ''}${Math.abs(baselineChange).toFixed(1)}%` : '—';
+            const nadirPct = Number.isFinite(nadirChange) ? `${nadirChange < 0 ? '↓ ' : nadirChange > 0 ? '↑ +' : ''}${Math.abs(nadirChange).toFixed(1)}%` : '—';
+            const newStatus = latest.newLesion?.status || latest.newLesionStatus || 'no';
+            const newText = newStatus === 'confirmed' ? 'Có, đã xác nhận' : newStatus === 'suspected' ? 'Nghi ngờ, chưa xác nhận' : 'Không';
+            container.innerHTML = `<p class="text-lg font-extrabold ${window.classForResponseConclusion(latest.response)} inline-block rounded-full px-2 py-1">${escapeHtml(latest.response || 'Chưa đủ dữ liệu')}</p><p class="mt-1">${escapeHtml(responseName)}</p><p class="mt-2">Đánh giá gần nhất: <strong>${escapeHtml(formatDisplayDate(latest.date))}</strong></p><dl class="mt-2 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1"><dt>SOD hiện tại</dt><dd class="font-semibold">${Number(latest.sod).toFixed(1)} mm</dd><dt>Baseline</dt><dd class="font-semibold">${Number(latest.baselineSod).toFixed(1)} mm</dd><dt>Nadir</dt><dd class="font-semibold">${Number(latest.nadir).toFixed(1)} mm</dd><dt>Thay đổi so Baseline</dt><dd class="font-semibold">${baselinePct}</dd><dt>Thay đổi so Nadir</dt><dd class="font-semibold">${nadirPct}</dd><dt>Tổn thương mới</dt><dd class="font-semibold">${escapeHtml(newText)}</dd></dl>${latest.responseNote ? `<p class="mt-2 text-[10px] text-amber-700">${escapeHtml(latest.responseNote)}</p>` : ''}`;
+        };
+        window.openResponseAssessmentFromSummary = async function() {
+            const patientId = window.currentViewingPatient?.id;
+            if (!patientId) return;
+            window.closePatientDetailModal();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            await window.openEditPatientModal(patientId);
+            window.openExtendedAssessment();
+            window.switchExtendedTab('response');
         };
 
         window.openEditPatientModal = async function(docId) {
@@ -3071,7 +3252,7 @@
             
             window.tempCurrentCycles = window.normalizeProtocolHistory(JSON.parse(JSON.stringify(p.cycles || [])));
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
-            window.tempResponseAssessments = window.mergeAssessmentDays(JSON.parse(JSON.stringify(p.responseAssessments || [])), 'lesions');
+            window.tempResponseAssessments = JSON.parse(JSON.stringify(p.responseAssessments || []));
             window.tempToxicityAssessments = window.mergeAssessmentDays(JSON.parse(JSON.stringify(p.toxicityAssessments || [])), 'items');
             window.editingResponseAssessmentIndex = null;
             window.editingToxicityAssessmentIndex = null;
@@ -3081,8 +3262,12 @@
             document.querySelectorAll('[data-toxicity-index]').forEach(select => { select.value = ''; });
             window.updateToxicityAlert();
             const assessmentToday = new Date(); document.getElementById('responseAssessmentDate').value = new Date(assessmentToday.getTime() - assessmentToday.getTimezoneOffset()*60000).toISOString().slice(0,10);
-            document.getElementById('responseAllGone').checked = false;
-            document.getElementById('responseNewLesion').checked = false;
+            document.getElementById('responseNonTargetStatus').value = 'not_assessed';
+            document.getElementById('responseNewLesionStatus').value = 'no';
+            document.getElementById('responseNewLesionOrgan').value = '';
+            document.getElementById('responseNewLesionDescription').value = '';
+            document.getElementById('responseNewLesionSize').value = '';
+            window.toggleNewLesionFields();
             window.renderResponseInputs();
             window.refreshExtendedAssessment();
 
