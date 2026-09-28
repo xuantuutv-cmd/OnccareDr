@@ -2625,16 +2625,16 @@
             const container = document.getElementById('responseLesions');
             const row = document.createElement('div'); row.className = 'response-lesion grid w-full max-w-[34rem] grid-cols-1 sm:grid-cols-[minmax(0,13rem)_minmax(0,14rem)_auto] gap-2 items-start';
             const opts = window.responseOrgans;
-            row.innerHTML = `<select class="lesion-organ rounded-lg border p-2 text-xs"><option value="">Chọn cơ quan</option>${opts.map(o => `<option>${o}</option>`).join('')}</select><div class="space-y-1"><input class="lesion-size1 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" placeholder="Kích thước 1 (mm)"><input class="lesion-size2 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" placeholder="Kích thước 2 (mm)"><p class="text-[10px] text-rose-600">Đơn vị mm — Theo kết quả CT-Scan</p><p class="lesion-live-result text-[10px] font-semibold text-slate-600"></p></div><button type="button" class="rounded-lg px-2 text-rose-600" aria-label="Xóa cơ quan">Xóa</button>`;
+            row.innerHTML = `<select class="lesion-organ rounded-lg border p-2 text-xs"><option value="">Chọn cơ quan</option>${opts.map(o => `<option>${o}</option>`).join('')}</select><div class="space-y-1"><input class="lesion-size1 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" placeholder="Kích thước 1 (mm)"><input class="lesion-size2 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" placeholder="Kích thước 2 (mm)"><p class="text-[10px] text-rose-600">Đơn vị mm — Theo kích thước đo trên CT/MRI</p><p class="lesion-live-result text-[10px] font-semibold text-slate-600"></p></div><button type="button" class="rounded-lg px-2 text-rose-600" aria-label="Xóa cơ quan">Xóa</button>`;
             const select = row.querySelector('.lesion-organ'); select.value = opts.includes(organ) ? organ : (organ ? 'khác' : '');
             if (organ && !opts.includes(organ)) select.dataset.custom = organ;
             if (fixed) { select.disabled = true; row.querySelector('button').classList.add('hidden'); }
             select.addEventListener('change', () => {
-                if (select.value && [...container.querySelectorAll('.lesion-organ')].some(other => other !== select && other.value === select.value)) { alert('Mỗi cơ quan chỉ được ghi nhận một lần.'); select.value = ''; return; }
+                if (select.value && [...container.querySelectorAll('.lesion-organ')].some(other => other !== select && (other.dataset.custom || other.value) === (select.value === 'khác' ? select.dataset.custom || 'khác' : select.value))) { alert('Mỗi cơ quan chỉ được ghi nhận một lần trong cùng lần nhập.'); select.value = ''; return; }
                 if (select.value === 'khác') {
                     const custom = prompt('Nhập tên cơ quan khác:');
                     const normalized = custom?.trim().toLocaleLowerCase('vi');
-                    const usedCustom = window.responseRecordedOrgans().some(value => value.toLocaleLowerCase('vi') === normalized) || [...container.querySelectorAll('.lesion-organ')].some(other => other !== select && (other.dataset.custom || '').toLocaleLowerCase('vi') === normalized);
+                    const usedCustom = [...container.querySelectorAll('.lesion-organ')].some(other => other !== select && (other.dataset.custom || '').toLocaleLowerCase('vi') === normalized);
                     if (!normalized) select.value = '';
                     else if (usedCustom) { alert('Cơ quan này đã có trong danh sách theo dõi.'); select.value = ''; }
                     else select.dataset.custom = custom.trim();
@@ -2647,7 +2647,7 @@
         };
         window.refreshAvailableResponseOrgans = function() {
             const selects = [...document.querySelectorAll('#responseLesions .lesion-organ:not(:disabled)')];
-            const selected = selects.map(s => s.value).filter(Boolean); const used = new Set([...window.responseRecordedOrgans(), ...selected]);
+            const selected = selects.map(s => s.value).filter(Boolean); const used = new Set(selected);
             selects.forEach(select => [...select.options].forEach(option => { if (option.value) option.disabled = used.has(option.value) && option.value !== select.value; }));
         };
         window.getResponseLesions = function() { return [...document.querySelectorAll('#responseLesions .response-lesion')].map(row => { const select = row.querySelector('.lesion-organ'); const size1Mm = Number(row.querySelector('.lesion-size1').value); const size2Mm = Number(row.querySelector('.lesion-size2').value); return { organ: select.value === 'khác' ? (select.dataset.custom || 'khác') : select.value, size1Mm, size2Mm, areaMm2: size1Mm * size2Mm }; }).filter(x => x.organ && x.size1Mm > 0 && x.size2Mm > 0); };
@@ -2702,6 +2702,25 @@
             else box.classList.add('hidden');
         };
         window.assessmentDateTime = function(item) { const date = formatDisplayDate(item.date); return item.recordedAt ? `${date} ${new Date(item.recordedAt).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}` : date; };
+        window.mergeAssessmentDays = function(assessments, collectionKey) {
+            const byDate = new Map();
+            [...(assessments || [])].sort((a, b) => (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0)).forEach(assessment => {
+                const current = byDate.get(assessment.date);
+                if (!current) {
+                    byDate.set(assessment.date, { ...assessment, [collectionKey]: [...(assessment[collectionKey] || [])] });
+                    return;
+                }
+                const entries = new Map((current[collectionKey] || []).map(item => [item.organ, item]));
+                (assessment[collectionKey] || []).forEach(item => entries.set(item.organ, item));
+                current[collectionKey] = [...entries.values()];
+                current.recordedAt = Math.max(Number(current.recordedAt) || 0, Number(assessment.recordedAt) || 0);
+                if (collectionKey === 'lesions') {
+                    current.allGone = Boolean(assessment.allGone);
+                    current.newLesion = Boolean(assessment.newLesion);
+                }
+            });
+            return [...byDate.values()].sort((a, b) => String(a.date).localeCompare(String(b.date)) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0));
+        };
         window.refreshExtendedAssessment = function() {
             window.recalculateResponseAssessments();
             const previous = (window.tempResponseAssessments || []).at(-1); document.getElementById('responseHistoryPreview').textContent = previous ? `Lần ghi nhận gần nhất: ${window.assessmentDateTime(previous)}` : 'Chưa có đánh giá đáp ứng trước đó.';
@@ -2758,8 +2777,19 @@
             if (allGone) lesions = rows.map(row => row.querySelector('.lesion-organ')).filter(s=>s.value).map(s=>({organ:s.value==='khác'?(s.dataset.custom||'khác'):s.value,size1Mm:0,size2Mm:0,areaMm2:0,conclusion:'Đáp ứng hoàn toàn (CR)'}));
             if (!lesions.length && !newLesion) { alert(allGone ? 'Chưa có cơ quan đích đã ghi nhận để xác nhận biến mất.' : 'Nhập đủ hai kích thước cho ít nhất một cơ quan.'); return; }
             const date = document.getElementById('responseAssessmentDate').value || new Date().toISOString().slice(0,10); const assessment = {date, recordedAt:Date.now(), lesions, allGone, newLesion};
-            if (Number.isInteger(window.editingResponseAssessmentIndex)) window.tempResponseAssessments[window.editingResponseAssessmentIndex] = assessment;
-            else window.tempResponseAssessments.push(assessment);
+            if (Number.isInteger(window.editingResponseAssessmentIndex)) {
+                window.tempResponseAssessments[window.editingResponseAssessmentIndex] = assessment;
+            } else {
+                const sameDay = window.tempResponseAssessments.find(item => item.date === date);
+                if (sameDay) {
+                    const merged = new Map((sameDay.lesions || []).map(item => [item.organ, item]));
+                    lesions.forEach(item => merged.set(item.organ, item));
+                    sameDay.lesions = [...merged.values()];
+                    sameDay.recordedAt = Date.now();
+                    sameDay.allGone = allGone;
+                    sameDay.newLesion = newLesion;
+                } else window.tempResponseAssessments.push(assessment);
+            }
             window.prepareAssessmentSave();
             window.editingResponseAssessmentIndex = null;
             window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || (a.recordedAt || 0) - (b.recordedAt || 0));
@@ -2774,8 +2804,17 @@
             if (!items.length) { alert('Chọn ít nhất một độc tính để ghi nhận.'); return; }
             const date = document.getElementById('toxicityAssessmentDate').value || new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
             const assessment = {date, recordedAt:Date.now(), items};
-            if (Number.isInteger(window.editingToxicityAssessmentIndex)) window.tempToxicityAssessments[window.editingToxicityAssessmentIndex] = assessment;
-            else window.tempToxicityAssessments.push(assessment);
+            if (Number.isInteger(window.editingToxicityAssessmentIndex)) {
+                window.tempToxicityAssessments[window.editingToxicityAssessmentIndex] = assessment;
+            } else {
+                const sameDay = window.tempToxicityAssessments.find(item => item.date === date);
+                if (sameDay) {
+                    const merged = new Map((sameDay.items || []).map(item => [item.organ, item]));
+                    items.forEach(item => merged.set(item.organ, item));
+                    sameDay.items = [...merged.values()];
+                    sameDay.recordedAt = Date.now();
+                } else window.tempToxicityAssessments.push(assessment);
+            }
             window.prepareAssessmentSave();
             window.editingToxicityAssessmentIndex = null;
             document.getElementById('toxicityRecordButton').textContent = 'Ghi nhận độc tính';
@@ -3032,8 +3071,8 @@
             
             window.tempCurrentCycles = window.normalizeProtocolHistory(JSON.parse(JSON.stringify(p.cycles || [])));
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
-            window.tempResponseAssessments = JSON.parse(JSON.stringify(p.responseAssessments || []));
-            window.tempToxicityAssessments = JSON.parse(JSON.stringify(p.toxicityAssessments || []));
+            window.tempResponseAssessments = window.mergeAssessmentDays(JSON.parse(JSON.stringify(p.responseAssessments || [])), 'lesions');
+            window.tempToxicityAssessments = window.mergeAssessmentDays(JSON.parse(JSON.stringify(p.toxicityAssessments || [])), 'items');
             window.editingResponseAssessmentIndex = null;
             window.editingToxicityAssessmentIndex = null;
             document.getElementById('responseRecordButton').textContent = 'Ghi nhận đánh giá đáp ứng';
