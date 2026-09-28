@@ -281,6 +281,10 @@
         html[data-theme="dark"] #statsFilters,
         html[data-theme="dark"] #statsTabs,
         html[data-theme="dark"] #statsModalContent .stats-card { background: #2b2b2b !important; border-color: #45464a !important; }
+        html[data-theme="dark"] #responseHistorySection { background: #172033 !important; border-color: #d1d5db !important; color: #e2e8f0; }
+        html[data-theme="dark"] #responseHistorySection [aria-controls="existingResponseList"] { color: #d8b4fe !important; }
+        html[data-theme="dark"] #responseHistorySection .response-edit-link { color: #a78bfa !important; }
+        html[data-theme="dark"] #responseHistorySection .response-delete-link { color: #e2e8f0 !important; }
         @keyframes panelOpening {
             from { opacity: 0; transform: translateY(12px) scale(0.985); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -700,12 +704,13 @@
                             <div class="flex gap-2"><button type="button" onclick="window.switchExtendedTab('response')" id="extendedResponseTab" class="rounded-lg bg-teal-700 px-4 py-2 text-white font-bold text-xs">Đánh giá đáp ứng</button><button type="button" onclick="window.switchExtendedTab('toxicity')" id="extendedToxicityTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">Đánh giá độc tính</button></div>
                             <section id="extendedResponsePanel" class="space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">Nhập hai kích thước vuông góc (mm) cho từng cơ quan. Hệ thống so sánh tích hai kích thước với lần ghi nhận gần nhất của chính cơ quan đó.</p>
+                                <label class="block text-xs font-semibold text-slate-600">Thời điểm ghi nhận <input id="responseAssessmentDate" type="date" class="ml-2 rounded-lg border p-2 text-xs"></label>
                                 <div id="responseLesions" class="space-y-2"></div>
                                 <button type="button" onclick="window.addResponseLesion()" class="rounded-lg border px-3 py-2 text-xs font-semibold">+ Thêm cơ quan</button>
                                 <label class="flex items-center gap-2 text-xs"><input id="responseAllGone" type="checkbox"> Tất cả tổn thương mục tiêu đã biến mất; hạch bệnh lý có trục ngắn &lt; 10 mm</label>
                                 <label class="flex items-center gap-2 text-xs"><input id="responseNewLesion" type="checkbox"> Xuất hiện tổn thương mới hoàn toàn</label>
                                 <div class="rounded-lg bg-indigo-50 p-3 text-sm"><strong>Kết luận theo cơ quan</strong><div id="responseConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div><p id="responseComparison" class="mt-1 text-xs text-slate-600"></p></div>
-                                <button type="button" onclick="window.recordResponseAssessment()" class="rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận đánh giá đáp ứng</button>
+                                <button type="button" id="responseRecordButton" onclick="window.recordResponseAssessment()" class="rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận đánh giá đáp ứng</button>
                                 <div id="responseHistoryPreview" class="text-xs text-slate-600"></div>
                             </section>
                             <section id="extendedToxicityPanel" class="hidden space-y-2 overflow-hidden">
@@ -908,22 +913,17 @@
 
                 <!-- KHUNG BÊN PHẢI: LỊCH SỬ HÓA TRỊ VÀ LỊCH SỬ MARKER -->
                 <div id="patientHistoryPanel" class="lg:col-span-7 space-y-4 overflow-y-auto max-h-[calc(85vh-120px)] pr-2 custom-scrollbar">
-                    <div class="bg-slate-800 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between sticky top-0 z-10 shadow-md">
-                        <span class="flex items-center gap-2 uppercase tracking-wide">
-                            <i class="fa-solid fa-timeline text-teal-300"></i> LỊCH SỬ HÓA TRỊ
-                        </span>
-                        <span id="existingCyclesCount" class="text-[10px] bg-slate-700 text-slate-200 px-2 py-0.5 rounded-full">0 chu kỳ</span>
-                    </div>
+                    <button type="button" class="w-full bg-slate-800 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between sticky top-0 z-10 shadow-md" aria-expanded="true" aria-controls="existingCyclesList" onclick="window.toggleHistorySection('existingCyclesList', this)">
+                        <span class="flex items-center gap-2 uppercase tracking-wide"><i class="fa-solid fa-timeline text-teal-300"></i> LỊCH SỬ HÓA TRỊ <span id="existingCyclesCount" class="text-[10px] bg-slate-700 text-slate-200 px-2 py-0.5 rounded-full">0 chu kỳ</span></span><i class="fa-solid fa-chevron-up history-section-chevron"></i>
+                    </button>
 
                     <div id="existingCyclesList" class="space-y-2.5"></div>
 
-                    <div class="bg-indigo-900 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between mt-6 sticky top-0 z-10 shadow-md">
-                        <span class="flex items-center gap-2 uppercase tracking-wide">
-                            <i class="fa-solid fa-vial text-indigo-300"></i> LỊCH SỬ MARKER
-                        </span>
-                        <span id="existingMarkersCount" class="text-[10px] bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded-full">0 chỉ số</span>
-                    </div>
+                    <button type="button" class="w-full bg-indigo-900 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between mt-6 sticky top-0 z-10 shadow-md" aria-expanded="true" aria-controls="markerHistoryContent" onclick="window.toggleHistorySection('markerHistoryContent', this)">
+                        <span class="flex items-center gap-2 uppercase tracking-wide"><i class="fa-solid fa-vial text-indigo-300"></i> LỊCH SỬ MARKER <span id="existingMarkersCount" class="text-[10px] bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded-full">0 chỉ số</span></span><i class="fa-solid fa-chevron-up history-section-chevron"></i>
+                    </button>
 
+                    <div id="markerHistoryContent" class="space-y-3">
                     <div class="bg-white p-3 rounded-xl border border-indigo-200 space-y-3">
                         <div class="flex items-center justify-between gap-2">
                             <h4 class="flex-1 text-center font-bold text-indigo-900 text-[11px] uppercase">Biểu đồ marker theo thời gian</h4>
@@ -935,8 +935,15 @@
                         <div id="historyMarkerChartWrap" class="hidden h-56 relative"><canvas id="historyMarkerCanvas"></canvas></div>
                     </div>
                     <div id="existingMarkersList" class="space-y-2"></div>
-                    <div class="bg-violet-50 border border-violet-200 rounded-xl p-3 space-y-2"><h4 class="font-bold text-violet-900 text-[11px] uppercase">LỊCH SỬ ĐÁP ỨNG U</h4><div id="existingResponseList" class="space-y-1 text-xs"></div></div>
-                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 space-y-2"><h4 class="font-bold text-rose-900 text-[11px] uppercase">ĐỘC TÍNH HÓA TRỊ ĐÃ GHI NHẬN</h4><div id="existingToxicityList" class="space-y-1 text-xs"></div></div>
+                    </div>
+                    <section id="responseHistorySection" class="bg-[#f5f3ff] border border-violet-200 rounded-2xl p-4 space-y-3">
+                        <button type="button" class="w-full text-left flex items-center justify-between font-bold text-violet-900 text-base uppercase" aria-expanded="true" aria-controls="existingResponseList" onclick="window.toggleHistorySection('existingResponseList', this)"><span>ĐÁP ỨNG U</span><i class="fa-solid fa-chevron-up history-section-chevron"></i></button>
+                        <div id="existingResponseList" class="space-y-2 text-sm"></div>
+                    </section>
+                    <section class="bg-rose-50 border border-rose-200 rounded-xl p-3 space-y-2">
+                        <button type="button" class="w-full text-left flex items-center justify-between font-bold text-rose-900 text-[11px] uppercase" aria-expanded="true" aria-controls="existingToxicityList" onclick="window.toggleHistorySection('existingToxicityList', this)"><span>ĐỘC TÍNH HÓA TRỊ ĐÃ GHI NHẬN</span><i class="fa-solid fa-chevron-up history-section-chevron"></i></button>
+                        <div id="existingToxicityList" class="space-y-2 text-xs"></div>
+                    </section>
                 </div>
 
             </form>
@@ -1913,6 +1920,22 @@
                 }
             }
         };
+        window.toggleHistorySection = function(contentId, button) {
+            const content = document.getElementById(contentId);
+            if (!content) return;
+            const willExpand = content.classList.contains('hidden');
+            content.classList.toggle('hidden', !willExpand);
+            button.setAttribute('aria-expanded', String(willExpand));
+            const chevron = button.querySelector('.history-section-chevron');
+            if (chevron) chevron.className = `fa-solid ${willExpand ? 'fa-chevron-up' : 'fa-chevron-down'} history-section-chevron`;
+        };
+        window.prepareAssessmentSave = function() {
+            if (!document.getElementById('editDocId').value) return;
+            document.getElementById('editCycleIndex').value = '';
+            document.getElementById('btnAddCycleBtn').classList.add('hidden');
+            document.getElementById('saveBtn').classList.remove('hidden');
+            document.getElementById('saveBtnText').textContent = 'Lưu hồ sơ';
+        };
 
         window.resetFormToAddNewMode = function() {
             document.getElementById('editCycleIndex').value = "";
@@ -1990,6 +2013,9 @@
             window.tempCurrentMarkers = [];
             window.tempResponseAssessments = [];
             window.tempToxicityAssessments = [];
+            window.editingResponseAssessmentIndex = null;
+            document.getElementById('responseRecordButton').textContent = 'Ghi nhận đánh giá đáp ứng';
+            const assessmentToday = new Date(); document.getElementById('responseAssessmentDate').value = new Date(assessmentToday.getTime() - assessmentToday.getTimezoneOffset()*60000).toISOString().slice(0,10);
             document.getElementById('responseAllGone').checked = false;
             document.getElementById('responseNewLesion').checked = false;
             window.renderResponseInputs();
@@ -2674,27 +2700,34 @@
             document.getElementById('responseAllGone').onchange = window.updateResponseConclusion; document.getElementById('responseNewLesion').onchange = window.updateResponseConclusion;
             const toxicity = (window.tempToxicityAssessments || []).at(-1); document.getElementById('toxicityHistoryPreview').textContent = toxicity ? `Lần ghi nhận gần nhất: ${formatDisplayDate(toxicity.date)} (${toxicity.items.length} mục).` : 'Chưa có ghi nhận độc tính.';
             const responseList = document.getElementById('existingResponseList');
-            if (responseList) responseList.innerHTML = window.tempResponseAssessments.length ? window.tempResponseAssessments.map((item,index) => `<div class="rounded-lg border border-violet-200 bg-white p-2"><div class="flex items-center justify-between gap-2"><strong>${escapeHtml(window.assessmentDateTime(item))}</strong><span class="flex gap-1"><button type="button" onclick="window.editResponseAssessment(${index})" class="text-indigo-700 underline">Sửa</button><button type="button" onclick="window.deleteResponseAssessment(${index})" class="text-rose-700 underline">Xóa</button></span></div>${(item.lesions || []).map(x => `<div class="mt-1 flex flex-wrap items-center gap-1"><strong>${escapeHtml(x.organ)}:</strong> ${item.allGone ? 'Tổn thương mục tiêu đã biến mất' : `${Number(x.size1Mm || 0).toFixed(1)} × ${Number(x.size2Mm || 0).toFixed(1)} mm = ${Number(x.areaMm2 || 0).toFixed(1)} mm²`} <span class="rounded-full px-2 py-0.5 font-bold ${window.classForResponseConclusion(x.conclusion || 'Mốc ban đầu')}">${escapeHtml(x.conclusion || 'Mốc ban đầu')}</span></div>`).join('')}${item.newLesion ? '<p class="font-bold text-rose-700">Tổn thương mới: PD</p>' : ''}</div>`).join('') : '<p class="text-slate-400">Chưa ghi nhận.</p>';
+            if (responseList) responseList.innerHTML = window.tempResponseAssessments.length ? [...window.tempResponseAssessments].map((item,index) => ({item,index})).reverse().map(({item,index}) => `<div class="rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm"><div class="flex items-center justify-between gap-2"><strong class="text-base text-slate-800">${escapeHtml(window.assessmentDateTime(item))}</strong><span class="flex gap-2"><button type="button" onclick="window.editResponseAssessment(${index})" class="response-edit-link text-indigo-700 underline">Sửa</button><button type="button" onclick="window.deleteResponseAssessment(${index})" class="response-delete-link text-slate-600 underline">Xóa</button></span></div>${(item.lesions || []).map(x => `<div class="response-history-conclusion mt-1 font-bold ${x.conclusion?.includes('(PD)') ? 'text-amber-700' : x.conclusion?.includes('(PR)') ? 'text-emerald-700' : x.conclusion?.includes('(CR)') ? 'text-teal-700' : 'text-slate-700'}">${escapeHtml(x.organ)}: ${escapeHtml(item.allGone ? 'Đáp ứng hoàn toàn (CR)' : (x.conclusion || 'Mốc ban đầu'))}</div>`).join('')}${item.newLesion ? '<div class="response-history-conclusion mt-1 font-bold text-amber-700">Tổn thương mới: Bệnh tiến triển (PD)</div>' : ''}</div>`).join('') : '<p class="text-violet-300">Chưa ghi nhận.</p>';
             const toxicityList = document.getElementById('existingToxicityList');
             if (toxicityList) toxicityList.innerHTML = window.tempToxicityAssessments.length ? window.tempToxicityAssessments.map((item,index) => `<div class="rounded-lg border bg-white p-2"><div class="flex items-center justify-between"><strong>${escapeHtml(window.assessmentDateTime(item))}</strong><span class="flex gap-1"><button type="button" onclick="window.editToxicityAssessment(${index})" class="text-indigo-700 underline">Sửa</button><button type="button" onclick="window.deleteToxicityAssessment(${index})" class="text-rose-700 underline">Xóa</button></span></div>${item.items.map(x => `<p class="${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-700' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(x.organ)} · Độ ${x.grade}</p>`).join('')}</div>`).join('') : '<p class="text-slate-400">Chưa ghi nhận.</p>';
         };
-        window.deleteResponseAssessment = function(index) { if (!confirm('Xóa lần đánh giá đáp ứng này? Kết luận các lần sau sẽ được tính lại.')) return; window.tempResponseAssessments.splice(index,1); window.refreshExtendedAssessment(); window.updateResponseConclusion(); };
+        window.deleteResponseAssessment = function(index) { if (!confirm('Xóa lần đánh giá đáp ứng này? Kết luận các lần sau sẽ được tính lại.')) return; window.tempResponseAssessments.splice(index,1); window.prepareAssessmentSave(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); };
         window.editResponseAssessment = function(index) {
             const item = window.tempResponseAssessments[index]; if (!item) return;
-            const date = prompt('Ngày ghi nhận (YYYY-MM-DD):', item.date || ''); if (date === null) return;
-            for (const lesion of item.lesions || []) {
-                if (item.allGone) continue;
-                const dims = prompt(`Kích thước mới cho ${lesion.organ} (mm): kích thước 1 x kích thước 2`, `${lesion.size1Mm || ''} x ${lesion.size2Mm || ''}`);
-                if (dims === null) return;
-                const parsed = dims.split(/[x×]/i).map(v => Number(v.trim()));
-                if (parsed.length !== 2 || parsed.some(v => !Number.isFinite(v) || v <= 0)) { alert('Nhập hai kích thước dương, ví dụ 20 x 15.'); return; }
-                lesion.size1Mm = parsed[0]; lesion.size2Mm = parsed[1]; lesion.areaMm2 = parsed[0] * parsed[1];
-            }
-            item.date = date; item.recordedAt = Date.now(); window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || (a.recordedAt || 0) - (b.recordedAt || 0)); window.refreshExtendedAssessment(); window.updateResponseConclusion();
+            window.prepareAssessmentSave();
+            window.editingResponseAssessmentIndex = index;
+            const rows = document.getElementById('responseLesions'); rows.innerHTML = '';
+            (item.lesions || []).forEach(lesion => {
+                window.addResponseLesion(lesion.organ, true);
+                const row = rows.lastElementChild;
+                row.querySelector('.lesion-size1').value = lesion.size1Mm || '';
+                row.querySelector('.lesion-size2').value = lesion.size2Mm || '';
+            });
+            if (!item.lesions?.length) window.addResponseLesion();
+            document.getElementById('responseAssessmentDate').value = item.date || '';
+            document.getElementById('responseAllGone').checked = Boolean(item.allGone);
+            document.getElementById('responseNewLesion').checked = Boolean(item.newLesion);
+            document.getElementById('responseRecordButton').textContent = 'Lưu thay đổi cho lần ghi nhận';
+            window.updateResponseConclusion();
+            const root = document.getElementById('extendedAssessmentModal'); root.classList.remove('hidden'); root.classList.add('flex'); window.switchExtendedTab('response');
         };
-        window.deleteToxicityAssessment = function(index) { if (!confirm('Xóa lần ghi nhận độc tính này?')) return; window.tempToxicityAssessments.splice(index,1); window.refreshExtendedAssessment(); };
+        window.deleteToxicityAssessment = function(index) { if (!confirm('Xóa lần ghi nhận độc tính này?')) return; window.tempToxicityAssessments.splice(index,1); window.prepareAssessmentSave(); window.refreshExtendedAssessment(); };
         window.editToxicityAssessment = function(index) {
             const item = window.tempToxicityAssessments[index]; if (!item) return;
+            window.prepareAssessmentSave();
             const date = prompt('Ngày ghi nhận (YYYY-MM-DD):', item.date || ''); if (date === null) return;
             const updated = [];
             for (const toxicity of item.items || []) {
@@ -2715,10 +2748,17 @@
             let lesions = window.getResponseLesions();
             if (allGone) lesions = rows.map(row => row.querySelector('.lesion-organ')).filter(s=>s.value).map(s=>({organ:s.value==='khác'?(s.dataset.custom||'khác'):s.value,size1Mm:0,size2Mm:0,areaMm2:0,conclusion:'Đáp ứng hoàn toàn (CR)'}));
             if (!lesions.length && !newLesion) { alert(allGone ? 'Chưa có cơ quan đích đã ghi nhận để xác nhận biến mất.' : 'Nhập đủ hai kích thước cho ít nhất một cơ quan.'); return; }
-            const date = new Date().toISOString().slice(0,10); const assessment = {date, recordedAt:Date.now(), lesions, allGone, newLesion};
-            window.tempResponseAssessments.push(assessment); window.recalculateResponseAssessments();
+            const date = document.getElementById('responseAssessmentDate').value || new Date().toISOString().slice(0,10); const assessment = {date, recordedAt:Date.now(), lesions, allGone, newLesion};
+            if (Number.isInteger(window.editingResponseAssessmentIndex)) window.tempResponseAssessments[window.editingResponseAssessmentIndex] = assessment;
+            else window.tempResponseAssessments.push(assessment);
+            window.prepareAssessmentSave();
+            window.editingResponseAssessmentIndex = null;
+            window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || (a.recordedAt || 0) - (b.recordedAt || 0));
+            document.getElementById('responseRecordButton').textContent = 'Ghi nhận đánh giá đáp ứng';
+            window.recalculateResponseAssessments();
             document.getElementById('responseAllGone').checked = false; document.getElementById('responseNewLesion').checked = false;
-            window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã ghi nhận đánh giá đáp ứng theo từng cơ quan.');
+            const now = new Date(); document.getElementById('responseAssessmentDate').value = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+            window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã lưu đánh giá đáp ứng theo từng cơ quan.');
         };
         window.recordToxicityAssessment = function() {
             const items = [...document.querySelectorAll('[data-toxicity-index]')].filter(s=>s.value).map(s=>({organ:toxicityCriteria[Number(s.dataset.toxicityIndex)][0], grade:Number(s.value), description:toxicityCriteria[Number(s.dataset.toxicityIndex)][Number(s.value)-1]}));
@@ -2875,7 +2915,7 @@
             }
 
             const responseHistory = p.responseAssessments || [];
-            cyclesContainer.insertAdjacentHTML('beforeend', `<div class="mt-6 border-b-2 border-violet-500 pb-1 font-bold text-violet-900">LỊCH SỬ ĐÁP ỨNG U</div>${responseHistory.length ? responseHistory.map(item => `<div class="ml-3 my-2 rounded-lg border border-violet-200 bg-violet-50 p-3"><div class="font-bold text-violet-900">${escapeHtml(window.assessmentDateTime(item))}</div>${(item.lesions || []).map(x => `<div class="mt-1 flex flex-wrap items-center gap-2 text-slate-700"><strong>${escapeHtml(x.organ)}:</strong> ${item.allGone ? 'Tổn thương mục tiêu đã biến mất' : (x.size1Mm != null ? `${Number(x.size1Mm).toFixed(1)} × ${Number(x.size2Mm || 0).toFixed(1)} mm = ${Number(x.areaMm2 || 0).toFixed(1)} mm²` : `${Number(x.sizeMm || 0).toFixed(1)} mm`)} <span class="rounded-full px-2 py-0.5 font-bold ${window.classForResponseConclusion(x.conclusion || item.conclusion || 'Mốc ban đầu')}">${escapeHtml(x.conclusion || item.conclusion || 'Mốc ban đầu')}</span></div>`).join('')}${item.newLesion ? '<div class="mt-1 font-bold text-rose-700">Tổn thương mới: Bệnh tiến triển (PD)</div>' : ''}</div>`).join('') : '<p class="p-2 text-slate-400">Chưa ghi nhận đánh giá đáp ứng.</p>'}`);
+            cyclesContainer.insertAdjacentHTML('beforeend', `<div class="mt-6 rounded-2xl border border-violet-200 bg-[#f5f3ff] p-4"><div class="mb-3 border-b-2 border-violet-500 pb-1 font-bold text-violet-900">ĐÁP ỨNG U</div>${responseHistory.length ? [...responseHistory].reverse().map(item => `<div class="my-2 rounded-xl border border-slate-300 bg-white px-4 py-3"><div class="font-bold text-slate-800">${escapeHtml(window.assessmentDateTime(item))}</div>${(item.lesions || []).map(x => `<div class="mt-1 font-bold ${x.conclusion?.includes('(PD)') ? 'text-amber-700' : x.conclusion?.includes('(PR)') ? 'text-emerald-700' : x.conclusion?.includes('(CR)') ? 'text-teal-700' : 'text-slate-700'}">${escapeHtml(x.organ)}: ${escapeHtml(item.allGone ? 'Đáp ứng hoàn toàn (CR)' : (x.conclusion || item.conclusion || 'Mốc ban đầu'))}</div>`).join('')}${item.newLesion ? '<div class="mt-1 font-bold text-amber-700">Tổn thương mới: Bệnh tiến triển (PD)</div>' : ''}</div>`).join('') : '<p class="text-violet-300">Chưa ghi nhận.</p>'}</div>`);
             const toxicityHistory = p.toxicityAssessments || [];
             cyclesContainer.insertAdjacentHTML('beforeend', `<div class="mt-6 border-b-2 border-rose-500 pb-1 font-bold text-rose-900">ĐỘC TÍNH HÓA TRỊ</div>${toxicityHistory.length ? toxicityHistory.map(item => `<div class="ml-3 my-2 rounded-lg border p-3 ${item.items?.some(x => x.grade >= 4) ? 'border-rose-300 bg-rose-50 text-rose-800' : item.items?.some(x => x.grade === 3) ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-slate-200 bg-slate-50'}"><div class="font-bold">${item.items?.some(x => x.grade >= 4) ? '❗ ' : item.items?.some(x => x.grade === 3) ? '⚠ ' : ''}${escapeHtml(formatDisplayDate(item.date))}</div>${(item.items || []).map(x => `<div class="mt-1 ${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-800' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(x.organ)} — Độ ${x.grade}: ${escapeHtml(x.description)}${x.grade === 3 ? ' (Tạm hoãn chu kỳ, cân nhắc giảm liều)' : ''}${x.grade >= 4 ? ' (Ngừng thuốc/đổi phác đồ; cảnh báo)' : ''}</div>`).join('')}</div>`).join('') : '<p class="p-2 text-slate-400">Chưa ghi nhận độc tính.</p>'}`);
             const responseList = document.getElementById('existingResponseList');
@@ -2976,6 +3016,9 @@
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
             window.tempResponseAssessments = JSON.parse(JSON.stringify(p.responseAssessments || []));
             window.tempToxicityAssessments = JSON.parse(JSON.stringify(p.toxicityAssessments || []));
+            window.editingResponseAssessmentIndex = null;
+            document.getElementById('responseRecordButton').textContent = 'Ghi nhận đánh giá đáp ứng';
+            const assessmentToday = new Date(); document.getElementById('responseAssessmentDate').value = new Date(assessmentToday.getTime() - assessmentToday.getTimezoneOffset()*60000).toISOString().slice(0,10);
             document.getElementById('responseAllGone').checked = false;
             document.getElementById('responseNewLesion').checked = false;
             window.renderResponseInputs();
