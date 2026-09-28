@@ -507,7 +507,7 @@
                         <tr>
                             <td colspan="8" class="p-8 text-center text-slate-400 font-medium">
                                 <i class="fa-solid fa-user-shield text-3xl mb-2 text-slate-300 block"></i>
-                                Nhập Mã số bệnh nhân vào ô phía trên để hiển thị hồ sơ.
+                                Nhập mã hoặc tên bệnh nhân vào ô phía trên để hiển thị hồ sơ.
                             </td>
                         </tr>
                     </tbody>
@@ -710,6 +710,7 @@
                             </section>
                             <section id="extendedToxicityPanel" class="hidden space-y-3">
                                 <p class="text-xs text-slate-600">Chọn tối đa một độ cho mỗi cơ quan. Để trống nếu không ghi nhận.</p>
+                                <div class="rounded-lg bg-slate-50 p-3 text-xs text-slate-700"><strong>Nguyên tắc xử lý:</strong> Độ 1–2 thường tiếp tục phác đồ và điều trị hỗ trợ triệu chứng. Độ 3 thường tạm hoãn hóa trị đến khi hồi phục độ 0–1, cân nhắc giảm liều chu kỳ sau. Độ 4 cần ngừng thuốc gây độc hoặc đổi phác đồ và hồi sức cấp cứu chuyên sâu.</div>
                                 <div id="toxicityInputs" class="space-y-2"></div>
                                 <button type="button" onclick="window.recordToxicityAssessment()" class="rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận độc tính</button>
                                 <div id="toxicityAlert" class="hidden rounded-lg p-3 text-sm font-bold"></div><div id="toxicityHistoryPreview" class="text-xs text-slate-600"></div>
@@ -2548,15 +2549,15 @@
         }
 
         const toxicityCriteria = [
-            ['Hạ bạch cầu đa nhân trung tính (ANC)', ['1.5 đến <2.0 x10⁹/L', '1.0 đến <1.5 x10⁹/L', '0.5 đến <1.0 x10⁹/L', '<0.5 x10⁹/L', 'Tử vong do độc tính']],
-            ['Thiếu máu (Hemoglobin)', ['10.0 g/dL đến LLN', '8.0 đến <10.0 g/dL', '<8.0 g/dL (cần truyền máu)', 'Đe dọa tính mạng, cần can thiệp cấp cứu', 'Tử vong']],
-            ['Hạ tiểu cầu', ['75,000 đến dưới LLN', '50,000 đến <75,000', '25,000 đến <50,000', '<25,000 (xuất huyết nặng)', 'Tử vong']],
-            ['Buồn nôn', ['Mất ăn, không sụt cân; buồn nôn nhẹ', 'Giảm ăn; cần thuốc chống nôn', 'Nôn nhiều, giảm ăn rõ; cần truyền dịch', 'Đe dọa tính mạng, sốc mất nước/rối loạn điện giải', 'Tử vong']],
-            ['Tiêu chảy', ['Tăng 1–2 lần/ngày', 'Tăng 3–4 lần/ngày', 'Tăng ≥7 lần/ngày/không tự chủ; cần nhập viện', 'Đe dọa tính mạng, rối loạn huyết động/sốc', 'Tử vong']],
-            ['Viêm niêm mạc miệng', ['Loét nhẹ, ban đỏ, không đau', 'Loét vừa, đau nhưng ăn thức ăn mềm được', 'Loét nặng; chỉ ăn lỏng/nuốt khó', 'Không thể ăn uống; cần nuôi dưỡng tĩnh mạch', 'Tử vong']],
-            ['Độc tính trên gan (AST / ALT)', ['>ULN đến 2.5 x ULN', '>2.5 đến 5 x ULN', '>5 đến 20 x ULN', '>20 x ULN hoặc suy gan cấp', 'Tử vong']],
-            ['Độc tính trên thận (Creatinin máu)', ['>ULN đến 1.5 x ULN', '>1.5 đến 3 x ULN', '>3 đến 6 x ULN', '>6 x ULN; cần lọc máu cấp', 'Tử vong']],
-            ['Độc tính thần kinh ngoại biên', ['Dị cảm nhẹ/mất phản xạ nhẹ', 'Giảm cảm giác ảnh hưởng sinh hoạt; yếu nhẹ', 'Giảm cảm giác nặng/yếu ảnh hưởng rõ sinh hoạt', 'Liệt, đe dọa tính mạng hoặc tàn tật vĩnh viễn', 'Tử vong']]
+            ['Hạ bạch cầu đa nhân trung tính (ANC)', ['1.5 đến dưới 2.0 x 10⁹/L (1500 - < 2000/uL)', '1.0 đến dưới 1.5 x 10⁹/L (1000 - < 1500/uL)', '0.5 đến dưới 1.0 x 10⁹/L (500 - < 1000/uL)', 'Dưới 0.5 x 10⁹/L (< 500/uL)', 'Tử vong do độc tính'], 'I. HỆ TẠO HUYẾT & HUYẾT HỌC'],
+            ['Thiếu máu (Hemoglobin)', ['10.0 g/dL đến giới hạn dưới bình thường (LLN)', '8.0 đến dưới 10.0 g/dL', 'Dưới 8.0 g/dL (cần truyền máu)', 'Đe dọa tính mạng (cần can thiệp cấp cứu)', 'Tử vong'], 'I. HỆ TẠO HUYẾT & HUYẾT HỌC'],
+            ['Hạ tiểu cầu', ['75,000 đến dưới LLN x 10⁶/L', '50,000 đến dưới 75,000 x 10⁶/L', '25,000 đến dưới 50,000 x 10⁶/L', 'Dưới 25,000 x 10⁶/L (xuất huyết nặng)', 'Tử vong'], 'I. HỆ TẠO HUYẾT & HUYẾT HỌC'],
+            ['Buồn nôn', ['Mất ăn nhưng không kèm sụt cân; buồn nôn nhẹ vài lần/ngày', 'Giảm ăn uống nhưng không sụt cân đáng kể; cần thuốc chống nôn', 'Nôn nhiều, giảm ăn uống rõ rệt, cần truyền dịch nuôi dưỡng', 'Đe dọa tính mạng, sốc do mất nước/rối loạn điện giải', 'Tử vong'], 'II. HỆ TIÊU HÓA'],
+            ['Tiêu chảy', ['Tăng 1–2 lần đi ngoài/ngày so với bình thường', 'Tăng 3–4 lần đi ngoài/ngày so với bình thường', 'Tăng từ 7 lần trở lên/ngày; tiểu tiện không tự chủ; cần nhập viện', 'Đe dọa tính mạng (rối loạn huyết động, sốc)', 'Tử vong'], 'II. HỆ TIÊU HÓA'],
+            ['Viêm niêm mạc miệng', ['Loét nhẹ, ban đỏ, không đau', 'Loét vừa, đau nhưng vẫn ăn được thức ăn mềm', 'Loét nặng, đau nhiều, chỉ ăn được thức ăn lỏng/nuốt khó', 'Không thể ăn uống đường miệng (cần nuôi dưỡng tĩnh mạch)', 'Tử vong'], 'II. HỆ TIÊU HÓA'],
+            ['Độc tính trên gan (AST / ALT)', ['Tăng nhẹ trên giới hạn trên bình thường (ULN) đến 2.5 x ULN', 'Tăng trên 2.5 đến 5.0 x ULN', 'Tăng trên 5.0 đến 20.0 x ULN', 'Tăng trên 20.0 x ULN (hoặc suy gan cấp)', 'Tử vong'], 'III. CHỨC NĂNG GAN - THẬN (CHUYỂN HÓA)'],
+            ['Độc tính trên thận (Creatinin máu)', ['Tăng nhẹ trên ULN đến 1.5 x ULN', 'Tăng trên 1.5 đến 3.0 x ULN', 'Tăng trên 3.0 đến 6.0 x ULN', 'Tăng trên 6.0 x ULN (cần lọc máu/chạy thận cấp)', 'Tử vong'], 'III. CHỨC NĂNG GAN - THẬN (CHUYỂN HÓA)'],
+            ['Độc tính thần kinh ngoại biên', ['Dị cảm nhẹ và/hoặc mất phản xạ gân xương nhẹ', 'Giảm cảm giác nhẹ ảnh hưởng đến sinh hoạt; yếu cơ nhẹ', 'Giảm cảm giác nặng hoặc yếu cơ ảnh hưởng rõ rệt đến sinh hoạt hàng ngày', 'Liệt vận động, đe dọa tính mạng hoặc tàn tật vĩnh viễn', 'Tử vong'], 'IV. HỆ THẦN KINH']
         ];
         const toxicityGuidance = ['Tiếp tục phác đồ, hỗ trợ triệu chứng.', 'Tiếp tục phác đồ, hỗ trợ triệu chứng.', 'Tạm hoãn đến khi hồi phục độ 0–1; cân nhắc giảm liều.', 'Ngừng thuốc gây độc hoặc đổi phác đồ; cấp cứu chuyên sâu.', ''];
         window.openExtendedAssessment = function() {
@@ -2578,7 +2579,7 @@
         window.addResponseLesion = function(organ = '', size = '') {
             const row = document.createElement('div'); row.className = 'response-lesion grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2';
             const opts = ['gan','phổi','xương','thận','tuyến thượng thận','não','phúc mạc','hạch','khác'];
-            row.innerHTML = `<select class="lesion-organ rounded-lg border p-2 text-xs"><option value="">Chọn cơ quan</option>${opts.map(o => `<option>${o}</option>`).join('')}</select><input class="lesion-size rounded-lg border p-2 text-xs" type="number" min="0" step="0.1" placeholder="Kích thước (mm)"><button type="button" class="rounded-lg px-2 text-rose-600" aria-label="Xóa tổn thương">Xóa</button>`;
+            row.innerHTML = `<select class="lesion-organ rounded-lg border p-2 text-xs"><option value="">Chọn cơ quan</option>${opts.map(o => `<option>${o}</option>`).join('')}</select><div class="space-y-1"><input class="lesion-size w-full rounded-lg border p-2 text-xs" type="number" min="0" step="0.1" placeholder="Kích thước (mm)"><p class="text-[10px] text-rose-600">Đơn vị mm — Theo kết quả CT-Scan</p></div><button type="button" class="rounded-lg px-2 text-rose-600" aria-label="Xóa tổn thương">Xóa</button>`;
             const select = row.querySelector('select'); select.value = opts.includes(organ) ? organ : (organ ? 'khác' : '');
             if (organ && !opts.includes(organ)) select.dataset.custom = organ;
             row.querySelector('input').value = size; select.addEventListener('change', () => { if (select.value === 'khác') { const custom = prompt('Nhập tên cơ quan khác:'); if (custom?.trim()) select.dataset.custom = custom.trim(); } });
@@ -2596,7 +2597,12 @@
             document.getElementById('responseConclusion').textContent = conclusion; document.getElementById('responseComparison').textContent = comparison;
         };
         window.renderToxicityInputs = function() {
-            document.getElementById('toxicityInputs').innerHTML = toxicityCriteria.map(([name, grades], i) => `<label class="grid grid-cols-1 sm:grid-cols-[1fr_2fr] items-center gap-2 rounded-lg border p-2 text-xs"><span class="font-semibold">${i+1}. ${name}</span><select data-toxicity-index="${i}" class="rounded border p-2"><option value="">Không ghi nhận</option>${grades.map((g,j)=>`<option value="${j+1}">Độ ${j+1}: ${g}</option>`).join('')}</select></label>`).join('');
+            let previousGroup = '';
+            document.getElementById('toxicityInputs').innerHTML = toxicityCriteria.map(([name, grades, group], i) => {
+                const heading = group !== previousGroup ? `<h4 class="pt-3 font-bold text-teal-900">${group}</h4>` : '';
+                previousGroup = group;
+                return `${heading}<label class="grid grid-cols-1 sm:grid-cols-[1fr_2fr] items-center gap-2 rounded-lg border p-2 text-xs"><span class="font-semibold">${i+1}. ${name}</span><select data-toxicity-index="${i}" class="rounded border p-2"><option value="">Không ghi nhận</option>${grades.map((g,j)=>`<option value="${j+1}">Độ ${j+1}: ${g}</option>`).join('')}</select></label>`;
+            }).join('');
             document.getElementById('toxicityInputs').addEventListener('change', window.updateToxicityAlert);
         };
         window.updateToxicityAlert = function() {
@@ -2650,7 +2656,7 @@
                 return;
             }
 
-            countBadge.innerText = `Tìm thấy 1 hồ sơ`;
+            countBadge.innerText = `Tìm thấy ${matched.length} hồ sơ`;
             tbody.innerHTML = "";
 
             matched.forEach(p => {
