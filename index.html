@@ -92,20 +92,28 @@
         }
         #patientSearchForm input { background: transparent !important; }
         .search-action {
-            width: 3rem;
-            height: 3rem;
-            flex: 0 0 3rem;
-            border: 0;
-            border-radius: 9999px;
-            background: transparent;
+            width: 2.75rem;
+            height: 2.75rem;
+            flex: 0 0 2.75rem;
+            border: none !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
             color: #cbd5e1;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: color 160ms ease, background-color 160ms ease;
+            transition: color 160ms ease, transform 160ms ease;
+            cursor: pointer;
         }
-        .search-action:hover { color: #fff; background: rgba(148, 163, 184, 0.12); }
-        .search-action i { font-size: 1.25rem; }
+        .search-action:hover {
+            color: #ffffff;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: scale(1.15);
+        }
+        .search-action i { font-size: 1.35rem; }
         html[data-theme="light"] #patientSearchForm {
             background: #fff;
             border-color: rgba(203, 213, 225, 0.7);
@@ -115,28 +123,54 @@
         html[data-theme="light"] #patientSearchForm input::placeholder { color: #666a73 !important; }
         html[data-theme="light"] .search-action {
             color: #111827 !important;
-            background: #ffffff !important;
-            border: 1px solid #d1d5db !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
         html[data-theme="light"] .search-action:hover {
             color: #000000 !important;
-            background: #f1f5f9 !important;
-            border-color: #94a3b8 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: scale(1.15);
+        }
+        #accountSettingsToggle,
+        #btnUserMgmt {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            color: #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 160ms ease, transform 160ms ease;
+            cursor: pointer;
+        }
+        #accountSettingsToggle:hover,
+        #btnUserMgmt:hover {
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            color: #ffffff;
+            transform: scale(1.15);
         }
         html[data-theme="light"] #accountSettingsToggle,
         html[data-theme="light"] #btnUserMgmt {
-            background-color: #ffffff !important;
+            background: transparent !important;
             color: #111827 !important;
-            border: 1.5px solid #cbd5e1 !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+            border: none !important;
+            box-shadow: none !important;
         }
         html[data-theme="light"] #accountSettingsToggle:hover,
         html[data-theme="light"] #btnUserMgmt:hover {
-            background-color: #f1f5f9 !important;
+            background: transparent !important;
             color: #000000 !important;
-            border-color: #64748b !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: scale(1.15);
         }
         html[data-theme="light"] #googleSignInBtn {
             background-color: #ffffff !important;
@@ -228,7 +262,7 @@
         #btnUserMgmt { background: transparent !important; box-shadow: none !important; }
         #accountSettingsToggle:hover,
         #btnUserMgmt:hover { background: transparent !important; }
-        .profile-action-icon { width: 1.4rem; height: 1.4rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .profile-action-icon { width: 1.65rem; height: 1.65rem; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
         .brand-leaf {
             color: transparent;
             background: linear-gradient(145deg, #a142f4 0%, #ea4335 15%, #fbbc04 28%, #34a853 38%, #16a34a 100%);
@@ -572,10 +606,10 @@
                 <i class="fa-solid fa-crown" aria-hidden="true"></i>
             </span>
         </div>
-        <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="w-9 h-9 rounded-full text-[#c4c7c5] hover:text-white border-0 flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
+        <button id="accountSettingsToggle" type="button" onclick="window.toggleAccountSettingsMenu()" aria-expanded="false" aria-controls="accountSettingsMenu" title="Cài đặt tài khoản" aria-label="Cài đặt tài khoản" class="p-1 border-0 flex items-center justify-center transition focus-visible:outline-none">
             <svg class="profile-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2h4l.5 2.2 1.5.6 1.9-1.2 2.8 2.8-1.2 1.9.6 1.5L22 10v4l-2.2.5-.6 1.5 1.2 1.9-2.8 2.8-1.9-1.2-1.5.6L14 22h-4l-.5-2.2-1.5-.6-1.9 1.2-2.8-2.8 1.2-1.9-.6-1.5L2 14v-4l2.2-.5.6-1.5-1.2-1.9 2.8-2.8 1.9 1.2 1.5-.6z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
-        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.toggleUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden w-9 h-9 rounded-full border-0 text-[#c4c7c5] hover:text-white flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
+        <button id="btnUserMgmt" type="button" onclick="window.closeAccountSettingsMenu(); window.toggleUserManagementModal()" title="Quản lý thành viên" aria-label="Quản lý thành viên" class="hidden p-1 border-0 flex items-center justify-center transition focus-visible:outline-none">
             <svg class="profile-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 8v6m-3-3h6"/></svg>
         </button>
         <section id="accountSettingsMenu" class="hidden absolute left-0 bottom-[calc(100%+0.75rem)] w-80 max-w-[calc(100vw-2.5rem)] max-h-[78vh] overflow-y-auto custom-scrollbar bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 space-y-3 text-xs">
