@@ -669,11 +669,32 @@
 
                     <!-- ICD CHÍNH & CHẨN ĐOÁN CHÍNH -->
                     <div class="bg-teal-900/5 p-3.5 rounded-xl border border-teal-800/20 space-y-2.5 shadow-sm relative">
-                        <h4 class="font-bold text-teal-900 uppercase text-[11px] tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-file-medical text-teal-700"></i> ICD CHÍNH & CHẨN ĐOÁN CHÍNH
-                        </h4>
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-teal-900 uppercase text-[11px] tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-medical text-teal-700"></i> ICD CHÍNH & CHẨN ĐOÁN CHÍNH
+                            </h4>
+                            <div id="diagnosisActionBtns" class="flex items-center gap-1.5">
+                                <button type="button" id="btnEditDiagnosis" onclick="window.toggleDiagnosisEdit(true)"
+                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-400 bg-amber-50 text-amber-800 font-bold text-[10px] hover:bg-amber-100 transition"
+                                    title="Sửa chẩn đoán ICD">
+                                    <i class="fa-solid fa-pen-to-square text-[9px]"></i> Sửa
+                                </button>
+                                <button type="button" id="btnSaveDiagnosis" onclick="window.saveDiagnosisOnly()"
+                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-600 bg-teal-600 text-white font-bold text-[10px] hover:bg-teal-700 transition hidden"
+                                    title="Lưu chẩn đoán ICD">
+                                    <i class="fa-solid fa-floppy-disk text-[9px]"></i> Lưu
+                                </button>
+                                <button type="button" id="btnCancelDiagnosis" onclick="window.toggleDiagnosisEdit(false)"
+                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-slate-600 font-bold text-[10px] hover:bg-slate-50 transition hidden"
+                                    title="Hủy sửa chẩn đoán">
+                                    <i class="fa-solid fa-xmark text-[9px]"></i> Hủy
+                                </button>
+                            </div>
+                        </div>
                         <div class="relative">
-                            <input type="text" id="npDiagnosis" autocomplete="off" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium">
+                            <input type="text" id="npDiagnosis" autocomplete="off"
+                                class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium transition"
+                                placeholder="Nhập hoặc chọn mã ICD...">
                             <div id="icdDropdownMain" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
                         </div>
                         <div class="grid grid-cols-4 gap-2" aria-label="Phân loại TNM">
@@ -1598,12 +1619,24 @@
             }
             return '';
         }
+        window._lastTNMGroupKey = null;
         window.updateTNMStage = function({ syncDiagnosis = true } = {}) {
             const groupKey = getTNMGroup();
             const selects = ['npTNMT','npTNMN','npTNMM'].map(id => document.getElementById(id));
             const stage = document.getElementById('npTNMStage');
             const hint = document.getElementById('tnmGroupHint');
             const group = groupKey ? tnmGroups[groupKey] : null;
+
+            // Nếu nhóm ICD thay đổi (người dùng chọn ICD mới khác nhóm bệnh),
+            // reset T/N/M về rỗng để không giữ lại TNM cũ không phù hợp
+            const groupChanged = groupKey !== window._lastTNMGroupKey && window._lastTNMGroupKey !== null;
+            if (groupChanged) {
+                selects.forEach(select => { select.value = ''; });
+                const prefixSel = document.getElementById('npTNMPrefix');
+                if (prefixSel) prefixSel.value = 'c';
+            }
+            window._lastTNMGroupKey = groupKey;
+
             selects.forEach(select => { select.disabled = !group; });
             const prefixSelect = document.getElementById('npTNMPrefix');
             if (prefixSelect) prefixSelect.disabled = !group;
@@ -1652,7 +1685,13 @@
             const diagInput = document.getElementById('npDiagnosis');
             if (diagInput) {
                 diagInput.addEventListener('input', () => window.updateTNMStage({ syncDiagnosis: false }));
-                diagInput.addEventListener('blur', () => window.updateTNMStage({ syncDiagnosis: true }));
+                // Khi blur: chỉ sync TNM vào chẩn đoán nếu nhóm ICD không thay đổi
+                // (tránh ghi đè text khi user đang gõ ICD mới)
+                diagInput.addEventListener('blur', () => {
+                    const groupKey = getTNMGroup();
+                    const sameGroup = (groupKey === window._lastTNMGroupKey);
+                    window.updateTNMStage({ syncDiagnosis: sameGroup });
+                });
             }
             window.updateTNMStage({ syncDiagnosis: false });
             setupIcdAutocomplete('npSubDiagnosisInput', 'icdDropdownSub');
@@ -1690,7 +1729,15 @@
                         div.addEventListener('click', () => {
                             input.value = `${m.code}: ${m.desc}`;
                             dropdown.classList.add('hidden');
-                            if (inputId === 'npDiagnosis') window.updateTNMStage();
+                            if (inputId === 'npDiagnosis') {
+                                // Reset TNM fields về rỗng khi chọn ICD mới
+                                // để tránh giữ lại TNM cũ không phù hợp với chẩn đoán mới
+                                ['npTNMT','npTNMN','npTNMM'].forEach(id => {
+                                    const el = document.getElementById(id);
+                                    if (el) el.value = '';
+                                });
+                                window.updateTNMStage();
+                            }
                             if (inputId === 'npSubDiagnosisInput') window.addSubDiagnosisItem();
                         });
                         dropdown.appendChild(div);
@@ -2057,7 +2104,17 @@
             document.getElementById('npDiagnosis').value = "";
             document.getElementById('npTNMPrefix').value = 'c';
             ['npTNMT','npTNMN','npTNMM'].forEach(id => { document.getElementById(id).value = ''; });
+            window._lastTNMGroupKey = null; // Reset tracking nhóm ICD cho form mới
             window.updateTNMStage();
+            // Form thêm mới: unlock ô chẩn đoán, ẩn nút Sửa/Lưu/Hủy
+            const diagInputNew = document.getElementById('npDiagnosis');
+            if (diagInputNew) {
+                diagInputNew.removeAttribute('readonly');
+                diagInputNew.classList.remove('bg-slate-50','text-slate-500','cursor-default','border-amber-400');
+            }
+            ['btnEditDiagnosis','btnSaveDiagnosis','btnCancelDiagnosis'].forEach(id => {
+                document.getElementById(id)?.classList.add('hidden');
+            });
             
             window.tempSubDiagnoses = [];
             window.renderSubDiagnosisTable();
@@ -3486,11 +3543,17 @@
                     };
                 }
             }
+            // Reset tracking nhóm ICD về null để updateTNMStage lần đầu
+            // không coi đây là "thay đổi nhóm" (không reset T/N/M)
+            window._lastTNMGroupKey = null;
+            // Gọi updateTNMStage để xác định nhóm ICD và bật/tắt selects
             window.updateTNMStage({ syncDiagnosis: false });
+            // Bây giờ _lastTNMGroupKey đã được set → set lại để lần set TNM không trigger reset
             document.getElementById('npTNMPrefix').value = savedTNM.prefix || 'c';
             document.getElementById('npTNMT').value = savedTNM.T || '';
             document.getElementById('npTNMN').value = savedTNM.N || '';
             document.getElementById('npTNMM').value = savedTNM.M || '';
+            // Gọi lần 2 để tính stage từ TNM đã set, không sync lại diagnosis
             window.updateTNMStage({ syncDiagnosis: false });
 
             if (p.subDiagnosesList && Array.isArray(p.subDiagnosesList)) {
@@ -3544,6 +3607,19 @@
             window.onProtocolSelectChanged();
             window.renderTempCyclesList();
             window.renderTempMarkersList();
+
+            // Lock ô chẩn đoán khi mở edit: readonly + xám + hiện nút Sửa
+            (function() {
+                const inp = document.getElementById('npDiagnosis');
+                if (inp) {
+                    inp.setAttribute('readonly', true);
+                    inp.classList.add('bg-slate-50', 'text-slate-700', 'cursor-default');
+                    inp.classList.remove('border-amber-400', 'focus:ring-amber-400', 'bg-white');
+                }
+                document.getElementById('btnEditDiagnosis')?.classList.remove('hidden');
+                document.getElementById('btnSaveDiagnosis')?.classList.add('hidden');
+                document.getElementById('btnCancelDiagnosis')?.classList.add('hidden');
+            })();
 
             window.setPanelVisibility(document.getElementById('patientFormModal'), true);
             window.renderTempMarkersList();
@@ -4109,6 +4185,150 @@
                 window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
             } catch (err) {
                 console.error("Lỗi đồng bộ tự động:", err);
+            }
+        };
+
+        // ============================================================
+        // CHỨC NĂNG SỬA CHẨN ĐOÁN ICD RIÊNG LẺ
+        // ============================================================
+
+        // Lưu giá trị chẩn đoán gốc để hoàn tác khi hủy
+        window._diagnosisBackup = { diagnosis: '', prefix: 'c', T: '', N: '', M: '' };
+
+        /**
+         * Bật/tắt chế độ chỉnh sửa chẩn đoán ICD.
+         * @param {boolean} editing - true: mở chế độ sửa, false: hủy sửa (khôi phục)
+         */
+        window.toggleDiagnosisEdit = function(editing) {
+            const input = document.getElementById('npDiagnosis');
+            const btnEdit = document.getElementById('btnEditDiagnosis');
+            const btnSave = document.getElementById('btnSaveDiagnosis');
+            const btnCancel = document.getElementById('btnCancelDiagnosis');
+
+            if (editing) {
+                // Sao lưu giá trị hiện tại để có thể hủy
+                window._diagnosisBackup = {
+                    diagnosis: input.value,
+                    prefix: document.getElementById('npTNMPrefix')?.value || 'c',
+                    T: document.getElementById('npTNMT')?.value || '',
+                    N: document.getElementById('npTNMN')?.value || '',
+                    M: document.getElementById('npTNMM')?.value || ''
+                };
+                // Unlock input — xóa readonly, đổi viền thành màu cam
+                input.removeAttribute('readonly');
+                input.classList.remove('bg-slate-50', 'text-slate-500', 'text-slate-700', 'cursor-default');
+                input.classList.add('bg-white', 'border-amber-400');
+                input.focus();
+                input.select();
+                // Hiện nút Lưu + Hủy, ẩn nút Sửa
+                btnEdit?.classList.add('hidden');
+                btnSave?.classList.remove('hidden');
+                btnCancel?.classList.remove('hidden');
+                // Cập nhật TNM selects theo ICD hiện tại
+                window.updateTNMStage({ syncDiagnosis: false });
+            } else {
+                // Hủy: khôi phục giá trị cũ
+                input.value = window._diagnosisBackup.diagnosis;
+                const prefix = document.getElementById('npTNMPrefix');
+                if (prefix) prefix.value = window._diagnosisBackup.prefix;
+                const tSel = document.getElementById('npTNMT');
+                if (tSel) tSel.value = window._diagnosisBackup.T;
+                const nSel = document.getElementById('npTNMN');
+                if (nSel) nSel.value = window._diagnosisBackup.N;
+                const mSel = document.getElementById('npTNMM');
+                if (mSel) mSel.value = window._diagnosisBackup.M;
+                window._lastTNMGroupKey = null;
+                window.updateTNMStage({ syncDiagnosis: false });
+                // Lock lại: readonly + xám + hiện Sửa, ẩn Lưu/Hủy
+                input.setAttribute('readonly', true);
+                input.classList.add('bg-slate-50', 'text-slate-700', 'cursor-default');
+                input.classList.remove('border-amber-400', 'bg-white');
+                btnEdit?.classList.remove('hidden');
+                btnSave?.classList.add('hidden');
+                btnCancel?.classList.add('hidden');
+                // Đóng dropdown nếu đang mở
+                document.getElementById('icdDropdownMain')?.classList.add('hidden');
+            }
+        };
+
+        /**
+         * Lock input chẩn đoán về chế độ readonly
+         */
+        window._lockDiagnosisInput = function() {
+            const input = document.getElementById('npDiagnosis');
+            const btnEdit = document.getElementById('btnEditDiagnosis');
+            const btnSave = document.getElementById('btnSaveDiagnosis');
+            const btnCancel = document.getElementById('btnCancelDiagnosis');
+            if (!input) return;
+            input.setAttribute('readonly', true);
+            input.classList.add('bg-slate-50', 'text-slate-700', 'cursor-default');
+            input.classList.remove('border-amber-400', 'focus:ring-amber-400');
+            // Hiện nút Sửa, ẩn nút Lưu + Hủy
+            if (btnEdit) btnEdit.classList.remove('hidden');
+            if (btnSave) btnSave.classList.add('hidden');
+            if (btnCancel) btnCancel.classList.add('hidden');
+        };
+
+        /**
+         * Lưu riêng chẩn đoán ICD + TNM lên Firestore ngay lập tức
+         */
+        window.saveDiagnosisOnly = async function() {
+            if (!window.canUseOncoCare) return;
+            const docId = document.getElementById('editDocId')?.value;
+            if (!docId) {
+                // Form thêm mới: lock lại, lưu cùng lúc submit form
+                window.updateTNMStage({ syncDiagnosis: true });
+                const inp0 = document.getElementById('npDiagnosis');
+                if (inp0) { inp0.setAttribute('readonly', true); inp0.classList.add('bg-slate-50','text-slate-700','cursor-default'); inp0.classList.remove('border-amber-400','bg-white'); }
+                document.getElementById('btnEditDiagnosis')?.classList.remove('hidden');
+                document.getElementById('btnSaveDiagnosis')?.classList.add('hidden');
+                document.getElementById('btnCancelDiagnosis')?.classList.add('hidden');
+                return;
+            }
+            const btnSave = document.getElementById('btnSaveDiagnosis');
+            if (btnSave) { btnSave.disabled = true; btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[9px]"></i> Đang lưu...'; }
+
+            try {
+                // Sync TNM vào text chẩn đoán trước khi lưu
+                window.updateTNMStage({ syncDiagnosis: true });
+
+                const diagnosisVal = document.getElementById('npDiagnosis').value.trim();
+                const tnmPrefix = document.getElementById('npTNMPrefix')?.value || 'c';
+                const tnmT = document.getElementById('npTNMT')?.value || '';
+                const tnmN = document.getElementById('npTNMN')?.value || '';
+                const tnmM = document.getElementById('npTNMM')?.value || '';
+                const tnmStage = document.getElementById('npTNMStage')?.textContent?.trim() || '';
+
+                const update = {
+                    diagnosis: diagnosisVal,
+                    tnm: (tnmT && tnmN && tnmM)
+                        ? { prefix: tnmPrefix, T: tnmT, N: tnmN, M: tnmM, stage: tnmStage === 'Không phân loại' ? '' : tnmStage }
+                        : null,
+                    updatedAt: serverTimestamp(),
+                    updatedByEmail: currentUser ? currentUser.email : ''
+                };
+
+                await updateDoc(doc(db, 'patients', docId), update);
+
+                // Cập nhật cache
+                const cacheIndex = cachedPatientsList.findIndex(p => p.id === docId);
+                if (cacheIndex >= 0) {
+                    cachedPatientsList[cacheIndex] = { ...cachedPatientsList[cacheIndex], ...update };
+                }
+
+                window.showToast('✅ Đã cập nhật chẩn đoán thành công!');
+                // Lock lại sau khi lưu
+                const inp = document.getElementById('npDiagnosis');
+                if (inp) { inp.setAttribute('readonly', true); inp.classList.add('bg-slate-50','text-slate-700','cursor-default'); inp.classList.remove('border-amber-400','bg-white'); }
+                document.getElementById('btnEditDiagnosis')?.classList.remove('hidden');
+                document.getElementById('btnSaveDiagnosis')?.classList.add('hidden');
+                document.getElementById('btnCancelDiagnosis')?.classList.add('hidden');
+                document.getElementById('icdDropdownMain')?.classList.add('hidden');
+            } catch (err) {
+                console.error('Lỗi lưu chẩn đoán:', err);
+                window.showToast('❌ Lỗi khi lưu chẩn đoán: ' + err.message);
+            } finally {
+                if (btnSave) { btnSave.disabled = false; btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk text-[9px]"></i> Lưu'; }
             }
         };
 
