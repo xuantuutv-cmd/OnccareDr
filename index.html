@@ -1428,6 +1428,10 @@
             { code: "C18.9", desc: "U ác tính đại tràng, không có hiệu" },
             { code: "C19", desc: "U ác tính đoạn nối trực - đại tràng" },
             { code: "C20", desc: "U ác tính trực tràng" },
+            { code: "C22.0", desc: "Ung thư biểu mô tế bào gan (Hepatocellular carcinoma - HCC)" },
+            { code: "C22.1", desc: "Ung thư đường mật trong gan (Intrahepatic cholangiocarcinoma)" },
+            { code: "C22.7", desc: "Các ung thư biểu mô nguyên phát khác của gan" },
+            { code: "C22.9", desc: "U ác tính gan nguyên phát, không xác định" },
             { code: "C50.1", desc: "U ác tính vùng trung tâm vú" },
             { code: "C50.2", desc: "U ác tính phần trên - trong vú" },
             { code: "C50.3", desc: "U ác tính phần dưới - trong vú" },
@@ -1480,7 +1484,8 @@
         const tnmGroups = {
             colorectal: { label: 'Đại trực tràng (C18/C20)', T: ['Tis','T1','T2','T3','T4a','T4b'], N: ['N0','N1','N1c','N2a','N2b','Nx'], M: ['M0','M1a','M1b','M1c','Mx'] },
             gastric: { label: 'Dạ dày (C16)', T: ['Tis','T1','T2','T3','T4a','T4b'], N: ['N0','N1','N2','N3','Nx'], M: ['M0','M1','Mx'] },
-            breast: { label: 'Vú (C50)', T: ['T0','Tis','T1mi','T1a','T1b','T1c','T2','T3','T4','T4a','T4b','T4c','T4d'], N: ['N0','N1mi','N1','N2','N3','Nx'], M: ['M0','M1','Mx'] }
+            breast: { label: 'Vú (C50)', T: ['T0','Tis','T1mi','T1a','T1b','T1c','T2','T3','T4','T4a','T4b','T4c','T4d'], N: ['N0','N1mi','N1','N2','N3','Nx'], M: ['M0','M1','Mx'] },
+            liver: { label: 'Gan nguyên phát / HCC (C22)', T: ['T1a','T1b','T2','T3','T4'], N: ['N0','N1','Nx'], M: ['M0','M1','Mx'] }
         };
         function getTNMGroup() {
             const rawDiag = (document.getElementById('npDiagnosis')?.value || '').trim();
@@ -1490,10 +1495,12 @@
                 if (codeMatch.startsWith('C16')) return 'gastric';
                 if (codeMatch.startsWith('C18') || codeMatch.startsWith('C19') || codeMatch.startsWith('C20')) return 'colorectal';
                 if (codeMatch.startsWith('C50')) return 'breast';
+                if (codeMatch.startsWith('C22')) return 'liver';
             }
             if (diagnosis.includes('vú') || diagnosis.includes('breast')) return 'breast';
             if (diagnosis.includes('dạ dày') || diagnosis.includes('gastric') || diagnosis.includes('bao tử')) return 'gastric';
             if (diagnosis.includes('đại tràng') || diagnosis.includes('trực tràng') || diagnosis.includes('colon') || diagnosis.includes('rectal') || diagnosis.includes('colorectal')) return 'colorectal';
+            if (diagnosis.includes('gan') || diagnosis.includes('hcc') || diagnosis.includes('hepatocellular') || diagnosis.includes('cholangiocarcinoma')) return 'liver';
             return null;
         }
 
@@ -1577,6 +1584,17 @@
                 if (((t <= 2 && t >= 0) && N === 'N2') || (T === 'T3' && (N === 'N1' || N === 'N2'))) return 'IIIA';
                 if (t === 4 && n >= 0 && n <= 2) return 'IIIB';
                 if (N === 'N3') return 'IIIC';
+            }
+            if (group === 'liver') {
+                // AJCC 8th edition HCC staging
+                if (M === 'M1') return 'IVB';
+                if (N === 'N1') return 'IVA';
+                if (M !== 'M0') return '';
+                if (T === 'T1a') return 'IA';
+                if (T === 'T1b') return 'IB';
+                if (T === 'T2')  return 'II';
+                if (T === 'T3')  return 'IIIA';
+                if (T === 'T4')  return 'IIIB';
             }
             return '';
         }
