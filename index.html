@@ -108,13 +108,46 @@
         .search-action i { font-size: 1.25rem; }
         html[data-theme="light"] #patientSearchForm {
             background: #fff;
-            border-color: rgba(203, 213, 225, 0.55);
+            border-color: rgba(203, 213, 225, 0.7);
             box-shadow: 0 8px 24px rgba(53, 105, 153, 0.16);
         }
         html[data-theme="light"] #patientSearchForm input { color: #202124 !important; }
         html[data-theme="light"] #patientSearchForm input::placeholder { color: #666a73 !important; }
-        html[data-theme="light"] .search-action { color: #202124; }
-        html[data-theme="light"] .search-action:hover { color: #111827; background: #f1f3f4; }
+        html[data-theme="light"] .search-action {
+            color: #111827 !important;
+            background: #ffffff !important;
+            border: 1px solid #d1d5db !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+        }
+        html[data-theme="light"] .search-action:hover {
+            color: #000000 !important;
+            background: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+        }
+        html[data-theme="light"] #accountSettingsToggle,
+        html[data-theme="light"] #btnUserMgmt {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+        }
+        html[data-theme="light"] #accountSettingsToggle:hover,
+        html[data-theme="light"] #btnUserMgmt:hover {
+            background-color: #f1f5f9 !important;
+            color: #000000 !important;
+            border-color: #64748b !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+        }
+        html[data-theme="light"] #googleSignInBtn {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+        }
+        html[data-theme="light"] #googleSignInBtn:hover {
+            background-color: #f8fafc !important;
+            border-color: #94a3b8 !important;
+        }
         .search-plus { font-size: 2rem; font-weight: 300; line-height: 1; }
         .item-suggestion:hover,
         .item-suggestion.suggestion-active {
@@ -129,9 +162,9 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         html[data-theme="dark"] body {
             background:
-                radial-gradient(ellipse 68% 58% at 50% 42%, rgba(27, 103, 176, 0.48) 0%, rgba(16, 54, 99, 0.34) 38%, rgba(8, 23, 44, 0.12) 72%, transparent 100%),
-                radial-gradient(ellipse at center, #0b1a30 0%, #07111f 65%, #040811 100%);
-            background-attachment: fixed;
+                radial-gradient(ellipse 85% 72% at 50% 50%, rgba(25, 47, 92, 0.85) 0%, rgba(16, 31, 64, 0.65) 32%, rgba(8, 15, 32, 0.40) 60%, rgba(3, 5, 10, 0.95) 86%, #010204 100%) !important;
+            background-color: #010204 !important;
+            background-attachment: fixed !important;
             color: #e2e8f0;
             color-scheme: dark;
         }
@@ -251,8 +284,8 @@
         html[data-theme="dark"] #userTableBody tr:hover td strong { color: #f3f4f6 !important; }
         #loginSplash {
             background:
-                radial-gradient(ellipse 70% 60% at 50% 45%, rgba(27, 103, 176, 0.42) 0%, rgba(16, 54, 99, 0.24) 44%, transparent 78%),
-                radial-gradient(ellipse at center, #0b1a30 0%, #07111f 65%, #040811 100%);
+                radial-gradient(ellipse 85% 72% at 50% 50%, rgba(25, 47, 92, 0.85) 0%, rgba(16, 31, 64, 0.65) 32%, rgba(8, 15, 32, 0.40) 60%, rgba(3, 5, 10, 0.95) 86%, #010204 100%) !important;
+            background-color: #010204 !important;
         }
         .splash-slogan {
             color: transparent;
@@ -698,7 +731,26 @@
                             <span class="font-bold text-slate-700 flex items-center gap-1.5 uppercase">
                                 <i class="fa-solid fa-id-card text-teal-600"></i> A. Thông Tin Hành Chính <span class="text-rose-500">*</span>
                             </span>
-                            <span id="adminEditNotice" class="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium hidden">Chế độ Admin</span>
+                            <div class="flex items-center gap-2">
+                                <span id="adminEditNotice" class="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium hidden">Chế độ Admin</span>
+                                <div id="adminInfoActionBtns" class="flex items-center gap-1.5">
+                                    <button type="button" id="btnEditAdminInfo" onclick="window.toggleAdminInfoEdit(true)"
+                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-400 bg-amber-50 text-amber-800 font-bold text-[10px] hover:bg-amber-100 transition shadow-sm"
+                                        title="Sửa thông tin hành chính">
+                                        <i class="fa-solid fa-pen-to-square text-[9px]"></i> Sửa
+                                    </button>
+                                    <button type="button" id="btnSaveAdminInfo" onclick="window.saveAdminInfoOnly()"
+                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-600 bg-teal-600 text-white font-bold text-[10px] hover:bg-teal-700 transition shadow-sm hidden"
+                                        title="Lưu thông tin hành chính">
+                                        <i class="fa-solid fa-floppy-disk text-[9px]"></i> Lưu
+                                    </button>
+                                    <button type="button" id="btnCancelAdminInfo" onclick="window.toggleAdminInfoEdit(false)"
+                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-slate-600 font-bold text-[10px] hover:bg-slate-50 transition shadow-sm hidden"
+                                        title="Hủy sửa thông tin hành chính">
+                                        <i class="fa-solid fa-xmark text-[9px]"></i> Hủy
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div id="adminInputFields" class="space-y-3">
@@ -2207,6 +2259,10 @@
                 diagInputNew.classList.remove('bg-slate-50','text-slate-500','cursor-default','border-amber-400');
             }
             ['btnEditDiagnosis','btnSaveDiagnosis','btnCancelDiagnosis'].forEach(id => {
+                document.getElementById(id)?.classList.add('hidden');
+            });
+            window._lockAdminInfoInputs(false);
+            ['btnEditAdminInfo','btnSaveAdminInfo','btnCancelAdminInfo'].forEach(id => {
                 document.getElementById(id)?.classList.add('hidden');
             });
             
@@ -3795,6 +3851,14 @@
                 document.getElementById('btnCancelDiagnosis')?.classList.add('hidden');
             })();
 
+            // Lock thông tin hành chính khi mở edit: readonly + xám + hiện nút Sửa nếu là Admin
+            window._lockAdminInfoInputs(true);
+            if (!isAdmin) {
+                document.getElementById('btnEditAdminInfo')?.classList.add('hidden');
+            } else {
+                document.getElementById('btnEditAdminInfo')?.classList.remove('hidden');
+            }
+
             window.setPanelVisibility(document.getElementById('patientFormModal'), true);
             window.renderTempMarkersList();
         };
@@ -4657,6 +4721,184 @@
                 window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
             } catch (err) {
                 console.error("Lỗi đồng bộ tự động:", err);
+            }
+        };
+
+        // ============================================================
+        // CHỨC NĂNG SỬA THÔNG TIN HÀNH CHÍNH RIÊNG LẺ
+        // ============================================================
+
+        // Lưu giá trị hành chính gốc để hoàn tác khi hủy
+        window._adminInfoBackup = { id: '', name: '', gender: '', birthYear: '', height: '', weight: '' };
+
+        /**
+         * Khóa / mở khóa các trường thông tin hành chính
+         */
+        window._lockAdminInfoInputs = function(locked) {
+            const fields = ['npId', 'npName', 'npBirthYear', 'npHeight', 'npWeight'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (locked) {
+                    el.setAttribute('readonly', true);
+                    el.classList.add('bg-slate-50', 'text-slate-700', 'cursor-default');
+                    el.classList.remove('bg-white', 'border-amber-400', 'focus:ring-amber-400');
+                } else {
+                    el.removeAttribute('readonly');
+                    el.classList.remove('bg-slate-50', 'text-slate-700', 'cursor-default');
+                    el.classList.add('bg-white', 'border-amber-400');
+                }
+            });
+
+            const genderEl = document.getElementById('npGender');
+            if (genderEl) {
+                genderEl.disabled = locked;
+                if (locked) {
+                    genderEl.classList.add('bg-slate-50', 'text-slate-700', 'cursor-default');
+                    genderEl.classList.remove('bg-white', 'border-amber-400');
+                } else {
+                    genderEl.classList.remove('bg-slate-50', 'text-slate-700', 'cursor-default');
+                    genderEl.classList.add('bg-white', 'border-amber-400');
+                }
+            }
+
+            const btnEdit = document.getElementById('btnEditAdminInfo');
+            const btnSave = document.getElementById('btnSaveAdminInfo');
+            const btnCancel = document.getElementById('btnCancelAdminInfo');
+
+            if (locked) {
+                btnEdit?.classList.remove('hidden');
+                btnSave?.classList.add('hidden');
+                btnCancel?.classList.add('hidden');
+            } else {
+                btnEdit?.classList.add('hidden');
+                btnSave?.classList.remove('hidden');
+                btnCancel?.classList.remove('hidden');
+            }
+        };
+
+        /**
+         * Bật / tắt chế độ chỉnh sửa thông tin hành chính
+         */
+        window.toggleAdminInfoEdit = function(editing) {
+            if (editing) {
+                window._adminInfoBackup = {
+                    id: document.getElementById('npId')?.value || '',
+                    name: document.getElementById('npName')?.value || '',
+                    gender: document.getElementById('npGender')?.value || '',
+                    birthYear: document.getElementById('npBirthYear')?.value || '',
+                    height: document.getElementById('npHeight')?.value || '',
+                    weight: document.getElementById('npWeight')?.value || ''
+                };
+                window._lockAdminInfoInputs(false);
+                document.getElementById('npName')?.focus();
+            } else {
+                // Khôi phục giá trị ban đầu
+                const idEl = document.getElementById('npId');
+                if (idEl) idEl.value = window._adminInfoBackup.id;
+                const nameEl = document.getElementById('npName');
+                if (nameEl) nameEl.value = window._adminInfoBackup.name;
+                const genderEl = document.getElementById('npGender');
+                if (genderEl) genderEl.value = window._adminInfoBackup.gender;
+                const birthYearEl = document.getElementById('npBirthYear');
+                if (birthYearEl) birthYearEl.value = window._adminInfoBackup.birthYear;
+                const heightEl = document.getElementById('npHeight');
+                if (heightEl) heightEl.value = window._adminInfoBackup.height;
+                const weightEl = document.getElementById('npWeight');
+                if (weightEl) weightEl.value = window._adminInfoBackup.weight;
+
+                window.calculateBSAandDoses();
+                window._lockAdminInfoInputs(true);
+            }
+        };
+
+        /**
+         * Lưu riêng thông tin hành chính lên Firestore ngay lập tức
+         */
+        window.saveAdminInfoOnly = async function() {
+            if (!window.canUseOncoCare) return;
+            const docId = document.getElementById('editDocId')?.value;
+
+            const name = document.getElementById('npName')?.value.trim() || '';
+            if (!name) {
+                alert("Vui lòng nhập họ và tên bệnh nhân!");
+                document.getElementById('npName')?.focus();
+                return;
+            }
+
+            const patientId = document.getElementById('npId')?.value.trim() || '';
+            if (patientId && !/^[0-9]{8}$/.test(patientId)) {
+                alert("Mã bệnh nhân phải gồm đúng 8 chữ số!");
+                document.getElementById('npId')?.focus();
+                return;
+            }
+
+            const gender = document.getElementById('npGender')?.value || '';
+            const birthYear = document.getElementById('npBirthYear')?.value || '';
+            const height = document.getElementById('npHeight')?.value || '';
+            const weight = document.getElementById('npWeight')?.value || '';
+            const bsaDisplay = document.getElementById('npBsaDisplay')?.innerText || '';
+            const bsaVal = parseFloat(bsaDisplay) || 0;
+
+            if (!docId) {
+                // Form thêm mới: khóa lại, lưu cùng lúc submit form
+                window._lockAdminInfoInputs(true);
+                return;
+            }
+
+            const btnSave = document.getElementById('btnSaveAdminInfo');
+            if (btnSave) {
+                btnSave.disabled = true;
+                btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[9px]"></i> Đang lưu...';
+            }
+
+            try {
+                const update = {
+                    patientId: patientId,
+                    name: name,
+                    gender: gender,
+                    birthYear: birthYear,
+                    height: height,
+                    weight: weight,
+                    bsa: bsaVal > 0 ? bsaVal.toFixed(2) : '',
+                    updatedAt: serverTimestamp(),
+                    updatedByEmail: currentUser ? currentUser.email : ''
+                };
+
+                await updateDoc(doc(db, 'patients', docId), update);
+
+                // Cập nhật cache
+                const cacheIndex = cachedPatientsList.findIndex(p => p.id === docId);
+                if (cacheIndex >= 0) {
+                    cachedPatientsList[cacheIndex] = { ...cachedPatientsList[cacheIndex], ...update };
+                }
+
+                // Cập nhật hiển thị text tóm tắt nếu có
+                const txtId = document.getElementById('txtPatientId');
+                if (txtId) txtId.innerText = patientId || '-';
+                const txtName = document.getElementById('txtName');
+                if (txtName) txtName.innerText = name || '-';
+                const txtGender = document.getElementById('txtGender');
+                if (txtGender) txtGender.innerText = gender || '-';
+                const txtBirth = document.getElementById('txtBirthYear');
+                if (txtBirth) txtBirth.innerText = birthYear || '-';
+
+                // Cập nhật bảng bệnh nhân nếu đang mở
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput && searchInput.value.trim()) {
+                    window.searchPatientByCode();
+                }
+
+                window.showToast('✅ Đã cập nhật thông tin hành chính thành công!');
+                window._lockAdminInfoInputs(true);
+            } catch (err) {
+                console.error('Lỗi lưu thông tin hành chính:', err);
+                window.showToast('❌ Lỗi khi lưu thông tin hành chính: ' + err.message);
+            } finally {
+                if (btnSave) {
+                    btnSave.disabled = false;
+                    btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk text-[9px]"></i> Lưu';
+                }
             }
         };
 
