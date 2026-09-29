@@ -575,6 +575,100 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- MODAL CHỈNH SỬA CHU KỲ HÓA TRỊ -->
+    <div id="editCycleModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="window.closeEditCycleModal()" title="Đóng"
+                        class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] flex items-center justify-center hover:brightness-110">
+                        <i class="fa-solid fa-xmark text-[7px] text-[#7a1712] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </button>
+                    <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center border border-amber-400/30">
+                        <i class="fa-solid fa-syringe text-amber-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 id="editCycleModalTitle" class="font-bold text-sm uppercase tracking-wide">Chỉnh sửa chu kỳ</h3>
+                        <p id="editCycleModalSubtitle" class="text-slate-400 text-[10px] mt-0.5"></p>
+                    </div>
+                </div>
+            </div>
+            <!-- Body -->
+            <div class="p-5 space-y-4 overflow-y-auto max-h-[75vh] text-xs">
+                <!-- Phác đồ -->
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Phác đồ điều trị</label>
+                    <select id="ecm_protocolSelect" onchange="window.ecmOnProtocolChange()"
+                        class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <option value="">-- Chọn phác đồ --</option>
+                    </select>
+                    <input type="text" id="ecm_customProtocol" placeholder="Nhập tên phác đồ tùy chỉnh..."
+                        class="hidden w-full p-2.5 bg-white border border-amber-300 rounded-lg font-bold text-teal-900 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="text" id="ecm_protocolDisplay" placeholder="Tên phác đồ hiển thị (nếu khác)"
+                        class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        title="Tên phác đồ sẽ lưu vào hồ sơ">
+                </div>
+                <!-- Tuần (14 ngày) -->
+                <div id="ecm_weekContainer" class="hidden space-y-1.5">
+                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Tuần trong chu kỳ</label>
+                    <div class="flex gap-2">
+                        <select id="ecm_weekSelect" class="flex-1 p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <option value="Tuần 1">Tuần 1</option>
+                            <option value="Tuần 2">Tuần 2</option>
+                            <option value="Cả chu kỳ">Cả chu kỳ</option>
+                            <option value="__CUSTOM__">Tùy chỉnh...</option>
+                        </select>
+                        <input type="text" id="ecm_weekCustom" placeholder="Vd: Ngày 10-14"
+                            class="hidden flex-1 p-2.5 bg-white border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    </div>
+                </div>
+                <!-- Ngày & Số chu kỳ -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Ngày truyền</label>
+                        <input type="date" id="ecm_date"
+                            class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Số chu kỳ</label>
+                        <input type="number" id="ecm_cycleNum" min="1"
+                            class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-center">
+                    </div>
+                </div>
+                <!-- Thuốc -->
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Thuốc hóa trị</label>
+                    <input type="text" id="ecm_drugNames" placeholder="Tên thuốc, liều mg..."
+                        class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+                <!-- Liều dùng -->
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Liều dùng chi tiết</label>
+                    <input type="text" id="ecm_doseInput" placeholder="Vd: D1: DOX 60mg/m²..."
+                        class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+                <!-- Ghi chú -->
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Tác dụng phụ / Ghi chú</label>
+                    <textarea id="ecm_note" rows="3" placeholder="Ghi nhận tác dụng phụ, biến chứng, lưu ý..."
+                        class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"></textarea>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-end gap-2.5 bg-slate-50 shrink-0">
+                <button type="button" onclick="window.closeEditCycleModal()"
+                    class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition text-xs">
+                    Hủy
+                </button>
+                <button type="button" id="ecm_saveBtn" onclick="window.saveCycleFromModal()"
+                    class="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-floppy-disk"></i> Lưu chu kỳ
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODUN 4: MODAL THÊM / SỬA HỒ SƠ BỆNH NHÂN & CHU KỲ -->
     <!-- ========================================== -->
     <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[115] hidden flex items-center justify-center p-4">
@@ -3903,45 +3997,224 @@
             await window.autoSyncChangesToDatabase();
         };
 
+        // Index chu kỳ đang chỉnh sửa trong modal
+        window._editingCycleModalIdx = -1;
+
+        /**
+         * Mở modal popup chỉnh sửa chu kỳ hóa trị
+         */
         window.editTempCycle = function(idx) {
             const c = window.tempCurrentCycles[idx];
             if (!c) return;
-            
-            window.resetFormToEditMode(idx);
-
-            const changeProtocolRadio = document.querySelector('input[name="protocolMode"][value="change"]');
-            if (changeProtocolRadio) changeProtocolRadio.checked = true;
-            window.toggleProtocolMode();
-
-            const protocolSelect = document.getElementById('protocolSelectList');
-            const matchingProtocolKey = c.protocolKeyUsed || Object.keys(chemoProtocolsData).find((key) =>
-                chemoProtocolsData[key].name === c.protocolUsed
-            );
-            const protocolKey = matchingProtocolKey || (c.protocolUsed ? 'CUSTOM' : '');
-            protocolSelect.value = protocolKey;
-            if (protocolKey === 'CUSTOM') {
-                document.getElementById('customProtocolNameInput').value = c.protocolUsed || '';
-            }
-            window.onProtocolSelectChanged();
-
-            document.getElementById('npCycleDate').value = c.date || '';
-            document.getElementById('npCycleNumber').value = c.cycleNum || (idx + 1);
-            document.getElementById('npDrugNamesInput').value = c.drugNames || '';
-            document.getElementById('npDoseInput').value = c.doseInput || '';
-            document.getElementById('npCycleNote').value = c.note || '';
-            document.getElementById('npProtocol').value = c.protocolUsed || '';
-            const weekSelect = document.getElementById('npProtocolWeek');
-            const knownWeeks = ['Tuần 1', 'Tuần 2', 'Cả chu kỳ'];
-            if (c.week && knownWeeks.includes(c.week)) {
-                weekSelect.value = c.week;
-                document.getElementById('npProtocolWeekCustom').classList.add('hidden');
-            } else if (c.week) {
-                weekSelect.value = '__CUSTOM__';
-                document.getElementById('npProtocolWeekCustom').value = c.week;
-                document.getElementById('npProtocolWeekCustom').classList.remove('hidden');
-            }
-            window.showToast(`Đang chỉnh sửa chu kỳ thứ ${c.cycleNum || (idx + 1)}. Nhấn "Lưu thông tin" để hoàn tất.`);
+            window._editingCycleModalIdx = idx;
+            window.openEditCycleModal(c, idx);
         };
+
+        window.openEditCycleModal = function(c, idx) {
+            // Tiêu đề modal
+            document.getElementById('editCycleModalTitle').textContent = `Chỉnh sửa ${c.branchName || 'Chu kỳ ' + (idx + 1)}`;
+            document.getElementById('editCycleModalSubtitle').textContent = c.date ? `Ngày truyền: ${formatDisplayDate(c.date)}` : '';
+
+            // Populate danh sách phác đồ từ chemoProtocolsData
+            const sel = document.getElementById('ecm_protocolSelect');
+            sel.innerHTML = '<option value="">-- Chọn phác đồ --</option>';
+            Object.entries(chemoProtocolsData).forEach(([key, info]) => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = info.name || key;
+                sel.appendChild(opt);
+            });
+            const customOpt = document.createElement('option');
+            customOpt.value = 'CUSTOM';
+            customOpt.textContent = '✏️ Tùy chỉnh...';
+            sel.appendChild(customOpt);
+
+            // Set giá trị phác đồ hiện tại
+            const matchingKey = c.protocolKeyUsed
+                || Object.keys(chemoProtocolsData).find(k => chemoProtocolsData[k].name === c.protocolUsed)
+                || (c.protocolUsed ? 'CUSTOM' : '');
+            sel.value = matchingKey;
+
+            const customInput = document.getElementById('ecm_customProtocol');
+            const displayInput = document.getElementById('ecm_protocolDisplay');
+            if (matchingKey === 'CUSTOM') {
+                customInput.classList.remove('hidden');
+                customInput.value = c.protocolUsed || '';
+            } else {
+                customInput.classList.add('hidden');
+                customInput.value = '';
+            }
+            displayInput.value = c.protocolUsed || (matchingKey && chemoProtocolsData[matchingKey] ? chemoProtocolsData[matchingKey].name : '');
+
+            // Xử lý tuần (phác đồ 14 ngày)
+            const is14Days = matchingKey && chemoProtocolsData[matchingKey]?.is14Days;
+            const weekContainer = document.getElementById('ecm_weekContainer');
+            const weekSel = document.getElementById('ecm_weekSelect');
+            const weekCustom = document.getElementById('ecm_weekCustom');
+            weekContainer.classList.toggle('hidden', !is14Days);
+            if (is14Days && c.week) {
+                const knownWeeks = ['Tuần 1', 'Tuần 2', 'Cả chu kỳ'];
+                if (knownWeeks.includes(c.week)) {
+                    weekSel.value = c.week;
+                    weekCustom.classList.add('hidden');
+                } else {
+                    weekSel.value = '__CUSTOM__';
+                    weekCustom.value = c.week;
+                    weekCustom.classList.remove('hidden');
+                }
+            }
+
+            // Điền các trường còn lại
+            document.getElementById('ecm_date').value = c.date || '';
+            document.getElementById('ecm_cycleNum').value = c.cycleNum || (idx + 1);
+            document.getElementById('ecm_drugNames').value = c.drugNames || '';
+            document.getElementById('ecm_doseInput').value = c.doseInput || '';
+            document.getElementById('ecm_note').value = c.note || '';
+
+            // Hiện modal
+            const modal = document.getElementById('editCycleModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeEditCycleModal = function() {
+            const modal = document.getElementById('editCycleModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            window._editingCycleModalIdx = -1;
+        };
+
+        /**
+         * Xử lý khi thay đổi phác đồ trong modal
+         */
+        window.ecmOnProtocolChange = function() {
+            const key = document.getElementById('ecm_protocolSelect').value;
+            const customInput = document.getElementById('ecm_customProtocol');
+            const displayInput = document.getElementById('ecm_protocolDisplay');
+            const weekContainer = document.getElementById('ecm_weekContainer');
+            const weekSel = document.getElementById('ecm_weekSelect');
+            const weekCustom = document.getElementById('ecm_weekCustom');
+
+            if (key === 'CUSTOM') {
+                customInput.classList.remove('hidden');
+                customInput.focus();
+                displayInput.value = '';
+            } else {
+                customInput.classList.add('hidden');
+                const info = chemoProtocolsData[key];
+                displayInput.value = info ? info.name : '';
+            }
+
+            // Hiện/ẩn chọn tuần
+            const is14Days = key !== 'CUSTOM' && chemoProtocolsData[key]?.is14Days;
+            weekContainer.classList.toggle('hidden', !is14Days);
+            if (!is14Days) { weekSel.value = 'Tuần 1'; weekCustom.classList.add('hidden'); }
+        };
+
+        /**
+         * Xử lý khi thay đổi tuần trong modal
+         */
+        window.ecmOnWeekChange = function() {
+            const weekSel = document.getElementById('ecm_weekSelect');
+            const weekCustom = document.getElementById('ecm_weekCustom');
+            if (weekSel.value === '__CUSTOM__') {
+                weekCustom.classList.remove('hidden');
+                weekCustom.focus();
+            } else {
+                weekCustom.classList.add('hidden');
+            }
+        };
+
+        /**
+         * Lưu chu kỳ từ modal về tempCurrentCycles và sync DB
+         */
+        window.saveCycleFromModal = async function() {
+            const idx = window._editingCycleModalIdx;
+            if (idx < 0 || idx >= window.tempCurrentCycles.length) return;
+
+            const protoKey = document.getElementById('ecm_protocolSelect').value;
+            let protocolUsed = '';
+            let protocolKeyUsed = protoKey;
+            if (protoKey === 'CUSTOM') {
+                protocolUsed = document.getElementById('ecm_customProtocol').value.trim()
+                    || document.getElementById('ecm_protocolDisplay').value.trim();
+            } else if (protoKey && chemoProtocolsData[protoKey]) {
+                protocolUsed = document.getElementById('ecm_protocolDisplay').value.trim()
+                    || chemoProtocolsData[protoKey].name;
+            } else {
+                protocolUsed = document.getElementById('ecm_protocolDisplay').value.trim();
+            }
+
+            // Lấy tuần
+            const is14Days = protoKey !== 'CUSTOM' && chemoProtocolsData[protoKey]?.is14Days;
+            let weekVal = '';
+            if (is14Days) {
+                const ws = document.getElementById('ecm_weekSelect').value;
+                weekVal = ws === '__CUSTOM__' ? document.getElementById('ecm_weekCustom').value.trim() : ws;
+            }
+
+            const cycleDate = document.getElementById('ecm_date').value;
+            const cycleNum = parseInt(document.getElementById('ecm_cycleNum').value) || (idx + 1);
+
+            if (!cycleDate) {
+                alert('Vui lòng chọn ngày truyền!');
+                return;
+            }
+            if (!protocolUsed) {
+                alert('Vui lòng chọn hoặc nhập tên phác đồ!');
+                return;
+            }
+
+            const saveBtn = document.getElementById('ecm_saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+
+            try {
+                const oldCycle = window.tempCurrentCycles[idx];
+                window.tempCurrentCycles[idx] = {
+                    ...oldCycle,
+                    branchName: `Chu kỳ ${cycleNum}`,
+                    cycleNum,
+                    week: weekVal,
+                    date: cycleDate,
+                    protocolUsed,
+                    protocolKeyUsed,
+                    isChangedProtocol: oldCycle.isChangedProtocol || protocolUsed !== oldCycle.protocolUsed,
+                    drugNames: document.getElementById('ecm_drugNames').value.trim(),
+                    doseInput: document.getElementById('ecm_doseInput').value.trim(),
+                    note: document.getElementById('ecm_note').value.trim(),
+                    updatedBy: window.getCurrentEditorName()
+                };
+
+                window.normalizeProtocolHistory(window.tempCurrentCycles);
+                window.renderTempCyclesList();
+                await window.autoSyncChangesToDatabase();
+                window.showToast(`✅ Đã cập nhật chu kỳ ${cycleNum} thành công!`);
+                window.closeEditCycleModal();
+            } catch (err) {
+                console.error('Lỗi lưu chu kỳ:', err);
+                alert('Lỗi khi lưu chu kỳ: ' + err.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu chu kỳ';
+            }
+        };
+
+        // Đóng modal khi click vào backdrop (gắn trực tiếp vì DOM đã load)
+        (function attachEditCycleModalListeners() {
+            const modal = document.getElementById('editCycleModal');
+            if (modal && !modal._backdropListenerAttached) {
+                modal._backdropListenerAttached = true;
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) window.closeEditCycleModal();
+                });
+            }
+            const weekSel = document.getElementById('ecm_weekSelect');
+            if (weekSel && !weekSel._changeListenerAttached) {
+                weekSel._changeListenerAttached = true;
+                weekSel.addEventListener('change', () => window.ecmOnWeekChange());
+            }
+        })();
 
         window.deleteTempCycle = async function(idx) {
             if (confirm("Bạn có chắc chắn muốn xóa chu kỳ này không?")) {
