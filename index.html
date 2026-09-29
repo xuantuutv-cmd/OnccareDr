@@ -701,7 +701,7 @@
                     <div id="extendedAssessmentModal" class="fixed inset-0 z-[160] hidden items-center justify-center bg-slate-900/60 p-3">
                         <div class="w-full max-w-6xl max-h-[95vh] overflow-hidden rounded-2xl bg-white p-5 shadow-2xl space-y-3 flex flex-col">
                             <div class="flex items-center justify-between shrink-0"><div class="flex items-center gap-3"><button type="button" onclick="window.closeExtendedAssessment()" title="Đóng" aria-label="Đóng cửa sổ đánh giá mở rộng" class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-teal-400"><i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity"></i></button><h3 class="font-bold text-teal-900">ĐÁNH GIÁ MỞ RỘNG</h3></div></div>
-                            <div class="flex gap-2"><button type="button" onclick="window.switchExtendedTab('response')" id="extendedResponseTab" class="rounded-lg bg-teal-700 px-4 py-2 text-white font-bold text-xs">Đánh giá đáp ứng</button><button type="button" onclick="window.switchExtendedTab('toxicity')" id="extendedToxicityTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">Đánh giá độc tính</button></div>
+                            <div class="flex flex-wrap gap-2"><button type="button" onclick="window.switchExtendedTab('response')" id="extendedResponseTab" class="rounded-lg bg-teal-700 px-4 py-2 text-white font-bold text-xs">RECIST 1.1</button><button type="button" onclick="window.switchExtendedTab('mrecist')" id="extendedMrecistTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">mRECIST <span class="ml-1 rounded bg-amber-100 px-1 text-amber-700 text-[9px]">Gan</span></button><button type="button" onclick="window.switchExtendedTab('toxicity')" id="extendedToxicityTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">Độc tính</button></div>
                             <section id="extendedResponsePanel" class="space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">RECIST 1.1 dùng một chiều đo: đường kính lớn nhất của tổn thương thường và trục ngắn của hạch. Tối đa 5 target lesion, không quá 2 trong cùng một cơ quan. Số đo theo CT/MRI.</p>
                                 <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="responseAssessmentDate" type="date" class="ml-2 rounded-lg border p-2 text-xs"></label>
@@ -722,6 +722,42 @@
                                 <div class="rounded-lg bg-indigo-50 p-3 text-sm"><div class="flex items-center justify-between gap-2"><strong>Kết quả RECIST 1.1</strong><button type="button" onclick="window.toggleResponseCalculation()" class="rounded-md border px-2 py-1 text-[11px] font-semibold">Xem cách tính</button></div><div id="responseConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div><div id="responseCalculation" class="hidden mt-2 space-y-1 border-t border-indigo-200 pt-2 text-xs"></div></div>
                                 <button type="button" id="responseRecordButton" onclick="window.recordResponseAssessment()" class="rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận đánh giá đáp ứng</button>
                                 <div id="responseHistoryPreview" class="text-xs text-slate-600"></div>
+                            </section>
+                            <!-- mRECIST PANEL -->
+                            <section id="extendedMrecistPanel" class="hidden space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
+                                <p class="text-xs text-slate-600">mRECIST đánh giá mô u sống (vùng ngấm thuốc thì động mạch) của tổn thương đích trong ung thư gan nguyên phát. Tối đa 5 tổn thương đích. Số đo theo CT/MRI đa pha.</p>
+                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="mrecistAssessmentDate" type="date" class="ml-2 rounded-lg border p-2 text-xs"></label>
+                                <div id="mrecistLesions" class="space-y-2"></div>
+                                <button type="button" id="addMrecistLesionButton" onclick="window.addMrecistLesion()" class="rounded-lg border px-3 py-2 text-xs font-semibold">+ Thêm tổn thương đích (mRECIST)</button>
+                                <div class="grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
+                                    <label class="text-xs font-semibold text-slate-600">Đánh giá tổn thương không đích / huyết khối tĩnh mạch cửa
+                                        <select id="mrecistNonTargetStatus" onchange="window.updateMrecistConclusion()" class="mt-1 w-full rounded-lg border p-2 text-xs">
+                                            <option value="not_assessed">Chưa đánh giá</option>
+                                            <option value="none">Không có tổn thương không đích</option>
+                                            <option value="non_cr_non_pd">Còn tổn thương / huyết khối, chưa CR/chưa PD</option>
+                                            <option value="cr">Biến mất / huyết khối hồi phục hoàn toàn</option>
+                                            <option value="pd">Tiến triển rõ</option>
+                                        </select>
+                                    </label>
+                                    <label class="text-xs font-semibold text-slate-600">Tổn thương mới
+                                        <select id="mrecistNewLesionStatus" onchange="window.updateMrecistConclusion()" class="mt-1 w-full rounded-lg border p-2 text-xs">
+                                            <option value="no">Không</option>
+                                            <option value="suspected">Nghi ngờ, chưa xác nhận</option>
+                                            <option value="confirmed">Có, đã xác nhận</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="rounded-lg bg-amber-50 p-3 text-sm border border-amber-200">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <strong class="text-amber-900">Kết quả mRECIST</strong>
+                                        <button type="button" onclick="window.toggleMrecistCalculation()" class="rounded-md border px-2 py-1 text-[11px] font-semibold">Xem cách tính</button>
+                                    </div>
+                                    <div id="mrecistConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div>
+                                    <div id="mrecistCalculation" class="hidden mt-2 space-y-1 border-t border-amber-200 pt-2 text-xs"></div>
+                                </div>
+                                <button type="button" id="mrecistRecordButton" onclick="window.recordMrecistAssessment()" class="rounded-lg bg-amber-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận đánh giá mRECIST</button>
+                                <div id="mrecistHistoryPreview" class="text-xs text-slate-600"></div>
+                                <div id="existingMrecistList" class="space-y-2"></div>
                             </section>
                             <section id="extendedToxicityPanel" class="hidden space-y-2 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">Chọn tối đa một độ cho mỗi cơ quan. Để trống nếu không ghi nhận.</p>
@@ -2632,11 +2668,11 @@
         };
         window.closeExtendedAssessment = function() { const root = document.getElementById('extendedAssessmentModal'); root.classList.add('hidden'); root.classList.remove('flex'); };
         window.switchExtendedTab = function(which) {
-            const response = which === 'response';
-            document.getElementById('extendedResponsePanel').classList.toggle('hidden', !response);
-            document.getElementById('extendedToxicityPanel').classList.toggle('hidden', response);
-            document.getElementById('extendedResponseTab').className = `rounded-lg px-4 py-2 font-bold text-xs ${response ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-700'}`;
-            document.getElementById('extendedToxicityTab').className = `rounded-lg px-4 py-2 font-bold text-xs ${!response ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-700'}`;
+            const panels = { response: 'extendedResponsePanel', mrecist: 'extendedMrecistPanel', toxicity: 'extendedToxicityPanel' };
+            const tabs   = { response: 'extendedResponseTab',  mrecist: 'extendedMrecistTab',  toxicity: 'extendedToxicityTab'  };
+            Object.entries(panels).forEach(([k, id]) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', k !== which); });
+            Object.entries(tabs).forEach(([k, id]) => { const el = document.getElementById(id); if (el) el.className = `rounded-lg px-4 py-2 font-bold text-xs ${k === which ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-700'}`; });
+            if (which === 'mrecist') { window.renderMrecistInputs(); window.refreshMrecistHistory(); }
         };
         window.responseOrgans = ['gan','phổi','xương','hạch nách','hạch trung thất','hạch ổ bụng','hạch chậu','não','phúc mạc','thận','tuyến thượng thận','khác'];
         window.calculateSOD = function(lesions) {
@@ -2958,6 +2994,216 @@
             const now = new Date(); document.getElementById('responseAssessmentDate').value = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
             window.toggleNewLesionFields(); window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã lưu đánh giá theo RECIST 1.1.');
         };
+
+        /* =============================================
+           mRECIST — Modified RECIST for HCC
+           ============================================= */
+        window.mrecistAssessments = function() { return (window.tempResponseAssessments || []).filter(item => item.recistVersion === 'mRECIST'); };
+        window.getLatestMrecistAssessment = function(assessments) {
+            return (assessments || []).filter(item => item.recistVersion === 'mRECIST').slice().sort((a,b) => String(a.date||'').localeCompare(String(b.date||'')) || ((Number(a.recordedAt)||0) - (Number(b.recordedAt)||0))).at(-1) || null;
+        };
+        window.calculateViableSOD = function(lesions) {
+            if (!Array.isArray(lesions) || !lesions.length || lesions.length > 5) return null;
+            if (lesions.some(l => !l.notSeen && !(Number.isFinite(Number(l.viableMm)) && Number(l.viableMm) >= 0))) return null;
+            return lesions.reduce((sum, l) => sum + (l.notSeen ? 0 : Number(l.viableMm)), 0);
+        };
+        window.calculateMRECIST = function(priorHistory, current) {
+            const history = (priorHistory || []).filter(i => i.recistVersion === 'mRECIST').slice().sort((a,b) => String(a.date||'').localeCompare(String(b.date||'')) || ((Number(a.recordedAt)||0)-(Number(b.recordedAt)||0)));
+            const currentSod = window.calculateViableSOD(current.lesions);
+            if (currentSod === null) return { valid: false, response: 'Chưa đủ dữ liệu' };
+            if (!history.length) {
+                return { valid: true, response: 'Baseline', viableSod: currentSod, baselineViableSod: currentSod, nadir: currentSod, baselineChangePct: 0, nadirChangePct: 0, responseNote: '' };
+            }
+            const baseline = history[0];
+            const baselineViableSod = Number(baseline.viableSod ?? window.calculateViableSOD(baseline.lesions));
+            const nadir = Math.min(...history.map(i => Number(i.viableSod ?? window.calculateViableSOD(i.lesions))).filter(Number.isFinite), currentSod);
+            const baselineChangePct = baselineViableSod > 0 ? ((currentSod - baselineViableSod) / baselineViableSod) * 100 : null;
+            const nadirChangePct   = nadir > 0             ? ((currentSod - nadir) / nadir) * 100                         : null;
+            const newLesionStatus  = (current.newLesion || {}).status || 'no';
+            const nonTarget        = current.nonTargetStatus || 'not_assessed';
+            let response, responseNote = '';
+            const allViableGone = lesions => (lesions || []).every(l => l.notSeen || Number(l.viableMm) === 0);
+            if (allViableGone(current.lesions) && newLesionStatus !== 'confirmed' && (nonTarget === 'cr' || nonTarget === 'none' || nonTarget === 'not_assessed')) {
+                response = 'CR'; responseNote = 'Tất cả mô u sống biến mất hoàn toàn.';
+            } else if (newLesionStatus === 'confirmed' || (nadirChangePct !== null && nadirChangePct >= 20 && currentSod - nadir >= 0)) {
+                response = 'PD';
+                responseNote = newLesionStatus === 'confirmed' ? 'Có tổn thương mới xác nhận.' : `Mô u sống tăng ${nadirChangePct?.toFixed(1)}% so Nadir.`;
+            } else if (nadirChangePct !== null && nadirChangePct <= -30 && newLesionStatus !== 'confirmed') {
+                response = 'PR'; responseNote = `Mô u sống giảm ${Math.abs(nadirChangePct).toFixed(1)}% so Nadir.`;
+            } else {
+                response = 'SD'; responseNote = 'Không đủ tiêu chí CR, PR hoặc PD.';
+            }
+            if (newLesionStatus === 'suspected' && response !== 'PD') responseNote += ' Có tổn thương mới nghi ngờ, chưa xác nhận.';
+            return { valid: true, response, viableSod: currentSod, baselineViableSod, nadir, baselineChangePct, nadirChangePct, responseNote, newLesionStatus };
+        };
+        window.recalculateMrecistHistory = function() {
+            const history = window.mrecistAssessments().slice().sort((a,b) => String(a.date||'').localeCompare(String(b.date||'')) || ((Number(a.recordedAt)||0)-(Number(b.recordedAt)||0)));
+            const prior = [];
+            history.forEach(item => { item.viableSod = window.calculateViableSOD(item.lesions); Object.assign(item, window.calculateMRECIST(prior, item)); prior.push(item); });
+            return history;
+        };
+        window.makeMrecistLesionId = function() { return globalThis.crypto?.randomUUID?.() || `mrl-${Date.now()}-${Math.random().toString(36).slice(2,9)}`; };
+        window.addMrecistLesion = function(lesion = {}) {
+            const container = document.getElementById('mrecistLesions');
+            if (container.querySelectorAll('.mrecist-lesion').length >= 5) { alert('mRECIST cho phép tối đa 5 tổn thương đích.'); return; }
+            const row = document.createElement('div'); row.className = 'mrecist-lesion grid gap-2 rounded-xl border border-amber-200 bg-amber-50/40 p-3 sm:grid-cols-2';
+            row.dataset.lesionId = lesion.id || window.makeMrecistLesionId();
+            const hasBaseline = window.mrecistAssessments().length > 0;
+            const fixDef = hasBaseline;
+            row.innerHTML = `
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-semibold text-slate-600">Tên / mô tả
+                        <input class="mrl-name mt-1 w-full rounded-lg border p-2 text-xs" maxlength="100" placeholder="Ví dụ: Nốt gan S5" ${fixDef ? 'disabled' : ''}>
+                    </label>
+                    <label class="block text-[10px] font-semibold text-slate-600">Cơ quan
+                        <input class="mrl-organ mt-1 w-full rounded-lg border p-2 text-xs" maxlength="60" list="responseOrganOptions" placeholder="Ví dụ: gan" ${fixDef ? 'disabled' : ''}>
+                    </label>
+                    <label class="block text-[10px] font-semibold text-slate-600">Tổng kích thước u (mm) <span class="font-normal text-slate-400">(tham khảo)</span>
+                        <input class="mrl-total mt-1 w-full rounded-lg border p-2 text-xs" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Đường kính lớn nhất toàn bộ u">
+                    </label>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-semibold text-amber-700">⭐ Kích thước mô u sống (mm) <span class="font-normal text-slate-400">(ngấm thuốc ĐM)</span>
+                        <input class="mrl-viable mt-1 w-full rounded-lg border border-amber-400 p-2 text-xs" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Vùng ngấm thuốc thì động mạch">
+                    </label>
+                    <label class="flex items-center gap-2 text-[10px] font-semibold text-slate-600">
+                        <input class="mrl-not-seen" type="checkbox"> Không còn thấy / biến mất hoàn toàn
+                    </label>
+                    <p class="mrl-live text-[10px] font-semibold text-amber-700"></p>
+                    <button type="button" class="remove-mrecist-lesion rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-700">Xóa tổn thương</button>
+                </div>`;
+            const nameEl = row.querySelector('.mrl-name'); const organEl = row.querySelector('.mrl-organ');
+            const totalEl = row.querySelector('.mrl-total'); const viableEl = row.querySelector('.mrl-viable'); const notSeenEl = row.querySelector('.mrl-not-seen');
+            nameEl.value = lesion.name || ''; organEl.value = lesion.organ || '';
+            totalEl.value = lesion.notSeen ? '' : (lesion.totalMm ?? ''); viableEl.value = lesion.notSeen ? '' : (lesion.viableMm ?? ''); notSeenEl.checked = Boolean(lesion.notSeen);
+            const syncState = () => { viableEl.disabled = notSeenEl.checked; totalEl.disabled = notSeenEl.checked; if (notSeenEl.checked) { viableEl.value = ''; totalEl.value = ''; } window.updateMrecistConclusion(); };
+            notSeenEl.addEventListener('change', syncState);
+            [nameEl, organEl, totalEl, viableEl].forEach(f => f.addEventListener('input', window.updateMrecistConclusion));
+            const removeBtn = row.querySelector('.remove-mrecist-lesion');
+            removeBtn.classList.toggle('hidden', hasBaseline);
+            removeBtn.onclick = () => { row.remove(); document.getElementById('addMrecistLesionButton').classList.toggle('hidden', container.querySelectorAll('.mrecist-lesion').length >= 5); window.updateMrecistConclusion(); };
+            container.appendChild(row); syncState();
+            document.getElementById('addMrecistLesionButton').classList.toggle('hidden', container.querySelectorAll('.mrecist-lesion').length >= 5);
+        };
+        window.getMrecistLesions = function() {
+            return [...document.querySelectorAll('.mrecist-lesion')].map(row => ({
+                id: row.dataset.lesionId,
+                name: row.querySelector('.mrl-name').value.trim(),
+                organ: row.querySelector('.mrl-organ').value.trim(),
+                totalMm: Number(row.querySelector('.mrl-total').value) || null,
+                viableMm: row.querySelector('.mrl-not-seen').checked ? 0 : Number(row.querySelector('.mrl-viable').value) || null,
+                notSeen: row.querySelector('.mrl-not-seen').checked,
+            }));
+        };
+        window.renderMrecistInputs = function(lesions = null) {
+            const container = document.getElementById('mrecistLesions'); container.innerHTML = '';
+            const saved = lesions || window.getLatestMrecistAssessment(window.tempResponseAssessments || [])?.lesions || [];
+            if (saved.length) saved.forEach(l => window.addMrecistLesion(l));
+            else window.addMrecistLesion({});
+            window.updateMrecistConclusion();
+        };
+        window.updateMrecistConclusion = function() {
+            const lesions = window.getMrecistLesions();
+            const history = window.mrecistAssessments();
+            const r = window.calculateMRECIST(history, { lesions, newLesion: { status: document.getElementById('mrecistNewLesionStatus')?.value || 'no' }, nonTargetStatus: document.getElementById('mrecistNonTargetStatus')?.value || 'not_assessed' });
+            window.mrecistCalculationPreview = r;
+            const conclusion = document.getElementById('mrecistConclusion');
+            if (!conclusion) return;
+            const viLabel = { CR:'Đáp ứng hoàn toàn', PR:'Đáp ứng một phần', SD:'Bệnh ổn định', PD:'Bệnh tiến triển', Baseline:'Đánh giá nền' };
+            if (!r.valid) { conclusion.textContent = r.response || 'Chưa đủ dữ liệu để đánh giá'; return; }
+            const colorClass = window.classForResponseConclusion ? window.classForResponseConclusion(r.response) : 'bg-slate-200 text-slate-800';
+            if (r.response === 'Baseline') {
+                conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${colorClass}">Baseline</span><span class="ml-2">Viable SOD ${r.viableSod?.toFixed(1)} mm</span>`;
+            } else {
+                const pBase = r.baselineChangePct === null ? '—' : `${r.baselineChangePct >= 0 ? '+' : ''}${r.baselineChangePct.toFixed(1)}%`;
+                conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${colorClass}">${escapeHtml(r.response)}</span><span class="ml-2">${viLabel[r.response] || ''}</span><p class="mt-1">Viable SOD: ${r.viableSod?.toFixed(1)} mm · Baseline: ${r.baselineViableSod?.toFixed(1)} mm · Nadir: ${r.nadir?.toFixed(1)} mm</p>${r.responseNote ? `<p>${escapeHtml(r.responseNote)}</p>` : ''}`;
+            }
+        };
+        window.toggleMrecistCalculation = function() {
+            const panel = document.getElementById('mrecistCalculation'); panel.classList.toggle('hidden');
+            if (panel.classList.contains('hidden')) return;
+            const r = window.mrecistCalculationPreview;
+            if (!r?.valid) { panel.textContent = 'Nhập đầy đủ số đo mô u sống để xem phép tính.'; return; }
+            const lesions = window.getMrecistLesions();
+            const viLabel = { CR:'Đáp ứng hoàn toàn', PR:'Đáp ứng một phần', SD:'Bệnh ổn định', PD:'Bệnh tiến triển', Baseline:'Đánh giá nền' };
+            const sums = lesions.map(l => `${escapeHtml(l.name)}: ${l.notSeen ? '0 mm (không còn thấy)' : `${Number(l.viableMm).toFixed(1)} mm`}`).join(' + ');
+            const pBase = r.baselineChangePct === null ? '—' : `${r.baselineChangePct >= 0 ? '+' : ''}${r.baselineChangePct.toFixed(1)}%`;
+            const pNadir = r.nadirChangePct === null ? '—' : `${r.nadirChangePct >= 0 ? '+' : ''}${r.nadirChangePct.toFixed(1)}%`;
+            panel.innerHTML = `<p>Viable SOD hiện tại: ${sums} = <strong>${r.viableSod?.toFixed(1)} mm</strong></p><p>Baseline Viable SOD: ${r.baselineViableSod?.toFixed(1)} mm</p><p>Nadir: ${r.nadir?.toFixed(1)} mm</p><p>Thay đổi so Baseline: ${pBase}</p><p>Thay đổi so Nadir: ${pNadir}</p><p>PR khi Nadir giảm ≥30%: ${(r.nadirChangePct??0) <= -30 ? 'Đạt' : 'Chưa đạt'}. PD khi Nadir tăng ≥20%: ${(r.nadirChangePct??0) >= 20 ? 'Đạt' : 'Chưa đạt'}.</p><p>Kết luận: <strong>${escapeHtml(r.response)}${viLabel[r.response] ? ` – ${viLabel[r.response]}` : ''}</strong>.</p>`;
+        };
+        window.refreshMrecistHistory = function() {
+            const history = window.mrecistAssessments();
+            const latest = window.getLatestMrecistAssessment(history);
+            const viLabel = { CR:'Đáp ứng hoàn toàn', PR:'Đáp ứng một phần', SD:'Bệnh ổn định', PD:'Bệnh tiến triển', Baseline:'Đánh giá nền' };
+            const preview = document.getElementById('mrecistHistoryPreview');
+            if (preview) preview.textContent = latest ? `mRECIST gần nhất: ${window.assessmentDateTime ? window.assessmentDateTime(latest) : latest.date} · ${latest.response || 'Chưa đủ dữ liệu'}${viLabel[latest.response] ? ` (${viLabel[latest.response]})` : ''}` : 'Chưa có đánh giá mRECIST nào.';
+            const list = document.getElementById('existingMrecistList');
+            if (!list) return;
+            const sorted = [...history].map((item,idx) => ({item,idx})).reverse();
+            if (!sorted.length) { list.innerHTML = '<p class="text-violet-300 text-xs">Chưa ghi nhận.</p>'; return; }
+            const prior = [];
+            const ordered = history.slice().sort((a,b) => String(a.date||'').localeCompare(String(b.date||'')) || ((Number(a.recordedAt)||0)-(Number(b.recordedAt)||0)));
+            list.innerHTML = sorted.map(({item, idx}) => {
+                const globalIdx = window.tempResponseAssessments ? window.tempResponseAssessments.indexOf(item) : -1;
+                const metrics = window.calculateMRECIST(ordered.slice(0, ordered.indexOf(item)), item);
+                const hLabel = viLabel[item.response] || '';
+                const sodFormula = (item.lesions||[]).filter(x => !x.notSeen).map(x => `${escapeHtml(x.name)}: ${Number(x.viableMm).toFixed(1)} mm`).join(' + ');
+                const notSeenPart = (item.lesions||[]).filter(x => x.notSeen).map(x => `${escapeHtml(x.name)}: không còn thấy`).join(', ');
+                const sodDisplay = [sodFormula, notSeenPart].filter(Boolean).join(' · ');
+                const dateLabel = window.assessmentDateTime ? window.assessmentDateTime(item) : (window.formatDisplayDate ? window.formatDisplayDate(item.date) : item.date);
+                return `<div class="rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3 shadow-sm"><div class="flex flex-wrap items-center justify-between gap-2"><strong class="text-sm text-slate-800">${escapeHtml(dateLabel)} · ${escapeHtml(item.response || 'Chưa đủ dữ liệu')}${hLabel ? ` <span class="font-normal text-slate-500">(${hLabel})</span>` : ''}</strong><span class="flex gap-2"><button type="button" onclick="window.editMrecistAssessment(${globalIdx})" class="rounded-md border px-2 py-1 font-semibold text-indigo-700 text-xs">Sửa</button><button type="button" onclick="window.deleteMrecistAssessment(${globalIdx})" class="rounded-md border px-2 py-1 font-semibold text-rose-700 text-xs">Xóa</button></span></div><p class="mt-1 text-xs">Viable SOD ${Number(item.viableSod).toFixed(1)} mm · Baseline ${Number(item.baselineViableSod).toFixed(1)} mm · Nadir ${Number(item.nadir).toFixed(1)} mm</p><p class="text-xs text-slate-600">${sodDisplay}${sodFormula ? ` = <strong>${Number(item.viableSod).toFixed(1)} mm</strong>` : ''}</p><p class="text-[10px] text-slate-500">${escapeHtml(metrics.responseNote || '')}</p></div>`;
+            }).join('');
+        };
+        window.recordMrecistAssessment = function() {
+            const date = document.getElementById('mrecistAssessmentDate').value;
+            if (!date) { alert('Vui lòng chọn ngày đánh giá mRECIST.'); return; }
+            const lesions = window.getMrecistLesions();
+            if (!lesions.length) { alert('Thêm ít nhất một tổn thương đích.'); return; }
+            for (const l of lesions) { if (!l.name) { alert('Mỗi tổn thương cần có tên/mô tả.'); return; } if (!l.notSeen && (l.viableMm === null || l.viableMm === undefined)) { alert(`Thiếu kích thước mô u sống cho tổn thương: ${l.name}`); return; } }
+            const existing = window.mrecistAssessments().find(item => item.date === date);
+            if (existing && window.editingMrecistAssessmentIndex === null) { if (!confirm('Đã có đánh giá mRECIST ngày này. Ghi đè?')) return; window.tempResponseAssessments.splice(window.tempResponseAssessments.indexOf(existing), 1); }
+            const assessment = {
+                assessmentId: window.makeMrecistLesionId(), recistVersion: 'mRECIST', date, recordedAt: Date.now(), lesions,
+                nonTargetStatus: document.getElementById('mrecistNonTargetStatus').value,
+                newLesion: { status: document.getElementById('mrecistNewLesionStatus').value }
+            };
+            assessment.viableSod = window.calculateViableSOD(lesions);
+            const nextHistory = window.mrecistAssessments().filter(i => i.assessmentId !== assessment.assessmentId);
+            Object.assign(assessment, window.calculateMRECIST(nextHistory, assessment));
+            if (Number.isInteger(window.editingMrecistAssessmentIndex) && window.editingMrecistAssessmentIndex >= 0) {
+                window.tempResponseAssessments[window.editingMrecistAssessmentIndex] = assessment;
+            } else {
+                window.tempResponseAssessments.push(assessment);
+            }
+            window.editingMrecistAssessmentIndex = null;
+            window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || ((a.recordedAt||0)-(b.recordedAt||0)));
+            window.recalculateMrecistHistory();
+            window.prepareAssessmentSave();
+            document.getElementById('mrecistRecordButton').textContent = 'Ghi nhận đánh giá mRECIST';
+            document.getElementById('mrecistNonTargetStatus').value = 'not_assessed';
+            document.getElementById('mrecistNewLesionStatus').value = 'no';
+            const now = new Date(); document.getElementById('mrecistAssessmentDate').value = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+            window.renderMrecistInputs(); window.refreshMrecistHistory(); window.showToast('Đã lưu đánh giá mRECIST!');
+        };
+        window.deleteMrecistAssessment = function(globalIdx) {
+            if (!confirm('Xóa lần đánh giá mRECIST này? Kết quả sau sẽ được tính lại.')) return;
+            window.tempResponseAssessments.splice(globalIdx, 1);
+            window.recalculateMrecistHistory();
+            window.prepareAssessmentSave();
+            window.renderMrecistInputs(); window.refreshMrecistHistory();
+        };
+        window.editMrecistAssessment = function(globalIdx) {
+            const item = window.tempResponseAssessments[globalIdx]; if (!item) return;
+            window.prepareAssessmentSave();
+            window.editingMrecistAssessmentIndex = globalIdx;
+            window.renderMrecistInputs(item.lesions);
+            document.getElementById('mrecistAssessmentDate').value = item.date || '';
+            document.getElementById('mrecistNonTargetStatus').value = item.nonTargetStatus || 'not_assessed';
+            document.getElementById('mrecistNewLesionStatus').value = (item.newLesion||{}).status || 'no';
+            document.getElementById('mrecistRecordButton').textContent = 'Cập nhật đánh giá mRECIST';
+            window.updateMrecistConclusion();
+        };
+        window.editingMrecistAssessmentIndex = null;
         window.recordToxicityAssessment = function() {
             const items = [...document.querySelectorAll('[data-toxicity-index]')].filter(s=>s.value).map(s=>({organ:toxicityCriteria[Number(s.dataset.toxicityIndex)][0], grade:Number(s.value), description:toxicityCriteria[Number(s.dataset.toxicityIndex)][Number(s.value)-1]}));
             if (!items.length) { alert('Chọn ít nhất một độc tính để ghi nhận.'); return; }
