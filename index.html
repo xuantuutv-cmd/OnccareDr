@@ -819,7 +819,7 @@
                             <div class="flex flex-wrap gap-2"><button type="button" onclick="window.switchExtendedTab('response')" id="extendedResponseTab" class="rounded-lg bg-teal-700 px-4 py-2 text-white font-bold text-xs">RECIST 1.1</button><button type="button" onclick="window.switchExtendedTab('mrecist')" id="extendedMrecistTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">mRECIST <span class="ml-1 rounded bg-amber-100 px-1 text-amber-700 text-[9px]">Gan</span></button><button type="button" onclick="window.switchExtendedTab('toxicity')" id="extendedToxicityTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">Độc tính</button></div>
                             <section id="extendedResponsePanel" class="space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">RECIST 1.1 dùng một chiều đo: đường kính lớn nhất của tổn thương thường và trục ngắn của hạch. Tối đa 5 target lesion, không quá 2 trong cùng một cơ quan. Số đo theo CT/MRI.</p>
-                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="responseAssessmentDate" type="date" class="ml-2 rounded-lg border p-2 text-xs"></label>
+                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="responseAssessmentDate" type="date" onchange="window.updateResponseConclusion()" oninput="window.updateResponseConclusion()" class="ml-2 rounded-lg border p-2 text-xs"></label>
                                 <div id="responseLesions" class="space-y-2"></div>
                                 <button type="button" id="addResponseLesionButton" onclick="window.addResponseLesion()" class="rounded-lg border px-3 py-2 text-xs font-semibold">+ Thêm target lesion</button>
                                 <div class="grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
@@ -830,8 +830,8 @@
                                         <select id="responseNewLesionStatus" onchange="window.toggleNewLesionFields(); window.updateResponseConclusion()" class="mt-1 w-full rounded-lg border p-2 text-xs"><option value="no">Không</option><option value="suspected">Nghi ngờ, chưa xác nhận</option><option value="confirmed">Có, đã xác nhận</option></select>
                                     </label>
                                     <div id="responseNewLesionFields" class="hidden space-y-1 sm:col-span-2">
-                                        <div class="grid gap-2 sm:grid-cols-2"><input id="responseNewLesionOrgan" class="rounded-lg border p-2 text-xs" placeholder="Cơ quan / vị trí"><input id="responseNewLesionDescription" class="rounded-lg border p-2 text-xs" placeholder="Mô tả tổn thương mới"></div>
-                                        <input id="responseNewLesionSize" type="number" min="0.1" step="0.1" class="w-full rounded-lg border p-2 text-xs" placeholder="Kích thước (mm, nếu có)">
+                                        <div class="grid gap-2 sm:grid-cols-2"><input id="responseNewLesionOrgan" oninput="window.updateResponseConclusion()" class="rounded-lg border p-2 text-xs" placeholder="Cơ quan / vị trí"><input id="responseNewLesionDescription" oninput="window.updateResponseConclusion()" class="rounded-lg border p-2 text-xs" placeholder="Mô tả tổn thương mới"></div>
+                                        <input id="responseNewLesionSize" oninput="window.updateResponseConclusion()" type="number" min="0.1" step="0.1" class="w-full rounded-lg border p-2 text-xs" placeholder="Kích thước (mm, nếu có)">
                                     </div>
                                 </div>
                                 <div class="rounded-lg bg-indigo-50 p-3 text-sm"><div class="flex items-center justify-between gap-2"><strong>Kết quả RECIST 1.1</strong><button type="button" onclick="window.toggleResponseCalculation()" class="rounded-md border px-2 py-1 text-[11px] font-semibold">Xem cách tính</button></div><div id="responseConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div><div id="responseCalculation" class="hidden mt-2 space-y-1 border-t border-indigo-200 pt-2 text-xs"></div></div>
@@ -841,7 +841,7 @@
                             <!-- mRECIST PANEL -->
                             <section id="extendedMrecistPanel" class="hidden space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">mRECIST đánh giá mô u sống (vùng ngấm thuốc thì động mạch) của tổn thương đích trong ung thư gan nguyên phát. Tối đa 5 tổn thương đích. Số đo theo CT/MRI đa pha.</p>
-                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="mrecistAssessmentDate" type="date" class="ml-2 rounded-lg border p-2 text-xs"></label>
+                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="mrecistAssessmentDate" type="date" onchange="window.updateMrecistConclusion()" oninput="window.updateMrecistConclusion()" class="ml-2 rounded-lg border p-2 text-xs"></label>
                                 <div id="mrecistLesions" class="space-y-2"></div>
                                 <button type="button" id="addMrecistLesionButton" onclick="window.addMrecistLesion()" class="rounded-lg border px-3 py-2 text-xs font-semibold">+ Thêm tổn thương đích (mRECIST)</button>
                                 <div class="grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
@@ -2830,7 +2830,10 @@
             if (!window.tempResponseAssessments) window.tempResponseAssessments = [];
             if (!window.tempToxicityAssessments) window.tempToxicityAssessments = [];
             const today = new Date();
-            if (!document.getElementById('toxicityAssessmentDate').value) document.getElementById('toxicityAssessmentDate').value = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+            const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+            if (!document.getElementById('toxicityAssessmentDate').value) document.getElementById('toxicityAssessmentDate').value = todayStr;
+            if (!document.getElementById('responseAssessmentDate').value) document.getElementById('responseAssessmentDate').value = todayStr;
+            if (!document.getElementById('mrecistAssessmentDate').value) document.getElementById('mrecistAssessmentDate').value = todayStr;
             if (!document.getElementById('toxicityInputs').childElementCount) window.renderToxicityInputs();
             if (!document.getElementById('responseLesions').childElementCount) window.renderResponseInputs();
             window.refreshExtendedAssessment(); window.switchExtendedTab('response');
@@ -2841,7 +2844,15 @@
             const tabs   = { response: 'extendedResponseTab',  mrecist: 'extendedMrecistTab',  toxicity: 'extendedToxicityTab'  };
             Object.entries(panels).forEach(([k, id]) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', k !== which); });
             Object.entries(tabs).forEach(([k, id]) => { const el = document.getElementById(id); if (el) el.className = `rounded-lg px-4 py-2 font-bold text-xs ${k === which ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-700'}`; });
-            if (which === 'mrecist') { window.renderMrecistInputs(); window.refreshMrecistHistory(); }
+            if (which === 'mrecist') { 
+                const mDate = document.getElementById('mrecistAssessmentDate');
+                if (mDate && !mDate.value) {
+                    const today = new Date();
+                    mDate.value = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+                }
+                window.renderMrecistInputs(); 
+                window.refreshMrecistHistory(); 
+            }
         };
         window.responseOrgans = ['gan','phổi','xương','hạch nách','hạch trung thất','hạch ổ bụng','hạch chậu','não','phúc mạc','thận','tuyến thượng thận','khác'];
         window.calculateSOD = function(lesions) {
@@ -2885,31 +2896,36 @@
         window.calculateRECIST = function(assessments, currentAssessment) {
             const storedHistory = (assessments || []).filter(item => item && item.recistVersion === '1.1');
             if (storedHistory.some(item => window.calculateSOD(item.lesions) === null)) return { valid: false, response: 'Chưa đủ dữ liệu để đánh giá' };
-            const ordered = [...(assessments || []), ...(currentAssessment ? [currentAssessment] : [])]
-                .filter(item => item && item.recistVersion === '1.1')
+            const targetId = currentAssessment?.assessmentId || '__preview_recist__';
+            const current = currentAssessment ? { ...currentAssessment, assessmentId: targetId, sod: window.calculateSOD(currentAssessment.lesions) } : null;
+            if (current && window.calculateSOD(current.lesions) === null) return { valid: false, response: 'Chưa đủ dữ liệu để đánh giá' };
+
+            const historyWithoutCurrent = storedHistory.filter(item => item.assessmentId !== targetId);
+            const ordered = [...historyWithoutCurrent, ...(current ? [current] : [])]
                 .map(item => ({ ...item, sod: window.calculateSOD(item.lesions) }))
                 .filter(item => Number.isFinite(Number(item.sod)))
                 .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0));
-            const current = currentAssessment ? { ...currentAssessment, sod: window.calculateSOD(currentAssessment.lesions) } : ordered.at(-1);
-            if (!current || window.calculateSOD(current.lesions) === null) return { valid: false, response: 'Chưa đủ dữ liệu để đánh giá' };
-            const index = ordered.findIndex(item => item.assessmentId && item.assessmentId === current.assessmentId);
-            const prior = ordered.slice(0, index >= 0 ? index : -1);
-            const baselineSod = prior.length ? Number(prior[0].sod) : Number(current.sod);
-            const currentAndPrior = [...prior, current];
+
+            const curItem = current || ordered.at(-1);
+            if (!curItem || window.calculateSOD(curItem.lesions) === null) return { valid: false, response: 'Chưa đủ dữ liệu để đánh giá' };
+            const index = ordered.findIndex(item => item.assessmentId === targetId);
+            const prior = index > 0 ? ordered.slice(0, index) : [];
+            const baselineSod = prior.length ? Number(prior[0].sod) : Number(curItem.sod);
+            const currentAndPrior = [...prior, curItem];
             const nadir = window.calculateNadir(currentAndPrior);
-            const baselineChangePct = window.calculateBaselineChange(current.sod, baselineSod);
-            const nadirChangePct = currentAndPrior.length === 1 ? null : window.calculateNadirChange(current.sod, nadir);
-            const newStatus = current.newLesion?.status || current.newLesionStatus || 'no';
-            const nonTarget = current.nonTargetStatus || 'not_assessed';
+            const baselineChangePct = prior.length ? window.calculateBaselineChange(curItem.sod, baselineSod) : null;
+            const nadirChangePct = prior.length ? window.calculateNadirChange(curItem.sod, nadir) : null;
+            const newStatus = curItem.newLesion?.status || curItem.newLesionStatus || 'no';
+            const nonTarget = curItem.nonTargetStatus || 'not_assessed';
             let response = 'SD';
             let targetResponse = 'SD';
             let responseNote = '';
-            if (currentAndPrior.length === 1) {
+            if (!prior.length) {
                 response = targetResponse = 'Baseline';
                 responseNote = 'Đánh giá đầu tiên trong hồ sơ được lưu làm Baseline.';
-            } else if (window.checkPD(current.sod, nadir, newStatus, nonTarget)) {
+            } else if (window.checkPD(curItem.sod, nadir, newStatus, nonTarget)) {
                 response = targetResponse = 'PD';
-            } else if (window.checkCR(current.lesions)) {
+            } else if (window.checkCR(curItem.lesions)) {
                 targetResponse = 'CR';
                 if (nonTarget === 'none' || nonTarget === 'cr') response = 'CR';
                 else if (nonTarget === 'non_cr_non_pd') response = targetResponse = 'PR';
@@ -2917,7 +2933,7 @@
             } else if (window.checkPR(baselineChangePct)) {
                 response = targetResponse = 'PR';
             }
-            return { valid: true, sod: Number(current.sod), baselineSod, nadir, baselineChangePct, nadirChangePct, response, targetResponse, responseNote, newLesionStatus: newStatus, absoluteIncrease: Number(current.sod) - Number(nadir), relativeIncrease: nadir > 0 ? (Number(current.sod) - Number(nadir)) / nadir : null };
+            return { valid: true, sod: Number(curItem.sod), baselineSod, nadir, baselineChangePct, nadirChangePct, response, targetResponse, responseNote, newLesionStatus: newStatus, absoluteIncrease: Number(curItem.sod) - Number(nadir), relativeIncrease: nadir > 0 ? (Number(curItem.sod) - Number(nadir)) / nadir : null };
         };
         window.recistAssessments = function() { return (window.tempResponseAssessments || []).filter(item => item.recistVersion === '1.1'); };
         window.getLatestRecistAssessment = function(assessments) {
@@ -2974,9 +2990,21 @@
         window.updateResponseConclusion = function() {
             const lesions = window.getResponseLesions();
             const newStatus = document.getElementById('responseNewLesionStatus')?.value || 'no';
-            const assessment = { recistVersion: '1.1', date: document.getElementById('responseAssessmentDate')?.value || '', lesions, sod: window.calculateSOD(lesions),
-                nonTargetStatus: document.getElementById('responseNonTargetStatus')?.value || 'not_assessed', newLesion: { status: newStatus } };
             const editingId = Number.isInteger(window.editingResponseAssessmentIndex) ? window.tempResponseAssessments[window.editingResponseAssessmentIndex]?.assessmentId : null;
+            const assessment = { 
+                assessmentId: editingId || '__preview_recist__',
+                recistVersion: '1.1', 
+                date: document.getElementById('responseAssessmentDate')?.value || '', 
+                lesions, 
+                sod: window.calculateSOD(lesions),
+                nonTargetStatus: document.getElementById('responseNonTargetStatus')?.value || 'not_assessed', 
+                newLesion: { 
+                    status: newStatus,
+                    organ: document.getElementById('responseNewLesionOrgan')?.value?.trim() || '',
+                    description: document.getElementById('responseNewLesionDescription')?.value?.trim() || '',
+                    sizeMm: Number(document.getElementById('responseNewLesionSize')?.value) || null
+                } 
+            };
             const history = window.recistAssessments().filter(item => item.assessmentId !== editingId);
             const result = window.calculateRECIST(history, assessment);
             window.responseCalculationPreview = result;
@@ -2986,13 +3014,14 @@
             if (missing.length) {
                 conclusion.innerHTML = missing.map(item => `<p class="text-rose-700">Thiếu số đo/thông tin của ${escapeHtml(item.name || 'Target lesion')}${item.name ? ` (${escapeHtml(item.name)})` : ''} – chưa đủ dữ liệu để tính RECIST.</p>`).join('');
             } else if (!result.valid) conclusion.textContent = 'Chưa đủ dữ liệu để đánh giá';
-            else if (result.response === 'Baseline') conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${window.classForResponseConclusion('Baseline')}">Baseline</span><span class="ml-2">SOD ${result.sod.toFixed(1)} mm</span>`;
+            else if (result.response === 'Baseline') conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${window.classForResponseConclusion('Baseline')}">Baseline</span><span class="ml-2">SOD ${result.sod.toFixed(1)} mm</span><span class="ml-2 text-slate-500 text-xs">(Đánh giá nền – không đánh giá đáp ứng)</span>`;
             else conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${window.classForResponseConclusion(result.response)}">${escapeHtml(result.response)}</span><span class="ml-2">${escapeHtml(({CR:'Đáp ứng hoàn toàn',PR:'Đáp ứng một phần',SD:'Bệnh ổn định',PD:'Bệnh tiến triển'})[result.response] || 'Chưa đủ dữ liệu để đánh giá')}</span><p class="mt-1">SOD: ${result.sod.toFixed(1)} mm · Baseline: ${result.baselineSod.toFixed(1)} mm · Nadir: ${result.nadir.toFixed(1)} mm</p>${result.responseNote ? `<p>${escapeHtml(result.responseNote)}</p>` : ''}${newStatus === 'suspected' ? '<p class="text-amber-700">Có tổn thương mới nghi ngờ, chưa xác nhận; chưa kết luận PD do dấu hiệu này.</p>' : ''}`;
             if (hasLegacyOnly) conclusion.insertAdjacentHTML('beforeend', '<p class="mt-1 text-amber-700">Đánh giá cũ – cần đánh giá lại theo RECIST 1.1. Dữ liệu cũ được giữ nguyên.</p>');
             document.querySelectorAll('#responseLesions .response-lesion').forEach(row => {
                 const lesion = lesions.find(item => item.id === row.dataset.lesionId);
                 row.querySelector('.lesion-live-result').textContent = !lesion ? '' : lesion.notSeen ? 'Đánh dấu không còn thấy' : lesion.measurementMm > 0 ? `${lesion.measurementMm} mm` : 'Nhập số đo để tính SOD';
             });
+            window.refreshResponseCalculation();
         };
         window.toggleNewLesionFields = function() {
             document.getElementById('responseNewLesionFields').classList.toggle('hidden', document.getElementById('responseNewLesionStatus').value === 'no');
@@ -3000,12 +3029,20 @@
         window.toggleResponseCalculation = function() {
             const panel = document.getElementById('responseCalculation');
             panel.classList.toggle('hidden');
-            if (panel.classList.contains('hidden')) return;
+            if (!panel.classList.contains('hidden')) window.refreshResponseCalculation();
+        };
+        window.refreshResponseCalculation = function() {
+            const panel = document.getElementById('responseCalculation');
+            if (!panel || panel.classList.contains('hidden')) return;
             const r = window.responseCalculationPreview;
-            if (!r?.valid) { panel.textContent = 'Nhập đầy đủ số đo target lesion để xem phép tính.'; return; }
+            if (!r?.valid) { panel.innerHTML = '<p class="text-slate-500">Nhập đầy đủ số đo target lesion để xem phép tính.</p>'; return; }
             const result = window.getResponseLesions();
             const responseViLabel = {CR:'Đáp ứng hoàn toàn',PR:'Đáp ứng một phần',SD:'Bệnh ổn định',PD:'Bệnh tiến triển',Baseline:'Đánh giá nền'};
-            const sums = result.map((item, i) => `${escapeHtml(item.name)}: ${item.notSeen ? '0 mm (không còn thấy)' : `${Number(item.measurementMm).toFixed(1)} mm`}`).join(' + ');
+            const sums = result.map((item, i) => `${escapeHtml(item.name || `Target ${i+1}`)}: ${item.notSeen ? '0 mm (không còn thấy)' : `${Number(item.measurementMm).toFixed(1)} mm`}`).join(' + ');
+            if (r.response === 'Baseline') {
+                panel.innerHTML = `<p>SOD hiện tại: ${sums} = <strong>${r.sod.toFixed(1)} mm</strong></p><p class="text-teal-700 font-semibold">Lần đánh giá <strong>Baseline (Đánh giá nền)</strong></p><p class="text-slate-600">Xác định số đo ban đầu để làm mốc theo dõi cho các lần tiếp theo. <em>Không đánh giá đáp ứng (CR/PR/SD/PD) cho lần nhập Baseline.</em></p>`;
+                return;
+            }
             const pBase = r.baselineChangePct === null ? '—' : `${r.baselineChangePct >= 0 ? '+' : ''}${r.baselineChangePct.toFixed(1)}%`;
             const pNadir = r.nadirChangePct === null ? '—' : `${r.nadirChangePct >= 0 ? '+' : ''}${r.nadirChangePct.toFixed(1)}%`;
             const abs = Number(r.absoluteIncrease || 0); const rel = Number(r.relativeIncrease || 0) * 100;
@@ -3142,7 +3179,8 @@
                 Object.assign(matching, metrics);
             } else {
                 const assessment = {
-                    assessmentId: window.makeResponseLesionId(), recistVersion: '1.1', date, recordedAt: Date.now(), lesions,
+                    assessmentId: (editingIndex !== null && window.tempResponseAssessments[editingIndex]?.assessmentId) ? window.tempResponseAssessments[editingIndex].assessmentId : window.makeResponseLesionId(),
+                    recistVersion: '1.1', date, recordedAt: Date.now(), lesions,
                     nonTargetStatus: document.getElementById('responseNonTargetStatus').value,
                     newLesion: { status: document.getElementById('responseNewLesionStatus').value, organ: document.getElementById('responseNewLesionOrgan').value.trim(), description: document.getElementById('responseNewLesionDescription').value.trim(), sizeMm: Number(document.getElementById('responseNewLesionSize').value) || null }
                 };
@@ -3160,7 +3198,7 @@
             document.getElementById('responseNonTargetStatus').value = 'not_assessed';
             document.getElementById('responseNewLesionStatus').value = 'no';
             document.getElementById('responseNewLesionOrgan').value = ''; document.getElementById('responseNewLesionDescription').value = ''; document.getElementById('responseNewLesionSize').value = '';
-            const now = new Date(); document.getElementById('responseAssessmentDate').value = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+
             window.toggleNewLesionFields(); window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã lưu đánh giá theo RECIST 1.1.');
         };
 
@@ -3177,15 +3215,29 @@
             return lesions.reduce((sum, l) => sum + (l.notSeen ? 0 : Number(l.viableMm)), 0);
         };
         window.calculateMRECIST = function(priorHistory, current) {
-            const history = (priorHistory || []).filter(i => i.recistVersion === 'mRECIST').slice().sort((a,b) => String(a.date||'').localeCompare(String(b.date||'')) || ((Number(a.recordedAt)||0)-(Number(b.recordedAt)||0)));
+            if (!current || !current.lesions) return { valid: false, response: 'Chưa đủ dữ liệu' };
             const currentSod = window.calculateViableSOD(current.lesions);
             if (currentSod === null) return { valid: false, response: 'Chưa đủ dữ liệu' };
-            if (!history.length) {
-                return { valid: true, response: 'Baseline', viableSod: currentSod, baselineViableSod: currentSod, nadir: currentSod, baselineChangePct: 0, nadirChangePct: 0, responseNote: '' };
+
+            const targetId = current.assessmentId || '__preview_mrecist__';
+            const currentObj = { ...current, assessmentId: targetId, viableSod: currentSod };
+
+            const historyWithoutCurrent = (priorHistory || []).filter(i => i && i.recistVersion === 'mRECIST' && i.assessmentId !== targetId);
+            const ordered = [...historyWithoutCurrent, currentObj]
+                .map(item => ({ ...item, viableSod: window.calculateViableSOD(item.lesions) }))
+                .filter(item => Number.isFinite(Number(item.viableSod)))
+                .sort((a,b) => String(a.date||'').localeCompare(String(b.date||'')) || ((Number(a.recordedAt)||0)-(Number(b.recordedAt)||0)));
+
+            const index = ordered.findIndex(item => item.assessmentId === targetId);
+            const prior = index > 0 ? ordered.slice(0, index) : [];
+
+            if (!prior.length) {
+                return { valid: true, response: 'Baseline', viableSod: currentSod, baselineViableSod: currentSod, nadir: currentSod, baselineChangePct: null, nadirChangePct: null, responseNote: 'Đánh giá đầu tiên trong hồ sơ được lưu làm Baseline.' };
             }
-            const baseline = history[0];
+            const baseline = prior[0];
             const baselineViableSod = Number(baseline.viableSod ?? window.calculateViableSOD(baseline.lesions));
-            const nadir = Math.min(...history.map(i => Number(i.viableSod ?? window.calculateViableSOD(i.lesions))).filter(Number.isFinite), currentSod);
+            const currentAndPrior = [...prior, currentObj];
+            const nadir = Math.min(...currentAndPrior.map(i => Number(i.viableSod ?? window.calculateViableSOD(i.lesions))).filter(Number.isFinite));
             const baselineChangePct = baselineViableSod > 0 ? ((currentSod - baselineViableSod) / baselineViableSod) * 100 : null;
             const nadirChangePct   = nadir > 0             ? ((currentSod - nadir) / nadir) * 100                         : null;
             const newLesionStatus  = (current.newLesion || {}).status || 'no';
@@ -3273,29 +3325,53 @@
         };
         window.updateMrecistConclusion = function() {
             const lesions = window.getMrecistLesions();
-            const history = window.mrecistAssessments();
-            const r = window.calculateMRECIST(history, { lesions, newLesion: { status: document.getElementById('mrecistNewLesionStatus')?.value || 'no' }, nonTargetStatus: document.getElementById('mrecistNonTargetStatus')?.value || 'not_assessed' });
+            const date = document.getElementById('mrecistAssessmentDate')?.value || '';
+            const editingIdx = (Number.isInteger(window.editingMrecistAssessmentIndex) && window.editingMrecistAssessmentIndex >= 0) ? window.editingMrecistAssessmentIndex : null;
+            const editingId = editingIdx !== null ? window.tempResponseAssessments[editingIdx]?.assessmentId : null;
+            const history = window.mrecistAssessments().filter(item => item.assessmentId !== editingId);
+            const currentObj = { 
+                assessmentId: editingId || '__preview_mrecist__',
+                recistVersion: 'mRECIST',
+                date,
+                lesions, 
+                newLesion: { status: document.getElementById('mrecistNewLesionStatus')?.value || 'no' }, 
+                nonTargetStatus: document.getElementById('mrecistNonTargetStatus')?.value || 'not_assessed' 
+            };
+            const r = window.calculateMRECIST(history, currentObj);
             window.mrecistCalculationPreview = r;
             const conclusion = document.getElementById('mrecistConclusion');
-            if (!conclusion) return;
-            const viLabel = { CR:'Đáp ứng hoàn toàn', PR:'Đáp ứng một phần', SD:'Bệnh ổn định', PD:'Bệnh tiến triển', Baseline:'Đánh giá nền' };
-            if (!r.valid) { conclusion.textContent = r.response || 'Chưa đủ dữ liệu để đánh giá'; return; }
-            const colorClass = window.classForResponseConclusion ? window.classForResponseConclusion(r.response) : 'bg-slate-200 text-slate-800';
-            if (r.response === 'Baseline') {
-                conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${colorClass}">Baseline</span><span class="ml-2">Viable SOD ${r.viableSod?.toFixed(1)} mm</span>`;
-            } else {
-                const pBase = r.baselineChangePct === null ? '—' : `${r.baselineChangePct >= 0 ? '+' : ''}${r.baselineChangePct.toFixed(1)}%`;
-                conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${colorClass}">${escapeHtml(r.response)}</span><span class="ml-2">${viLabel[r.response] || ''}</span><p class="mt-1">Viable SOD: ${r.viableSod?.toFixed(1)} mm · Baseline: ${r.baselineViableSod?.toFixed(1)} mm · Nadir: ${r.nadir?.toFixed(1)} mm</p>${r.responseNote ? `<p>${escapeHtml(r.responseNote)}</p>` : ''}`;
+            if (conclusion) {
+                const viLabel = { CR:'Đáp ứng hoàn toàn', PR:'Đáp ứng một phần', SD:'Bệnh ổn định', PD:'Bệnh tiến triển', Baseline:'Đánh giá nền' };
+                if (!r.valid) { 
+                    conclusion.textContent = r.response || 'Chưa đủ dữ liệu để đánh giá'; 
+                } else {
+                    const colorClass = window.classForResponseConclusion ? window.classForResponseConclusion(r.response) : 'bg-slate-200 text-slate-800';
+                    if (r.response === 'Baseline') {
+                        conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${colorClass}">Baseline</span><span class="ml-2">Viable SOD ${r.viableSod?.toFixed(1)} mm</span><span class="ml-2 text-slate-500 text-xs">(Đánh giá nền – không đánh giá đáp ứng)</span>`;
+                    } else {
+                        const pBase = r.baselineChangePct === null ? '—' : `${r.baselineChangePct >= 0 ? '+' : ''}${r.baselineChangePct.toFixed(1)}%`;
+                        conclusion.innerHTML = `<span class="rounded-full px-2 py-1 font-bold ${colorClass}">${escapeHtml(r.response)}</span><span class="ml-2">${viLabel[r.response] || ''}</span><p class="mt-1">Viable SOD: ${r.viableSod?.toFixed(1)} mm · Baseline: ${r.baselineViableSod?.toFixed(1)} mm · Nadir: ${r.nadir?.toFixed(1)} mm</p>${r.responseNote ? `<p>${escapeHtml(r.responseNote)}</p>` : ''}`;
+                    }
+                }
             }
+            window.refreshMrecistCalculation();
         };
         window.toggleMrecistCalculation = function() {
             const panel = document.getElementById('mrecistCalculation'); panel.classList.toggle('hidden');
-            if (panel.classList.contains('hidden')) return;
+            if (!panel.classList.contains('hidden')) window.refreshMrecistCalculation();
+        };
+        window.refreshMrecistCalculation = function() {
+            const panel = document.getElementById('mrecistCalculation');
+            if (!panel || panel.classList.contains('hidden')) return;
             const r = window.mrecistCalculationPreview;
-            if (!r?.valid) { panel.textContent = 'Nhập đầy đủ số đo mô u sống để xem phép tính.'; return; }
+            if (!r?.valid) { panel.innerHTML = '<p class="text-slate-500">Nhập đầy đủ số đo mô u sống để xem phép tính.</p>'; return; }
             const lesions = window.getMrecistLesions();
             const viLabel = { CR:'Đáp ứng hoàn toàn', PR:'Đáp ứng một phần', SD:'Bệnh ổn định', PD:'Bệnh tiến triển', Baseline:'Đánh giá nền' };
-            const sums = lesions.map(l => `${escapeHtml(l.name)}: ${l.notSeen ? '0 mm (không còn thấy)' : `${Number(l.viableMm).toFixed(1)} mm`}`).join(' + ');
+            const sums = lesions.map((l, i) => `${escapeHtml(l.name || `Tổn thương ${i+1}`)}: ${l.notSeen ? '0 mm (không còn thấy)' : `${Number(l.viableMm).toFixed(1)} mm`}`).join(' + ');
+            if (r.response === 'Baseline') {
+                panel.innerHTML = `<p>Viable SOD hiện tại: ${sums} = <strong>${r.viableSod?.toFixed(1)} mm</strong></p><p class="text-amber-800 font-semibold">Lần đánh giá <strong>Baseline (Đánh giá nền)</strong> theo mRECIST</p><p class="text-slate-600">Xác định số đo mô u sống ban đầu để làm mốc theo dõi cho các lần tiếp theo. <em>Không đánh giá đáp ứng (CR/PR/SD/PD) cho lần nhập Baseline.</em></p>`;
+                return;
+            }
             const pBase = r.baselineChangePct === null ? '—' : `${r.baselineChangePct >= 0 ? '+' : ''}${r.baselineChangePct.toFixed(1)}%`;
             const pNadir = r.nadirChangePct === null ? '—' : `${r.nadirChangePct >= 0 ? '+' : ''}${r.nadirChangePct.toFixed(1)}%`;
             panel.innerHTML = `<p>Viable SOD hiện tại: ${sums} = <strong>${r.viableSod?.toFixed(1)} mm</strong></p><p>Baseline Viable SOD: ${r.baselineViableSod?.toFixed(1)} mm</p><p>Nadir: ${r.nadir?.toFixed(1)} mm</p><p>Thay đổi so Baseline: ${pBase}</p><p>Thay đổi so Nadir: ${pNadir}</p><p>PR khi Nadir giảm ≥30%: ${(r.nadirChangePct??0) <= -30 ? 'Đạt' : 'Chưa đạt'}. PD khi Nadir tăng ≥20%: ${(r.nadirChangePct??0) >= 20 ? 'Đạt' : 'Chưa đạt'}.</p><p>Kết luận: <strong>${escapeHtml(r.response)}${viLabel[r.response] ? ` – ${viLabel[r.response]}` : ''}</strong>.</p>`;
@@ -3331,16 +3407,18 @@
             for (const l of lesions) { if (!l.name) { alert('Mỗi tổn thương cần có tên/mô tả.'); return; } if (!l.notSeen && (l.viableMm === null || l.viableMm === undefined)) { alert(`Thiếu kích thước mô u sống cho tổn thương: ${l.name}`); return; } }
             const existing = window.mrecistAssessments().find(item => item.date === date);
             if (existing && window.editingMrecistAssessmentIndex === null) { if (!confirm('Đã có đánh giá mRECIST ngày này. Ghi đè?')) return; window.tempResponseAssessments.splice(window.tempResponseAssessments.indexOf(existing), 1); }
+            const editingIdx = (Number.isInteger(window.editingMrecistAssessmentIndex) && window.editingMrecistAssessmentIndex >= 0) ? window.editingMrecistAssessmentIndex : null;
             const assessment = {
-                assessmentId: window.makeMrecistLesionId(), recistVersion: 'mRECIST', date, recordedAt: Date.now(), lesions,
+                assessmentId: (editingIdx !== null && window.tempResponseAssessments[editingIdx]?.assessmentId) ? window.tempResponseAssessments[editingIdx].assessmentId : window.makeMrecistLesionId(),
+                recistVersion: 'mRECIST', date, recordedAt: Date.now(), lesions,
                 nonTargetStatus: document.getElementById('mrecistNonTargetStatus').value,
                 newLesion: { status: document.getElementById('mrecistNewLesionStatus').value }
             };
             assessment.viableSod = window.calculateViableSOD(lesions);
             const nextHistory = window.mrecistAssessments().filter(i => i.assessmentId !== assessment.assessmentId);
             Object.assign(assessment, window.calculateMRECIST(nextHistory, assessment));
-            if (Number.isInteger(window.editingMrecistAssessmentIndex) && window.editingMrecistAssessmentIndex >= 0) {
-                window.tempResponseAssessments[window.editingMrecistAssessmentIndex] = assessment;
+            if (editingIdx !== null) {
+                window.tempResponseAssessments[editingIdx] = assessment;
             } else {
                 window.tempResponseAssessments.push(assessment);
             }
@@ -3351,7 +3429,7 @@
             document.getElementById('mrecistRecordButton').textContent = 'Ghi nhận đánh giá mRECIST';
             document.getElementById('mrecistNonTargetStatus').value = 'not_assessed';
             document.getElementById('mrecistNewLesionStatus').value = 'no';
-            const now = new Date(); document.getElementById('mrecistAssessmentDate').value = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+
             window.renderMrecistInputs(); window.refreshMrecistHistory(); window.showToast('Đã lưu đánh giá mRECIST!');
         };
         window.deleteMrecistAssessment = function(globalIdx) {
