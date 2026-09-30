@@ -4,8 +4,8 @@
   "description": "Quản lý hóa trị ung bướu và thống kê",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#07111f",
-  "theme_color": "#0d9488",
+  "background_color": "#010204",
+  "theme_color": "#010204",
   "icons": [
     {
       "src": "./icon-192.png?v=5",

@@ -10,6 +10,11 @@
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#010204" id="metaThemeColor">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#010204">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8f9fb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>OncoCare Pro - Quản Lý Hóa Trị Ung Bướu & Thống Kê</title>
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=2">
@@ -24,9 +29,18 @@
     <!-- Chart.js for Marker Tracking Chart & Pie Chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        window.updateAppThemeColor = function(theme) {
+            const color = theme === 'dark' ? '#010204' : '#f8f9fb';
+            const meta = document.getElementById('metaThemeColor');
+            if (meta) meta.setAttribute('content', color);
+            document.querySelectorAll('meta[name="theme-color"]').forEach(el => {
+                el.setAttribute('content', color);
+            });
+        };
         (() => {
-            const savedTheme = localStorage.getItem('oncocare-theme');
-            document.documentElement.dataset.theme = savedTheme || 'dark';
+            const savedTheme = localStorage.getItem('oncocare-theme') || 'dark';
+            document.documentElement.dataset.theme = savedTheme;
+            window.updateAppThemeColor(savedTheme);
         })();
         window.loginWithGoogle = window.loginWithGoogle || function() {
             alert("Hệ thống đang tải thư viện đăng nhập, vui lòng bấm lại sau 1-2 giây...");
@@ -747,6 +761,95 @@
         </div>
     </div>
 
+    <!-- MODAL XÁC NHẬN HẸN TÁI KHÁM -->
+    <div id="followUpModal" class="fixed inset-0 z-[220] hidden items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-fadeIn">
+            <!-- Header -->
+            <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="window.closeFollowUpModal(false)" title="Đóng"
+                        class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] flex items-center justify-center hover:brightness-110">
+                        <i class="fa-solid fa-xmark text-[7px] text-[#7a1712] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </button>
+                    <div class="w-8 h-8 bg-teal-500/20 rounded-lg flex items-center justify-center border border-teal-400/30">
+                        <i class="fa-solid fa-calendar-check text-teal-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm uppercase tracking-wide">Xác nhận hẹn tái khám</h3>
+                        <p class="text-slate-400 text-[10px] mt-0.5">Đặt lịch hẹn sau chu kỳ hóa trị</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Body -->
+            <div class="p-5 space-y-4 text-xs">
+                <div class="p-3 bg-teal-50 border border-teal-200 rounded-xl text-teal-900 text-xs font-medium flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-info text-teal-600 mt-0.5 text-sm shrink-0"></i>
+                    <div>
+                        <p class="font-bold">Đã ghi nhận chu kỳ điều trị!</p>
+                        <p class="text-[11px] text-teal-800 mt-0.5">Bệnh nhân có hẹn tái khám sau chu kỳ này không?</p>
+                    </div>
+                </div>
+
+                <!-- Choice Toggle -->
+                <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+                    <button type="button" id="btnFollowUpNo" onclick="window.setFollowUpChoice(false)" class="py-2 px-3 rounded-lg font-bold text-xs transition flex items-center justify-center gap-1.5 bg-white text-slate-700 shadow-sm">
+                        <i class="fa-solid fa-xmark text-slate-500"></i> Không hẹn
+                    </button>
+                    <button type="button" id="btnFollowUpYes" onclick="window.setFollowUpChoice(true)" class="py-2 px-3 rounded-lg font-bold text-xs transition flex items-center justify-center gap-1.5 text-teal-700 hover:text-teal-900">
+                        <i class="fa-solid fa-calendar-plus text-teal-600"></i> Có hẹn tái khám
+                    </button>
+                </div>
+
+                <!-- Options when 'Yes' is selected -->
+                <div id="followUpConfigSection" class="hidden space-y-3 pt-1 border-t border-slate-100">
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider mb-1.5">Số ngày hẹn tái khám</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="followUpDaysInput" min="1" max="365" value="21" oninput="window.updateFollowUpPreviewDate()"
+                                class="w-24 p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-center text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <span class="text-slate-600 font-medium">ngày</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick buttons -->
+                    <div>
+                        <label class="block font-semibold text-slate-500 text-[10px] uppercase tracking-wider mb-1">Gợi ý nhanh:</label>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button type="button" onclick="window.setFollowUpPresetDays(7)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[11px] transition">7 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(14)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[11px] transition">14 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(21)" class="px-2.5 py-1 bg-teal-100 text-teal-900 font-bold rounded-md border border-teal-300 text-[11px] transition">21 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(28)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[11px] transition">28 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(30)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[11px] transition">30 ngày</button>
+                        </div>
+                    </div>
+
+                    <!-- Date Preview Calculation -->
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1 text-[11px]">
+                        <div class="flex justify-between text-slate-600">
+                            <span>Ngày hiện tại hệ thống:</span>
+                            <strong id="followUpCurrentDateText" class="text-slate-800">--/--/----</strong>
+                        </div>
+                        <div class="flex justify-between text-teal-900 font-bold text-xs pt-1 border-t border-amber-200/60">
+                            <span>Ngày tái khám dự kiến:</span>
+                            <span id="followUpTargetDateText" class="text-teal-700 bg-teal-100/80 px-2 py-0.5 rounded font-extrabold">--/--/----</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-end gap-2.5 bg-slate-50 shrink-0">
+                <button type="button" onclick="window.closeFollowUpModal(false)"
+                    class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition text-xs">
+                    Không hẹn
+                </button>
+                <button type="button" id="btnConfirmFollowUp" onclick="window.confirmSaveFollowUp()"
+                    class="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-check"></i> Xác nhận lịch hẹn
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODUN 4: MODAL THÊM / SỬA HỒ SƠ BỆNH NHÂN & CHU KỲ -->
     <!-- ========================================== -->
     <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[115] hidden flex items-center justify-center p-4">
@@ -1364,15 +1467,15 @@
         <div class="p-3 sm:p-5 space-y-3 flex-1 min-h-0 overflow-hidden flex flex-col text-xs">
             <!-- Bộ lọc khoảng thời gian thực -->
             <div id="statsFilters" class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 flex flex-wrap justify-center items-end gap-3 shrink-0">
-                <div class="w-full sm:w-56">
+                <div class="w-full sm:w-52">
                     <label for="statsStartDate" class="block text-center font-semibold text-slate-700 mb-1">Từ ngày</label>
                     <input type="date" id="statsStartDate" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium text-center">
                 </div>
-                <div class="w-full sm:w-56">
+                <div class="w-full sm:w-52">
                     <label for="statsEndDate" class="block text-center font-semibold text-slate-700 mb-1">Đến ngày</label>
                     <input type="date" id="statsEndDate" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium text-center">
                 </div>
-                <div class="w-full sm:w-52">
+                <div class="w-full sm:w-48">
                     <label for="statsIcdFilter" class="sr-only">Lọc theo nhóm ICD</label>
                     <select id="statsIcdFilter" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 text-center">
                         <option value="ALL">Tất cả ICD</option>
@@ -1381,6 +1484,12 @@
                         <option value="C19">C19 (Đoạn nối trực - đại tràng)</option>
                         <option value="C20">C20 (Trực tràng)</option>
                         <option value="C50">C50 (Vú)</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-52">
+                    <label for="statsProtocolFilter" class="sr-only">Lọc theo phác đồ</label>
+                    <select id="statsProtocolFilter" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 text-center">
+                        <option value="ALL">Tất cả phác đồ</option>
                     </select>
                 </div>
                 <div>
@@ -1394,6 +1503,10 @@
                 <button type="button" id="btnStatsPatientsTab" onclick="window.switchStatsTab('patients')" class="flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition">
                     <i class="fa-solid fa-hospital-user mr-1.5"></i>Danh sách bệnh
                 </button>
+                <button type="button" id="btnStatsFollowUpTab" onclick="window.switchStatsTab('followup')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-calendar-check text-amber-600"></i>Bệnh nhân đến hẹn
+                    <span id="statsFollowUpBadge" class="hidden px-1.5 py-0.2 bg-rose-500 text-white text-[9px] rounded-full font-bold">0</span>
+                </button>
                 <button type="button" id="btnStatsOverviewTab" onclick="window.switchStatsTab('overview')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition">
                     <i class="fa-solid fa-chart-pie mr-1.5"></i>Thống kê
                 </button>
@@ -1404,7 +1517,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
                 <div class="stats-card bg-teal-50 border border-teal-200 p-3 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-teal-700 font-semibold uppercase text-[10px]">Tổng BN nhập trong khoảng thời gian</p>
+                        <p class="text-teal-700 font-semibold uppercase text-[10px]">Tổng BN trong kỳ (COUNT DISTINCT)</p>
                         <h4 id="statTotalPatients" class="text-2xl font-bold text-teal-900 mt-1">0</h4>
                     </div>
                     <div class="w-10 h-10 bg-teal-200/60 rounded-full flex items-center justify-center text-teal-800 text-lg">
@@ -1428,6 +1541,16 @@
                     <div class="w-10 h-10 bg-amber-200/60 rounded-full flex items-center justify-center text-amber-800 text-lg">
                         <i class="fa-solid fa-user-clock"></i>
                     </div>
+                </div>
+            </div>
+
+            <!-- Phân bố phác đồ -->
+            <div class="stats-card bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl shrink-0">
+                <p class="text-emerald-800 font-bold uppercase text-[10px] mb-1.5 flex items-center gap-1.5">
+                    <i class="fa-solid fa-vial text-emerald-600"></i> PHÂN BỐ BỆNH NHÂN THEO PHÁC ĐỒ (COUNT DISTINCT):
+                </p>
+                <div id="statProtocolBreakdown" class="flex flex-wrap gap-1.5 text-xs">
+                    <span class="text-slate-400">Đang tính toán...</span>
                 </div>
             </div>
 
@@ -1480,6 +1603,63 @@
                     </table>
                 </div>
                 <div id="statsPagination" class="flex flex-wrap items-center justify-center gap-1 pt-1 shrink-0" aria-label="Phân trang danh sách bệnh nhân"></div>
+            </div>
+
+            <!-- Danh sách bệnh nhân đến hẹn tái khám -->
+            <div id="statsFollowUpPanel" class="hidden flex-1 min-h-0 flex-col space-y-2 overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">DANH SÁCH BỆNH NHÂN ĐẾN HẸN TÁI KHÁM:</h4>
+                        <span id="statsFollowUpCountText" class="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">0 bệnh nhân</span>
+                    </div>
+                    <!-- Sub filter tabs for follow-up -->
+                    <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px]">
+                        <button type="button" id="btnFuFilterTomorrow" onclick="window.setFollowUpFilter('tomorrow')" class="px-2.5 py-1 rounded-md font-bold bg-white text-teal-800 shadow-sm transition flex items-center gap-1">
+                            <i class="fa-solid fa-bell text-amber-500"></i> Báo trước 1 ngày (Ngày mai)
+                        </button>
+                        <button type="button" id="btnFuFilterToday" onclick="window.setFollowUpFilter('today')" class="px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-teal-800 transition">
+                            Hôm nay
+                        </button>
+                        <button type="button" id="btnFuFilterOverdue" onclick="window.setFollowUpFilter('overdue')" class="px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-teal-800 transition">
+                            Quá hẹn
+                        </button>
+                        <button type="button" id="btnFuFilterAll" onclick="window.setFollowUpFilter('all')" class="px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-teal-800 transition">
+                            Tất cả lịch hẹn
+                        </button>
+                    </div>
+                </div>
+                <div id="statsFollowUpTableViewport" class="flex-1 min-h-0 overflow-x-auto overflow-y-auto rounded-xl border border-slate-200 bg-white">
+                    <table class="w-full min-w-[850px] table-fixed text-left text-xs text-slate-700">
+                        <colgroup>
+                            <col style="width: 10%;">
+                            <col style="width: 18%;">
+                            <col style="width: 14%;">
+                            <col style="width: 18%;">
+                            <col style="width: 18%;">
+                            <col style="width: 12%;">
+                            <col style="width: 10%;">
+                        </colgroup>
+                        <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="p-3">Mã BN</th>
+                                <th class="p-3">Họ và Tên</th>
+                                <th class="p-3 text-center">Ngày Tái Khám</th>
+                                <th class="p-3 text-center">Trạng Thái Hẹn</th>
+                                <th class="p-3">Phác Đồ</th>
+                                <th class="p-3 text-center">Chu Kỳ Gần Nhất</th>
+                                <th class="p-3 text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsFollowUpTableBody" class="divide-y divide-slate-200">
+                            <tr>
+                                <td colspan="7" class="p-6 text-center text-slate-400 font-medium">
+                                    Không có bệnh nhân nào đến hẹn tái khám.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="statsFollowUpPagination" class="flex flex-wrap items-center justify-center gap-1 pt-1 shrink-0" aria-label="Phân trang danh sách tái khám"></div>
             </div>
         </div>
 
@@ -1555,16 +1735,83 @@
             return match ? `${match[3]}/${match[2]}/${match[1]}` : dateText;
         }
 
+        /**
+         * Lấy ngày hiện tại hoặc ngày sau N ngày theo ngày lịch (calendar day)
+         * chuẩn múi giờ Việt Nam (Asia/Ho_Chi_Minh) định dạng YYYY-MM-DD
+         */
+        window.getSystemDateVN = function(offsetDays = 0) {
+            const now = new Date();
+            const vnFormatter = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Ho_Chi_Minh',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const vnDateStr = vnFormatter.format(now);
+            if (!offsetDays) return vnDateStr;
+            const [year, month, day] = vnDateStr.split('-').map(Number);
+            const d = new Date(Date.UTC(year, month - 1, day));
+            d.setUTCDate(d.getUTCDate() + Number(offsetDays));
+            return d.toISOString().slice(0, 10);
+        };
+
+        /**
+         * Tính số ngày lịch chênh lệch giữa 2 chuỗi ngày YYYY-MM-DD (dateStr1 - dateStr2)
+         */
+        window.getCalendarDayDiff = function(dateStr1, dateStr2) {
+            if (!dateStr1 || !dateStr2) return 0;
+            const [y1, m1, d1] = String(dateStr1).slice(0, 10).split('-').map(Number);
+            const [y2, m2, d2] = String(dateStr2).slice(0, 10).split('-').map(Number);
+            if (isNaN(y1) || isNaN(y2)) return 0;
+            const utc1 = Date.UTC(y1, m1 - 1, d1);
+            const utc2 = Date.UTC(y2, m2 - 1, d2);
+            return Math.round((utc1 - utc2) / 86400000);
+        };
+
+        /**
+         * Lấy thông tin lịch hẹn tái khám gần nhất của bệnh nhân
+         */
+        window.getPatientLatestFollowUp = function(patient) {
+            if (!patient) return null;
+            if (patient.latestFollowUp && patient.latestFollowUp.date) {
+                return patient.latestFollowUp;
+            }
+            const cycles = patient.cycles || [];
+            for (let i = cycles.length - 1; i >= 0; i--) {
+                const c = cycles[i];
+                if (c && c.followUpDate) {
+                    return {
+                        date: c.followUpDate,
+                        days: c.followUpDays || 0,
+                        cycleNum: c.cycleNum || (i + 1),
+                        branchName: c.branchName || `Chu kỳ ${c.cycleNum || (i + 1)}`,
+                        protocol: c.protocolUsed || patient.protocol || 'Chưa cập nhật',
+                        required: true,
+                        createdAt: c.followUpCreatedAt || ''
+                    };
+                }
+            }
+            return null;
+        };
+
         window.toggleTheme = function() {
             const isDark = document.documentElement.dataset.theme !== 'dark';
-            document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-            localStorage.setItem('oncocare-theme', isDark ? 'dark' : 'light');
+            const newTheme = isDark ? 'dark' : 'light';
+            document.documentElement.dataset.theme = newTheme;
+            localStorage.setItem('oncocare-theme', newTheme);
+            if (typeof window.updateAppThemeColor === 'function') {
+                window.updateAppThemeColor(newTheme);
+            }
             const button = document.getElementById('themeToggleButton');
             const icon = document.getElementById('themeToggleIcon');
-            button.setAttribute('aria-pressed', String(isDark));
-            button.setAttribute('aria-label', isDark ? 'Bật giao diện sáng' : 'Bật giao diện tối');
-            button.title = isDark ? 'Bật giao diện sáng' : 'Bật giao diện tối';
-            icon.className = `fa-solid ${isDark ? 'fa-moon' : 'fa-sun'}`;
+            if (button) {
+                button.setAttribute('aria-pressed', String(isDark));
+                button.setAttribute('aria-label', isDark ? 'Bật giao diện sáng' : 'Bật giao diện tối');
+                button.title = isDark ? 'Bật giao diện sáng' : 'Bật giao diện tối';
+            }
+            if (icon) {
+                icon.className = `fa-solid ${isDark ? 'fa-moon' : 'fa-sun'}`;
+            }
         };
         window.toggleAccountSettingsMenu = function() {
             const menu = document.getElementById('accountSettingsMenu');
@@ -2525,6 +2772,10 @@
             document.getElementById('statsStartDate').value = '';
             document.getElementById('statsEndDate').value = '';
             document.getElementById('statsIcdFilter').value = 'ALL';
+            window.populateStatsProtocolFilter();
+            if (document.getElementById('statsProtocolFilter')) {
+                document.getElementById('statsProtocolFilter').value = 'ALL';
+            }
             if (!window.statsModalIsMaximized) window.toggleStatsModalSize();
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
@@ -2537,6 +2788,9 @@
             document.getElementById('statsStartDate').value = '';
             document.getElementById('statsEndDate').value = '';
             document.getElementById('statsIcdFilter').value = 'ALL';
+            if (document.getElementById('statsProtocolFilter')) {
+                document.getElementById('statsProtocolFilter').value = 'ALL';
+            }
             window.runChemoStatistics();
             window.switchStatsTab('patients');
         };
@@ -2554,28 +2808,41 @@
 
         window.switchStatsTab = function(tabName) {
             if (!window.canUseOncoCare) return;
-            const showOverview = tabName === 'overview';
             const overviewPanel = document.getElementById('statsOverviewPanel');
             const patientsPanel = document.getElementById('statsPatientsPanel');
-            overviewPanel.classList.toggle('hidden', !showOverview);
-            patientsPanel.classList.toggle('hidden', showOverview);
-            patientsPanel.classList.toggle('flex', !showOverview);
-            const activePanel = showOverview ? overviewPanel : patientsPanel;
-            activePanel.classList.remove('tab-panel-enter');
-            void activePanel.offsetWidth;
-            activePanel.classList.add('tab-panel-enter');
+            const followUpPanel = document.getElementById('statsFollowUpPanel');
+
+            overviewPanel.classList.toggle('hidden', tabName !== 'overview');
+            patientsPanel.classList.toggle('hidden', tabName !== 'patients');
+            patientsPanel.classList.toggle('flex', tabName === 'patients');
+            if (followUpPanel) {
+                followUpPanel.classList.toggle('hidden', tabName !== 'followup');
+                followUpPanel.classList.toggle('flex', tabName === 'followup');
+            }
+
+            const activePanel = tabName === 'overview' ? overviewPanel : (tabName === 'followup' ? followUpPanel : patientsPanel);
+            if (activePanel) {
+                activePanel.classList.remove('tab-panel-enter');
+                void activePanel.offsetWidth;
+                activePanel.classList.add('tab-panel-enter');
+            }
 
             const overviewButton = document.getElementById('btnStatsOverviewTab');
             const patientsButton = document.getElementById('btnStatsPatientsTab');
-            overviewButton.className = showOverview
-                ? 'flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition'
-                : 'flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition';
-            patientsButton.className = showOverview
-                ? 'flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition'
-                : 'flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition';
+            const followUpButton = document.getElementById('btnStatsFollowUpTab');
 
-            if (!showOverview) window.renderStatsPatientPage();
-            if (showOverview) setTimeout(() => window.statsPieChartInstance?.resize(), 0);
+            const activeClass = 'flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition';
+            const inactiveClass = 'flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition';
+
+            if (overviewButton) overviewButton.className = tabName === 'overview' ? activeClass : inactiveClass;
+            if (patientsButton) patientsButton.className = tabName === 'patients' ? activeClass : inactiveClass;
+            if (followUpButton) {
+                followUpButton.className = (tabName === 'followup' ? activeClass : inactiveClass) + ' flex items-center justify-center gap-1.5';
+            }
+
+            if (tabName === 'patients') window.renderStatsPatientPage();
+            if (tabName === 'followup') window.renderStatsFollowUpList();
+            if (tabName === 'overview') setTimeout(() => window.statsPieChartInstance?.resize(), 0);
         };
 
         window.closeStatsModal = function() {
@@ -3724,6 +3991,7 @@
                             </div>
                             <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${escapeHtml(c.drugNames || 'N/A')} - <strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'N/A')}</p>
                             <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${escapeHtml(c.note || 'Không có')}</p>
+                            ${c.followUpDate ? `<p class="text-amber-800 font-semibold text-[11px] pt-1 border-t border-slate-200/60 flex items-center gap-1.5"><i class="fa-solid fa-calendar-check text-amber-600"></i><strong>Hẹn tái khám:</strong> ${escapeHtml(formatDisplayDate(c.followUpDate))} ${c.followUpDays ? `<span class="font-normal text-slate-500">(sau ${c.followUpDays} ngày)</span>` : ''}</p>` : ''}
                         `;
                         cyclesContainer.appendChild(cDiv);
                     });
@@ -3949,11 +4217,20 @@
                 updatedBy: window.getCurrentEditorName()
             };
 
+            let targetIndex = 0;
             if (existingIndex !== -1) {
+                if (window.tempCurrentCycles[existingIndex].followUpDate) {
+                    cycleData.followUpRequired = window.tempCurrentCycles[existingIndex].followUpRequired;
+                    cycleData.followUpDays = window.tempCurrentCycles[existingIndex].followUpDays;
+                    cycleData.followUpDate = window.tempCurrentCycles[existingIndex].followUpDate;
+                    cycleData.followUpCreatedAt = window.tempCurrentCycles[existingIndex].followUpCreatedAt;
+                }
                 window.tempCurrentCycles[existingIndex] = cycleData;
+                targetIndex = existingIndex;
                 window.showToast(`Đã tự động cập nhật chu kỳ ngày ${cycleDate}!`);
             } else {
                 window.tempCurrentCycles.push(cycleData);
+                targetIndex = window.tempCurrentCycles.length - 1;
                 window.showToast("Đã thêm chu kỳ mới thành công!");
             }
 
@@ -3966,6 +4243,87 @@
                 document.getElementById('currentActiveProtoLabel').innerText = proto;
                 window.toggleProtocolMode();
             }
+
+            // Mở popup hỏi hẹn tái khám cho chu kỳ vừa thêm
+            window.openFollowUpModal(targetIndex);
+        };
+
+        // ==========================================
+        // CHỨC NĂNG XÁC NHẬN HẸN TÁI KHÁM
+        // ==========================================
+        window._currentFollowUpCycleIndex = null;
+        window._followUpChoice = true;
+
+        window.openFollowUpModal = function(cycleIndex) {
+            window._currentFollowUpCycleIndex = cycleIndex;
+            window.setFollowUpChoice(true);
+            const daysInput = document.getElementById('followUpDaysInput');
+            if (daysInput) daysInput.value = 21;
+            window.updateFollowUpPreviewDate();
+            window.setPanelVisibility(document.getElementById('followUpModal'), true);
+        };
+
+        window.setFollowUpChoice = function(choice) {
+            window._followUpChoice = choice;
+            const btnYes = document.getElementById('btnFollowUpYes');
+            const btnNo = document.getElementById('btnFollowUpNo');
+            const configSection = document.getElementById('followUpConfigSection');
+            const confirmBtn = document.getElementById('btnConfirmFollowUp');
+
+            if (choice) {
+                if (btnYes) btnYes.className = 'py-2 px-3 rounded-lg font-bold text-xs transition flex items-center justify-center gap-1.5 bg-white text-teal-800 shadow-sm border border-teal-200';
+                if (btnNo) btnNo.className = 'py-2 px-3 rounded-lg font-semibold text-xs transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900';
+                if (configSection) configSection.classList.remove('hidden');
+                if (confirmBtn) confirmBtn.innerHTML = '<i class="fa-solid fa-check"></i> Xác nhận lịch hẹn';
+            } else {
+                if (btnNo) btnNo.className = 'py-2 px-3 rounded-lg font-bold text-xs transition flex items-center justify-center gap-1.5 bg-white text-slate-800 shadow-sm border border-slate-300';
+                if (btnYes) btnYes.className = 'py-2 px-3 rounded-lg font-semibold text-xs transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-teal-800';
+                if (configSection) configSection.classList.add('hidden');
+                if (confirmBtn) confirmBtn.innerHTML = '<i class="fa-solid fa-check"></i> Hoàn tất (Không hẹn)';
+            }
+        };
+
+        window.setFollowUpPresetDays = function(days) {
+            const input = document.getElementById('followUpDaysInput');
+            if (input) {
+                input.value = days;
+                window.updateFollowUpPreviewDate();
+            }
+        };
+
+        window.updateFollowUpPreviewDate = function() {
+            const days = parseInt(document.getElementById('followUpDaysInput')?.value) || 0;
+            const todayVN = window.getSystemDateVN(0);
+            const targetDateVN = window.getSystemDateVN(days);
+            const curEl = document.getElementById('followUpCurrentDateText');
+            const targetEl = document.getElementById('followUpTargetDateText');
+            if (curEl) curEl.innerText = formatDisplayDate(todayVN);
+            if (targetEl) targetEl.innerText = days > 0 ? formatDisplayDate(targetDateVN) : 'Chưa nhập số ngày';
+        };
+
+        window.confirmSaveFollowUp = async function() {
+            if (window._followUpChoice && window._currentFollowUpCycleIndex !== null && window.tempCurrentCycles[window._currentFollowUpCycleIndex]) {
+                const days = parseInt(document.getElementById('followUpDaysInput')?.value) || 21;
+                const targetDateVN = window.getSystemDateVN(days);
+                const targetCycle = window.tempCurrentCycles[window._currentFollowUpCycleIndex];
+                targetCycle.followUpRequired = true;
+                targetCycle.followUpDays = days;
+                targetCycle.followUpDate = targetDateVN;
+                targetCycle.followUpCreatedAt = new Date().toISOString();
+
+                window.normalizeProtocolHistory(window.tempCurrentCycles);
+                window.renderTempCyclesList();
+                if (document.getElementById('editDocId').value) {
+                    await window.autoSyncChangesToDatabase();
+                }
+                window.showToast(`📅 Đã lưu lịch hẹn tái khám ngày ${formatDisplayDate(targetDateVN)} (sau ${days} ngày)!`);
+            }
+            window.closeFollowUpModal();
+        };
+
+        window.closeFollowUpModal = function(save = false) {
+            window.setPanelVisibility(document.getElementById('followUpModal'), false);
+            window._currentFollowUpCycleIndex = null;
         };
 
         window.previewNewPatientCycle = function() {
@@ -4074,6 +4432,7 @@
                                     <i id="cycleIcon_${idx}" class="fa-solid fa-plus text-teal-600"></i>
                                 </button>
                                 <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
+                                ${c.followUpDate ? `<span class="ml-1 text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold"><i class="fa-solid fa-calendar-check"></i> ${escapeHtml(formatDisplayDate(c.followUpDate))}</span>` : ''}
                             </div>
                             <div class="flex items-center space-x-1">
                                 <button type="button" onclick="window.editTempCycle(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[10px] border border-amber-200"><i class="fa-solid fa-pen"></i> Sửa</button>
@@ -4086,6 +4445,7 @@
                             <div><strong class="text-slate-900">Thuốc hóa trị:</strong> ${escapeHtml(c.drugNames || 'Chưa cập nhật')}</div>
                             <div><strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'Chưa cập nhật')}</div>
                             <div><strong class="text-slate-900">Tác dụng phụ / Ghi chú:</strong> ${escapeHtml(c.note || 'Không ghi nhận')}</div>
+                            ${c.followUpDate ? `<div><strong class="text-slate-900">Hẹn tái khám:</strong> <span class="text-amber-800 font-bold">${escapeHtml(formatDisplayDate(c.followUpDate))}</span> ${c.followUpDays ? `<span class="text-slate-500">(sau ${c.followUpDays} ngày)</span>` : ''}</div>` : ''}
                             <div class="text-[10px] text-slate-400 pt-1">Cập nhật bởi: ${escapeHtml(c.updatedBy || 'Thạch Xuân Tựu')}</div>
                         </div>
                     `;
@@ -4670,6 +5030,7 @@
                 document.getElementById('npProtocol').value = effectiveProtocol;
                 document.getElementById('currentActiveProtoLabel').innerText = effectiveProtocol;
             }
+            const latestFollowUp = window.getPatientLatestFollowUp({ cycles: window.tempCurrentCycles, protocol: effectiveProtocol });
             const payload = {
                 patientId: patientIdVal,
                 name: nameVal,
@@ -4685,6 +5046,7 @@
                 protocolKey: effectiveProtocolKey,
                 cycles: window.tempCurrentCycles,
                 markers: window.tempCurrentMarkers,
+                latestFollowUp: latestFollowUp || null,
                 responseAssessments: window.tempResponseAssessments || [],
                 toxicityAssessments: window.tempToxicityAssessments || [],
                 updatedAt: serverTimestamp(),
@@ -4750,11 +5112,14 @@
                 window.normalizeProtocolHistory(window.tempCurrentCycles);
                 const latestCycle = window.tempCurrentCycles[window.tempCurrentCycles.length - 1];
                 const cachedPatient = cachedPatientsList.find(patient => patient.id === docId) || {};
+                const effectiveProto = latestCycle?.protocolUsed || cachedPatient.protocol || '';
+                const latestFollowUp = window.getPatientLatestFollowUp({ cycles: window.tempCurrentCycles, protocol: effectiveProto });
                 const update = {
                     cycles: window.tempCurrentCycles,
                     markers: window.tempCurrentMarkers,
-                    protocol: latestCycle?.protocolUsed || cachedPatient.protocol || '',
+                    protocol: effectiveProto,
                     protocolKey: latestCycle?.protocolKeyUsed || cachedPatient.protocolKey || '',
+                    latestFollowUp: latestFollowUp || null,
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 };
@@ -5285,11 +5650,193 @@
             addPageButton('›', statsCurrentPage + 1, { disabled: statsCurrentPage === totalPages });
         };
 
+        window.populateStatsProtocolFilter = function() {
+            const select = document.getElementById('statsProtocolFilter');
+            if (!select) return;
+            const currentVal = select.value || 'ALL';
+            const protocolSet = new Set();
+            
+            // Từ dữ liệu chemoProtocolsData
+            if (typeof chemoProtocolsData === 'object' && chemoProtocolsData !== null) {
+                Object.values(chemoProtocolsData).forEach(proto => {
+                    if (proto && proto.name) protocolSet.add(proto.name);
+                });
+            }
+            // Từ cachedPatientsList
+            (cachedPatientsList || []).forEach(p => {
+                if (p.protocol && p.protocol !== 'Chưa cập nhật') protocolSet.add(p.protocol);
+                (p.cycles || []).forEach(c => {
+                    if (c && c.protocolUsed) protocolSet.add(c.protocolUsed);
+                });
+            });
+
+            const sortedProtocols = Array.from(protocolSet).sort((a, b) => a.localeCompare(b, 'vi'));
+            select.innerHTML = '<option value="ALL">Tất cả phác đồ</option>' + sortedProtocols.map(proto => 
+                `<option value="${escapeHtml(proto)}">${escapeHtml(proto)}</option>`
+            ).join('');
+
+            if (sortedProtocols.includes(currentVal) || currentVal === 'ALL') {
+                select.value = currentVal;
+            } else {
+                select.value = 'ALL';
+            }
+        };
+
+        window.statsFollowUpFilter = 'tomorrow';
+        window.statsFollowUpPage = 1;
+        window.statsFollowUpList = [];
+
+        window.setFollowUpFilter = function(filterMode) {
+            window.statsFollowUpFilter = filterMode;
+            ['tomorrow', 'today', 'overdue', 'all'].forEach(mode => {
+                const btn = document.getElementById(`btnFuFilter${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+                if (!btn) return;
+                const isActive = mode === filterMode;
+                btn.className = isActive
+                    ? 'px-2.5 py-1 rounded-md font-bold bg-white text-teal-800 shadow-sm transition flex items-center gap-1'
+                    : 'px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-teal-800 transition flex items-center gap-1';
+            });
+            window.statsFollowUpPage = 1;
+            window.renderStatsFollowUpList();
+        };
+
+        window.renderStatsFollowUpList = function() {
+            const tbody = document.getElementById('statsFollowUpTableBody');
+            const countText = document.getElementById('statsFollowUpCountText');
+            const pagination = document.getElementById('statsFollowUpPagination');
+            if (!tbody) return;
+
+            const todayVN = window.getSystemDateVN(0);
+            const tomorrowVN = window.getSystemDateVN(1);
+
+            const allFollowUpPatients = [];
+            (cachedPatientsList || []).forEach(p => {
+                const fu = window.getPatientLatestFollowUp(p);
+                if (fu && fu.date) {
+                    const diffDays = window.getCalendarDayDiff(fu.date, todayVN);
+                    allFollowUpPatients.push({
+                        patient: p,
+                        followUp: fu,
+                        diffDays: diffDays
+                    });
+                }
+            });
+
+            // Update badge for tomorrow in the tab
+            const tomorrowCount = allFollowUpPatients.filter(item => item.followUp.date === tomorrowVN).length;
+            const badgeEl = document.getElementById('statsFollowUpBadge');
+            if (badgeEl) {
+                if (tomorrowCount > 0) {
+                    badgeEl.innerText = tomorrowCount;
+                    badgeEl.classList.remove('hidden');
+                } else {
+                    badgeEl.classList.add('hidden');
+                }
+            }
+
+            let filtered = [];
+            if (window.statsFollowUpFilter === 'tomorrow') {
+                filtered = allFollowUpPatients.filter(item => item.followUp.date === tomorrowVN);
+            } else if (window.statsFollowUpFilter === 'today') {
+                filtered = allFollowUpPatients.filter(item => item.followUp.date === todayVN);
+            } else if (window.statsFollowUpFilter === 'overdue') {
+                filtered = allFollowUpPatients.filter(item => item.followUp.date < todayVN);
+            } else {
+                filtered = allFollowUpPatients;
+            }
+
+            filtered.sort((a, b) => a.followUp.date.localeCompare(b.followUp.date));
+            window.statsFollowUpList = filtered;
+
+            if (countText) {
+                countText.innerText = `${filtered.length} bệnh nhân`;
+            }
+
+            const pageSize = 10;
+            const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+            window.statsFollowUpPage = Math.min(Math.max(window.statsFollowUpPage, 1), totalPages);
+            const pageStart = (window.statsFollowUpPage - 1) * pageSize;
+            const pageItems = filtered.slice(pageStart, pageStart + pageSize);
+
+            tbody.innerHTML = '';
+            if (filtered.length === 0) {
+                const emptyMsg = window.statsFollowUpFilter === 'tomorrow'
+                    ? 'Không có bệnh nhân nào đến hẹn tái khám vào ngày mai.'
+                    : window.statsFollowUpFilter === 'today'
+                    ? 'Không có bệnh nhân nào đến hẹn tái khám trong ngày hôm nay.'
+                    : window.statsFollowUpFilter === 'overdue'
+                    ? 'Không có bệnh nhân nào bị quá hẹn tái khám.'
+                    : 'Chưa có lịch hẹn tái khám nào được ghi nhận.';
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">${emptyMsg}</td></tr>`;
+                if (pagination) pagination.innerHTML = '';
+                return;
+            }
+
+            pageItems.forEach(({ patient: p, followUp: fu, diffDays }) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                const treatmentSummary = window.getLatestTreatmentSummary(p);
+
+                let statusBadge = '';
+                if (diffDays === 1) {
+                    statusBadge = `<span class="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-bell text-amber-600"></i> Ngày mai (1 ngày)</span>`;
+                } else if (diffDays === 0) {
+                    statusBadge = `<span class="px-2.5 py-1 bg-teal-100 text-teal-900 border border-teal-300 rounded-full font-bold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-calendar-day text-teal-600"></i> Hôm nay</span>`;
+                } else if (diffDays < 0) {
+                    statusBadge = `<span class="px-2.5 py-1 bg-rose-100 text-rose-800 border border-rose-300 rounded-full font-bold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation text-rose-600"></i> Quá hẹn ${Math.abs(diffDays)} ngày</span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-300 rounded-full font-semibold text-[11px] inline-flex items-center gap-1"><i class="fa-regular fa-clock text-slate-500"></i> Còn ${diffDays} ngày</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold text-teal-800 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
+                    <td class="p-2.5 font-semibold text-slate-900 truncate" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
+                    <td class="p-2.5 text-center font-bold text-teal-950 truncate">${escapeHtml(formatDisplayDate(fu.date))}</td>
+                    <td class="p-2.5 text-center truncate">${statusBadge}</td>
+                    <td class="p-2.5 font-bold text-amber-800 truncate" title="${escapeHtml(fu.protocol || treatmentSummary.protocol)}">${escapeHtml(fu.protocol || treatmentSummary.protocol)}</td>
+                    <td class="p-2.5 text-center font-semibold text-teal-700 truncate">${escapeHtml(fu.branchName || treatmentSummary.cycle)}</td>
+                    <td class="p-2.5 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button type="button" data-fu-action="view" title="Xem chi tiết" class="p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg transition"><i class="fa-solid fa-eye"></i></button>
+                            <button type="button" data-fu-action="edit" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                        </div>
+                    </td>
+                `;
+
+                tr.querySelector('[data-fu-action="view"]')?.addEventListener('click', () => window.viewPatientDetail(p.id));
+                tr.querySelector('[data-fu-action="edit"]')?.addEventListener('click', () => {
+                    window.closeStatsModal();
+                    window.openEditPatientModal(p.id);
+                });
+
+                tbody.appendChild(tr);
+            });
+
+            if (pagination) {
+                pagination.innerHTML = '';
+                if (totalPages > 1) {
+                    for (let page = 1; page <= totalPages; page++) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.innerText = page;
+                        btn.className = `min-w-8 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition ${page === window.statsFollowUpPage ? 'bg-teal-700 border-teal-700 text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-teal-50'}`;
+                        btn.onclick = () => {
+                            window.statsFollowUpPage = page;
+                            window.renderStatsFollowUpList();
+                        };
+                        pagination.appendChild(btn);
+                    }
+                }
+            }
+        };
+
         window.runChemoStatistics = function() {
             if (!window.canUseOncoCare) return;
+            window.populateStatsProtocolFilter();
             const startDate = document.getElementById('statsStartDate').value;
             const endDate = document.getElementById('statsEndDate').value;
             const icdFilter = document.getElementById('statsIcdFilter').value;
+            const protocolFilter = document.getElementById('statsProtocolFilter')?.value || 'ALL';
 
             let filtered = cachedPatientsList.filter(p => {
                 if (!window.isPatientInDateRange(p, startDate, endDate)) {
@@ -5299,6 +5846,16 @@
                     const diag = (p.diagnosis || '').toUpperCase();
                     if (!diag.includes(icdFilter.toUpperCase())) {
                         return false;
+                    }
+                }
+                if (protocolFilter !== 'ALL') {
+                    const cycles = p.cycles || [];
+                    const cyclesInRange = cycles.filter(c => c && c.date && (!startDate || c.date >= startDate) && (!endDate || c.date <= endDate));
+                    if (cyclesInRange.length > 0) {
+                        const hasProtoInCycle = cyclesInRange.some(c => (c.protocolUsed || '') === protocolFilter || (c.protocolKeyUsed || '') === protocolFilter);
+                        if (!hasProtoInCycle) return false;
+                    } else {
+                        if (p.protocol !== protocolFilter && p.protocolKey !== protocolFilter) return false;
                     }
                 }
                 return true;
@@ -5312,6 +5869,7 @@
                 return dateB.localeCompare(dateA); // Ngày mới nhất lên trước
             });
 
+            // COUNT DISTINCT patientId (mỗi bệnh nhân duy nhất trong danh sách thỏa mãn)
             document.getElementById('statTotalPatients').innerText = filtered.length;
 
             let maleCount = filtered.filter(p => p.gender === 'Nam').length;
@@ -5330,9 +5888,30 @@
             });
             document.getElementById('statAgeSummary').innerText = `Trẻ (<40): ${youngCount} | Trung niên (40-60): ${midCount} | Già (>60): ${seniorCount}`;
 
+            // Thống kê phân bố theo phác đồ (COUNT DISTINCT per protocol)
+            const protocolCounts = {};
+            filtered.forEach(p => {
+                const treatmentSummary = window.getLatestTreatmentSummary(p);
+                const protoName = treatmentSummary.protocol || 'Chưa cập nhật';
+                protocolCounts[protoName] = (protocolCounts[protoName] || 0) + 1;
+            });
+
+            const statProtocolContainer = document.getElementById('statProtocolBreakdown');
+            if (statProtocolContainer) {
+                const topProtocols = Object.entries(protocolCounts).sort((a, b) => b[1] - a[1]);
+                if (topProtocols.length === 0) {
+                    statProtocolContainer.innerHTML = '<span class="text-slate-400">Không có dữ liệu trong khoảng này</span>';
+                } else {
+                    statProtocolContainer.innerHTML = topProtocols.map(([proto, count]) => 
+                        `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-teal-300 text-teal-900 font-semibold text-[11px] shadow-sm"><strong class="text-teal-700">${escapeHtml(proto)}:</strong> ${count} BN</span>`
+                    ).join(' ');
+                }
+            }
+
             statsFilteredPatients = filtered;
             statsCurrentPage = 1;
             window.renderStatsPatientPage();
+            window.renderStatsFollowUpList();
 
             let icdCounts = { "C16": 0, "C18": 0, "C19": 0, "C20": 0, "C50": 0, "Khác": 0 };
             filtered.forEach(p => {
