@@ -542,7 +542,7 @@
     <!-- ========================================== -->
     <!-- MODUN 3: GIAO DIỆN CHÍNH & TRA CỨU BỆNH NHÂN -->
     <!-- ========================================== -->
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 flex-1 w-full flex flex-col justify-center -translate-y-6 space-y-7">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 flex-1 w-full flex flex-col justify-center -translate-y-6 space-y-7">
 
         <div class="text-center pb-1">
             <h2 class="text-3xl sm:text-4xl font-light tracking-[-0.035em] text-slate-800 antialiased">Tra cứu hồ sơ bệnh nhân</h2>
@@ -581,28 +581,29 @@
                 <span id="patientCountBadge" class="bg-slate-100 text-slate-600 text-xs px-2.5 py-0.5 rounded-full font-bold">Chưa chọn tra cứu</span>
             </div>
 
-            <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-sm">
-                <table class="w-full min-w-[940px] table-fixed text-left text-xs text-slate-700">
+            <div class="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                <table class="w-full table-auto text-left text-xs text-slate-700">
                     <colgroup>
-                        <col style="width: 10%;">
-                        <col style="width: 18%;">
-                        <col style="width: 7%;">
-                        <col style="width: 7%;">
-                        <col style="width: 28%;">
-                        <col style="width: 13%;">
                         <col style="width: 9%;">
-                        <col style="width: 8%;">
+                        <col style="width: 16%;">
+                        <col style="width: 6%;">
+                        <col style="width: 6%;">
+                        <col style="width: 30%;">
+                        <col style="width: 16%;">
+                        <col style="width: 10%;">
+                        <col style="width: 7%;">
                     </colgroup>
                     <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
                         <tr>
-                            <th class="p-3">Mã BN</th>
-                            <th class="p-3">Họ và Tên</th>
-                            <th class="p-3 text-center">Giới Tính</th>
-                            <th class="p-3 text-center">Năm Sinh</th>
-                            <th class="p-3">Chẩn Đoán (Chính / Phụ)</th>
-                            <th class="p-3">Phác Đồ</th>
-                            <th class="p-3 text-center">Chu Kỳ Gần Nhất</th>
-                            <th class="p-3 text-center">Thao Tác</th>
+                            <th class="px-3 py-2.5 whitespace-nowrap">Mã BN</th>
+                            <th class="px-3 py-2.5">Họ và Tên</th>
+                            <th class="px-3 py-2.5 text-center whitespace-nowrap">Giới Tính</th>
+                            <th class="px-3 py-2.5 text-center whitespace-nowrap">Năm Sinh</th>
+                            <th class="px-3 py-2.5">Chẩn Đoán (Chính / Phụ)</th>
+                            <th class="px-3 py-2.5">Phác Đồ</th>
+                            <th class="px-3 py-2.5 text-center">Chu Kỳ Gần Nhất</th>
+                            <th class="px-3 py-2.5 text-center">Thao Tác</th>
                         </tr>
                     </thead>
                     <tbody id="allPatientsTableBody" class="divide-y divide-slate-200">
@@ -614,6 +615,7 @@
                         </tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </section>
 
@@ -3983,21 +3985,21 @@
                 const subDiag = p.subDiagnosis || (p.subDiagnosesList && p.subDiagnosesList.length ? p.subDiagnosesList.join(', ') : 'Không có');
                 const treatmentSummary = window.getLatestTreatmentSummary ? window.getLatestTreatmentSummary(p) : { protocol: p.protocol || 'Chưa cập nhật', cycle: 'Chưa cập nhật' };
                 tr.innerHTML = `
-                    <td class="p-2.5 font-bold text-blue-700 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
-                    <td class="p-2.5 font-semibold text-slate-900 whitespace-normal break-words leading-tight" style="max-width: 18ch; word-break: break-word;" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
-                    <td class="p-2.5 text-center truncate">${escapeHtml(p.gender || '-')}</td>
-                    <td class="p-2.5 text-center font-bold text-slate-700 truncate">${escapeHtml(p.birthYear || '-')}</td>
-                    <td class="p-2.5 font-medium text-slate-800 text-[11px] leading-tight">
-                        <div class="truncate" title="${escapeHtml(fullDiag)}"><strong class="text-blue-700">Chính:</strong> ${escapeHtml(fullDiag)}</div>
-                        <div class="truncate text-[10px] text-slate-500" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
+                    <td class="px-3 py-2.5 font-bold text-blue-700 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
+                    <td class="px-3 py-2.5 font-semibold text-slate-900 whitespace-normal break-words leading-snug" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
+                    <td class="px-3 py-2.5 text-center whitespace-nowrap">${escapeHtml(p.gender || '-')}</td>
+                    <td class="px-3 py-2.5 text-center font-bold text-slate-700 whitespace-nowrap">${escapeHtml(p.birthYear || '-')}</td>
+                    <td class="px-3 py-2.5 font-medium text-slate-800 text-[11px] leading-snug">
+                        <div class="line-clamp-2" title="${escapeHtml(fullDiag)}"><strong class="text-blue-700">Chính:</strong> ${escapeHtml(fullDiag)}</div>
+                        <div class="line-clamp-1 text-[10px] text-slate-500 mt-0.5" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
                     </td>
-                    <td class="p-2.5 font-bold text-amber-800 truncate" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
-                    <td class="p-2.5 text-center font-semibold text-blue-700 truncate" title="${escapeHtml(treatmentSummary.cycle)}">${escapeHtml(treatmentSummary.cycle)}</td>
-                    <td class="p-2.5 text-center">
-                        <div class="flex items-center justify-center gap-1">
-                            <button type="button" data-patient-action="view" title="Form tóm tắt & Marker" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition"><i class="fa-solid fa-eye"></i></button>
-                            <button type="button" data-patient-action="edit" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg transition"><i class="fa-solid fa-pen-to-square"></i></button>
-                            ${(isAdmin || isVip) ? `<button type="button" data-patient-action="delete" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    <td class="px-3 py-2.5 font-bold text-amber-800 text-[11px] leading-snug" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
+                    <td class="px-3 py-2.5 text-center font-semibold text-blue-700 text-[11px] whitespace-nowrap" title="${escapeHtml(treatmentSummary.cycle)}">${escapeHtml(treatmentSummary.cycle)}</td>
+                    <td class="px-3 py-2.5 text-center">
+                        <div class="flex items-center justify-center gap-1 flex-nowrap">
+                            <button type="button" data-patient-action="view" title="Form tóm tắt & Marker" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition flex-shrink-0"><i class="fa-solid fa-eye"></i></button>
+                            <button type="button" data-patient-action="edit" title="Cập nhật chu kỳ / Hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg transition flex-shrink-0"><i class="fa-solid fa-pen-to-square"></i></button>
+                            ${(isAdmin || isVip) ? `<button type="button" data-patient-action="delete" title="Xóa hồ sơ" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg transition flex-shrink-0"><i class="fa-solid fa-trash"></i></button>` : ''}
                         </div>
                     </td>
                 `;
