@@ -476,7 +476,118 @@
         select, input, textarea { outline: none !important; }
         select:invalid, input:invalid { box-shadow: none !important; outline: none !important; border-color: inherit !important; }
         html[data-theme="dark"] select:invalid, html[data-theme="dark"] input:invalid { border-color: #334155 !important; box-shadow: none !important; }
-    </style>
+
+        /* Patient form dashboard layout: presentation only; keep all form IDs and handlers intact. */
+        #patientFormModal > div {
+            width: min(96vw, 90rem);
+            max-height: 94vh;
+            border-radius: 1.5rem;
+            border-color: rgba(148, 163, 184, .28);
+            box-shadow: 0 28px 90px rgba(2, 8, 23, .36);
+        }
+        #patientFormModal > div > div:first-child {
+            min-height: 4.25rem;
+            padding: .9rem 1.5rem;
+            background: linear-gradient(110deg, #0f172a 0%, #123348 52%, #115e59 100%);
+            border-bottom-color: rgba(148, 163, 184, .18);
+        }
+        #patientForm {
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 1.15rem;
+            padding: 1.15rem;
+            background: #f1f5f9;
+        }
+        #patientInputPanel, #patientHistoryPanel {
+            min-width: 0;
+            max-height: calc(94vh - 6.6rem);
+            padding: .15rem .45rem .5rem .15rem;
+            scrollbar-gutter: stable;
+        }
+        #patientInputPanel { display: flex; flex-direction: column; gap: 1rem; }
+        #patientHistoryPanel { display: flex; flex-direction: column; gap: .85rem; }
+        #patientInputPanel > .bg-slate-50,
+        #patientInputPanel > .bg-teal-900\/5,
+        #patientInputPanel > .bg-amber-900\/5,
+        #patientInputPanel > .bg-indigo-900\/5 {
+            border-radius: 1rem;
+            border-color: #dbe4ee;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, .045);
+        }
+        #patientInputPanel > .bg-slate-50 { padding: 1.1rem; }
+        #patientInputPanel > .bg-teal-900\/5,
+        #patientInputPanel > .bg-amber-900\/5,
+        #patientInputPanel > .bg-indigo-900\/5 { padding: 1rem; }
+        #patientInputPanel h4,
+        #patientInputPanel > .bg-slate-50 > div:first-child > span {
+            letter-spacing: .045em;
+        }
+        #patientInputPanel input:not([type="radio"]),
+        #patientInputPanel select,
+        #patientInputPanel textarea {
+            border-radius: .7rem;
+            transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+        }
+        #patientInputPanel input:focus,
+        #patientInputPanel select:focus,
+        #patientInputPanel textarea:focus {
+            border-color: #14b8a6 !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, .14) !important;
+        }
+        #patientInputPanel button,
+        #patientHistoryPanel button { border-radius: .75rem; transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+        #patientInputPanel button:hover,
+        #patientHistoryPanel button:hover { transform: translateY(-1px); }
+        #patientInputPanel #btnAddCycleBtn { background: #164e63; }
+        #patientInputPanel #btnAddCycleBtn:hover { background: #0e7490; }
+        #patientInputPanel #saveBtn { background: #0f766e; box-shadow: 0 5px 14px rgba(13, 148, 136, .2); }
+        #patientInputPanel #saveBtn:hover { background: #0f5f59; }
+        #patientInputPanel button[onclick*="addNewMarkerFromForm"] { background: #4338ca; border-radius: .75rem; }
+        #patientInputPanel button[onclick*="openExtendedAssessment"] { border-radius: .75rem; box-shadow: 0 5px 14px rgba(13, 148, 136, .16); }
+        #patientHistoryPanel > button[aria-controls="existingCyclesList"],
+        #patientHistoryPanel > button[aria-controls="markerHistoryContent"] {
+            position: sticky;
+            top: 0;
+            padding: .85rem 1rem;
+            border: 1px solid rgba(148, 163, 184, .18);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, .12);
+        }
+        #patientHistoryPanel #markerHistoryContent > .bg-white,
+        #patientHistoryPanel #responseHistorySection,
+        #patientHistoryPanel > section:last-child {
+            border-radius: 1rem;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, .045);
+        }
+        html[data-theme="dark"] #patientForm { background: #080e1a; }
+        html[data-theme="dark"] #patientInputPanel > .bg-slate-50,
+        html[data-theme="dark"] #patientInputPanel > .bg-teal-900\/5,
+        html[data-theme="dark"] #patientInputPanel > .bg-amber-900\/5,
+        html[data-theme="dark"] #patientInputPanel > .bg-indigo-900\/5,
+        html[data-theme="dark"] #patientHistoryPanel #markerHistoryContent > .bg-white,
+        html[data-theme="dark"] #patientHistoryPanel #responseHistorySection,
+        html[data-theme="dark"] #patientHistoryPanel > section:last-child {
+            border-color: #27364d !important;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .14);
+        }
+        html[data-theme="dark"] #patientFormModal > div > div:first-child {
+            background: linear-gradient(110deg, #0b1120 0%, #10233d 55%, #123a40 100%);
+        }
+        @media (max-width: 1023px) {
+            #patientForm { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
+            #patientInputPanel, #patientHistoryPanel { max-height: none; overflow: visible; }
+            #patientHistoryPanel { margin-top: 0; }
+        }
+        @media (max-width: 640px) {
+            #patientFormModal { padding: 0 !important; align-items: stretch; }
+            #patientFormModal > div { width: 100%; height: 100%; max-height: 100dvh; border-radius: 0; }
+            #patientFormModal > div > div:first-child { padding: .75rem 1rem; }
+            #patientForm { display: block; overflow-y: auto; overflow-x: hidden; padding: .85rem; -webkit-overflow-scrolling: touch; }
+            #patientInputPanel, #patientHistoryPanel { max-height: none; overflow: visible; padding-right: 0; }
+            #patientInputPanel > .bg-slate-50 { padding: .85rem; }
+            #patientInputPanel > .bg-teal-900\/5,
+            #patientInputPanel > .bg-amber-900\/5,
+            #patientInputPanel > .bg-indigo-900\/5 { padding: .85rem; }
+        }
+        </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
     <!-- Google Tag Manager (noscript) -->
@@ -864,7 +975,7 @@
     <!-- MODUN 4: MODAL THÊM / SỬA HỒ SƠ BỆNH NHÂN & CHU KỲ -->
     <!-- ========================================== -->
     <div id="patientFormModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[115] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
+        <div class="bg-white rounded-2xl max-w-[90rem] w-full max-h-[94vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
             <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between shrink-0 border-b border-slate-800">
                 <div class="flex items-center space-x-3">
                     <button type="button" onclick="window.closePatientFormModal()" title="Đóng" aria-label="Đóng cửa sổ cập nhật hồ sơ" class="group shrink-0 w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
