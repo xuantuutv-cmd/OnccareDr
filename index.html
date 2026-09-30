@@ -571,6 +571,127 @@
         html[data-theme="dark"] #patientFormModal > div > div:first-child {
             background: linear-gradient(110deg, #0b1120 0%, #10233d 55%, #123a40 100%);
         }
+        html[data-theme="dark"] #patientFormModal > div {
+            background: #08172a !important;
+            border-color: #173453 !important;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, .5);
+        }
+        html[data-theme="dark"] #patientForm {
+            background: linear-gradient(135deg, #071629 0%, #0a1c32 55%, #071629 100%);
+            color: #d7e5f6;
+        }
+        html[data-theme="dark"] #patientInputPanel > .bg-slate-50,
+        html[data-theme="dark"] #patientInputPanel > .bg-teal-900\/5,
+        html[data-theme="dark"] #patientInputPanel > .bg-amber-900\/5,
+        html[data-theme="dark"] #patientInputPanel > .bg-indigo-900\/5,
+        html[data-theme="dark"] #patientHistoryPanel #markerHistoryContent > .bg-white,
+        html[data-theme="dark"] #patientHistoryPanel #responseHistorySection,
+        html[data-theme="dark"] #patientHistoryPanel > section:last-child {
+            background: linear-gradient(145deg, #0d223b 0%, #0a1c32 100%) !important;
+            border-color: #1b3b5e !important;
+            border-radius: .85rem;
+            box-shadow: inset 0 1px rgba(148, 191, 237, .035), 0 8px 22px rgba(0, 0, 0, .12);
+        }
+        html[data-theme="dark"] #patientInputPanel > .bg-slate-50 > div:first-child,
+        html[data-theme="dark"] #patientInputPanel h4 {
+            color: #d9e9fb !important;
+        }
+        html[data-theme="dark"] #patientInputPanel label,
+        html[data-theme="dark"] #patientHistoryPanel label { color: #b7c9df !important; }
+        html[data-theme="dark"] #patientInputPanel input:not([type="radio"]),
+        html[data-theme="dark"] #patientInputPanel select,
+        html[data-theme="dark"] #patientInputPanel textarea,
+        html[data-theme="dark"] #patientHistoryPanel select {
+            background-color: #0a1a2d !important;
+            border-color: #294969 !important;
+            color: #e2edf9 !important;
+        }
+        html[data-theme="dark"] #patientInputPanel input:focus,
+        html[data-theme="dark"] #patientInputPanel select:focus,
+        html[data-theme="dark"] #patientInputPanel textarea:focus {
+            border-color: #14b8a6 !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, .19) !important;
+        }
+        html[data-theme="dark"] #patientInputPanel .bg-white,
+        html[data-theme="dark"] #patientInputPanel .bg-slate-50,
+        html[data-theme="dark"] #patientHistoryPanel #markerHistoryContent .bg-white {
+            border-color: #264462 !important;
+        }
+        html[data-theme="dark"] #patientHistoryPanel > button[aria-controls="existingCyclesList"] {
+            background: linear-gradient(100deg, #102e4b, #123a52) !important;
+            border-color: #245478 !important;
+        }
+        html[data-theme="dark"] #patientHistoryPanel > button[aria-controls="markerHistoryContent"] {
+            background: linear-gradient(100deg, #182b57, #202d61) !important;
+            border-color: #344c83 !important;
+        }
+        html[data-theme="dark"] #patientHistoryPanel #responseHistorySection > button,
+        html[data-theme="dark"] #patientHistoryPanel > section:last-child > button { color: #c9dcf5 !important; }
+        html[data-theme="dark"] #patientInputPanel button[onclick*="openExtendedAssessment"],
+        html[data-theme="dark"] #patientInputPanel #saveBtn {
+            background: linear-gradient(100deg, #079b9b, #08a99c) !important;
+            border-color: #11c5b6 !important;
+            color: #f0fffe !important;
+        }
+        html[data-theme="dark"] #patientInputPanel #saveBtn:hover,
+        html[data-theme="dark"] #patientInputPanel button[onclick*="openExtendedAssessment"]:hover { filter: brightness(1.12); }
+        html[data-theme="dark"] #patientInputPanel button[onclick*="addNewMarkerFromForm"] {
+            background: linear-gradient(100deg, #4540a0, #5550c2) !important;
+            border-color: #6268c8 !important;
+            color: #f4f3ff !important;
+        }
+        html[data-theme="dark"] #extendedAssessmentModal > div {
+            background: linear-gradient(140deg, #071629 0%, #0b1e34 100%) !important;
+            border: 1px solid #1b3b5e;
+            color: #d7e5f6;
+        }
+        html[data-theme="dark"] #extendedAssessmentModal > div > div:first-child h3 { color: #e2efff !important; }
+        html[data-theme="dark"] #extendedAssessmentModal #extendedResponsePanel > div,
+        html[data-theme="dark"] #extendedAssessmentModal #extendedMrecistPanel > div,
+        html[data-theme="dark"] #extendedAssessmentModal #extendedToxicityPanel > div {
+            border-color: #294969 !important;
+            border-radius: .85rem;
+        }
+        html[data-theme="dark"] #extendedAssessmentModal #extendedResponsePanel > div.bg-indigo-50,
+        html[data-theme="dark"] #extendedAssessmentModal #extendedMrecistPanel > div.bg-amber-50,
+        html[data-theme="dark"] #extendedAssessmentModal #extendedToxicityPanel > div.bg-slate-50 {
+            background: #102642 !important;
+            color: #d7e5f6 !important;
+        }
+        html[data-theme="dark"] #extendedAssessmentModal label,
+        html[data-theme="dark"] #extendedAssessmentModal p { color: #adc3dc !important; }
+        html[data-theme="dark"] #extendedAssessmentModal input:not([type="radio"]),
+        html[data-theme="dark"] #extendedAssessmentModal select,
+        html[data-theme="dark"] #extendedAssessmentModal textarea {
+            background: #0a1a2d !important;
+            border-color: #294969 !important;
+            color: #e2edf9 !important;
+        }
+        html[data-theme="dark"] #extendedAssessmentModal #extendedResponseTab,
+        html[data-theme="dark"] #extendedAssessmentModal #extendedMrecistTab,
+        html[data-theme="dark"] #extendedAssessmentModal #extendedToxicityTab {
+            border: 1px solid #294969;
+            border-radius: .7rem;
+            transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+        }
+        html[data-theme="dark"] #extendedAssessmentModal #extendedResponseTab[class*="bg-teal-700"],
+        html[data-theme="dark"] #extendedAssessmentModal #extendedMrecistTab[class*="bg-teal-700"],
+        html[data-theme="dark"] #extendedAssessmentModal #extendedToxicityTab[class*="bg-teal-700"] {
+            background: #087f83 !important;
+            border-color: #12b8ae !important;
+            color: #f0fffe !important;
+        }
+        html[data-theme="dark"] #extendedAssessmentModal #extendedResponseTab[class*="bg-slate-100"],
+        html[data-theme="dark"] #extendedAssessmentModal #extendedMrecistTab[class*="bg-slate-100"],
+        html[data-theme="dark"] #extendedAssessmentModal #extendedToxicityTab[class*="bg-slate-100"] {
+            background: #102642 !important;
+            border-color: #294969 !important;
+            color: #bad0e8 !important;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #patientInputPanel button, #patientHistoryPanel button { transition: none; }
+            #patientInputPanel button:hover, #patientHistoryPanel button:hover { transform: none; }
+        }
         @media (max-width: 1023px) {
             #patientForm { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
             #patientInputPanel, #patientHistoryPanel { max-height: none; overflow: visible; }
