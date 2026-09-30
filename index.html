@@ -473,6 +473,9 @@
             #doctorProfile { left: .65rem; bottom: .65rem; }
             footer { margin-top: 1rem; padding-top: 1rem; padding-bottom: 1rem; }
         }
+        select, input, textarea { outline: none !important; }
+        select:invalid, input:invalid { box-shadow: none !important; outline: none !important; border-color: inherit !important; }
+        html[data-theme="dark"] select:invalid, html[data-theme="dark"] input:invalid { border-color: #334155 !important; box-shadow: none !important; }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
@@ -1310,7 +1313,7 @@
                         <button type="button" class="w-full text-left flex items-center justify-between font-bold text-violet-900 text-base uppercase" aria-expanded="true" aria-controls="existingResponseList" onclick="window.toggleHistorySection('existingResponseList', this)"><span>ĐÁP ỨNG U</span><i class="fa-solid fa-chevron-up history-section-chevron"></i></button>
                         <div id="existingResponseList" class="space-y-2 text-sm"></div>
                     </section>
-                    <section class="bg-rose-50 border border-rose-200 rounded-xl p-3 space-y-2">
+                    <section class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                         <button type="button" class="w-full text-left flex items-center justify-between font-bold text-rose-900 text-[11px] uppercase" aria-expanded="true" aria-controls="existingToxicityList" onclick="window.toggleHistorySection('existingToxicityList', this)"><span>ĐỘC TÍNH HÓA TRỊ ĐÃ GHI NHẬN</span><i class="fa-solid fa-chevron-up history-section-chevron"></i></button>
                         <div id="existingToxicityList" class="space-y-2 text-xs"></div>
                     </section>
