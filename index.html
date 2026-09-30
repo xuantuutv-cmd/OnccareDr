@@ -4361,13 +4361,29 @@
         // CHỨC NĂNG XÁC NHẬN HẸN TÁI KHÁM
         // ==========================================
         window._currentFollowUpCycleIndex = null;
+        window._currentFollowUpPatientId = null;
         window._followUpChoice = true;
 
         window.openFollowUpModal = function(cycleIndex) {
+            window._currentFollowUpPatientId = null;
             window._currentFollowUpCycleIndex = cycleIndex;
             window.setFollowUpChoice(true);
             const daysInput = document.getElementById('followUpDaysInput');
             if (daysInput) daysInput.value = 21;
+            window.updateFollowUpPreviewDate();
+            window.setPanelVisibility(document.getElementById('followUpModal'), true);
+        };
+
+        window.openNewPatientFollowUpModal = function(patientId) {
+            window._currentFollowUpCycleIndex = null;
+            window._currentFollowUpPatientId = patientId;
+            window.setFollowUpChoice(false);
+            const daysInput = document.getElementById('followUpDaysInput');
+            if (daysInput) daysInput.value = 21;
+            const title = document.querySelector('#followUpModal h3');
+            const description = document.querySelector('#followUpModal .p-5.space-y-4 > div:first-child p:last-child');
+            if (title) title.textContent = 'Xác nhận tái khám';
+            if (description) description.textContent = 'Bệnh nhân có lịch hẹn tái khám không?';
             window.updateFollowUpPreviewDate();
             window.setPanelVisibility(document.getElementById('followUpModal'), true);
         };
@@ -4411,6 +4427,35 @@
         };
 
         window.confirmSaveFollowUp = async function() {
+            if (window._currentFollowUpPatientId) {
+                const patientId = window._currentFollowUpPatientId;
+                if (window._followUpChoice) {
+                    const days = parseInt(document.getElementById('followUpDaysInput')?.value, 10);
+                    if (!Number.isInteger(days) || days < 1 || days > 365) {
+                        alert('Vui lòng nhập số ngày hẹn từ 1 đến 365.');
+                        return;
+                    }
+                    const targetDateVN = window.getSystemDateVN(days);
+                    const latestFollowUp = {
+                        date: targetDateVN,
+                        days,
+                        required: true,
+                        createdAt: new Date().toISOString()
+                    };
+                    try {
+                        await updateDoc(doc(db, 'patients', patientId), { latestFollowUp, updatedAt: serverTimestamp() });
+                        const patient = cachedPatientsList.find(item => item.id === patientId);
+                        if (patient) patient.latestFollowUp = latestFollowUp;
+                        window.showToast(`📅 Đã lưu lịch hẹn tái khám ngày ${formatDisplayDate(targetDateVN)} (sau ${days} ngày)!`);
+                    } catch (err) {
+                        console.error('Lỗi lưu lịch hẹn tái khám:', err);
+                        alert('Không thể lưu lịch hẹn tái khám: ' + err.message);
+                        return;
+                    }
+                }
+                window.closeFollowUpModal();
+                return;
+            }
             if (window._followUpChoice && window._currentFollowUpCycleIndex !== null && window.tempCurrentCycles[window._currentFollowUpCycleIndex]) {
                 const days = parseInt(document.getElementById('followUpDaysInput')?.value) || 21;
                 const targetDateVN = window.getSystemDateVN(days);
@@ -4433,6 +4478,11 @@
         window.closeFollowUpModal = function(save = false) {
             window.setPanelVisibility(document.getElementById('followUpModal'), false);
             window._currentFollowUpCycleIndex = null;
+            window._currentFollowUpPatientId = null;
+            const title = document.querySelector('#followUpModal h3');
+            const description = document.querySelector('#followUpModal .p-5.space-y-4 > div:first-child p:last-child');
+            if (title) title.textContent = 'Xác nhận hẹn tái khám';
+            if (description) description.textContent = 'Bệnh nhân có hẹn tái khám sau chu kỳ này không?';
         };
 
         window.previewNewPatientCycle = function() {
@@ -5162,6 +5212,7 @@
                 updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
             };
 
+            let newlyCreatedPatientId = null;
             try {
                 const duplicateSnapshot = await getDocs(query(
                     collection(db, "patients"),
@@ -5193,6 +5244,7 @@
                     const createdPatient = { id: createdPatientRef.id, ...payload };
                     cachedPatientsList = cachedPatientsList.filter(patient => patient.id !== createdPatient.id);
                     cachedPatientsList.push(createdPatient);
+                    newlyCreatedPatientId = createdPatientRef.id;
                     window.showToast("Đã thêm mới hồ sơ bệnh nhân thành công!");
                 }
                 window.closePatientFormModal();
@@ -5200,6 +5252,7 @@
                     document.getElementById('searchInput').value = patientIdVal;
                     window.searchPatientByCode();
                 }
+                if (newlyCreatedPatientId) window.openNewPatientFollowUpModal(newlyCreatedPatientId);
             } catch (err) {
                 console.error("Lỗi lưu dữ liệu:", err);
                 if (err.message === "PATIENT_CODE_EXISTS") {
