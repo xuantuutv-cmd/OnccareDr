@@ -22,6 +22,64 @@
     <link rel="shortcut icon" type="image/svg+xml" href="./favicon.svg?v=2">
     <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+    (() => {
+        const nativeValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+        const isDateField = input => input.matches('[data-date-format="dmy"]');
+        const toISO = raw => {
+            const match = String(raw).match(/^(\d{2})\/(\d{2})\/(\d{4})$/) || null;
+            const iso = match ? `${match[3]}-${match[2]}-${match[1]}` : String(raw);
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return '';
+            const date = new Date(iso + 'T00:00:00Z');
+            return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === iso ? iso : '';
+        };
+        const display = iso => /^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso.slice(8)}/${iso.slice(5,7)}/${iso.slice(0,4)}` : iso;
+        const validate = input => {
+            const raw = nativeValue.get.call(input);
+            input.setCustomValidity(raw && !toISO(raw) ? 'Vui lòng nhập ngày hợp lệ theo định dạng dd/mm/yyyy.' : '');
+        };
+        // Scope the compatibility accessor strictly to date fields, including cloned/dynamic forms.
+        Object.defineProperty(HTMLInputElement.prototype, 'value', {
+            configurable: true, enumerable: nativeValue.enumerable,
+            get() { const raw = nativeValue.get.call(this); return isDateField(this) ? toISO(raw) : raw; },
+            set(value) { nativeValue.set.call(this, isDateField(this) ? display(String(value ?? '')) : value); if (isDateField(this)) validate(this); }
+        });
+        const initialize = root => {
+            const inputs = [...(root.querySelectorAll?.('input[data-date-format="dmy"]') || [])];
+            if (root.matches?.('input[data-date-format="dmy"]')) inputs.unshift(root);
+            inputs.forEach(input => {
+                const raw = nativeValue.get.call(input);
+                if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) nativeValue.set.call(input, display(raw));
+                validate(input);
+                if (input.parentElement?.classList.contains('date-field')) return;
+                const wrapper = document.createElement('span'); wrapper.className = 'date-field';
+                input.before(wrapper); wrapper.append(input);
+                const button = document.createElement('button'); button.type = 'button'; button.className = 'date-picker-button'; button.title = 'Chọn ngày'; button.setAttribute('aria-label', 'Chọn ngày');
+                button.innerHTML = '<i class="fa-solid fa-calendar-days" aria-hidden="true"></i>';
+                wrapper.append(button);
+            });
+        };
+        document.addEventListener('input', event => { if (event.target instanceof HTMLInputElement && isDateField(event.target)) validate(event.target); }, true);
+        document.addEventListener('change', event => { if (event.target instanceof HTMLInputElement && isDateField(event.target)) validate(event.target); }, true);
+        document.addEventListener('click', event => {
+            const button = event.target.closest('.date-picker-button'); if (!button) return;
+            const input = button.parentElement.querySelector('input[data-date-format]');
+            if (!input || input.disabled || input.readOnly) return;
+            const picker = document.createElement('input'); picker.type = 'date'; picker.value = input.value;
+            picker.style.cssText = 'position:absolute;opacity:0;width:1px;height:1px;pointer-events:none';
+            button.parentElement.append(picker);
+            picker.addEventListener('change', () => { input.value = picker.value; input.dispatchEvent(new Event('input', {bubbles:true})); input.dispatchEvent(new Event('change', {bubbles:true})); picker.remove(); }, {once:true});
+            picker.addEventListener('blur', () => picker.remove(), {once:true});
+            setTimeout(() => picker.remove(), 60000);
+            try { picker.showPicker(); } catch { picker.remove(); input.focus(); }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            initialize(document);
+            new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => { if (node.nodeType === 1) initialize(node); }))).observe(document.body, {childList:true, subtree:true});
+        });
+    })();
+    </script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts Inter -->
@@ -777,6 +835,14 @@
         .mac-window-controls { order: 2; margin-left: auto; }
         .mac-window-controls button { width: 20px !important; height: 20px !important; }
         @media (hover: none) { button.mac-close i { opacity: 1; } }
+        .date-field { display: inline-flex; align-items: center; position: relative; max-width: 100%; gap: 4px; }
+        .date-field:has(> input.w-full) { display: flex; width: 100%; }
+        .date-field > input { min-width: 0; }
+        .date-picker-button { flex: 0 0 28px; width: 28px; height: 32px; border-radius: 8px; color: inherit; }
+        .date-picker-button:hover { background: #94a3b833; }
+        [id$="Modal"] > div { border-radius: 16px !important; }
+        [id$="Modal"] > div > :first-child { border-top-left-radius: inherit; border-top-right-radius: inherit; }
+        #statsOverviewPanel > .grid { flex-shrink: 0; }
         </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
@@ -1028,7 +1094,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div class="space-y-1.5">
                         <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Ngày truyền</label>
-                        <input type="date" id="ecm_date"
+                        <input type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" id="ecm_date"
                             class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium">
                     </div>
                     <div class="space-y-1.5">
@@ -1323,7 +1389,7 @@
                             <div class="flex flex-wrap gap-2"><button type="button" onclick="window.switchExtendedTab('response')" id="extendedResponseTab" class="rounded-lg bg-teal-700 px-4 py-2 text-white font-bold text-xs">RECIST 1.1</button><button type="button" onclick="window.switchExtendedTab('mrecist')" id="extendedMrecistTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">mRECIST <span class="ml-1 rounded bg-amber-100 px-1 text-amber-700 text-[11px]">Gan</span></button><button type="button" onclick="window.switchExtendedTab('toxicity')" id="extendedToxicityTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">Độc tính</button></div>
                             <section id="extendedResponsePanel" class="space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">RECIST 1.1 dùng một chiều đo: đường kính lớn nhất của tổn thương thường và trục ngắn của hạch. Tối đa 5 target lesion, không quá 2 trong cùng một cơ quan. Số đo theo CT/MRI.</p>
-                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="responseAssessmentDate" type="date" onchange="window.updateResponseConclusion()" oninput="window.updateResponseConclusion()" class="ml-2 rounded-lg border p-2 text-xs"></label>
+                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="responseAssessmentDate" type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" onchange="window.updateResponseConclusion()" oninput="window.updateResponseConclusion()" class="ml-2 rounded-lg border p-2 text-xs"></label>
                                 <div id="responseLesions" class="space-y-2"></div>
                                 <button type="button" id="addResponseLesionButton" onclick="window.addResponseLesion()" class="rounded-lg border px-3 py-2 text-xs font-semibold">+ Thêm target lesion</button>
                                 <div class="grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
@@ -1345,7 +1411,7 @@
                             <!-- mRECIST PANEL -->
                             <section id="extendedMrecistPanel" class="hidden space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">mRECIST đánh giá mô u sống (vùng ngấm thuốc thì động mạch) của tổn thương đích trong ung thư gan nguyên phát. Tối đa 5 tổn thương đích. Số đo theo CT/MRI đa pha.</p>
-                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="mrecistAssessmentDate" type="date" onchange="window.updateMrecistConclusion()" oninput="window.updateMrecistConclusion()" class="ml-2 rounded-lg border p-2 text-xs"></label>
+                                <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="mrecistAssessmentDate" type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" onchange="window.updateMrecistConclusion()" oninput="window.updateMrecistConclusion()" class="ml-2 rounded-lg border p-2 text-xs"></label>
                                 <div id="mrecistLesions" class="space-y-2"></div>
                                 <button type="button" id="addMrecistLesionButton" onclick="window.addMrecistLesion()" class="rounded-lg border px-3 py-2 text-xs font-semibold">+ Thêm tổn thương đích (mRECIST)</button>
                                 <div class="grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2">
@@ -1381,7 +1447,7 @@
                             <section id="extendedToxicityPanel" class="hidden space-y-2 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">Chọn tối đa một độ cho mỗi cơ quan. Để trống nếu không ghi nhận.</p>
                                 <div class="rounded-lg bg-slate-50 p-3 text-xs text-slate-700"><strong>Nguyên tắc xử lý:</strong> Độ 1–2 thường tiếp tục phác đồ và điều trị hỗ trợ triệu chứng. Độ 3 thường tạm hoãn hóa trị đến khi hồi phục độ 0–1, cân nhắc giảm liều chu kỳ sau. Độ 4 cần ngừng thuốc gây độc hoặc đổi phác đồ và hồi sức cấp cứu chuyên sâu.</div>
-                                <label class="flex items-center gap-2 text-xs font-semibold text-slate-600">Thời điểm ghi nhận <input id="toxicityAssessmentDate" type="date" class="rounded-lg border p-2 text-xs"></label>
+                                <label class="flex items-center gap-2 text-xs font-semibold text-slate-600">Thời điểm ghi nhận <input id="toxicityAssessmentDate" type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" class="rounded-lg border p-2 text-xs"></label>
                                 <div id="toxicityInputs" class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]"></div>
                                 <button type="button" id="toxicityRecordButton" onclick="window.runSavingButton(this, () => window.recordToxicityAssessment())" class="rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận độc tính</button>
                                 <div id="toxicityAlert" class="hidden rounded-lg p-3 text-sm font-bold"></div><div id="toxicityHistoryPreview" class="text-xs text-slate-600"></div>
@@ -1443,7 +1509,7 @@
                         </div>
                         <div>
                             <label class="block font-semibold text-slate-700 mb-1 text-center">Ngày xét nghiệm:</label>
-                            <input type="date" id="npMarkerDate" class="block w-full max-w-48 mx-auto p-2 bg-white border border-slate-200 rounded-lg font-medium text-center">
+                            <input type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" id="npMarkerDate" class="block w-full max-w-48 mx-auto p-2 bg-white border border-slate-200 rounded-lg font-medium text-center">
                         </div>
                         <button type="button" onclick="window.runSavingButton(this, () => window.addNewMarkerFromForm())" class="w-full py-2 px-3 rounded-lg bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold transition">
                             <i class="fa-solid fa-plus mr-1"></i> Thêm vào lịch sử marker
@@ -1543,7 +1609,7 @@
                                 </div>
                                 <div>
                                     <label class="block font-semibold text-slate-700 mb-1 text-center">Ngày thực hiện:</label>
-                                    <input type="date" id="npCycleDate" class="block w-full max-w-48 mx-auto p-2 bg-white border border-slate-200 rounded-lg font-medium text-center">
+                                    <input type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" id="npCycleDate" class="block w-full max-w-48 mx-auto p-2 bg-white border border-slate-200 rounded-lg font-medium text-center">
                                 </div>
                             </div>
 
@@ -1749,7 +1815,7 @@
 <!-- MODUN 6: MODAL THỐNG KÊ (ĐÃ CẬP NHẬT) -->
 <!-- ========================================== -->
 <div id="statsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-0">
-    <div id="statsModalContent" class="bg-white rounded-none max-w-none w-full h-full max-h-none overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
+    <div id="statsModalContent" class="bg-white rounded-2xl max-w-none w-full h-full max-h-none overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
         <div id="statsModalHeader" class="bg-[#2b2b2b] text-white p-4 px-6 flex items-center gap-4 shrink-0 border-b border-slate-200">
             <div class="mac-window-controls flex items-center gap-2 shrink-0" aria-label="Điều khiển cửa sổ">
                 <button type="button" onclick="window.closeStatsModal()" title="Đóng" aria-label="Đóng cửa sổ thống kê" class="mac-close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
@@ -1770,11 +1836,11 @@
             <div id="statsFilters" class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 flex flex-wrap justify-center items-end gap-3 shrink-0">
                 <div class="w-full sm:w-52">
                     <label for="statsStartDate" class="block text-center font-semibold text-slate-700 mb-1">Từ ngày</label>
-                    <input type="date" id="statsStartDate" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium text-center">
+                    <input type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" id="statsStartDate" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium text-center">
                 </div>
                 <div class="w-full sm:w-52">
                     <label for="statsEndDate" class="block text-center font-semibold text-slate-700 mb-1">Đến ngày</label>
-                    <input type="date" id="statsEndDate" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium text-center">
+                    <input type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" id="statsEndDate" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-medium text-center">
                 </div>
                 <div class="w-full sm:w-48">
                     <label for="statsIcdFilter" class="sr-only">Lọc theo nhóm ICD</label>
@@ -1813,7 +1879,7 @@
                 </button>
             </div>
 
-            <div id="statsOverviewPanel" class="flex-1 min-h-0 flex flex-col space-y-3 overflow-hidden">
+            <div id="statsOverviewPanel" class="flex-1 min-h-0 flex flex-col gap-4 overflow-y-auto">
             <!-- Tổng quan số liệu -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
                 <div class="stats-card bg-teal-50 border border-teal-200 p-3 rounded-xl flex items-center justify-between">
@@ -1845,22 +1911,24 @@
                 </div>
             </div>
 
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
             <!-- Phân bố phác đồ -->
             <div class="stats-card bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl shrink-0">
                 <p class="text-emerald-800 font-bold uppercase text-[12px] mb-1.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-vial text-emerald-600"></i> PHÂN BỐ BỆNH NHÂN THEO PHÁC ĐỒ (COUNT DISTINCT):
                 </p>
-                <div id="statProtocolBreakdown" class="flex flex-wrap gap-1.5 text-xs">
+                <div id="statProtocolBreakdown" class="space-y-2 text-xs">
                     <span class="text-slate-400">Đang tính toán...</span>
                 </div>
             </div>
 
             <!-- Biểu đồ -->
-            <div class="stats-card bg-white p-3 rounded-xl border border-slate-200 flex-1 min-h-0 flex flex-col items-center">
+            <div class="stats-card bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center lg:order-first">
                 <h4 class="font-bold text-slate-700 uppercase text-[13px] mb-2 self-start shrink-0">TỶ LỆ PHÂN BỐ NHÓM BỆNH ICD CHÍNH:</h4>
-                <div class="w-full max-w-xs flex-1 min-h-0 relative flex justify-center">
+                <div class="w-full max-w-md h-80 relative">
                     <canvas id="statsPieChart"></canvas>
                 </div>
+            </div>
             </div>
             </div>
 
@@ -2049,7 +2117,8 @@
                 month: '2-digit',
                 day: '2-digit'
             });
-            const vnDateStr = vnFormatter.format(now);
+            const parts = Object.fromEntries(vnFormatter.formatToParts(now).map(part => [part.type, part.value]));
+            const vnDateStr = `${parts.year}-${parts.month}-${parts.day}`;
             if (!offsetDays) return vnDateStr;
             const [year, month, day] = vnDateStr.split('-').map(Number);
             const d = new Date(Date.UTC(year, month - 1, day));
@@ -3052,6 +3121,13 @@
                 btnChart.className = "flex-1 py-2 px-3 rounded-lg font-bold text-xs transition bg-white text-teal-800 shadow-sm flex items-center justify-center gap-2";
                 contentChart.classList.remove('hidden');
                 animatePanel(contentChart);
+                const select = document.getElementById('chartMarkerSelect');
+                const types = [...new Set((window.currentViewingPatient?.markers || []).map(marker => marker.type || ''))];
+                if (types.length === 1) {
+                    const value = types[0] || '__UNSPECIFIED__';
+                    if (![...select.options].some(option => option.value === value)) select.add(new Option(types[0] || 'Chưa phân loại', value));
+                    select.value = value;
+                }
                 window.renderMarkerChart();
             }
         };
@@ -3274,8 +3350,8 @@
             content.classList.toggle('max-h-[90vh]', !window.statsModalIsMaximized);
             content.classList.toggle('max-h-none', window.statsModalIsMaximized);
             content.classList.toggle('h-full', window.statsModalIsMaximized);
-            content.classList.toggle('rounded-2xl', !window.statsModalIsMaximized);
-            content.classList.toggle('rounded-none', window.statsModalIsMaximized);
+            content.classList.add('rounded-2xl');
+            content.classList.remove('rounded-none');
             button.title = window.statsModalIsMaximized ? 'Thu về cửa sổ' : 'Phóng to';
             button.setAttribute('aria-label', button.title);
             button.innerHTML = `<i class="fa-solid ${window.statsModalIsMaximized ? 'fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center'} text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>`;
@@ -5005,7 +5081,7 @@
                         </div>
                         <div>
                             <label class="block font-semibold text-slate-700 mb-0.5 text-[13px]">Ngày xét nghiệm:</label>
-                            <input type="date" id="editMarkerDate_${idx}" value="${escapeHtml(m.date || '')}" class="w-full sm:w-48 p-1.5 bg-white border border-slate-300 rounded-lg font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
+                            <input type="text" data-date-format="dmy" inputmode="numeric" placeholder="dd/mm/yyyy" id="editMarkerDate_${idx}" value="${escapeHtml(m.date || '')}" class="w-full sm:w-48 p-1.5 bg-white border border-slate-300 rounded-lg font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
                         </div>
                         <div class="flex items-center justify-end gap-2 pt-1 border-t border-indigo-200">
                             <button type="button" onclick="window.cancelEditTempMarker()" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg font-semibold text-[13px] border border-slate-300 transition flex items-center gap-1">
@@ -6425,7 +6501,7 @@
                     statProtocolContainer.innerHTML = '<span class="text-slate-400">Không có dữ liệu trong khoảng này</span>';
                 } else {
                     statProtocolContainer.innerHTML = topProtocols.map(([proto, count]) => 
-                        `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-teal-300 text-teal-900 font-semibold text-[13px] shadow-sm"><strong class="text-teal-700">${escapeHtml(proto)}:</strong> ${count} BN</span>`
+                        `<div class="flex items-start justify-between gap-3 p-3 rounded-lg bg-white border border-teal-200 text-teal-900 text-[13px]"><span class="font-semibold min-w-0 break-words">${escapeHtml(proto)}</span><strong class="shrink-0 rounded-full bg-teal-100 px-2 py-1">${count} BN</strong></div>`
                     ).join(' ');
                 }
             }
