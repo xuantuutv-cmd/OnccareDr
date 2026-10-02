@@ -930,6 +930,20 @@
         .stats-column-resize { position: absolute; right: 0; top: 0; bottom: 0; width: 10px; cursor: col-resize; touch-action: none; user-select: none; border: 0; background: transparent; padding: 0; }
         .stats-column-resize::after { content: ''; position: absolute; right: 3px; top: 20%; bottom: 20%; width: 2px; background: #94a3b8; opacity: .45; }
         .stats-column-resize:hover::after, .stats-column-resize:focus-visible::after { background: #0d9488; opacity: 1; }
+        /* Visible cell grid and opaque action cells pinned to the viewport's right edge. */
+        :is(#statsTableViewport, #statsFollowUpTableViewport) table { border-collapse: separate; border-spacing: 0; }
+        :is(#statsTableViewport, #statsFollowUpTableViewport) :is(th, td) { border-right: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; }
+        :is(#statsTableViewport, #statsFollowUpTableViewport) tr > :first-child { border-left: 1px solid #cbd5e1; }
+        :is(#statsTableViewport, #statsFollowUpTableViewport) thead th { border-top: 1px solid #cbd5e1; }
+        #statsPatientsTable thead th:last-child,
+        #statsFollowUpTableViewport thead th:last-child { position: sticky; right: 0; z-index: 3; background: #f1f5f9 !important; box-shadow: -2px 0 0 #cbd5e1; }
+        :is(#statsTableViewport, #statsFollowUpTableViewport) tbody tr > td:last-child:not([colspan]) { position: sticky; right: 0; z-index: 2; background: #fff !important; box-shadow: -2px 0 0 #cbd5e1; }
+        :is(#statsTableViewport, #statsFollowUpTableViewport) tbody tr:hover > td:last-child:not([colspan]) { background: #f8fafc !important; }
+        html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) :is(th, td) { border-color: #475569 !important; }
+        html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) thead th:last-child { background: #1e293b !important; box-shadow: -2px 0 0 #475569; }
+        html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) tbody tr > td:last-child:not([colspan]) { background: #172033 !important; box-shadow: -2px 0 0 #475569; }
+        html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) tbody tr:hover > td:last-child:not([colspan]) { background: #334155 !important; }
+
         </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
@@ -6742,6 +6756,7 @@
                 table.style.minWidth = `${total}px`;
             };
             headers.forEach((header, index) => {
+                if (index === headers.length - 1) return; // Keep the action column fixed.
                 const handle = document.createElement('button');
                 handle.type = 'button'; handle.className = 'stats-column-resize';
                 handle.setAttribute('aria-label', `Điều chỉnh độ rộng cột ${header.textContent.trim()}`);
