@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oncocare-v10';
+const CACHE_NAME = 'oncocare-v11';
 const APP_SHELL = [
     './',
     './index.html',

@@ -56,7 +56,18 @@
         }
     </script>
     
+
+    <script>
+        tailwind.config = { theme: { extend: { fontSize: {
+            xs: ['14px', '1.4'], sm: ['16px', '1.45'], base: ['18px', '1.5'],
+            lg: ['20px', '1.4'], xl: ['22px', '1.4'], '2xl': ['26px', '1.35'],
+            '3xl': ['32px', '1.25'], '4xl': ['38px', '1.2'], '5xl': ['50px', '1.15'],
+            '6xl': ['62px', '1.1'], '7xl': ['74px', '1.1'], '8xl': ['98px', '1'], '9xl': ['130px', '1']
+        } } } };
+        if (window.Chart) Chart.defaults.font.size = 14;
+    </script>
     <style>
+        body { font-size: 18px; }
         body { font-family: 'Inter', sans-serif; background: #e9edf2; }
         html[data-theme="light"] body {
             background:
@@ -137,7 +148,7 @@
             box-shadow: none !important;
             transform: scale(1.15);
         }
-        .search-action i { font-size: 1.35rem; }
+        .search-action i { font-size: calc(1.35rem + 2px); }
         html[data-theme="light"] #patientSearchForm {
             background: #fff;
             border-color: rgba(203, 213, 225, 0.9);
@@ -206,7 +217,7 @@
             background-color: #f8fafc !important;
             border-color: #2563eb !important;
         }
-        .search-plus { font-size: 2rem; font-weight: 300; line-height: 1; }
+        .search-plus { font-size: calc(2rem + 2px); font-weight: 300; line-height: 1; }
         .item-suggestion:hover,
         .item-suggestion.suggestion-active {
             background-color: #2563eb !important;
@@ -273,7 +284,7 @@
         html[data-theme="dark"] input::placeholder,
         html[data-theme="dark"] textarea::placeholder { color: #64748b; }
         html[data-theme="dark"] table thead { background-color: #0c1424; }
-        table thead th { font-size: 0.75rem !important; }
+        table thead th { font-size: calc(0.75rem + 2px) !important; }
         html[data-theme="dark"] table thead th { color: #f8fafc !important; }
         html[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-track { background: #0c1424; }
         html[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
@@ -329,7 +340,7 @@
         #themeToggleButton .theme-toggle-thumb { width: 1.35rem; height: 1.35rem; border-radius: 9999px; background: #303238; box-shadow: none; display: flex; align-items: center; justify-content: center; transform: translateX(0); transition: transform 200ms ease, background-color 200ms ease; }
         #themeToggleButton[aria-pressed="true"] { background: #202124; border-color: #34363d; }
         #themeToggleButton[aria-pressed="true"] .theme-toggle-thumb { transform: translateX(1.35rem); background: #303238; }
-        #themeToggleButton .theme-toggle-thumb i { font-size: .7rem; color: #d1d5db; }
+        #themeToggleButton .theme-toggle-thumb i { font-size: calc(.7rem + 2px); color: #d1d5db; }
         #themeToggleButton[aria-pressed="true"] .theme-toggle-thumb i { color: #e5e7eb; }
         html[data-theme="dark"] select option { background-color: #374151; color: #f3f4f6; }
         html[data-theme="dark"] select optgroup { background-color: #374151; color: #f3f4f6; }
@@ -399,17 +410,17 @@
             body { min-height: 100dvh; }
             header > div { min-height: 3.75rem; padding-top: .45rem; padding-bottom: .45rem; }
             header .w-14, header .h-14 { width: 2.75rem; height: 2.75rem; }
-            header .fa-leaf { font-size: 1.8rem; }
-            header h1 { font-size: 1.05rem; }
+            header .fa-leaf { font-size: calc(1.8rem + 2px); }
+            header h1 { font-size: calc(1.05rem + 2px); }
             #googleSignInBtn { padding: .55rem .8rem; }
             main { padding-top: 1.75rem !important; padding-bottom: 1rem !important; margin-top: 0; transform: none !important; }
-            main h2 { font-size: 1.65rem; line-height: 1.25; }
+            main h2 { font-size: calc(1.65rem + 2px); line-height: 1.25; }
             #accountStatusNotice { padding: .8rem; }
             #patientSearchForm { min-height: 3.75rem; padding-left: .5rem; padding-right: .5rem; }
-            #searchInput { padding: .75rem .65rem; font-size: .9rem; }
+            #searchInput { padding: .75rem .65rem; font-size: calc(.9rem + 2px); }
             .search-action { width: 2.65rem; height: 2.65rem; flex-basis: 2.65rem; }
-            .search-action i { font-size: 1.05rem; }
-            .search-plus { font-size: 1.75rem; }
+            .search-action i { font-size: calc(1.05rem + 2px); }
+            .search-plus { font-size: calc(1.75rem + 2px); }
 
             #patientFormModal { padding: 0 !important; align-items: stretch; }
             #patientFormModal > div {
@@ -433,7 +444,7 @@
             }
             #patientHistoryPanel { margin-top: 1.25rem; }
             #patientInputPanel .grid { min-width: 0; }
-            #patientInputPanel input, #patientInputPanel select, #patientInputPanel textarea { font-size: 16px; }
+            #patientInputPanel input, #patientInputPanel select, #patientInputPanel textarea { font-size: 18px; }
             #patientInputPanel button, #patientHistoryPanel button { min-height: 2.5rem; }
             #patientInputPanel .bg-slate-50.p-4,
             #patientInputPanel .bg-teal-900\/5.p-4 { padding: .85rem; }
@@ -448,7 +459,7 @@
             }
             #patientDetailModal > div > .p-6 { padding: 1rem; }
             #patientDetailModal #btnTabTimeline,
-            #patientDetailModal #btnTabChart { padding: .65rem .4rem; font-size: .68rem; line-height: 1.2; }
+            #patientDetailModal #btnTabChart { padding: .65rem .4rem; font-size: calc(.68rem + 2px); line-height: 1.2; }
             #patientDetailModal #tabContentChart > div:first-child { align-items: flex-start; gap: .5rem; }
             #patientDetailModal #tabContentChart h4 { line-height: 1.4; }
             #patientDetailModal #tabContentChart select { max-width: 7.5rem; }
@@ -458,8 +469,8 @@
             #statsFilters { padding: .65rem; gap: .5rem; }
             #statsFilters > div { width: calc(50% - .25rem); }
             #statsFilters > div:nth-child(3) { width: 100%; }
-            #statsFilters input, #statsFilters select { padding: .55rem; font-size: 16px; }
-            #statsTabs button { padding: .65rem .35rem; font-size: .7rem; }
+            #statsFilters input, #statsFilters select { padding: .55rem; font-size: 18px; }
+            #statsTabs button { padding: .65rem .35rem; font-size: calc(.7rem + 2px); }
             #statsOverviewPanel .grid { grid-template-columns: 1fr; }
             #statsPatientsPanel { overflow: visible; }
             #statsTableViewport { overflow: auto; -webkit-overflow-scrolling: touch; }
@@ -708,6 +719,12 @@
             #patientInputPanel > .bg-amber-900\/5,
             #patientInputPanel > .bg-indigo-900\/5 { padding: .85rem; }
         }
+        #responseEditorModal section, #responseDetailsBody section { overflow-wrap: anywhere; }
+        #responseEditorModal section { max-height: none; }
+        html[data-theme="dark"] :is(#responseEditorModal, #responseDetailsModal) > div { background: #0b1e34; color: #d7e5f6; }
+        html[data-theme="dark"] :is(#responseEditorModal, #responseDetailsModal) :is(h3, h4, label, p, strong) { color: inherit; }
+        html[data-theme="dark"] #responseEditorModal :is(input, select) { background: #142b43; color: #e2efff; border-color: #45617b; }
+        html[data-theme="dark"] #responseEditorModal :is(.bg-indigo-50, .bg-amber-50) { background: #172f49; }
         </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
@@ -829,7 +846,7 @@
                         <col style="width: 10%;">
                         <col style="width: 7%;">
                     </colgroup>
-                    <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-[12px] font-bold">
                         <tr>
                             <th class="px-3 py-2.5 whitespace-nowrap">Mã BN</th>
                             <th class="px-3 py-2.5">Họ và Tên</th>
@@ -870,7 +887,7 @@
     <div id="doctorProfile" class="hidden fixed bottom-5 left-5 z-[90] flex flex-col-reverse items-center gap-2.5">
         <div class="relative inline-flex shrink-0">
             <img id="docAvatar" src="https://placehold.co/100x100/0d9488/ffffff?text=Doctor" alt="Ảnh đại diện" class="w-9 h-9 rounded-full border-2 border-emerald-500 object-cover shadow-lg bg-white">
-            <span id="docAdminCrown" class="hidden absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-amber-400 text-amber-950 border-2 border-white items-center justify-center text-[9px] shadow" title="Admin" aria-label="Admin">
+            <span id="docAdminCrown" class="hidden absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-amber-400 text-amber-950 border-2 border-white items-center justify-center text-[11px] shadow" title="Admin" aria-label="Admin">
                 <i class="fa-solid fa-crown" aria-hidden="true"></i>
             </span>
         </div>
@@ -918,14 +935,14 @@
                 <div class="flex items-center gap-3">
                     <button type="button" onclick="window.closeEditCycleModal()" title="Đóng"
                         class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] flex items-center justify-center hover:brightness-110">
-                        <i class="fa-solid fa-xmark text-[7px] text-[#7a1712] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        <i class="fa-solid fa-xmark text-[9px] text-[#7a1712] opacity-0 group-hover:opacity-100 transition-opacity"></i>
                     </button>
                     <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center border border-amber-400/30">
                         <i class="fa-solid fa-syringe text-amber-400 text-sm"></i>
                     </div>
                     <div>
                         <h3 id="editCycleModalTitle" class="font-bold text-sm uppercase tracking-wide">Chỉnh sửa chu kỳ</h3>
-                        <p id="editCycleModalSubtitle" class="text-slate-400 text-[10px] mt-0.5"></p>
+                        <p id="editCycleModalSubtitle" class="text-slate-400 text-[12px] mt-0.5"></p>
                     </div>
                 </div>
             </div>
@@ -933,7 +950,7 @@
             <div class="p-5 space-y-4 overflow-y-auto max-h-[75vh] text-xs">
                 <!-- Phác đồ -->
                 <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Phác đồ điều trị</label>
+                    <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Phác đồ điều trị</label>
                     <select id="ecm_protocolSelect" onchange="window.ecmOnProtocolChange()"
                         class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
                         <option value="">-- Chọn phác đồ --</option>
@@ -946,7 +963,7 @@
                 </div>
                 <!-- Tuần (14 ngày) -->
                 <div id="ecm_weekContainer" class="hidden space-y-1.5">
-                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Tuần trong chu kỳ</label>
+                    <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Tuần trong chu kỳ</label>
                     <div class="flex gap-2">
                         <select id="ecm_weekSelect" class="flex-1 p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                             <option value="Tuần 1">Tuần 1</option>
@@ -961,31 +978,31 @@
                 <!-- Ngày & Số chu kỳ -->
                 <div class="grid grid-cols-2 gap-3">
                     <div class="space-y-1.5">
-                        <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Ngày truyền</label>
+                        <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Ngày truyền</label>
                         <input type="date" id="ecm_date"
                             class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Số chu kỳ</label>
+                        <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Số chu kỳ</label>
                         <input type="number" id="ecm_cycleNum" min="1"
                             class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-center">
                     </div>
                 </div>
                 <!-- Thuốc -->
                 <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Thuốc hóa trị</label>
+                    <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Thuốc hóa trị</label>
                     <input type="text" id="ecm_drugNames" placeholder="Tên thuốc, liều mg..."
                         class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                 </div>
                 <!-- Liều dùng -->
                 <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Liều dùng chi tiết</label>
+                    <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Liều dùng chi tiết</label>
                     <input type="text" id="ecm_doseInput" placeholder="Vd: D1: DOX 60mg/m²..."
                         class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                 </div>
                 <!-- Ghi chú -->
                 <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider">Tác dụng phụ / Ghi chú</label>
+                    <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Tác dụng phụ / Ghi chú</label>
                     <textarea id="ecm_note" rows="3" placeholder="Ghi nhận tác dụng phụ, biến chứng, lưu ý..."
                         class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"></textarea>
                 </div>
@@ -1012,14 +1029,14 @@
                 <div class="flex items-center gap-3">
                     <button type="button" onclick="window.closeFollowUpModal(false)" title="Đóng"
                         class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] flex items-center justify-center hover:brightness-110">
-                        <i class="fa-solid fa-xmark text-[7px] text-[#7a1712] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        <i class="fa-solid fa-xmark text-[9px] text-[#7a1712] opacity-0 group-hover:opacity-100 transition-opacity"></i>
                     </button>
                     <div class="w-8 h-8 bg-teal-500/20 rounded-lg flex items-center justify-center border border-teal-400/30">
                         <i class="fa-solid fa-calendar-check text-teal-400 text-sm"></i>
                     </div>
                     <div>
                         <h3 class="font-bold text-sm uppercase tracking-wide">Xác nhận hẹn tái khám</h3>
-                        <p class="text-slate-400 text-[10px] mt-0.5">Đặt lịch hẹn sau chu kỳ hóa trị</p>
+                        <p class="text-slate-400 text-[12px] mt-0.5">Đặt lịch hẹn sau chu kỳ hóa trị</p>
                     </div>
                 </div>
             </div>
@@ -1029,7 +1046,7 @@
                     <i class="fa-solid fa-circle-info text-teal-600 mt-0.5 text-sm shrink-0"></i>
                     <div>
                         <p class="font-bold">Đã ghi nhận chu kỳ điều trị!</p>
-                        <p class="text-[11px] text-teal-800 mt-0.5">Bệnh nhân có hẹn tái khám sau chu kỳ này không?</p>
+                        <p class="text-[13px] text-teal-800 mt-0.5">Bệnh nhân có hẹn tái khám sau chu kỳ này không?</p>
                     </div>
                 </div>
 
@@ -1046,7 +1063,7 @@
                 <!-- Options when 'Yes' is selected -->
                 <div id="followUpConfigSection" class="hidden space-y-3 pt-1 border-t border-slate-100">
                     <div>
-                        <label class="block font-bold text-slate-700 uppercase text-[10px] tracking-wider mb-1.5">Số ngày hẹn tái khám</label>
+                        <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider mb-1.5">Số ngày hẹn tái khám</label>
                         <div class="flex items-center gap-2">
                             <input type="number" id="followUpDaysInput" min="1" max="365" value="21" oninput="window.updateFollowUpPreviewDate()"
                                 class="w-24 p-2.5 bg-white border border-slate-200 rounded-lg font-bold text-center text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
@@ -1056,18 +1073,18 @@
 
                     <!-- Quick buttons -->
                     <div>
-                        <label class="block font-semibold text-slate-500 text-[10px] uppercase tracking-wider mb-1">Gợi ý nhanh:</label>
+                        <label class="block font-semibold text-slate-500 text-[12px] uppercase tracking-wider mb-1">Gợi ý nhanh:</label>
                         <div class="flex flex-wrap gap-1.5">
-                            <button type="button" onclick="window.setFollowUpPresetDays(7)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[11px] transition">7 ngày</button>
-                            <button type="button" onclick="window.setFollowUpPresetDays(14)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[11px] transition">14 ngày</button>
-                            <button type="button" onclick="window.setFollowUpPresetDays(21)" class="px-2.5 py-1 bg-teal-100 text-teal-900 font-bold rounded-md border border-teal-300 text-[11px] transition">21 ngày</button>
-                            <button type="button" onclick="window.setFollowUpPresetDays(28)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[11px] transition">28 ngày</button>
-                            <button type="button" onclick="window.setFollowUpPresetDays(30)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[11px] transition">30 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(7)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[13px] transition">7 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(14)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[13px] transition">14 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(21)" class="px-2.5 py-1 bg-teal-100 text-teal-900 font-bold rounded-md border border-teal-300 text-[13px] transition">21 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(28)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[13px] transition">28 ngày</button>
+                            <button type="button" onclick="window.setFollowUpPresetDays(30)" class="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 font-semibold rounded-md border border-slate-200 text-[13px] transition">30 ngày</button>
                         </div>
                     </div>
 
                     <!-- Date Preview Calculation -->
-                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1 text-[11px]">
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1 text-[13px]">
                         <div class="flex justify-between text-slate-600">
                             <span>Ngày hiện tại hệ thống:</span>
                             <strong id="followUpCurrentDateText" class="text-slate-800">--/--/----</strong>
@@ -1100,7 +1117,7 @@
             <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between shrink-0 border-b border-slate-800">
                 <div class="flex items-center space-x-3">
                     <button type="button" onclick="window.closePatientFormModal()" title="Đóng" aria-label="Đóng cửa sổ cập nhật hồ sơ" class="group shrink-0 w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
-                        <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                        <i class="fa-solid fa-xmark text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                     </button>
                     <div class="w-8 h-8 bg-teal-600/30 rounded-lg flex items-center justify-center border border-teal-400/30">
                         <i class="fa-solid fa-hospital text-teal-300 text-sm"></i>
@@ -1123,22 +1140,22 @@
                                 <i class="fa-solid fa-id-card text-teal-600"></i> A. Thông Tin Hành Chính <span class="text-rose-500">*</span>
                             </span>
                             <div class="flex items-center gap-2">
-                                <span id="adminEditNotice" class="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium hidden">Chế độ Admin</span>
+                                <span id="adminEditNotice" class="text-[12px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium hidden">Chế độ Admin</span>
                                 <div id="adminInfoActionBtns" class="flex items-center gap-1.5">
                                     <button type="button" id="btnEditAdminInfo" onclick="window.toggleAdminInfoEdit(true)"
-                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-400 bg-amber-50 text-amber-800 font-bold text-[10px] hover:bg-amber-100 transition shadow-sm"
+                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-400 bg-amber-50 text-amber-800 font-bold text-[12px] hover:bg-amber-100 transition shadow-sm"
                                         title="Sửa thông tin hành chính">
-                                        <i class="fa-solid fa-pen-to-square text-[9px]"></i> Sửa
+                                        <i class="fa-solid fa-pen-to-square text-[11px]"></i> Sửa
                                     </button>
                                     <button type="button" id="btnSaveAdminInfo" onclick="window.saveAdminInfoOnly()"
-                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-600 bg-teal-600 text-white font-bold text-[10px] hover:bg-teal-700 transition shadow-sm hidden"
+                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-600 bg-teal-600 text-white font-bold text-[12px] hover:bg-teal-700 transition shadow-sm hidden"
                                         title="Lưu thông tin hành chính">
-                                        <i class="fa-solid fa-floppy-disk text-[9px]"></i> Lưu
+                                        <i class="fa-solid fa-floppy-disk text-[11px]"></i> Lưu
                                     </button>
                                     <button type="button" id="btnCancelAdminInfo" onclick="window.toggleAdminInfoEdit(false)"
-                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-slate-600 font-bold text-[10px] hover:bg-slate-50 transition shadow-sm hidden"
+                                        class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-slate-600 font-bold text-[12px] hover:bg-slate-50 transition shadow-sm hidden"
                                         title="Hủy sửa thông tin hành chính">
-                                        <i class="fa-solid fa-xmark text-[9px]"></i> Hủy
+                                        <i class="fa-solid fa-xmark text-[11px]"></i> Hủy
                                     </button>
                                 </div>
                             </div>
@@ -1185,15 +1202,15 @@
 
                         <div class="grid grid-cols-3 gap-2 bg-teal-50/50 p-2.5 rounded-lg border border-teal-100">
                             <div>
-                                <label class="block text-slate-600 font-semibold text-[10px]">Cao (cm):</label>
+                                <label class="block text-slate-600 font-semibold text-[12px]">Cao (cm):</label>
                                 <input type="number" id="npHeight" oninput="window.calculateBSAandDoses()" class="w-full p-1.5 bg-white border border-slate-200 rounded text-center font-bold text-slate-800 focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-slate-600 font-semibold text-[10px]">Nặng (kg):</label>
+                                <label class="block text-slate-600 font-semibold text-[12px]">Nặng (kg):</label>
                                 <input type="number" id="npWeight" oninput="window.calculateBSAandDoses()" class="w-full p-1.5 bg-white border border-slate-200 rounded text-center font-bold text-slate-800 focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-teal-800 font-semibold text-[10px]">BSA (m²):</label>
+                                <label class="block text-teal-800 font-semibold text-[12px]">BSA (m²):</label>
                                 <div id="npBsaDisplay" class="p-1.5 bg-white border border-teal-200 rounded text-center font-extrabold text-teal-700 text-xs shadow-inner">--</div>
                             </div>
                         </div>
@@ -1207,24 +1224,24 @@
                     <!-- ICD CHÍNH & CHẨN ĐOÁN CHÍNH -->
                     <div class="bg-teal-900/5 p-3.5 rounded-xl border border-teal-800/20 space-y-2.5 shadow-sm relative">
                         <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-teal-900 uppercase text-[11px] tracking-wider flex items-center gap-1.5">
+                            <h4 class="font-bold text-teal-900 uppercase text-[13px] tracking-wider flex items-center gap-1.5">
                                 <i class="fa-solid fa-file-medical text-teal-700"></i> ICD CHÍNH & CHẨN ĐOÁN CHÍNH
                             </h4>
                             <div id="diagnosisActionBtns" class="flex items-center gap-1.5">
                                 <button type="button" id="btnEditDiagnosis" onclick="window.toggleDiagnosisEdit(true)"
-                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-400 bg-amber-50 text-amber-800 font-bold text-[10px] hover:bg-amber-100 transition"
+                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-400 bg-amber-50 text-amber-800 font-bold text-[12px] hover:bg-amber-100 transition"
                                     title="Sửa chẩn đoán ICD">
-                                    <i class="fa-solid fa-pen-to-square text-[9px]"></i> Sửa
+                                    <i class="fa-solid fa-pen-to-square text-[11px]"></i> Sửa
                                 </button>
                                 <button type="button" id="btnSaveDiagnosis" onclick="window.saveDiagnosisOnly()"
-                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-600 bg-teal-600 text-white font-bold text-[10px] hover:bg-teal-700 transition hidden"
+                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-600 bg-teal-600 text-white font-bold text-[12px] hover:bg-teal-700 transition hidden"
                                     title="Lưu chẩn đoán ICD">
-                                    <i class="fa-solid fa-floppy-disk text-[9px]"></i> Lưu
+                                    <i class="fa-solid fa-floppy-disk text-[11px]"></i> Lưu
                                 </button>
                                 <button type="button" id="btnCancelDiagnosis" onclick="window.toggleDiagnosisEdit(false)"
-                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-slate-600 font-bold text-[10px] hover:bg-slate-50 transition hidden"
+                                    class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-slate-600 font-bold text-[12px] hover:bg-slate-50 transition hidden"
                                     title="Hủy sửa chẩn đoán">
-                                    <i class="fa-solid fa-xmark text-[9px]"></i> Hủy
+                                    <i class="fa-solid fa-xmark text-[11px]"></i> Hủy
                                 </button>
                             </div>
                         </div>
@@ -1235,16 +1252,16 @@
                             <div id="icdDropdownMain" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 hidden custom-scrollbar"></div>
                         </div>
                         <div class="grid grid-cols-4 gap-2" aria-label="Phân loại TNM">
-                            <label class="block text-[10px] font-semibold text-slate-600">Tiền tố
+                            <label class="block text-[12px] font-semibold text-slate-600">Tiền tố
                                 <select id="npTNMPrefix" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="c">c</option><option value="p">p</option><option value="yp">yp</option></select>
                             </label>
-                            <label class="block text-[10px] font-semibold text-slate-600">T
+                            <label class="block text-[12px] font-semibold text-slate-600">T
                                 <select id="npTNMT" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="">Chọn T</option></select>
                             </label>
-                            <label class="block text-[10px] font-semibold text-slate-600">N
+                            <label class="block text-[12px] font-semibold text-slate-600">N
                                 <select id="npTNMN" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="">Chọn N</option></select>
                             </label>
-                            <label class="block text-[10px] font-semibold text-slate-600">M
+                            <label class="block text-[12px] font-semibold text-slate-600">M
                                 <select id="npTNMM" onchange="window.updateTNMStage()" class="mt-1 w-full p-2 bg-white border border-slate-200 rounded-lg text-sm" disabled><option value="">Chọn M</option></select>
                             </label>
                         </div>
@@ -1252,14 +1269,14 @@
                             <span class="text-xs font-semibold text-slate-600">Giai đoạn theo bảng TNM</span>
                             <strong id="npTNMStage" class="text-sm font-bold text-teal-800" aria-live="polite">—</strong>
                         </div>
-                        <p id="tnmGroupHint" class="text-[10px] text-slate-500">Nhập/chọn chẩn đoán ICD C16, C18/C20 hoặc C50 để bật phân loại TNM.</p>
+                        <p id="tnmGroupHint" class="text-[12px] text-slate-500">Nhập/chọn chẩn đoán ICD C16, C18/C20 hoặc C50 để bật phân loại TNM.</p>
                         <button type="button" onclick="window.openExtendedAssessment()" class="w-full py-2 rounded-lg border border-teal-700 bg-teal-700 text-white font-bold text-xs hover:bg-teal-800">MỞ RỘNG</button>
                     </div>
 
                     <div id="extendedAssessmentModal" class="fixed inset-0 z-[160] hidden items-center justify-center bg-slate-900/60 p-3">
                         <div class="w-full max-w-6xl max-h-[95vh] overflow-hidden rounded-2xl bg-white p-5 shadow-2xl space-y-3 flex flex-col">
-                            <div class="flex items-center justify-between shrink-0"><div class="flex items-center gap-3"><button type="button" onclick="window.closeExtendedAssessment()" title="Đóng" aria-label="Đóng cửa sổ đánh giá mở rộng" class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-teal-400"><i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity"></i></button><h3 class="font-bold text-teal-900">ĐÁNH GIÁ MỞ RỘNG</h3></div></div>
-                            <div class="flex flex-wrap gap-2"><button type="button" onclick="window.switchExtendedTab('response')" id="extendedResponseTab" class="rounded-lg bg-teal-700 px-4 py-2 text-white font-bold text-xs">RECIST 1.1</button><button type="button" onclick="window.switchExtendedTab('mrecist')" id="extendedMrecistTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">mRECIST <span class="ml-1 rounded bg-amber-100 px-1 text-amber-700 text-[9px]">Gan</span></button><button type="button" onclick="window.switchExtendedTab('toxicity')" id="extendedToxicityTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">Độc tính</button></div>
+                            <div class="flex items-center justify-between shrink-0"><div class="flex items-center gap-3"><button type="button" onclick="window.closeExtendedAssessment()" title="Đóng" aria-label="Đóng cửa sổ đánh giá mở rộng" class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-teal-400"><i class="fa-solid fa-xmark text-[9px] opacity-0 group-hover:opacity-100 transition-opacity"></i></button><h3 class="font-bold text-teal-900">ĐÁNH GIÁ MỞ RỘNG</h3></div></div>
+                            <div class="flex flex-wrap gap-2"><button type="button" onclick="window.switchExtendedTab('response')" id="extendedResponseTab" class="rounded-lg bg-teal-700 px-4 py-2 text-white font-bold text-xs">RECIST 1.1</button><button type="button" onclick="window.switchExtendedTab('mrecist')" id="extendedMrecistTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">mRECIST <span class="ml-1 rounded bg-amber-100 px-1 text-amber-700 text-[11px]">Gan</span></button><button type="button" onclick="window.switchExtendedTab('toxicity')" id="extendedToxicityTab" class="rounded-lg bg-slate-100 px-4 py-2 text-slate-700 font-bold text-xs">Độc tính</button></div>
                             <section id="extendedResponsePanel" class="space-y-3 max-h-[calc(95vh-130px)] overflow-y-auto">
                                 <p class="text-xs text-slate-600">RECIST 1.1 dùng một chiều đo: đường kính lớn nhất của tổn thương thường và trục ngắn của hạch. Tối đa 5 target lesion, không quá 2 trong cùng một cơ quan. Số đo theo CT/MRI.</p>
                                 <label class="block text-xs font-semibold text-slate-600">Ngày đánh giá <input id="responseAssessmentDate" type="date" onchange="window.updateResponseConclusion()" oninput="window.updateResponseConclusion()" class="ml-2 rounded-lg border p-2 text-xs"></label>
@@ -1277,7 +1294,7 @@
                                         <input id="responseNewLesionSize" oninput="window.updateResponseConclusion()" type="number" min="0.1" step="0.1" class="w-full rounded-lg border p-2 text-xs" placeholder="Kích thước (mm, nếu có)">
                                     </div>
                                 </div>
-                                <div class="rounded-lg bg-indigo-50 p-3 text-sm"><div class="flex items-center justify-between gap-2"><strong>Kết quả RECIST 1.1</strong><button type="button" onclick="window.toggleResponseCalculation()" class="rounded-md border px-2 py-1 text-[11px] font-semibold">Xem cách tính</button></div><div id="responseConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div><div id="responseCalculation" class="hidden mt-2 space-y-1 border-t border-indigo-200 pt-2 text-xs"></div></div>
+                                <div class="rounded-lg bg-indigo-50 p-3 text-sm"><div class="flex items-center justify-between gap-2"><strong>Kết quả RECIST 1.1</strong><button type="button" onclick="window.toggleResponseCalculation()" class="rounded-md border px-2 py-1 text-[13px] font-semibold">Xem cách tính</button></div><div id="responseConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div><div id="responseCalculation" class="hidden mt-2 space-y-1 border-t border-indigo-200 pt-2 text-xs"></div></div>
                                 <button type="button" id="responseRecordButton" onclick="window.recordResponseAssessment()" class="rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận đánh giá đáp ứng</button>
                                 <div id="responseHistoryPreview" class="text-xs text-slate-600"></div>
                             </section>
@@ -1308,7 +1325,7 @@
                                 <div class="rounded-lg bg-amber-50 p-3 text-sm border border-amber-200">
                                     <div class="flex items-center justify-between gap-2">
                                         <strong class="text-amber-900">Kết quả mRECIST</strong>
-                                        <button type="button" onclick="window.toggleMrecistCalculation()" class="rounded-md border px-2 py-1 text-[11px] font-semibold">Xem cách tính</button>
+                                        <button type="button" onclick="window.toggleMrecistCalculation()" class="rounded-md border px-2 py-1 text-[13px] font-semibold">Xem cách tính</button>
                                     </div>
                                     <div id="mrecistConclusion" class="mt-2 space-y-1 text-xs">Chưa đủ dữ liệu để đánh giá</div>
                                     <div id="mrecistCalculation" class="hidden mt-2 space-y-1 border-t border-amber-200 pt-2 text-xs"></div>
@@ -1321,7 +1338,7 @@
                                 <p class="text-xs text-slate-600">Chọn tối đa một độ cho mỗi cơ quan. Để trống nếu không ghi nhận.</p>
                                 <div class="rounded-lg bg-slate-50 p-3 text-xs text-slate-700"><strong>Nguyên tắc xử lý:</strong> Độ 1–2 thường tiếp tục phác đồ và điều trị hỗ trợ triệu chứng. Độ 3 thường tạm hoãn hóa trị đến khi hồi phục độ 0–1, cân nhắc giảm liều chu kỳ sau. Độ 4 cần ngừng thuốc gây độc hoặc đổi phác đồ và hồi sức cấp cứu chuyên sâu.</div>
                                 <label class="flex items-center gap-2 text-xs font-semibold text-slate-600">Thời điểm ghi nhận <input id="toxicityAssessmentDate" type="date" class="rounded-lg border p-2 text-xs"></label>
-                                <div id="toxicityInputs" class="grid grid-cols-2 gap-x-2 gap-y-1 text-[9px]"></div>
+                                <div id="toxicityInputs" class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]"></div>
                                 <button type="button" id="toxicityRecordButton" onclick="window.recordToxicityAssessment()" class="rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white">Ghi nhận độc tính</button>
                                 <div id="toxicityAlert" class="hidden rounded-lg p-3 text-sm font-bold"></div><div id="toxicityHistoryPreview" class="text-xs text-slate-600"></div>
                             </section>
@@ -1330,7 +1347,7 @@
 
                     <!-- BẢNG MÃ ICD PHỤ & CHẨN ĐOÁN PHỤ -->
                     <div class="bg-amber-900/5 p-3.5 rounded-xl border border-amber-800/20 space-y-2.5 shadow-sm relative">
-                        <h4 class="font-bold text-amber-900 uppercase text-[11px] tracking-wider flex items-center justify-between">
+                        <h4 class="font-bold text-amber-900 uppercase text-[13px] tracking-wider flex items-center justify-between">
                             <span class="flex items-center gap-1.5"><i class="fa-solid fa-notes-medical text-amber-700"></i> MÃ ICD PHỤ & CHẨN ĐOÁN PHỤ</span>
                         </h4>
                         
@@ -1340,7 +1357,7 @@
                         </div>
 
                         <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-                            <table class="w-full text-left text-[11px]">
+                            <table class="w-full text-left text-[13px]">
                                 <thead class="bg-amber-100/60 text-amber-900 font-bold border-b border-slate-200">
                                     <tr>
                                         <th class="p-2">STT</th>
@@ -1359,7 +1376,7 @@
 
                     <!-- NHẬP CHỈ SỐ MARKER UNG THƯ -->
                     <div class="bg-indigo-900/5 p-3.5 rounded-xl border border-indigo-800/20 space-y-2.5 shadow-sm">
-                        <h4 class="font-bold text-indigo-900 uppercase text-[11px] tracking-wider flex items-center gap-1.5">
+                        <h4 class="font-bold text-indigo-900 uppercase text-[13px] tracking-wider flex items-center gap-1.5">
                             <i class="fa-solid fa-vial-virus text-indigo-700"></i> MARKER
                         </h4>
                         <div class="grid grid-cols-2 gap-2">
@@ -1387,17 +1404,17 @@
                         <button type="button" onclick="window.addNewMarkerFromForm()" class="w-full py-2 px-3 rounded-lg bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold transition">
                             <i class="fa-solid fa-plus mr-1"></i> Thêm vào lịch sử marker
                         </button>
-                        <p class="text-[10px] text-slate-500">Loại marker và ngày xét nghiệm có thể để trống; giá trị vẫn được lưu vào nhóm “Chưa phân loại”.</p>
+                        <p class="text-[12px] text-slate-500">Loại marker và ngày xét nghiệm có thể để trống; giá trị vẫn được lưu vào nhóm “Chưa phân loại”.</p>
                     </div>
 
                     <!-- MỤC THÔNG TIN ĐIỀU TRỊ & QUẢN LÝ CHU KỲ -->
                     <div class="bg-teal-900/5 p-4 rounded-xl border border-teal-800/20 space-y-3 shadow-sm">
-                        <h4 class="font-bold text-teal-900 uppercase text-[11px] tracking-wider flex items-center gap-2 pb-1 border-b border-teal-800/10">
+                        <h4 class="font-bold text-teal-900 uppercase text-[13px] tracking-wider flex items-center gap-2 pb-1 border-b border-teal-800/10">
                             <i class="fa-solid fa-pen-to-square text-teal-700"></i> B. PHÁC ĐỒ
                         </h4>
 
                         <div id="protocolModeContainer" class="hidden bg-white p-2.5 rounded-lg border border-teal-100 space-y-1">
-                            <label class="block text-center font-bold text-slate-700 text-[10px]">Tùy chọn phác đồ điều trị:</label>
+                            <label class="block text-center font-bold text-slate-700 text-[12px]">Tùy chọn phác đồ điều trị:</label>
                             <div class="flex items-center space-x-4">
                                 <label class="flex items-center space-x-1.5 cursor-pointer font-semibold text-teal-800">
                                     <input type="radio" name="protocolMode" value="continue" checked onchange="window.toggleProtocolMode()" class="text-teal-600">
@@ -1453,7 +1470,7 @@
                             </div>
 
                             <div id="weekSelectContainer" class="hidden bg-amber-50/60 p-2.5 rounded-lg border border-amber-200 space-y-1">
-                                <label class="block font-bold text-amber-900 text-[11px]">
+                                <label class="block font-bold text-amber-900 text-[13px]">
                                     <i class="fa-solid fa-calendar-week text-amber-700"></i> Phân tuần dùng thuốc (Thuốc uống 14 ngày):
                                 </label>
                                 <select id="npProtocolWeek" onchange="window.handleProtocolWeekChange()" class="w-full p-2 bg-white border border-amber-300 rounded-lg font-semibold text-amber-900 focus:outline-none">
@@ -1466,12 +1483,12 @@
                             </div>
 
                             <div id="protocolDoseOverrides" class="hidden bg-indigo-50/60 p-2.5 rounded-lg border border-indigo-200 space-y-2">
-                                <label class="block font-bold text-indigo-900 text-[11px]">Điều chỉnh liều thuốc có khoảng liều (mặc định mức thấp):</label>
+                                <label class="block font-bold text-indigo-900 text-[13px]">Điều chỉnh liều thuốc có khoảng liều (mặc định mức thấp):</label>
                                 <div id="protocolDoseInputs" class="grid grid-cols-2 gap-2"></div>
                             </div>
 
                             <div id="customProtocolInputContainer" class="hidden space-y-1">
-                                <label class="block font-bold text-indigo-900 text-[10px]">Nhập Tên Phác Đồ Tự Chỉnh:</label>
+                                <label class="block font-bold text-indigo-900 text-[12px]">Nhập Tên Phác Đồ Tự Chỉnh:</label>
                                 <input type="text" id="customProtocolNameInput" oninput="window.onCustomProtocolNameInput()" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-teal-900 focus:outline-none">
                             </div>
 
@@ -1503,11 +1520,11 @@
 
                             <div class="pt-2 flex items-center justify-between gap-2">
                                 <!-- Nút Thêm chu kỳ mới -->
-                                <button type="button" id="btnAddCycleBtn" onclick="window.addNewCycleFromForm()" class="flex-1 py-2.5 px-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg transition text-[11px] flex items-center justify-center gap-1">
+                                <button type="button" id="btnAddCycleBtn" onclick="window.addNewCycleFromForm()" class="flex-1 py-2.5 px-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg transition text-[13px] flex items-center justify-center gap-1">
                                     <i class="fa-solid fa-plus"></i> Thêm chu kỳ mới
                                 </button>
                                 <!-- Nút Lưu thay đổi -->
-                                <button type="submit" id="saveBtn" class="flex-1 py-2.5 px-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition text-[11px] flex items-center justify-center gap-1 hidden">
+                                <button type="submit" id="saveBtn" class="flex-1 py-2.5 px-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition text-[13px] flex items-center justify-center gap-1 hidden">
                                     <i class="fa-solid fa-check"></i> <span id="saveBtnText">Lưu thông tin</span>
                                 </button>
                             </div>
@@ -1519,19 +1536,19 @@
                 <!-- KHUNG BÊN PHẢI: LỊCH SỬ HÓA TRỊ VÀ LỊCH SỬ MARKER -->
                 <div id="patientHistoryPanel" class="lg:col-span-7 space-y-4 overflow-y-auto max-h-[calc(85vh-120px)] pr-2 custom-scrollbar">
                     <button type="button" class="w-full bg-slate-800 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between sticky top-0 z-10 shadow-md" aria-expanded="true" aria-controls="existingCyclesList" onclick="window.toggleHistorySection('existingCyclesList', this)">
-                        <span class="flex items-center gap-2 uppercase tracking-wide"><i class="fa-solid fa-timeline text-teal-300"></i> LỊCH SỬ HÓA TRỊ <span id="existingCyclesCount" class="text-[10px] bg-slate-700 text-slate-200 px-2 py-0.5 rounded-full">0 chu kỳ</span></span><i class="fa-solid fa-chevron-up history-section-chevron"></i>
+                        <span class="flex items-center gap-2 uppercase tracking-wide"><i class="fa-solid fa-timeline text-teal-300"></i> LỊCH SỬ HÓA TRỊ <span id="existingCyclesCount" class="text-[12px] bg-slate-700 text-slate-200 px-2 py-0.5 rounded-full">0 chu kỳ</span></span><i class="fa-solid fa-chevron-up history-section-chevron"></i>
                     </button>
 
                     <div id="existingCyclesList" class="space-y-2.5"></div>
 
                     <button type="button" class="w-full bg-indigo-900 text-white p-3 px-4 rounded-xl font-bold text-xs flex items-center justify-between mt-6 sticky top-0 z-10 shadow-md" aria-expanded="true" aria-controls="markerHistoryContent" onclick="window.toggleHistorySection('markerHistoryContent', this)">
-                        <span class="flex items-center gap-2 uppercase tracking-wide"><i class="fa-solid fa-vial text-indigo-300"></i> LỊCH SỬ MARKER <span id="existingMarkersCount" class="text-[10px] bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded-full">0 chỉ số</span></span><i class="fa-solid fa-chevron-up history-section-chevron"></i>
+                        <span class="flex items-center gap-2 uppercase tracking-wide"><i class="fa-solid fa-vial text-indigo-300"></i> LỊCH SỬ MARKER <span id="existingMarkersCount" class="text-[12px] bg-indigo-800 text-indigo-200 px-2 py-0.5 rounded-full">0 chỉ số</span></span><i class="fa-solid fa-chevron-up history-section-chevron"></i>
                     </button>
 
                     <div id="markerHistoryContent" class="space-y-3">
                     <div class="bg-white p-3 rounded-xl border border-indigo-200 space-y-3">
                         <div class="flex items-center justify-between gap-2">
-                            <h4 class="flex-1 text-center font-bold text-indigo-900 text-[11px] uppercase">Biểu đồ marker theo thời gian</h4>
+                            <h4 class="flex-1 text-center font-bold text-indigo-900 text-[13px] uppercase">Biểu đồ marker theo thời gian</h4>
                             <select id="historyMarkerSelect" onchange="window.renderHistoryMarkerChart()" class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-center text-indigo-900" autocomplete="off">
                                 <option value="">Chọn marker</option>
                             </select>
@@ -1546,7 +1563,7 @@
                         <div id="existingResponseList" class="space-y-2 text-sm"></div>
                     </section>
                     <section class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-                        <button type="button" class="w-full text-left flex items-center justify-between font-bold text-rose-900 text-[11px] uppercase" aria-expanded="true" aria-controls="existingToxicityList" onclick="window.toggleHistorySection('existingToxicityList', this)"><span>ĐỘC TÍNH HÓA TRỊ ĐÃ GHI NHẬN</span><i class="fa-solid fa-chevron-up history-section-chevron"></i></button>
+                        <button type="button" class="w-full text-left flex items-center justify-between font-bold text-rose-900 text-[13px] uppercase" aria-expanded="true" aria-controls="existingToxicityList" onclick="window.toggleHistorySection('existingToxicityList', this)"><span>ĐỘC TÍNH HÓA TRỊ ĐÃ GHI NHẬN</span><i class="fa-solid fa-chevron-up history-section-chevron"></i></button>
                         <div id="existingToxicityList" class="space-y-2 text-xs"></div>
                     </section>
                 </div>
@@ -1563,7 +1580,7 @@
             <div class="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-5 px-6 flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center space-x-3">
                     <button type="button" onclick="window.closePatientDetailModal()" title="Đóng" aria-label="Đóng cửa sổ chi tiết bệnh nhân" class="group shrink-0 w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
-                        <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                        <i class="fa-solid fa-xmark text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                     </button>
                     <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
                         <i class="fa-solid fa-id-card text-teal-200 text-lg"></i>
@@ -1579,10 +1596,10 @@
                 <div class="bg-teal-50/50 p-4 rounded-2xl border border-teal-200/80 shadow-sm">
                     <div class="space-y-3">
                         <div class="flex items-center gap-2 pb-2 border-b border-teal-200/60">
-                            <span class="font-bold text-teal-900 uppercase text-[11px]"><i class="fa-solid fa-file-medical"></i> Form Tóm Tắt Hồ Sơ Bệnh Nhân</span>
+                            <span class="font-bold text-teal-900 uppercase text-[13px]"><i class="fa-solid fa-file-medical"></i> Form Tóm Tắt Hồ Sơ Bệnh Nhân</span>
                         </div>
                         <div>
-                            <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-0.5">Chẩn Đoán Lâm Sàng (Chính & Phụ)</label>
+                            <label class="block font-bold text-slate-500 uppercase text-[12px] tracking-wider mb-0.5">Chẩn Đoán Lâm Sàng (Chính & Phụ)</label>
                             <div id="detDiagnosis" class="p-2.5 bg-white rounded-xl font-semibold text-slate-800 text-xs border border-slate-200/60 space-y-1">
                                 <div><strong class="text-teal-800">Chính:</strong> <span id="detDiagMain">-</span></div>
                                 <div><strong class="text-indigo-800">TNM / Giai đoạn:</strong> <span id="detTNM">-</span></div>
@@ -1590,7 +1607,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-0.5">Phác Đồ Hóa Trị Tổng Thể</label>
+                            <label class="block font-bold text-slate-500 uppercase text-[12px] tracking-wider mb-0.5">Phác Đồ Hóa Trị Tổng Thể</label>
                             <div id="detProtocol" class="p-2.5 bg-amber-50 rounded-xl font-bold text-amber-800 text-xs border border-amber-200/80 flex items-center gap-2">
                                 <i class="fa-solid fa-vial text-amber-600"></i>
                                 <span>-</span>
@@ -1598,7 +1615,7 @@
                         </div>
                         <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
                             <section class="rounded-xl border border-indigo-200 bg-white p-3" aria-labelledby="summaryMarkerHeading">
-                                <div class="flex items-center justify-between gap-2"><h4 id="summaryMarkerHeading" class="font-bold text-indigo-900">MARKER</h4><button type="button" onclick="window.switchDetailTab('chart')" class="text-[11px] font-semibold text-indigo-700 underline">Xem biểu đồ Marker</button></div>
+                                <div class="flex items-center justify-between gap-2"><h4 id="summaryMarkerHeading" class="font-bold text-indigo-900">MARKER</h4><button type="button" onclick="window.switchDetailTab('chart')" class="text-[13px] font-semibold text-indigo-700 underline">Xem biểu đồ Marker</button></div>
                                 <div id="summaryMarkerList" class="mt-2 space-y-1 text-xs text-slate-700">Chưa ghi nhận</div>
                             </section>
                             <section id="summaryResponseCard" class="rounded-xl border border-violet-200 bg-white p-3" aria-labelledby="summaryResponseHeading">
@@ -1621,7 +1638,7 @@
                 </div>
 
                 <div id="tabContentTimeline" class="space-y-3">
-                    <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
+                    <h4 class="font-bold text-slate-800 uppercase text-[13px] tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-timeline text-teal-600"></i> Dòng Thời Gian Chu Kỳ Hóa Trị & Thông Tin Điều Trị
                     </h4>
                     <div id="detCyclesTimeline" class="space-y-3"></div>
@@ -1629,7 +1646,7 @@
 
                 <div id="tabContentChart" class="hidden space-y-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <h4 class="font-bold text-slate-800 uppercase text-[11px] tracking-wider flex items-center gap-2">
+                        <h4 class="font-bold text-slate-800 uppercase text-[13px] tracking-wider flex items-center gap-2">
                             <i class="fa-solid fa-chart-line text-teal-600"></i> Biểu Đồ Theo Dõi Marker Ung Thư Theo Thời Gian
                         </h4>
                         <select id="chartMarkerSelect" onchange="window.renderMarkerChart()" class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-center text-indigo-900 focus:outline-none">
@@ -1652,7 +1669,7 @@
                     </div>
 
                     <div class="pt-2 border-t border-slate-100">
-                        <h5 class="font-bold text-slate-700 mb-2 uppercase text-[10px]">Chi Tiết Các Lần Đo Chỉ Số:</h5>
+                        <h5 class="font-bold text-slate-700 mb-2 uppercase text-[12px]">Chi Tiết Các Lần Đo Chỉ Số:</h5>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
                                 <thead class="bg-slate-50 text-slate-600 font-bold">
@@ -1670,7 +1687,7 @@
                     </div>
                 </div>
 
-                <div class="pt-3 border-t border-slate-200 flex justify-between items-center text-slate-400 text-[11px]">
+                <div class="pt-3 border-t border-slate-200 flex justify-between items-center text-slate-400 text-[13px]">
                     <span>Cập nhật gần nhất bởi:</span>
                     <span id="detCreatedBy" class="font-semibold text-slate-600">Thạch Xuân Tựu</span>
                 </div>
@@ -1693,13 +1710,13 @@
         <div id="statsModalHeader" class="bg-[#2b2b2b] text-white p-4 px-6 flex items-center gap-4 shrink-0 border-b border-slate-200">
             <div class="flex items-center gap-2 shrink-0" aria-label="Điều khiển cửa sổ">
                 <button type="button" onclick="window.closeStatsModal()" title="Đóng" aria-label="Đóng cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
-                    <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                    <i class="fa-solid fa-xmark text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                 </button>
                 <button type="button" onclick="window.minimizeStatsModal()" title="Thu nhỏ" aria-label="Thu nhỏ cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#febc2e] border border-[#dea123] text-[#785000] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
-                    <i class="fa-solid fa-minus text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                    <i class="fa-solid fa-minus text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                 </button>
                 <button type="button" id="statsMaximizeBtn" onclick="window.toggleStatsModalSize()" title="Thu về cửa sổ" aria-label="Thu về cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#28c840] border border-[#20a833] text-[#075d18] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
-                    <i class="fa-solid fa-down-left-and-up-right-to-center text-[6px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                    <i class="fa-solid fa-down-left-and-up-right-to-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                 </button>
             </div>
             <h3 class="font-bold text-base flex items-center gap-2">
@@ -1748,7 +1765,7 @@
                 </button>
                 <button type="button" id="btnStatsFollowUpTab" onclick="window.switchStatsTab('followup')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-calendar-check text-amber-600"></i>Bệnh nhân đến hẹn
-                    <span id="statsFollowUpBadge" class="hidden px-1.5 py-0.2 bg-rose-500 text-white text-[9px] rounded-full font-bold">0</span>
+                    <span id="statsFollowUpBadge" class="hidden px-1.5 py-0.2 bg-rose-500 text-white text-[11px] rounded-full font-bold">0</span>
                 </button>
                 <button type="button" id="btnStatsOverviewTab" onclick="window.switchStatsTab('overview')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition">
                     <i class="fa-solid fa-chart-pie mr-1.5"></i>Thống kê
@@ -1760,7 +1777,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
                 <div class="stats-card bg-teal-50 border border-teal-200 p-3 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-teal-700 font-semibold uppercase text-[10px]">Tổng BN trong kỳ (COUNT DISTINCT)</p>
+                        <p class="text-teal-700 font-semibold uppercase text-[12px]">Tổng BN trong kỳ (COUNT DISTINCT)</p>
                         <h4 id="statTotalPatients" class="text-2xl font-bold text-teal-900 mt-1">0</h4>
                     </div>
                     <div class="w-10 h-10 bg-teal-200/60 rounded-full flex items-center justify-center text-teal-800 text-lg">
@@ -1769,7 +1786,7 @@
                 </div>
                 <div class="stats-card bg-indigo-50 border border-indigo-200 p-3 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-indigo-700 font-semibold uppercase text-[10px]">Phân bố Giới Tính</p>
+                        <p class="text-indigo-700 font-semibold uppercase text-[12px]">Phân bố Giới Tính</p>
                         <div id="statGenderSummary" class="text-xs font-bold text-indigo-900 mt-1 space-x-2">Nam: 0 | Nữ: 0</div>
                     </div>
                     <div class="w-10 h-10 bg-indigo-200/60 rounded-full flex items-center justify-center text-indigo-800 text-lg">
@@ -1778,8 +1795,8 @@
                 </div>
                 <div class="stats-card bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-amber-700 font-semibold uppercase text-[10px]">Phân bố Nhóm Tuổi</p>
-                        <div id="statAgeSummary" class="text-[11px] font-bold text-amber-900 mt-1">Trẻ: 0 | Trung niên: 0 | Già: 0</div>
+                        <p class="text-amber-700 font-semibold uppercase text-[12px]">Phân bố Nhóm Tuổi</p>
+                        <div id="statAgeSummary" class="text-[13px] font-bold text-amber-900 mt-1">Trẻ: 0 | Trung niên: 0 | Già: 0</div>
                     </div>
                     <div class="w-10 h-10 bg-amber-200/60 rounded-full flex items-center justify-center text-amber-800 text-lg">
                         <i class="fa-solid fa-user-clock"></i>
@@ -1789,7 +1806,7 @@
 
             <!-- Phân bố phác đồ -->
             <div class="stats-card bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl shrink-0">
-                <p class="text-emerald-800 font-bold uppercase text-[10px] mb-1.5 flex items-center gap-1.5">
+                <p class="text-emerald-800 font-bold uppercase text-[12px] mb-1.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-vial text-emerald-600"></i> PHÂN BỐ BỆNH NHÂN THEO PHÁC ĐỒ (COUNT DISTINCT):
                 </p>
                 <div id="statProtocolBreakdown" class="flex flex-wrap gap-1.5 text-xs">
@@ -1799,7 +1816,7 @@
 
             <!-- Biểu đồ -->
             <div class="stats-card bg-white p-3 rounded-xl border border-slate-200 flex-1 min-h-0 flex flex-col items-center">
-                <h4 class="font-bold text-slate-700 uppercase text-[11px] mb-2 self-start shrink-0">TỶ LỆ PHÂN BỐ NHÓM BỆNH ICD CHÍNH:</h4>
+                <h4 class="font-bold text-slate-700 uppercase text-[13px] mb-2 self-start shrink-0">TỶ LỆ PHÂN BỐ NHÓM BỆNH ICD CHÍNH:</h4>
                 <div class="w-full max-w-xs flex-1 min-h-0 relative flex justify-center">
                     <canvas id="statsPieChart"></canvas>
                 </div>
@@ -1809,8 +1826,8 @@
             <!-- Danh sách bệnh nhân thống kê cho phép Admin sửa/xoá trực tiếp -->
             <div id="statsPatientsPanel" class="hidden flex-1 min-h-0 flex-col space-y-2 overflow-hidden">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 shrink-0">
-                    <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">DANH SÁCH BỆNH NHÂN TRONG KHOẢNG THỜI GIAN:</h4>
-                    <span class="text-[10px] text-slate-500">Sắp xếp theo ngày hóa trị mới nhất</span>
+                    <h4 class="font-bold text-slate-700 uppercase text-[13px] tracking-wider">DANH SÁCH BỆNH NHÂN TRONG KHOẢNG THỜI GIAN:</h4>
+                    <span class="text-[12px] text-slate-500">Sắp xếp theo ngày hóa trị mới nhất</span>
                 </div>
                 <div id="statsTableViewport" class="flex-1 min-h-0 overflow-x-auto overflow-y-auto rounded-xl border border-slate-200 bg-white">
                     <table class="w-full min-w-[850px] table-fixed text-left text-xs text-slate-700">
@@ -1824,7 +1841,7 @@
                             <col style="width: 9%;">
                             <col style="width: 9%;">
                         </colgroup>
-                        <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold sticky top-0 z-10 shadow-sm">
+                        <thead class="bg-slate-100 text-slate-600 uppercase text-[12px] font-bold sticky top-0 z-10 shadow-sm">
                             <tr>
                                 <th class="p-3 w-[9%]">Mã BN</th>
                                 <th class="p-3 w-[15%]">Họ và Tên</th>
@@ -1852,11 +1869,11 @@
             <div id="statsFollowUpPanel" class="hidden flex-1 min-h-0 flex-col space-y-2 overflow-hidden">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0">
                     <div class="flex items-center gap-2">
-                        <h4 class="font-bold text-slate-700 uppercase text-[11px] tracking-wider">DANH SÁCH BỆNH NHÂN ĐẾN HẸN TÁI KHÁM:</h4>
-                        <span id="statsFollowUpCountText" class="text-[10px] bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded-full">0 bệnh nhân</span>
+                        <h4 class="font-bold text-slate-700 uppercase text-[13px] tracking-wider">DANH SÁCH BỆNH NHÂN ĐẾN HẸN TÁI KHÁM:</h4>
+                        <span id="statsFollowUpCountText" class="text-[12px] bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded-full">0 bệnh nhân</span>
                     </div>
                     <!-- Sub filter tabs for follow-up -->
-                    <div class="flex flex-wrap items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px]">
+                    <div class="flex flex-wrap items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[13px]">
                         <button type="button" id="btnFuFilterTomorrow" onclick="window.setFollowUpFilter('tomorrow')" class="px-2.5 py-1 rounded-md font-bold bg-white text-blue-800 shadow-sm transition flex items-center gap-1">
                             <i class="fa-solid fa-bell text-amber-500"></i> Báo trước (Ngày mai)
                         </button>
@@ -1885,7 +1902,7 @@
                             <col style="width: 12%;">
                             <col style="width: 10%;">
                         </colgroup>
-                        <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold sticky top-0 z-10 shadow-sm">
+                        <thead class="bg-slate-100 text-slate-600 uppercase text-[12px] font-bold sticky top-0 z-10 shadow-sm">
                             <tr>
                                 <th class="p-3">Mã BN</th>
                                 <th class="p-3">Họ và Tên</th>
@@ -1916,7 +1933,7 @@
 </div>
 
 <button id="statsMinimizedRestore" type="button" onclick="window.restoreStatsModal()" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[80] px-4 py-2.5 rounded-xl bg-teal-800 hover:bg-teal-900 text-white text-xs font-bold shadow-2xl border border-teal-600 items-center gap-2">
-    <i class="fa-solid fa-chart-pie text-teal-300"></i> THỐNG KÊ <i class="fa-solid fa-up-right-and-down-left-from-center text-[10px]"></i>
+    <i class="fa-solid fa-chart-pie text-teal-300"></i> THỐNG KÊ <i class="fa-solid fa-up-right-and-down-left-from-center text-[12px]"></i>
 </button>
 
     <!-- ========================================== -->
@@ -1927,7 +1944,7 @@
             <div class="bg-slate-800 text-white p-4 px-6 flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center gap-3">
                     <button type="button" onclick="window.closeUserManagementModal()" title="Đóng" aria-label="Đóng cửa sổ quản lý thành viên" class="group shrink-0 w-3.5 h-3.5 rounded-full bg-[#ff5f57] border border-[#e0443e] text-[#7a1712] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
-                        <i class="fa-solid fa-xmark text-[7px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                        <i class="fa-solid fa-xmark text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                     </button>
                     <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-users-gear text-amber-400"></i> Quản Lý Thành Viên & Phân Quyền
@@ -1938,7 +1955,7 @@
             <div class="p-6 space-y-4 text-xs">
                 <div class="overflow-x-auto rounded-2xl border border-slate-200/80">
                     <table class="w-full text-left text-xs text-slate-700">
-                    <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-[12px] font-bold">
                             <tr>
                                 <th class="p-3">Thành Viên</th>
                                 <th class="p-3">Email</th>
@@ -2659,7 +2676,7 @@
             wrap.classList.toggle('hidden', variableItems.length === 0);
             variableItems.forEach(({item,index}) => {
                 const label = document.createElement('label');
-                label.className = 'block text-[10px] font-semibold text-indigo-900';
+                label.className = 'block text-[12px] font-semibold text-indigo-900';
                 label.innerHTML = `${escapeHtml(item.drug)} (${escapeHtml(item.unit)}; ${item.range[0]}–${item.range[1]})`;
                 const input = document.createElement('input');
                 input.type = 'number'; input.step = 'any'; input.min = item.range[0]; input.max = item.range[1];
@@ -3222,7 +3239,7 @@
             content.classList.toggle('rounded-none', window.statsModalIsMaximized);
             button.title = window.statsModalIsMaximized ? 'Thu về cửa sổ' : 'Phóng to';
             button.setAttribute('aria-label', button.title);
-            button.innerHTML = `<i class="fa-solid ${window.statsModalIsMaximized ? 'fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center'} text-[6px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>`;
+            button.innerHTML = `<i class="fa-solid ${window.statsModalIsMaximized ? 'fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center'} text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>`;
             setTimeout(() => window.statsPieChartInstance?.resize(), 0);
         };
     </script>
@@ -3661,7 +3678,7 @@
             if (container.querySelectorAll('.response-lesion').length >= 5) { alert('RECIST 1.1 cho phép tối đa 5 target lesions.'); return; }
             const row = document.createElement('div'); row.className = 'response-lesion grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-2';
             row.dataset.lesionId = lesion.id || window.makeResponseLesionId();
-            row.innerHTML = `<div class="space-y-2"><label class="block text-[10px] font-semibold text-slate-600">Tên / mô tả<input class="lesion-name mt-1 w-full rounded-lg border p-2 text-xs" maxlength="100" placeholder="Ví dụ: U gan 1"></label><label class="block text-[10px] font-semibold text-slate-600">Cơ quan<input class="lesion-organ mt-1 w-full rounded-lg border p-2 text-xs" maxlength="60" list="responseOrganOptions" placeholder="Chọn hoặc nhập cơ quan"></label><label class="block text-[10px] font-semibold text-slate-600">Loại tổn thương<select class="lesion-type mt-1 w-full rounded-lg border p-2 text-xs"><option value="lesion">Tổn thương thông thường</option><option value="node">Hạch</option></select></label></div><div class="space-y-2"><label class="lesion-measurement-label block text-[10px] font-semibold text-slate-600">Đường kính lớn nhất (mm)<input class="lesion-measurement mt-1 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" inputmode="decimal"></label><label class="flex items-center gap-2 text-[10px] font-semibold text-slate-600"><input class="lesion-not-seen" type="checkbox"> Không còn thấy / không đo được</label><p class="text-[10px] text-rose-600">Kích thước một chiều theo CT/MRI; hạch đo trục ngắn.</p><p class="lesion-live-result text-[10px] font-semibold text-slate-600"></p><button type="button" class="remove-response-lesion rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-700">Xóa target lesion</button></div>`;
+            row.innerHTML = `<div class="space-y-2"><label class="block text-[12px] font-semibold text-slate-600">Tên / mô tả<input class="lesion-name mt-1 w-full rounded-lg border p-2 text-xs" maxlength="100" placeholder="Ví dụ: U gan 1"></label><label class="block text-[12px] font-semibold text-slate-600">Cơ quan<input class="lesion-organ mt-1 w-full rounded-lg border p-2 text-xs" maxlength="60" list="responseOrganOptions" placeholder="Chọn hoặc nhập cơ quan"></label><label class="block text-[12px] font-semibold text-slate-600">Loại tổn thương<select class="lesion-type mt-1 w-full rounded-lg border p-2 text-xs"><option value="lesion">Tổn thương thông thường</option><option value="node">Hạch</option></select></label></div><div class="space-y-2"><label class="lesion-measurement-label block text-[12px] font-semibold text-slate-600">Đường kính lớn nhất (mm)<input class="lesion-measurement mt-1 w-full rounded-lg border p-2 text-xs" type="number" min="0.1" step="0.1" inputmode="decimal"></label><label class="flex items-center gap-2 text-[12px] font-semibold text-slate-600"><input class="lesion-not-seen" type="checkbox"> Không còn thấy / không đo được</label><p class="text-[12px] text-rose-600">Kích thước một chiều theo CT/MRI; hạch đo trục ngắn.</p><p class="lesion-live-result text-[12px] font-semibold text-slate-600"></p><button type="button" class="remove-response-lesion rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-700">Xóa target lesion</button></div>`;
             const name = row.querySelector('.lesion-name'); const organ = row.querySelector('.lesion-organ'); const type = row.querySelector('.lesion-type'); const measurement = row.querySelector('.lesion-measurement'); const notSeen = row.querySelector('.lesion-not-seen');
             name.value = lesion.name || ''; organ.value = lesion.organ || ''; type.value = lesion.type === 'node' ? 'node' : 'lesion'; measurement.value = lesion.notSeen ? '' : (lesion.measurementMm ?? ''); notSeen.checked = Boolean(lesion.notSeen);
             const syncMeasureState = () => { const node = type.value === 'node'; row.querySelector('.lesion-measurement-label').firstChild.textContent = node ? 'Trục ngắn (mm)' : 'Đường kính lớn nhất (mm)'; measurement.disabled = notSeen.checked; if (notSeen.checked) measurement.value = ''; window.updateResponseConclusion(); };
@@ -3786,7 +3803,7 @@
             document.getElementById('toxicityInputs').innerHTML = toxicityCriteria.map(([name, grades, group], i) => {
                 const heading = group !== previousGroup ? `<h4 class="col-span-full pt-1 font-bold text-teal-900 border-b">${group}</h4>` : '';
                 previousGroup = group;
-                return `${heading}<label class="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] items-center gap-1 rounded-lg border p-1 text-[10px] leading-tight"><span class="font-semibold">${i+1}. ${name}</span><select data-toxicity-index="${i}" class="rounded border p-1 text-[10px]"><option value="">Không ghi nhận</option>${grades.map((g,j)=>`<option value="${j+1}">Độ ${j+1}: ${g}</option>`).join('')}</select></label>`;
+                return `${heading}<label class="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] items-center gap-1 rounded-lg border p-1 text-[12px] leading-tight"><span class="font-semibold">${i+1}. ${name}</span><select data-toxicity-index="${i}" class="rounded border p-1 text-[12px]"><option value="">Không ghi nhận</option>${grades.map((g,j)=>`<option value="${j+1}">Độ ${j+1}: ${g}</option>`).join('')}</select></label>`;
             }).join('');
             document.getElementById('toxicityInputs').addEventListener('change', window.updateToxicityAlert);
         };
@@ -3822,13 +3839,14 @@
             const toxicity = (window.tempToxicityAssessments || []).at(-1); document.getElementById('toxicityHistoryPreview').textContent = toxicity ? `Lần ghi nhận gần nhất: ${formatDisplayDate(toxicity.date)} (${toxicity.items.length} mục).` : 'Chưa có ghi nhận độc tính.';
             const responseList = document.getElementById('existingResponseList');
             if (responseList) responseList.innerHTML = responseHistory.length ? [...responseHistory].map((item,index) => ({item,index})).reverse().map(({item,index}) => {
+                if (item.recistVersion === 'mRECIST') return `<div class="rounded-xl border border-amber-200 bg-white p-3 text-sm"><div class="flex flex-wrap items-center justify-between gap-2"><strong>mRECIST · ${escapeHtml(formatDisplayDate(item.date))} · ${escapeHtml(item.response || 'Chưa đủ dữ liệu')}</strong><span class="flex gap-2"><button type="button" onclick="window.editMrecistAssessment(${index})" class="rounded-md border px-2 py-1 text-indigo-700">Sửa</button><button type="button" onclick="window.deleteMrecistAssessment(${index})" class="rounded-md border px-2 py-1 text-rose-700">Xóa</button></span></div><p>${escapeHtml(window.responseLabel(item.response))}</p></div>`;
                 if (item.recistVersion !== '1.1') return `<div class="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs"><strong>${escapeHtml(window.assessmentDateTime(item))} · Đánh giá cũ – cần đánh giá lại theo RECIST 1.1.</strong><p>Dữ liệu lịch sử được giữ nguyên, không quy đổi từ diện tích sang SOD.</p></div>`;
                 const metrics = window.calculateRECIST(responseHistory.slice(0, index), item);
                 const histViLabel = {CR:'Đáp ứng hoàn toàn',PR:'Đáp ứng một phần',SD:'Bệnh ổn định',PD:'Bệnh tiến triển',Baseline:'Đánh giá nền'}[item.response] || '';
                 const sodFormula = (item.lesions || []).filter(x => !x.notSeen).map(x => `${escapeHtml(x.name)}: ${Number(x.measurementMm).toFixed(1)} mm`).join(' + ');
                 const notSeenPart = (item.lesions || []).filter(x => x.notSeen).map(x => `${escapeHtml(x.name)}: không còn thấy (0 mm)`).join(', ');
                 const sodDisplay = [sodFormula, notSeenPart].filter(Boolean).join(' · ');
-                return `<div class="rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm"><div class="flex flex-wrap items-center justify-between gap-2"><strong class="text-sm text-slate-800">${escapeHtml(formatDisplayDate(item.date))} · ${escapeHtml(item.response || 'Chưa đủ dữ liệu')}${histViLabel ? ` <span class="font-normal text-slate-500">(${histViLabel})</span>` : ''}</strong><span class="flex gap-2"><button type="button" onclick="window.editResponseAssessment(${index})" class="rounded-md border px-2 py-1 font-semibold text-indigo-700">Sửa</button><button type="button" onclick="window.deleteResponseAssessment(${index})" class="rounded-md border px-2 py-1 font-semibold text-rose-700">Xóa</button></span></div><p class="mt-1">SOD ${Number(item.sod).toFixed(1)} mm · Baseline ${Number(item.baselineSod).toFixed(1)} mm · Nadir ${Number(item.nadir).toFixed(1)} mm</p><p class="text-xs text-slate-600">${sodDisplay} = <strong>${Number(item.sod).toFixed(1)} mm</strong></p><p class="text-[10px] text-slate-500">${escapeHtml(metrics.responseNote || '')}</p></div>`;
+                return `<div class="rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm"><div class="flex flex-wrap items-center justify-between gap-2"><strong class="text-sm text-slate-800">${escapeHtml(formatDisplayDate(item.date))} · ${escapeHtml(item.response || 'Chưa đủ dữ liệu')}${histViLabel ? ` <span class="font-normal text-slate-500">(${histViLabel})</span>` : ''}</strong><span class="flex gap-2"><button type="button" onclick="window.editResponseAssessment(${index})" class="rounded-md border px-2 py-1 font-semibold text-indigo-700">Sửa</button><button type="button" onclick="window.deleteResponseAssessment(${index})" class="rounded-md border px-2 py-1 font-semibold text-rose-700">Xóa</button></span></div><p class="mt-1">SOD ${Number(item.sod).toFixed(1)} mm · Baseline ${Number(item.baselineSod).toFixed(1)} mm · Nadir ${Number(item.nadir).toFixed(1)} mm</p><p class="text-xs text-slate-600">${sodDisplay} = <strong>${Number(item.sod).toFixed(1)} mm</strong></p><p class="text-[12px] text-slate-500">${escapeHtml(metrics.responseNote || '')}</p></div>`;
             }).join('') : '<p class="text-violet-300">Chưa ghi nhận.</p>';
             const toxicityList = document.getElementById('existingToxicityList');
             if (toxicityList) toxicityList.innerHTML = window.tempToxicityAssessments.length ? window.tempToxicityAssessments.map((item,index) => `<div class="rounded-lg border bg-white p-2"><div class="flex items-center justify-between gap-2"><strong>${escapeHtml(window.assessmentDateTime(item))}</strong><span class="flex gap-1"><button type="button" onclick="window.editToxicityAssessment(${index})" class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 py-1 font-semibold text-indigo-700 hover:bg-slate-200"><i class="fa-solid fa-pen text-amber-600"></i>Sửa</button><button type="button" onclick="window.deleteToxicityAssessment(${index})" class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 py-1 font-semibold text-rose-700 hover:bg-slate-200"><i class="fa-solid fa-trash text-rose-600"></i>Xóa</button></span></div>${item.items.map(x => `<p class="${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-700' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(x.organ)} · Độ ${x.grade}</p>`).join('')}</div>`).join('') : '<p class="text-slate-400">Chưa ghi nhận.</p>';
@@ -3838,6 +3856,7 @@
             const item = window.tempResponseAssessments[index]; if (!item) return;
             if (item.recistVersion !== '1.1') { alert('Đánh giá cũ không thể chuyển đổi chính xác sang RECIST 1.1. Hãy tạo đánh giá RECIST mới; dữ liệu cũ vẫn được giữ.'); return; }
             window.prepareAssessmentSave();
+            window.openResponseEditor('response', item);
             window.editingResponseAssessmentIndex = index;
             const history = window.recistAssessments();
             const isOnlyBaseline = history.length === 1 && history[0].assessmentId === item.assessmentId;
@@ -3851,7 +3870,7 @@
             window.toggleNewLesionFields();
             document.getElementById('responseRecordButton').textContent = 'Lưu thay đổi cho lần ghi nhận';
             window.updateResponseConclusion();
-            const root = document.getElementById('extendedAssessmentModal'); root.classList.remove('hidden'); root.classList.add('flex'); window.switchExtendedTab('response');
+            document.getElementById('responseHistoryPreview').classList.add('hidden');
         };
         window.deleteToxicityAssessment = function(index) { if (!confirm('Xóa lần ghi nhận độc tính này?')) return; window.tempToxicityAssessments.splice(index,1); window.prepareAssessmentSave(); window.refreshExtendedAssessment(); };
         window.editToxicityAssessment = function(index) {
@@ -3909,7 +3928,7 @@
             document.getElementById('responseNewLesionStatus').value = 'no';
             document.getElementById('responseNewLesionOrgan').value = ''; document.getElementById('responseNewLesionDescription').value = ''; document.getElementById('responseNewLesionSize').value = '';
 
-            window.toggleNewLesionFields(); window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã lưu đánh giá theo RECIST 1.1.');
+            window.toggleNewLesionFields(); window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã cập nhật đánh giá. Bấm Lưu hồ sơ để lưu thay đổi.'); window.closeResponseEditor();
         };
 
         /* =============================================
@@ -3983,24 +4002,24 @@
             const fixDef = hasBaseline;
             row.innerHTML = `
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-semibold text-slate-600">Tên / mô tả
+                    <label class="block text-[12px] font-semibold text-slate-600">Tên / mô tả
                         <input class="mrl-name mt-1 w-full rounded-lg border p-2 text-xs" maxlength="100" placeholder="Ví dụ: Nốt gan S5" ${fixDef ? 'disabled' : ''}>
                     </label>
-                    <label class="block text-[10px] font-semibold text-slate-600">Cơ quan
+                    <label class="block text-[12px] font-semibold text-slate-600">Cơ quan
                         <input class="mrl-organ mt-1 w-full rounded-lg border p-2 text-xs" maxlength="60" list="responseOrganOptions" placeholder="Ví dụ: gan" ${fixDef ? 'disabled' : ''}>
                     </label>
-                    <label class="block text-[10px] font-semibold text-slate-600">Tổng kích thước u (mm) <span class="font-normal text-slate-400">(tham khảo)</span>
+                    <label class="block text-[12px] font-semibold text-slate-600">Tổng kích thước u (mm) <span class="font-normal text-slate-400">(tham khảo)</span>
                         <input class="mrl-total mt-1 w-full rounded-lg border p-2 text-xs" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Đường kính lớn nhất toàn bộ u">
                     </label>
                 </div>
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-semibold text-amber-700">⭐ Kích thước mô u sống (mm) <span class="font-normal text-slate-400">(ngấm thuốc ĐM)</span>
+                    <label class="block text-[12px] font-semibold text-amber-700">⭐ Kích thước mô u sống (mm) <span class="font-normal text-slate-400">(ngấm thuốc ĐM)</span>
                         <input class="mrl-viable mt-1 w-full rounded-lg border border-amber-400 p-2 text-xs" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Vùng ngấm thuốc thì động mạch">
                     </label>
-                    <label class="flex items-center gap-2 text-[10px] font-semibold text-slate-600">
+                    <label class="flex items-center gap-2 text-[12px] font-semibold text-slate-600">
                         <input class="mrl-not-seen" type="checkbox"> Không còn thấy / biến mất hoàn toàn
                     </label>
-                    <p class="mrl-live text-[10px] font-semibold text-amber-700"></p>
+                    <p class="mrl-live text-[12px] font-semibold text-amber-700"></p>
                     <button type="button" class="remove-mrecist-lesion rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-700">Xóa tổn thương</button>
                 </div>`;
             const nameEl = row.querySelector('.mrl-name'); const organEl = row.querySelector('.mrl-organ');
@@ -4106,7 +4125,7 @@
                 const notSeenPart = (item.lesions||[]).filter(x => x.notSeen).map(x => `${escapeHtml(x.name)}: không còn thấy`).join(', ');
                 const sodDisplay = [sodFormula, notSeenPart].filter(Boolean).join(' · ');
                 const dateLabel = window.assessmentDateTime ? window.assessmentDateTime(item) : (window.formatDisplayDate ? window.formatDisplayDate(item.date) : item.date);
-                return `<div class="rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3 shadow-sm"><div class="flex flex-wrap items-center justify-between gap-2"><strong class="text-sm text-slate-800">${escapeHtml(dateLabel)} · ${escapeHtml(item.response || 'Chưa đủ dữ liệu')}${hLabel ? ` <span class="font-normal text-slate-500">(${hLabel})</span>` : ''}</strong><span class="flex gap-2"><button type="button" onclick="window.editMrecistAssessment(${globalIdx})" class="rounded-md border px-2 py-1 font-semibold text-indigo-700 text-xs">Sửa</button><button type="button" onclick="window.deleteMrecistAssessment(${globalIdx})" class="rounded-md border px-2 py-1 font-semibold text-rose-700 text-xs">Xóa</button></span></div><p class="mt-1 text-xs">Viable SOD ${Number(item.viableSod).toFixed(1)} mm · Baseline ${Number(item.baselineViableSod).toFixed(1)} mm · Nadir ${Number(item.nadir).toFixed(1)} mm</p><p class="text-xs text-slate-600">${sodDisplay}${sodFormula ? ` = <strong>${Number(item.viableSod).toFixed(1)} mm</strong>` : ''}</p><p class="text-[10px] text-slate-500">${escapeHtml(metrics.responseNote || '')}</p></div>`;
+                return `<div class="rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3 shadow-sm"><div class="flex flex-wrap items-center justify-between gap-2"><strong class="text-sm text-slate-800">${escapeHtml(dateLabel)} · ${escapeHtml(item.response || 'Chưa đủ dữ liệu')}${hLabel ? ` <span class="font-normal text-slate-500">(${hLabel})</span>` : ''}</strong><span class="flex gap-2"><button type="button" onclick="window.editMrecistAssessment(${globalIdx})" class="rounded-md border px-2 py-1 font-semibold text-indigo-700 text-xs">Sửa</button><button type="button" onclick="window.deleteMrecistAssessment(${globalIdx})" class="rounded-md border px-2 py-1 font-semibold text-rose-700 text-xs">Xóa</button></span></div><p class="mt-1 text-xs">Viable SOD ${Number(item.viableSod).toFixed(1)} mm · Baseline ${Number(item.baselineViableSod).toFixed(1)} mm · Nadir ${Number(item.nadir).toFixed(1)} mm</p><p class="text-xs text-slate-600">${sodDisplay}${sodFormula ? ` = <strong>${Number(item.viableSod).toFixed(1)} mm</strong>` : ''}</p><p class="text-[12px] text-slate-500">${escapeHtml(metrics.responseNote || '')}</p></div>`;
             }).join('');
         };
         window.recordMrecistAssessment = function() {
@@ -4115,6 +4134,8 @@
             const lesions = window.getMrecistLesions();
             if (!lesions.length) { alert('Thêm ít nhất một tổn thương đích.'); return; }
             for (const l of lesions) { if (!l.name) { alert('Mỗi tổn thương cần có tên/mô tả.'); return; } if (!l.notSeen && (l.viableMm === null || l.viableMm === undefined)) { alert(`Thiếu kích thước mô u sống cho tổn thương: ${l.name}`); return; } }
+            const edited = Number.isInteger(window.editingMrecistAssessmentIndex) ? window.tempResponseAssessments[window.editingMrecistAssessmentIndex] : null;
+            if (edited && window.mrecistAssessments().some(item => item !== edited && item.date === date)) { alert('Đã có đánh giá mRECIST ngày này. Vui lòng sửa lần đánh giá đó.'); return; }
             const existing = window.mrecistAssessments().find(item => item.date === date);
             if (existing && window.editingMrecistAssessmentIndex === null) { if (!confirm('Đã có đánh giá mRECIST ngày này. Ghi đè?')) return; window.tempResponseAssessments.splice(window.tempResponseAssessments.indexOf(existing), 1); }
             const editingIdx = (Number.isInteger(window.editingMrecistAssessmentIndex) && window.editingMrecistAssessmentIndex >= 0) ? window.editingMrecistAssessmentIndex : null;
@@ -4140,18 +4161,19 @@
             document.getElementById('mrecistNonTargetStatus').value = 'not_assessed';
             document.getElementById('mrecistNewLesionStatus').value = 'no';
 
-            window.renderMrecistInputs(); window.refreshMrecistHistory(); window.showToast('Đã lưu đánh giá mRECIST!');
+            window.renderMrecistInputs(); window.refreshMrecistHistory(); window.showToast('Đã cập nhật đánh giá. Bấm Lưu hồ sơ để lưu thay đổi.'); window.refreshExtendedAssessment(); window.closeResponseEditor();
         };
         window.deleteMrecistAssessment = function(globalIdx) {
             if (!confirm('Xóa lần đánh giá mRECIST này? Kết quả sau sẽ được tính lại.')) return;
             window.tempResponseAssessments.splice(globalIdx, 1);
             window.recalculateMrecistHistory();
             window.prepareAssessmentSave();
-            window.renderMrecistInputs(); window.refreshMrecistHistory();
+            window.renderMrecistInputs(); window.refreshMrecistHistory(); window.refreshExtendedAssessment();
         };
         window.editMrecistAssessment = function(globalIdx) {
             const item = window.tempResponseAssessments[globalIdx]; if (!item) return;
             window.prepareAssessmentSave();
+            window.openResponseEditor('mrecist', item);
             window.editingMrecistAssessmentIndex = globalIdx;
             window.renderMrecistInputs(item.lesions);
             document.getElementById('mrecistAssessmentDate').value = item.date || '';
@@ -4159,6 +4181,8 @@
             document.getElementById('mrecistNewLesionStatus').value = (item.newLesion||{}).status || 'no';
             document.getElementById('mrecistRecordButton').textContent = 'Cập nhật đánh giá mRECIST';
             window.updateMrecistConclusion();
+            document.getElementById('existingMrecistList').classList.add('hidden');
+            document.getElementById('mrecistHistoryPreview').classList.add('hidden');
         };
         window.editingMrecistAssessmentIndex = null;
         window.recordToxicityAssessment = function() {
@@ -4224,12 +4248,12 @@
                     <td class="px-3 py-2.5 font-semibold text-slate-900 whitespace-normal break-words leading-snug" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
                     <td class="px-3 py-2.5 text-center whitespace-nowrap">${escapeHtml(p.gender || '-')}</td>
                     <td class="px-3 py-2.5 text-center font-bold text-slate-700 whitespace-nowrap">${escapeHtml(p.birthYear || '-')}</td>
-                    <td class="px-3 py-2.5 font-medium text-slate-800 text-[11px] leading-snug">
+                    <td class="px-3 py-2.5 font-medium text-slate-800 text-[13px] leading-snug">
                         <div class="line-clamp-2" title="${escapeHtml(fullDiag)}"><strong class="text-blue-700">Chính:</strong> ${escapeHtml(fullDiag)}</div>
-                        <div class="line-clamp-1 text-[10px] text-slate-500 mt-0.5" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
+                        <div class="line-clamp-1 text-[12px] text-slate-500 mt-0.5" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
                     </td>
-                    <td class="px-3 py-2.5 font-bold text-amber-800 text-[11px] leading-snug" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
-                    <td class="px-3 py-2.5 text-center font-semibold text-blue-700 text-[11px] whitespace-nowrap" title="${escapeHtml(treatmentSummary.cycle)}">${escapeHtml(treatmentSummary.cycle)}</td>
+                    <td class="px-3 py-2.5 font-bold text-amber-800 text-[13px] leading-snug" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
+                    <td class="px-3 py-2.5 text-center font-semibold text-blue-700 text-[13px] whitespace-nowrap" title="${escapeHtml(treatmentSummary.cycle)}">${escapeHtml(treatmentSummary.cycle)}</td>
                     <td class="px-3 py-2.5 text-center">
                         <div class="flex items-center justify-center gap-1 flex-nowrap">
                             <button type="button" data-patient-action="view" title="Form tóm tắt & Marker" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition flex-shrink-0"><i class="fa-solid fa-eye"></i></button>
@@ -4328,11 +4352,11 @@
                         cDiv.innerHTML = `
                             <div class="font-bold text-teal-800 text-xs flex justify-between items-center">
                                 <span>${escapeHtml(c.branchName || 'Chu kỳ')} - Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}</span>
-                                ${c.week ? `<span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300">${escapeHtml(c.week)}</span>` : ''}
+                                ${c.week ? `<span class="bg-amber-100 text-amber-900 text-[12px] font-bold px-2 py-0.5 rounded border border-amber-300">${escapeHtml(c.week)}</span>` : ''}
                             </div>
                             <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${escapeHtml(c.drugNames || 'N/A')} - <strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'N/A')}</p>
                             <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${escapeHtml(c.note || 'Không có')}</p>
-                            ${c.followUpDate ? `<p class="text-amber-800 font-semibold text-[11px] pt-1 border-t border-slate-200/60 flex items-center gap-1.5"><i class="fa-solid fa-calendar-check text-amber-600"></i><strong>Hẹn tái khám:</strong> ${escapeHtml(formatDisplayDate(c.followUpDate))} ${c.followUpDays ? `<span class="font-normal text-slate-500">(sau ${c.followUpDays} ngày)</span>` : ''}</p>` : ''}
+                            ${c.followUpDate ? `<p class="text-amber-800 font-semibold text-[13px] pt-1 border-t border-slate-200/60 flex items-center gap-1.5"><i class="fa-solid fa-calendar-check text-amber-600"></i><strong>Hẹn tái khám:</strong> ${escapeHtml(formatDisplayDate(c.followUpDate))} ${c.followUpDays ? `<span class="font-normal text-slate-500">(sau ${c.followUpDays} ngày)</span>` : ''}</p>` : ''}
                         `;
                         cyclesContainer.appendChild(cDiv);
                     });
@@ -4351,28 +4375,69 @@
             window.switchDetailTab('timeline');
         };
 
+        window.responseLabel = code => ({CR:'Đáp ứng hoàn toàn', PR:'Đáp ứng một phần', SD:'Bệnh ổn định', PD:'Bệnh tiến triển', Baseline:'Đánh giá nền'})[code] || 'Chưa đủ dữ liệu';
         window.renderSummaryResponse = function(patient) {
-            const container = document.getElementById('summaryResponseContent');
-            const latest = window.getLatestRecistAssessment(patient.responseAssessments || []);
-            if (!latest) { container.innerHTML = '<p class="font-bold text-slate-600">Chưa ghi nhận</p>'; return; }
-            const responseName = ({ CR: 'Đáp ứng hoàn toàn', PR: 'Đáp ứng một phần', SD: 'Bệnh ổn định', PD: 'Bệnh tiến triển', Baseline: 'Baseline', 'Chưa đủ dữ liệu': 'Chưa đủ dữ liệu để đánh giá' })[latest.response] || 'Chưa đủ dữ liệu để đánh giá';
-            const baselineChange = Number(latest.baselineChangePct);
-            const nadirChange = latest.nadirChangePct === null || latest.nadirChangePct === undefined ? NaN : Number(latest.nadirChangePct);
-            const baselinePct = Number.isFinite(baselineChange) ? `${baselineChange < 0 ? '↓ ' : baselineChange > 0 ? '↑ +' : ''}${Math.abs(baselineChange).toFixed(1)}%` : '—';
-            const nadirPct = Number.isFinite(nadirChange) ? `${nadirChange < 0 ? '↓ ' : nadirChange > 0 ? '↑ +' : ''}${Math.abs(nadirChange).toFixed(1)}%` : '—';
-            const newStatus = latest.newLesion?.status || latest.newLesionStatus || 'no';
-            const newText = newStatus === 'confirmed' ? 'Có, đã xác nhận' : newStatus === 'suspected' ? 'Nghi ngờ, chưa xác nhận' : 'Không';
-            container.innerHTML = `<p class="text-lg font-extrabold ${window.classForResponseConclusion(latest.response)} inline-block rounded-full px-2 py-1">${escapeHtml(latest.response || 'Chưa đủ dữ liệu')}</p><p class="mt-1">${escapeHtml(responseName)}</p><p class="mt-2">Đánh giá gần nhất: <strong>${escapeHtml(formatDisplayDate(latest.date))}</strong></p><dl class="mt-2 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1"><dt>SOD hiện tại</dt><dd class="font-semibold">${Number(latest.sod).toFixed(1)} mm</dd><dt>Baseline</dt><dd class="font-semibold">${Number(latest.baselineSod).toFixed(1)} mm</dd><dt>Nadir</dt><dd class="font-semibold">${Number(latest.nadir).toFixed(1)} mm</dd><dt>Thay đổi so Baseline</dt><dd class="font-semibold">${baselinePct}</dd><dt>Thay đổi so Nadir</dt><dd class="font-semibold">${nadirPct}</dd><dt>Tổn thương mới</dt><dd class="font-semibold">${escapeHtml(newText)}</dd></dl>${latest.responseNote ? `<p class="mt-2 text-[10px] text-amber-700">${escapeHtml(latest.responseNote)}</p>` : ''}`;
+            const history = patient.responseAssessments || [];
+            const latest = [window.getLatestRecistAssessment(history), window.getLatestMrecistAssessment(history)].filter(Boolean);
+            document.getElementById('summaryResponseContent').innerHTML = latest.length ? latest.map(item => `<div class="mb-2"><p class="font-semibold">${item.recistVersion === '1.1' ? 'RECIST 1.1' : 'mRECIST'} · ${escapeHtml(formatDisplayDate(item.date))}</p><p class="mt-1"><span class="inline-block rounded-full px-2 py-1 font-bold ${window.classForResponseConclusion(item.response)}">${escapeHtml(item.response || '—')}</span> ${escapeHtml(window.responseLabel(item.response))}</p></div>`).join('') : '<p>Chưa ghi nhận đánh giá RECIST 1.1 / mRECIST.</p>';
         };
-        window.openResponseAssessmentFromSummary = async function() {
-            const patientId = window.currentViewingPatient?.id;
-            if (!patientId) return;
-            window.closePatientDetailModal();
-            await new Promise(resolve => setTimeout(resolve, 200));
-            await window.openEditPatientModal(patientId);
-            window.openExtendedAssessment();
-            window.switchExtendedTab('response');
+        window.closeResponseDetails = function() {
+            document.getElementById('responseDetailsModal').classList.replace('flex', 'hidden');
+            document.querySelector('#summaryResponseCard button').focus();
         };
+        window.openResponseAssessmentFromSummary = function() {
+            const history = window.currentViewingPatient?.responseAssessments || [];
+            const number = value => value !== null && value !== undefined && Number.isFinite(Number(value)) ? Number(value).toFixed(1) : '—';
+            document.getElementById('responseDetailsBody').innerHTML = [...history].sort((a,b) => String(b.date).localeCompare(String(a.date))).map(item => {
+                const m = item.recistVersion === 'mRECIST';
+                if (!m && item.recistVersion !== '1.1') return `<section class="rounded-xl border p-3">${escapeHtml(formatDisplayDate(item.date))} · Dữ liệu đánh giá cũ, chưa có cách tính RECIST.</section>`;
+                const r = m ? window.calculateMRECIST(history, item) : window.calculateRECIST(history, item);
+                const sod = m ? r.viableSod : r.sod, base = m ? r.baselineViableSod : r.baselineSod;
+                const sum = (item.lesions || []).map(l => `${escapeHtml(l.name || 'Tổn thương')}: ${l.notSeen ? '0 (không còn thấy)' : number(m ? l.viableMm : l.measurementMm)} mm`).join(' + ');
+                const change = (reference, pct) => reference > 0 && pct != null ? `(${number(sod)} − ${number(reference)}) / ${number(reference)} × 100 = ${number(pct)}%` : 'Không áp dụng';
+                const nt = {not_assessed:'Chưa đánh giá', none:'Không có', non_cr_non_pd:'Còn tổn thương, không CR/không PD', cr:'Đã biến mất', pd:'Tiến triển rõ'};
+                const nl = {no:'Không', suspected:'Nghi ngờ, chưa xác nhận', confirmed:'Có, đã xác nhận'};
+                return `<section class="rounded-xl border border-violet-200 p-4 space-y-2"><h4 class="font-bold">${m ? 'mRECIST' : 'RECIST 1.1'} · ${escapeHtml(formatDisplayDate(item.date))}</h4><p class="font-semibold">${escapeHtml(r.response || 'Chưa đủ dữ liệu')} — ${escapeHtml(window.responseLabel(r.response))}</p><p>${m ? 'Tổng đường kính mô u sống' : 'Tổng đường kính tổn thương đích'}: ${sum} = <strong>${number(sod)} mm</strong></p>${r.response === 'Baseline' ? '<p>Lần đánh giá nền: ghi nhận số đo ban đầu làm mốc theo dõi.</p>' : `<p>Baseline: ${number(base)} mm · Nadir: ${number(r.nadir)} mm</p><p>Thay đổi so Baseline: ${change(base, r.baselineChangePct)}</p><p>Thay đổi so Nadir: ${change(r.nadir, r.nadirChangePct)}</p><p>Tăng tuyệt đối so Nadir: ${number(sod - r.nadir)} mm</p>`}<p>Tổn thương không đích: ${escapeHtml(nt[item.nonTargetStatus] || 'Chưa đánh giá')}</p><p>Tổn thương mới: ${escapeHtml(nl[item.newLesion?.status || item.newLesionStatus || 'no'] || 'Chưa đánh giá')}</p>${r.responseNote ? `<p>${escapeHtml(r.responseNote)}</p>` : ''}</section>`;
+            }).join('') || '<p>Chưa có đánh giá đáp ứng u.</p>';
+            document.getElementById('responseDetailsModal').classList.replace('hidden', 'flex');
+            document.querySelector('#responseDetailsModal button').focus();
+        };
+        // Move the existing form into an isolated dialog; preserve the unsaved input form as DOM nodes.
+        window.openResponseEditor = function(kind, item) {
+            if (window.responseEditorState) window.closeResponseEditor();
+            const panel = document.getElementById(kind === 'response' ? 'extendedResponsePanel' : 'extendedMrecistPanel');
+            const marker = document.createComment('response editor');
+            panel.before(marker);
+            const children = [...panel.childNodes];
+            const clones = children.map(node => node.cloneNode(true));
+            panel.replaceChildren(...clones);
+            window.responseEditorState = {panel, marker, children, className: panel.className, focus: document.activeElement, responsePreview: window.responseCalculationPreview, mrecistPreview: window.mrecistCalculationPreview};
+            document.getElementById('responseEditorBody').append(panel);
+            panel.classList.remove('hidden');
+            document.getElementById('responseEditorTitle').textContent = `SỬA ${kind === 'response' ? 'RECIST 1.1' : 'mRECIST'} · ${formatDisplayDate(item.date)}`;
+            document.getElementById('responseEditorModal').classList.replace('hidden', 'flex');
+            document.querySelector('#responseEditorModal button').focus();
+        };
+        window.closeResponseEditor = function() {
+            const state = window.responseEditorState;
+            if (!state) return;
+            state.panel.replaceChildren(...state.children);
+            state.panel.className = state.className;
+            state.marker.replaceWith(state.panel);
+            window.editingResponseAssessmentIndex = null;
+            window.editingMrecistAssessmentIndex = null;
+            window.responseEditorState = null;
+            window.responseCalculationPreview = state.responsePreview;
+            window.mrecistCalculationPreview = state.mrecistPreview;
+            document.getElementById('responseEditorModal').classList.replace('flex', 'hidden');
+            window.refreshExtendedAssessment(); window.refreshMrecistHistory();
+            state.focus?.focus();
+        };
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            if (window.responseEditorState) { event.stopImmediatePropagation(); window.closeResponseEditor(); }
+            else if (!document.getElementById('responseDetailsModal').classList.contains('hidden')) { event.stopImmediatePropagation(); window.closeResponseDetails(); }
+        }, true);
 
         window.openEditPatientModal = async function(docId) {
             if (!window.canUseOncoCare) return;
@@ -4807,7 +4872,7 @@
                 headerDiv.innerHTML = `
                     <span class="font-bold text-teal-900 text-xs uppercase flex items-center gap-1.5">
                         <i class="fa-solid fa-vial text-teal-700"></i> PHÁC ĐỒ: ${escapeHtml(group.protocolUsed)}
-                        ${group.isChanged ? '<span class="text-[10px] text-rose-600 font-bold bg-rose-100 px-1.5 py-0.5 rounded"><i class="fa-solid fa-right-left"></i> Đổi phác đồ</span>' : ''}
+                        ${group.isChanged ? '<span class="text-[12px] text-rose-600 font-bold bg-rose-100 px-1.5 py-0.5 rounded"><i class="fa-solid fa-right-left"></i> Đổi phác đồ</span>' : ''}
                     </span>
                 `;
                 listDiv.appendChild(headerDiv);
@@ -4823,21 +4888,21 @@
                                     <i id="cycleIcon_${idx}" class="fa-solid fa-plus text-teal-600"></i>
                                 </button>
                                 <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
-                                ${c.followUpDate ? `<span class="ml-1 text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold"><i class="fa-solid fa-calendar-check"></i> ${escapeHtml(formatDisplayDate(c.followUpDate))}</span>` : ''}
+                                ${c.followUpDate ? `<span class="ml-1 text-[12px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold"><i class="fa-solid fa-calendar-check"></i> ${escapeHtml(formatDisplayDate(c.followUpDate))}</span>` : ''}
                             </div>
                             <div class="flex items-center space-x-1">
-                                <button type="button" onclick="window.editTempCycle(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[10px] border border-amber-200"><i class="fa-solid fa-pen"></i> Sửa</button>
-                                <button type="button" onclick="window.deleteTempCycle(${idx})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px] border border-rose-200"><i class="fa-solid fa-trash"></i> Xóa</button>
+                                <button type="button" onclick="window.editTempCycle(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[12px] border border-amber-200"><i class="fa-solid fa-pen"></i> Sửa</button>
+                                <button type="button" onclick="window.deleteTempCycle(${idx})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[12px] border border-rose-200"><i class="fa-solid fa-trash"></i> Xóa</button>
                             </div>
                         </div>
                         
-                        <div id="cycleDetail_${idx}" class="hidden p-3 bg-slate-50 border-t border-slate-100 space-y-1.5 text-[11px] text-slate-700">
+                        <div id="cycleDetail_${idx}" class="hidden p-3 bg-slate-50 border-t border-slate-100 space-y-1.5 text-[13px] text-slate-700">
                             <div><strong class="text-slate-900">Phác đồ áp dụng:</strong> ${escapeHtml(c.protocolUsed || 'Chưa cập nhật')}</div>
                             <div><strong class="text-slate-900">Thuốc hóa trị:</strong> ${escapeHtml(c.drugNames || 'Chưa cập nhật')}</div>
                             <div><strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'Chưa cập nhật')}</div>
                             <div><strong class="text-slate-900">Tác dụng phụ / Ghi chú:</strong> ${escapeHtml(c.note || 'Không ghi nhận')}</div>
                             ${c.followUpDate ? `<div><strong class="text-slate-900">Hẹn tái khám:</strong> <span class="text-amber-800 font-bold">${escapeHtml(formatDisplayDate(c.followUpDate))}</span> ${c.followUpDays ? `<span class="text-slate-500">(sau ${c.followUpDays} ngày)</span>` : ''}</div>` : ''}
-                            <div class="text-[10px] text-slate-400 pt-1">Cập nhật bởi: ${escapeHtml(c.updatedBy || 'Thạch Xuân Tựu')}</div>
+                            <div class="text-[12px] text-slate-400 pt-1">Cập nhật bởi: ${escapeHtml(c.updatedBy || 'Thạch Xuân Tựu')}</div>
                         </div>
                     `;
                     listDiv.appendChild(div);
@@ -4881,11 +4946,11 @@
                     div.innerHTML = `
                         <div class="flex items-center justify-between font-bold text-indigo-900 pb-1 border-b border-indigo-200">
                             <span class="flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square text-indigo-600"></i> Chỉnh sửa chỉ số marker</span>
-                            <span class="text-[10px] text-slate-500 font-semibold">Chỉ số #${idx + 1}</span>
+                            <span class="text-[12px] text-slate-500 font-semibold">Chỉ số #${idx + 1}</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
-                                <label class="block font-semibold text-slate-700 mb-0.5 text-[11px]">Loại Marker:</label>
+                                <label class="block font-semibold text-slate-700 mb-0.5 text-[13px]">Loại Marker:</label>
                                 <select id="editMarkerType_${idx}" onchange="window.handleEditMarkerTypeChange(${idx})" class="w-full p-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs">
                                     <option value="" ${currentType === '' ? 'selected' : ''}>-- Chưa phân loại --</option>
                                     ${standardTypes.map(t => `<option value="${t}" ${currentType === t ? 'selected' : ''}>${t}</option>`).join('')}
@@ -4895,19 +4960,19 @@
                                 <input type="text" id="editMarkerCustomType_${idx}" placeholder="Nhập tên marker khác..." value="${isCustom ? escapeHtml(currentType) : ''}" class="${isCustom ? '' : 'hidden'} mt-1.5 w-full p-1.5 bg-white border border-indigo-300 rounded-lg text-xs font-semibold text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
                             </div>
                             <div>
-                                <label class="block font-semibold text-slate-700 mb-0.5 text-[11px]">Giá trị:</label>
+                                <label class="block font-semibold text-slate-700 mb-0.5 text-[13px]">Giá trị:</label>
                                 <input type="number" step="0.01" id="editMarkerValue_${idx}" value="${escapeHtml(m.value !== undefined ? m.value : '')}" class="w-full p-1.5 bg-white border border-slate-300 rounded-lg font-bold text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
                             </div>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-0.5 text-[11px]">Ngày xét nghiệm:</label>
+                            <label class="block font-semibold text-slate-700 mb-0.5 text-[13px]">Ngày xét nghiệm:</label>
                             <input type="date" id="editMarkerDate_${idx}" value="${escapeHtml(m.date || '')}" class="w-full sm:w-48 p-1.5 bg-white border border-slate-300 rounded-lg font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
                         </div>
                         <div class="flex items-center justify-end gap-2 pt-1 border-t border-indigo-200">
-                            <button type="button" onclick="window.cancelEditTempMarker()" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg font-semibold text-[11px] border border-slate-300 transition flex items-center gap-1">
+                            <button type="button" onclick="window.cancelEditTempMarker()" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg font-semibold text-[13px] border border-slate-300 transition flex items-center gap-1">
                                 <i class="fa-solid fa-xmark"></i> Hủy
                             </button>
-                            <button type="button" onclick="window.saveEditTempMarker(${idx})" class="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold text-[11px] shadow-sm transition flex items-center gap-1">
+                            <button type="button" onclick="window.saveEditTempMarker(${idx})" class="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold text-[13px] shadow-sm transition flex items-center gap-1">
                                 <i class="fa-solid fa-check"></i> Lưu cập nhật
                             </button>
                         </div>
@@ -4920,11 +4985,11 @@
                         <div class="flex-1 pr-2">
                             <span class="font-bold text-indigo-900">[${escapeHtml(m.type || 'Chưa phân loại')}]</span> 
                             <span class="font-bold text-slate-800 ml-1">${escapeHtml(m.value)}</span> 
-                            <span class="text-slate-500 text-[10px] ml-1">(${escapeHtml(formatDisplayDate(m.date))})</span>
+                            <span class="text-slate-500 text-[12px] ml-1">(${escapeHtml(formatDisplayDate(m.date))})</span>
                         </div>
                         <div class="flex items-center space-x-1.5 shrink-0">
-                            <button type="button" onclick="window.editTempMarker(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[10px] border border-amber-200 transition flex items-center gap-1"><i class="fa-solid fa-pen"></i> Sửa</button>
-                            <button type="button" onclick="window.deleteTempMarker(${idx})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px] border border-rose-200 transition flex items-center gap-1"><i class="fa-solid fa-trash"></i> Xóa</button>
+                            <button type="button" onclick="window.editTempMarker(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[12px] border border-amber-200 transition flex items-center gap-1"><i class="fa-solid fa-pen"></i> Sửa</button>
+                            <button type="button" onclick="window.deleteTempMarker(${idx})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[12px] border border-rose-200 transition flex items-center gap-1"><i class="fa-solid fa-trash"></i> Xóa</button>
                         </div>
                     `;
                     listDiv.appendChild(div);
@@ -5653,7 +5718,7 @@
             const btnSave = document.getElementById('btnSaveAdminInfo');
             if (btnSave) {
                 btnSave.disabled = true;
-                btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[9px]"></i> Đang lưu...';
+                btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[11px]"></i> Đang lưu...';
             }
 
             try {
@@ -5701,7 +5766,7 @@
             } finally {
                 if (btnSave) {
                     btnSave.disabled = false;
-                    btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk text-[9px]"></i> Lưu';
+                    btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk text-[11px]"></i> Lưu';
                 }
             }
         };
@@ -5804,7 +5869,7 @@
                 return;
             }
             const btnSave = document.getElementById('btnSaveDiagnosis');
-            if (btnSave) { btnSave.disabled = true; btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[9px]"></i> Đang lưu...'; }
+            if (btnSave) { btnSave.disabled = true; btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[11px]"></i> Đang lưu...'; }
 
             try {
                 // Sync TNM vào text chẩn đoán trước khi lưu
@@ -5846,7 +5911,7 @@
                 console.error('Lỗi lưu chẩn đoán:', err);
                 window.showToast('❌ Lỗi khi lưu chẩn đoán: ' + err.message);
             } finally {
-                if (btnSave) { btnSave.disabled = false; btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk text-[9px]"></i> Lưu'; }
+                if (btnSave) { btnSave.disabled = false; btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk text-[11px]"></i> Lưu'; }
             }
         };
 
@@ -5983,9 +6048,9 @@
                         <td class="p-2.5 font-semibold text-slate-900 whitespace-normal break-words leading-tight" style="max-width: 18ch; word-break: break-word;" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
                         <td class="p-2.5 text-center truncate">${escapeHtml(p.gender || '-')}</td>
                         <td class="p-2.5 text-center font-bold text-slate-700 truncate">${escapeHtml(p.birthYear || '-')}</td>
-                        <td class="p-2.5 font-medium text-slate-800 text-[11px] leading-tight">
+                        <td class="p-2.5 font-medium text-slate-800 text-[13px] leading-tight">
                             <div class="truncate" title="${escapeHtml(fullDiag)}"><strong class="text-blue-700">Chính:</strong> ${escapeHtml(fullDiag)}</div>
-                            <div class="truncate text-[10px] text-slate-500" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
+                            <div class="truncate text-[12px] text-slate-500" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
                         </td>
                         <td class="p-2.5 font-bold text-amber-800 truncate" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
                         <td class="p-2.5 text-center font-semibold text-blue-700 truncate" title="${escapeHtml(treatmentSummary.cycle)}">${escapeHtml(treatmentSummary.cycle)}</td>
@@ -6176,18 +6241,18 @@
 
                 let statusBadge = '';
                 if (fu.isEndedTreatment) {
-                    statusBadge = `<span class="px-2.5 py-1 bg-rose-50 text-rose-800 border border-rose-300 rounded-full font-bold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-flag-checkered text-rose-600"></i> Kết thúc ĐT (Quá ${Math.abs(diffDays)} ngày)</span>`;
+                    statusBadge = `<span class="px-2.5 py-1 bg-rose-50 text-rose-800 border border-rose-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><i class="fa-solid fa-flag-checkered text-rose-600"></i> Kết thúc ĐT (Quá ${Math.abs(diffDays)} ngày)</span>`;
                 } else if (fu.hasNewCycle) {
                     const newCycleLabel = fu.newCycle?.branchName || (fu.newCycle?.cycleNum ? `Chu kỳ ${fu.newCycle.cycleNum}` : 'Mới');
-                    statusBadge = `<span class="px-2.5 py-1 bg-blue-100 text-blue-900 border border-blue-300 rounded-full font-bold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-circle-check text-blue-600"></i> Đã có CK mới (${escapeHtml(newCycleLabel)})</span>`;
+                    statusBadge = `<span class="px-2.5 py-1 bg-blue-100 text-blue-900 border border-blue-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><i class="fa-solid fa-circle-check text-blue-600"></i> Đã có CK mới (${escapeHtml(newCycleLabel)})</span>`;
                 } else if (diffDays === 1) {
-                    statusBadge = `<span class="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-bell text-amber-600"></i> Ngày mai (1 ngày)</span>`;
+                    statusBadge = `<span class="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><i class="fa-solid fa-bell text-amber-600"></i> Ngày mai (1 ngày)</span>`;
                 } else if (diffDays === 0) {
-                    statusBadge = `<span class="px-2.5 py-1 bg-blue-50 text-blue-900 border border-blue-300 rounded-full font-bold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-calendar-day text-blue-600"></i> Hôm nay</span>`;
+                    statusBadge = `<span class="px-2.5 py-1 bg-blue-50 text-blue-900 border border-blue-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><i class="fa-solid fa-calendar-day text-blue-600"></i> Hôm nay</span>`;
                 } else if (diffDays < 0) {
-                    statusBadge = `<span class="px-2.5 py-1 bg-rose-100 text-rose-800 border border-rose-300 rounded-full font-bold text-[11px] inline-flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation text-rose-600"></i> Quá hẹn ${Math.abs(diffDays)} ngày</span>`;
+                    statusBadge = `<span class="px-2.5 py-1 bg-rose-100 text-rose-800 border border-rose-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation text-rose-600"></i> Quá hẹn ${Math.abs(diffDays)} ngày</span>`;
                 } else {
-                    statusBadge = `<span class="px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-300 rounded-full font-semibold text-[11px] inline-flex items-center gap-1"><i class="fa-regular fa-clock text-slate-500"></i> Còn ${diffDays} ngày</span>`;
+                    statusBadge = `<span class="px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-300 rounded-full font-semibold text-[13px] inline-flex items-center gap-1"><i class="fa-regular fa-clock text-slate-500"></i> Còn ${diffDays} ngày</span>`;
                 }
 
                 const displayProtocol = fu.hasNewCycle && fu.newCycle?.protocolUsed 
@@ -6321,7 +6386,7 @@
                     statProtocolContainer.innerHTML = '<span class="text-slate-400">Không có dữ liệu trong khoảng này</span>';
                 } else {
                     statProtocolContainer.innerHTML = topProtocols.map(([proto, count]) => 
-                        `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-teal-300 text-teal-900 font-semibold text-[11px] shadow-sm"><strong class="text-teal-700">${escapeHtml(proto)}:</strong> ${count} BN</span>`
+                        `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-teal-300 text-teal-900 font-semibold text-[13px] shadow-sm"><strong class="text-teal-700">${escapeHtml(proto)}:</strong> ${count} BN</span>`
                     ).join(' ');
                 }
             }
@@ -6359,7 +6424,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } } }
                 }
             });
         };
@@ -6388,9 +6453,9 @@
                             ${u.isBlocked ? '<span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded font-bold">Đã khóa</span>' : (u.isApproved ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded font-bold">Đã duyệt</span>' : '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold">Chờ duyệt</span>')}
                         </td>
                         <td class="p-3 text-center space-x-1">
-                            <button type="button" data-user-action="approve" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[10px]">Duyệt</button>
-                            <button type="button" data-user-action="block" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[10px]">${u.isBlocked ? 'Mở khóa' : 'Khóa'}</button>
-                            ${u.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase() ? `<button type="button" data-user-action="vip" title="${u.role === 'VIP' ? 'Bỏ quyền VIP' : 'Cấp quyền VIP'}" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded font-semibold text-[10px]"><i class="fa-solid fa-crown"></i> ${u.role === 'VIP' ? 'Bỏ VIP' : 'Cấp VIP'}</button>` : ''}
+                            <button type="button" data-user-action="approve" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded font-semibold text-[12px]">Duyệt</button>
+                            <button type="button" data-user-action="block" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[12px]">${u.isBlocked ? 'Mở khóa' : 'Khóa'}</button>
+                            ${u.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase() ? `<button type="button" data-user-action="vip" title="${u.role === 'VIP' ? 'Bỏ quyền VIP' : 'Cấp quyền VIP'}" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded font-semibold text-[12px]"><i class="fa-solid fa-crown"></i> ${u.role === 'VIP' ? 'Bỏ VIP' : 'Cấp VIP'}</button>` : ''}
                         </td>
                     `;
                     tr.querySelector('[data-user-action="approve"]')?.addEventListener('click', () => window.adminApproveUser(uId, true));
@@ -6442,5 +6507,19 @@
             }
         };
     </script>
+
+    <div id="responseEditorModal" role="dialog" aria-modal="true" aria-labelledby="responseEditorTitle" class="fixed inset-0 z-[180] hidden items-center justify-center bg-slate-900/60 p-3">
+        <div class="w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 shadow-2xl">
+            <div class="flex items-start justify-between gap-3 mb-3"><h3 id="responseEditorTitle" class="font-bold text-teal-900"></h3><button type="button" onclick="window.closeResponseEditor()" class="rounded-lg border px-3 py-2 text-sm">Hủy / Đóng</button></div>
+            <p class="mb-3 text-sm text-slate-600">Dữ liệu của lần đánh giá được chọn đã được điền sẵn. Sau khi cập nhật, bấm Lưu hồ sơ để lưu thay đổi.</p>
+            <div id="responseEditorBody"></div>
+        </div>
+    </div>
+    <div id="responseDetailsModal" role="dialog" aria-modal="true" aria-labelledby="responseDetailsTitle" class="fixed inset-0 z-[180] hidden items-center justify-center bg-slate-900/60 p-3">
+        <div class="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 shadow-2xl">
+            <div class="flex items-center justify-between gap-3 mb-4"><h3 id="responseDetailsTitle" class="font-bold text-violet-900">CHI TIẾT ĐÁP ỨNG U</h3><button type="button" onclick="window.closeResponseDetails()" class="rounded-lg border px-3 py-2 text-sm">Đóng</button></div>
+            <div id="responseDetailsBody" class="space-y-4 text-sm"></div>
+        </div>
+    </div>
 </body>
 </html>
