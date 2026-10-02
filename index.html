@@ -62,18 +62,77 @@
         };
         document.addEventListener('input', event => { if (event.target instanceof HTMLInputElement && isDateField(event.target)) validate(event.target); }, true);
         document.addEventListener('change', event => { if (event.target instanceof HTMLInputElement && isDateField(event.target)) validate(event.target); }, true);
+        let calendar = null;
+        const closeCalendar = (restoreFocus = false) => {
+            if (!calendar) return;
+            const {panel, input, trigger} = calendar;
+            panel.remove(); trigger?.setAttribute('aria-expanded', 'false'); calendar = null;
+            if (restoreFocus) input.focus();
+        };
+        const positionCalendar = () => {
+            if (!calendar) return;
+            const rect = calendar.input.getBoundingClientRect();
+            if (!calendar.input.isConnected || !calendar.input.getClientRects().length) { closeCalendar(); return; }
+            const width = Math.min(304, innerWidth - 16);
+            Object.assign(calendar.panel.style, {width: `${width}px`, left: `${Math.max(8, Math.min(rect.left, innerWidth - width - 8))}px`, top: `${rect.bottom + 6}px`, maxHeight: `${Math.max(0, innerHeight - rect.bottom - 14)}px`});
+        };
+        const chooseDate = value => {
+            const input = calendar.input;
+            input.value = value;
+            input.dispatchEvent(new Event('input', {bubbles:true}));
+            input.dispatchEvent(new Event('change', {bubbles:true}));
+            closeCalendar(true);
+        };
+        const renderCalendar = () => {
+            const {panel, year, month, input} = calendar;
+            panel.replaceChildren();
+            const header = document.createElement('div'); header.className = 'calendar-header';
+            const button = (label, text, action) => { const el = document.createElement('button'); el.type='button'; el.textContent=text; el.setAttribute('aria-label',label); el.onclick=action; return el; };
+            const shift = delta => { const date = new Date(year, month + delta, 1); calendar.year=date.getFullYear(); calendar.month=date.getMonth(); renderCalendar(); };
+            header.append(button('Tháng trước', '‹', () => shift(-1)));
+            const monthSelect = document.createElement('select'); monthSelect.setAttribute('aria-label', 'Tháng');
+            for (let m=0;m<12;m++) monthSelect.add(new Option(`Tháng ${m+1}`, m));
+            monthSelect.value=month; monthSelect.onchange=()=>{calendar.month=Number(monthSelect.value); renderCalendar();};
+            const yearSelect = document.createElement('select'); yearSelect.setAttribute('aria-label','Năm');
+            const currentYear = new Date().getFullYear();
+            for(let y=Math.min(1900,year);y<=Math.max(currentYear+30,year);y++) yearSelect.add(new Option(y,y));
+            yearSelect.value=year; yearSelect.onchange=()=>{calendar.year=Number(yearSelect.value); renderCalendar();};
+            header.append(monthSelect, yearSelect, button('Tháng sau', '›', () => shift(1))); panel.append(header);
+            const grid = document.createElement('div'); grid.className='calendar-grid';
+            ['T2','T3','T4','T5','T6','T7','CN'].forEach(text=>{const cell=document.createElement('span'); cell.textContent=text; grid.append(cell);});
+            const offset=(new Date(year,month,1).getDay()+6)%7;
+            for(let i=0;i<offset;i++) grid.append(document.createElement('span'));
+            const today=window.getSystemDateVN();
+            for(let day=1;day<=new Date(year,month+1,0).getDate();day++) {
+                const iso=`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const el=button(display(iso),day,()=>chooseDate(iso));
+                if(iso===input.value) {el.classList.add('selected'); el.setAttribute('aria-pressed','true');}
+                if(iso===today) el.setAttribute('aria-current','date');
+                grid.append(el);
+            }
+            panel.append(grid);
+            const footer=document.createElement('div'); footer.className='calendar-footer';
+            footer.append(button('Chọn hôm nay','Hôm nay',()=>chooseDate(window.getSystemDateVN())),button('Xóa ngày','Xóa',()=>chooseDate('')),button('Đóng lịch','Đóng',()=>closeCalendar(true)));
+            panel.append(footer); positionCalendar();
+        };
         document.addEventListener('click', event => {
-            const button = event.target.closest('.date-picker-button'); if (!button) return;
-            const input = button.parentElement.querySelector('input[data-date-format]');
-            if (!input || input.disabled || input.readOnly) return;
-            const picker = document.createElement('input'); picker.type = 'date'; picker.value = input.value;
-            picker.style.cssText = 'position:absolute;opacity:0;width:1px;height:1px;pointer-events:none';
-            button.parentElement.append(picker);
-            picker.addEventListener('change', () => { input.value = picker.value; input.dispatchEvent(new Event('input', {bubbles:true})); input.dispatchEvent(new Event('change', {bubbles:true})); picker.remove(); }, {once:true});
-            picker.addEventListener('blur', () => picker.remove(), {once:true});
-            setTimeout(() => picker.remove(), 60000);
-            try { picker.showPicker(); } catch { picker.remove(); input.focus(); }
+            const trigger=event.target.closest('.date-picker-button');
+            const input=trigger ? trigger.parentElement.querySelector('input[data-date-format]') : event.target.closest('input[data-date-format]');
+            if (!input) { if(calendar && !calendar.panel.contains(event.target)) closeCalendar(); return; }
+            if(input.disabled || input.readOnly) return;
+            if(calendar?.input===input) { if(trigger) closeCalendar(); return; }
+            closeCalendar();
+            const iso=input.value || window.getSystemDateVN();
+            const panel=document.createElement('div'); panel.className='date-calendar'; panel.setAttribute('role','dialog'); panel.setAttribute('aria-label','Chọn ngày');
+            panel.addEventListener('click', event => event.stopPropagation());
+            document.body.append(panel);
+            const opener=trigger || input.parentElement.querySelector('.date-picker-button'); opener?.setAttribute('aria-expanded','true');
+            calendar={panel,input,trigger:opener,year:Number(iso.slice(0,4)),month:Number(iso.slice(5,7))-1}; renderCalendar();
+            if(trigger) panel.querySelector('button.selected, .calendar-grid button')?.focus();
         });
+        document.addEventListener('keydown', event => { if(event.key==='Escape' && calendar) {event.stopImmediatePropagation();closeCalendar(true);} },true);
+        document.addEventListener('scroll',positionCalendar,true);
+        window.addEventListener('resize',positionCalendar);
         document.addEventListener('DOMContentLoaded', () => {
             initialize(document);
             new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => { if (node.nodeType === 1) initialize(node); }))).observe(document.body, {childList:true, subtree:true});
@@ -842,7 +901,26 @@
         .date-picker-button:hover { background: #94a3b833; }
         [id$="Modal"] > div { border-radius: 16px !important; }
         [id$="Modal"] > div > :first-child { border-top-left-radius: inherit; border-top-right-radius: inherit; }
-        #statsOverviewPanel > .grid { flex-shrink: 0; }
+        #statsOverviewPanel > .grid:not(.stats-distributions) { flex-shrink: 0; }
+        .date-calendar { position: fixed; z-index: 1000; padding: 12px; border: 1px solid #cbd5e1; border-radius: 16px; background: #fff; color: #1e293b; box-shadow: 0 12px 36px #0f172a33; overflow-y: auto; font-size: 14px; }
+        .calendar-header, .calendar-footer { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+        .calendar-header select { min-width: 0; background: transparent; padding: 6px 2px; border-radius: 6px; }
+        .date-calendar button { min-height: 32px; padding: 4px 8px; border-radius: 8px; }
+        .date-calendar button:hover, .date-calendar button:focus-visible { background: #ccfbf1; color: #115e59; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 3px; margin: 8px 0; text-align: center; }
+        .calendar-grid > span { color: #64748b; padding: 4px 0; }
+        .calendar-grid button.selected { background: #0f766e; color: white; }
+        .calendar-grid button[aria-current="date"] { box-shadow: inset 0 0 0 1px #0d9488; }
+        .calendar-footer { border-top: 1px solid #cbd5e1; padding-top: 8px; }
+        html[data-theme="dark"] .date-calendar { background: #142338; color: #e2e8f0; border-color: #475569; }
+        html[data-theme="dark"] .calendar-header select { background: #142338; color: #e2e8f0; }
+        #statsOverviewPanel > .stats-distributions { flex-shrink: 1; overflow: hidden; grid-template-rows: minmax(0,1fr); }
+        @media (max-width: 1023px) {
+            #statsOverviewPanel > .stats-distributions { grid-template-rows: minmax(0,1fr) minmax(0,1fr); }
+            #statsOverviewPanel > .grid:not(.stats-distributions) { grid-template-columns: repeat(3,minmax(0,1fr)); }
+            #statsOverviewPanel > .grid:not(.stats-distributions) .stats-card { padding: 8px; }
+            #statsOverviewPanel > .grid:not(.stats-distributions) .stats-card > .rounded-full { display: none; }
+        }
         </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
@@ -1879,7 +1957,7 @@
                 </button>
             </div>
 
-            <div id="statsOverviewPanel" class="flex-1 min-h-0 flex flex-col gap-4 overflow-y-auto">
+            <div id="statsOverviewPanel" class="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
             <!-- Tổng quan số liệu -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
                 <div class="stats-card bg-teal-50 border border-teal-200 p-3 rounded-xl flex items-center justify-between">
@@ -1911,21 +1989,21 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+            <div class="stats-distributions grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
             <!-- Phân bố phác đồ -->
-            <div class="stats-card bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl shrink-0">
+            <div class="stats-card bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl flex flex-col min-h-0 overflow-hidden">
                 <p class="text-emerald-800 font-bold uppercase text-[12px] mb-1.5 flex items-center gap-1.5">
                     <i class="fa-solid fa-vial text-emerald-600"></i> PHÂN BỐ BỆNH NHÂN THEO PHÁC ĐỒ (COUNT DISTINCT):
                 </p>
-                <div id="statProtocolBreakdown" class="space-y-2 text-xs">
+                <div id="statProtocolBreakdown" class="space-y-2 text-xs flex-1 min-h-0 overflow-y-auto pr-2">
                     <span class="text-slate-400">Đang tính toán...</span>
                 </div>
             </div>
 
             <!-- Biểu đồ -->
-            <div class="stats-card bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center lg:order-first">
+            <div class="stats-card bg-white p-4 rounded-xl border border-slate-200 flex flex-col min-h-0 items-center order-first">
                 <h4 class="font-bold text-slate-700 uppercase text-[13px] mb-2 self-start shrink-0">TỶ LỆ PHÂN BỐ NHÓM BỆNH ICD CHÍNH:</h4>
-                <div class="w-full max-w-md h-80 relative">
+                <div class="w-full max-w-md flex-1 min-h-0 relative">
                     <canvas id="statsPieChart"></canvas>
                 </div>
             </div>
@@ -3242,8 +3320,9 @@
         window.statsModalIsMaximized = true;
         window.openStatsModal = function() {
             if (!window.canUseOncoCare) return;
-            document.getElementById('statsStartDate').value = '';
-            document.getElementById('statsEndDate').value = '';
+            const today = window.getSystemDateVN();
+            document.getElementById('statsStartDate').value = today;
+            document.getElementById('statsEndDate').value = today;
             document.getElementById('statsIcdFilter').value = 'ALL';
             window.populateStatsProtocolFilter();
             if (document.getElementById('statsProtocolFilter')) {
@@ -6098,16 +6177,15 @@
             const hasCycleInRange = cycleDates.some(d => (!startDate || d >= startDate) && (!endDate || d <= endDate));
             if (hasCycleInRange) return true;
 
-            const parseTs = (ts) => {
+            const parseTs = ts => {
                 if (!ts) return '';
-                if (typeof ts === 'string') return ts.split('T')[0];
-                if (ts.toDate && typeof ts.toDate === 'function') {
-                    try { return ts.toDate().toISOString().split('T')[0]; } catch(e){}
-                }
-                if (ts.seconds) {
-                    try { return new Date(ts.seconds * 1000).toISOString().split('T')[0]; } catch(e){}
-                }
-                return '';
+                if (typeof ts === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(ts)) return ts;
+                try {
+                    const date = ts.toDate ? ts.toDate() : ts.seconds !== undefined ? new Date(ts.seconds * 1000) : new Date(ts);
+                    if (!Number.isFinite(date.getTime())) return '';
+                    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Ho_Chi_Minh', year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date).map(part=>[part.type,part.value]));
+                    return `${parts.year}-${parts.month}-${parts.day}`;
+                } catch { return ''; }
             };
             // 2. Kiểm tra ngày tạo hồ sơ
             const created = parseTs(patient.createdAt);
