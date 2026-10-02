@@ -887,16 +887,19 @@
         button.is-saving::before { content: ''; position: absolute; z-index: 1; left: calc(50% - 49px); top: calc(50% - 7px); width: 14px; height: 14px; border: 2px solid var(--saving-color, white); border-right-color: transparent; border-radius: 50%; animation: saving-spin .75s linear infinite; }
         button.is-saving::after { content: 'Đang lưu…'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding-left: 22px; color: var(--saving-color, white); font-size: 14px; font-weight: 600; }
         @keyframes saving-spin { to { transform: rotate(360deg); } }
-        button.mac-close { width: 20px !important; height: 20px !important; min-width: 20px; padding: 0 !important; flex: 0 0 20px; border-radius: 50% !important; background: #ff5f57 !important; border: 1px solid #e0443e !important; color: #7a1712 !important; display: inline-flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 2px #ffffff35; margin-left: auto; }
-        button.mac-close i { font-size: 11px !important; color: #7a1712 !important; opacity: 0; transition: opacity .15s; }
+        button.mac-close { width: 18px !important; height: 18px !important; min-width: 18px; padding: 0 !important; flex: 0 0 18px; border-radius: 50% !important; background: #ff5f57 !important; border: 1px solid #e0443e !important; color: #7a1712 !important; display: inline-flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 2px #ffffff35; margin-left: auto; }
+        button.mac-close i { font-size: 10px !important; color: #7a1712 !important; opacity: 0; transition: opacity .15s; }
         button.mac-close:hover i, button.mac-close:focus-visible i { opacity: 1; }
         button.mac-close:focus-visible { outline: 2px solid #38bdf8; outline-offset: 3px; }
         .mac-window-controls { order: 2; margin-left: auto; }
-        .mac-window-controls button { width: 20px !important; height: 20px !important; }
+        .mac-window-controls button { width: 18px !important; height: 18px !important; }
+        .mac-window-controls button.mac-close { margin-left: 0; }
         @media (hover: none) { button.mac-close i { opacity: 1; } }
         .date-field { display: inline-flex; align-items: center; position: relative; max-width: 100%; gap: 4px; }
         .date-field:has(> input.w-full) { display: flex; width: 100%; }
         .date-field > input { min-width: 0; }
+        .date-field:has(> input.mx-auto) { justify-content: center; }
+        .date-field > input.mx-auto { margin-left: 0; margin-right: 0; }
         .date-picker-button { flex: 0 0 28px; width: 28px; height: 32px; border-radius: 8px; color: inherit; }
         .date-picker-button:hover { background: #94a3b833; }
         [id$="Modal"] > div { border-radius: 16px !important; }
@@ -1896,13 +1899,13 @@
     <div id="statsModalContent" class="bg-white rounded-2xl max-w-none w-full h-full max-h-none overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
         <div id="statsModalHeader" class="bg-[#2b2b2b] text-white p-4 px-6 flex items-center gap-4 shrink-0 border-b border-slate-200">
             <div class="mac-window-controls flex items-center gap-2 shrink-0" aria-label="Điều khiển cửa sổ">
-                <button type="button" onclick="window.closeStatsModal()" title="Đóng" aria-label="Đóng cửa sổ thống kê" class="mac-close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-                <button type="button" onclick="window.minimizeStatsModal()" title="Thu nhỏ" aria-label="Thu nhỏ cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#febc2e] border border-[#dea123] text-[#785000] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
-                    <i class="fa-solid fa-minus text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
-                </button>
                 <button type="button" id="statsMaximizeBtn" onclick="window.toggleStatsModalSize()" title="Thu về cửa sổ" aria-label="Thu về cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#28c840] border border-[#20a833] text-[#075d18] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
                     <i class="fa-solid fa-down-left-and-up-right-to-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                 </button>
+                <button type="button" onclick="window.minimizeStatsModal()" title="Thu nhỏ" aria-label="Thu nhỏ cửa sổ thống kê" class="group w-3.5 h-3.5 rounded-full bg-[#febc2e] border border-[#dea123] text-[#785000] flex items-center justify-center shadow-inner hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white/70">
+                    <i class="fa-solid fa-minus text-[9px] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
+                </button>
+                <button type="button" onclick="window.closeStatsModal()" title="Đóng" aria-label="Đóng cửa sổ thống kê" class="mac-close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
             </div>
             <h3 class="font-bold text-base flex items-center gap-2">
                 <i class="fa-solid fa-chart-pie text-teal-300"></i> THỐNG KÊ
