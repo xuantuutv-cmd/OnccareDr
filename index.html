@@ -944,6 +944,80 @@
         html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) tbody tr > td:last-child:not([colspan]) { background: #172033 !important; box-shadow: -2px 0 0 #475569; }
         html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) tbody tr:hover > td:last-child:not([colspan]) { background: #334155 !important; }
 
+        /* Mobile layout overrides: keep form handlers and desktop layout intact. */
+        @media (max-width: 640px) {
+            main, main > *, #patientForm > * { min-width: 0; }
+            header > div { gap: .5rem; padding-inline: .75rem; }
+            header > div > div:first-child { min-width: 0; gap: .4rem; }
+            header > div > div:first-child > * + * { margin-left: 0; }
+            header h1 { font-size: 1.05rem; white-space: nowrap; }
+            #authHeaderSection { flex-shrink: 0; }
+            #googleSignInBtn { min-height: 44px; padding-inline: .65rem; }
+            main { padding-inline: .75rem; }
+            #patientSearchForm { flex-wrap: wrap; border-radius: 1.5rem; padding: .5rem; gap: .25rem; }
+            #searchInput { flex-basis: 100%; width: 100%; padding: .6rem; font-size: 16px; }
+            #patientSearchForm > div { margin-left: auto; }
+            .search-action { width: 44px; height: 44px; flex-basis: 44px; }
+            #patientListSection { padding: .85rem; border-radius: 1.25rem; }
+            #patientListSection > div:first-child { flex-wrap: wrap; gap: .65rem; }
+            #patientListSection table { min-width: 800px; }
+            #patientListSection .overflow-x-auto { overscroll-behavior-x: contain; }
+            #patientListSection th, #patientListSection td { padding: .65rem; }
+            #patientListSection td button { min-width: 44px; min-height: 44px; }
+
+            :is(#patientFormModal, #patientDetailModal, #statsModal) { height: 100dvh; }
+            #patientForm { min-height: 0; scroll-padding-block: 1rem; }
+            #patientHistoryPanel { margin-top: 1.25rem; }
+            #patientInputPanel :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea),
+            :is(#editCycleModal, #followUpModal, #responseEditorModal, #extendedAssessmentModal, #statsFilters) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+                min-width: 0; max-width: 100%; min-height: 44px; font-size: 16px;
+            }
+            #patientInputPanel .grid > * { min-width: 0; }
+            #patientInputPanel .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            #protocolModeContainer .flex.items-center.space-x-4 > * { margin-left: 0; }
+            #patientDetailModal > div > div:first-child { padding: .75rem; gap: .75rem; flex-shrink: 0; }
+            #patientDetailModal #tabContentChart > div:first-child { flex-wrap: wrap; }
+            #detName, #detDiagnosis, #detProtocol { overflow-wrap: anywhere; }
+            :is(#editCycleModal, #followUpModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) { padding: .5rem; }
+            :is(#editCycleModal, #followUpModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) > div {
+                max-height: calc(100dvh - 1rem); overflow-y: auto; overscroll-behavior-y: contain;
+            }
+            :is(#extendedResponsePanel, #extendedMrecistPanel, #extendedToxicityPanel) { max-height: none; overflow: visible; }
+            #toxicityInputs { grid-template-columns: minmax(0, 1fr); }
+
+            /* One vertical scroll area prevents filters from squeezing tables/charts. */
+            #statsModalContent { width: 100% !important; height: 100% !important; max-height: 100% !important; border-radius: 0; }
+            #statsModalContent > div:nth-child(2) { overflow-y: auto; }
+            #statsFilters > div, #statsFilters > div:nth-child(3) { width: calc(50% - .25rem); min-width: 0; }
+            #statsFilters > div:last-child { width: 100%; }
+            #statsTabs { overflow-x: auto; }
+            #statsTabs button { flex: 1 0 8rem; min-height: 44px; }
+            :is(#statsOverviewPanel, #statsPatientsPanel, #statsFollowUpPanel) { flex: 0 0 auto; overflow: visible; }
+            #statsOverviewPanel > .grid:not(.stats-distributions) { grid-template-columns: minmax(0, 1fr); }
+            #statsOverviewPanel > .stats-distributions { grid-template-rows: auto; flex: none; overflow: visible; }
+            #statsOverviewPanel .stats-distributions > .stats-card { min-height: 280px; }
+            #statProtocolBreakdown { max-height: 320px; }
+            :is(#statsTableViewport, #statsFollowUpTableViewport) { flex: none; max-height: 60dvh; overflow: auto; overscroll-behavior: contain; }
+            :is(#statsPagination, #statsFollowUpPagination) button { min-width: 44px; min-height: 44px; }
+            #userManagementModal table { min-width: 640px; }
+
+            button.mac-close, .mac-window-controls button {
+                width: 44px !important; height: 44px !important; min-width: 44px; flex-basis: 44px;
+            }
+            button.mac-close i, .mac-window-controls button i { opacity: 1; }
+            .date-picker-button { width: 44px; height: 44px; flex-basis: 44px; }
+            .date-calendar button { min-height: 40px; }
+            #statsModalHeader { gap: .75rem; }
+            #statsModalHeader h3 { font-size: .85rem; }
+            #toastNotification { left: .75rem; right: .75rem; bottom: 4.5rem; max-width: calc(100% - 1.5rem); }
+            #toastMessage { min-width: 0; overflow-wrap: anywhere; }
+            footer { padding-bottom: 4.5rem; }
+            #loginSplash { overflow-y: auto; padding: 1.5rem; }
+        }
+        @media (max-width: 374px) {
+            #patientInputPanel .grid-cols-3 { grid-template-columns: minmax(0, 1fr); }
+            #statsModalHeader { padding-inline: .65rem; }
+        }
         </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
