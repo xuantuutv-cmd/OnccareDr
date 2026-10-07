@@ -78,7 +78,7 @@ export const DeleteCycleConfirmModal: React.FC<DeleteCycleConfirmModalProps> = (
         <div className="bg-slate-900 dark:bg-[#2b2b2b] text-white px-5 py-4 flex items-center justify-between shrink-0 border-b border-slate-800 dark:border-[#3c4043]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-rose-500/20 rounded-lg flex items-center justify-center border border-rose-400/30">
-              <i className="fa-solid fa-triangle-exclamation text-rose-400 text-sm"></i>
+              <svg className="lucide lucide-alert-triangle text-rose-400 shrink-0" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
             </div>
             <div>
               <h3 id="deleteCycleModalTitle" className="font-bold text-sm uppercase tracking-wide">
@@ -95,7 +95,7 @@ export const DeleteCycleConfirmModal: React.FC<DeleteCycleConfirmModalProps> = (
             aria-label="Đóng cửa sổ"
             className="w-7 h-7 rounded-full bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-slate-400 hover:text-white flex items-center justify-center text-xs transition"
           >
-            <i className="fa-solid fa-xmark"></i>
+            <svg className="lucide lucide-x shrink-0" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
 
@@ -103,7 +103,7 @@ export const DeleteCycleConfirmModal: React.FC<DeleteCycleConfirmModalProps> = (
         <div className="p-5 space-y-4 text-xs">
           {/* Warning banner */}
           <div className="p-3.5 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-xl text-rose-900 dark:text-rose-200 text-xs font-medium flex items-start gap-3">
-            <i className="fa-solid fa-circle-exclamation text-rose-600 dark:text-rose-400 mt-0.5 text-base shrink-0"></i>
+            <svg className="lucide lucide-alert-circle text-rose-600 dark:text-rose-400 mt-0.5 shrink-0" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
             <div className="space-y-1">
               <p className="font-bold text-[13px] text-rose-950 dark:text-rose-100">Hành động này không thể hoàn tác!</p>
               <p className="text-rose-800 dark:text-rose-300 leading-relaxed">
@@ -161,11 +161,11 @@ export const DeleteCycleConfirmModal: React.FC<DeleteCycleConfirmModalProps> = (
           >
             {isDeleting ? (
               <>
-                <i className="fa-solid fa-spinner fa-spin"></i> Đang xóa...
+                <svg className="lucide lucide-loader-2 animate-spin shrink-0" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Đang xóa...
               </>
             ) : (
               <>
-                <i className="fa-solid fa-trash"></i> Xóa chu kỳ
+                <svg className="lucide lucide-trash-2 shrink-0" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Xóa chu kỳ
               </>
             )}
           </button>

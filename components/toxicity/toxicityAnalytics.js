@@ -60,7 +60,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                 <!-- 1. BỘ LỌC THỐNG KÊ ĐỘC TÍNH -->
                 <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-2.5 shrink-0 text-xs">
                     <div class="flex flex-wrap items-center gap-1.5">
-                        <span class="font-bold text-slate-700 mr-1"><i class="fa-solid fa-filter text-teal-600 mr-1"></i>Thời gian:</span>
+                        <span class="font-bold text-slate-700 mr-1"><svg class="lucide lucide-filter text-teal-600 inline-block mr-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Thời gian:</span>
                         <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
                             <button type="button" data-period="all" class="tox-period-btn px-2.5 py-1 rounded-md font-semibold transition ${currentFilters.period === 'all' ? 'bg-white text-teal-800 shadow-sm font-bold' : 'text-slate-600 hover:text-teal-800'}">Tất cả</button>
                             <button type="button" data-period="this_month" class="tox-period-btn px-2.5 py-1 rounded-md font-semibold transition ${currentFilters.period === 'this_month' ? 'bg-white text-teal-800 shadow-sm font-bold' : 'text-slate-600 hover:text-teal-800'}">Tháng này</button>
@@ -88,8 +88,8 @@ export function renderToxicityDashboard(container, patientsList = []) {
                             </select>
                         </div>
 
-                        <button type="button" id="toxResetBtn" class="p-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg border border-slate-200 transition flex items-center gap-1" title="Xóa bộ lọc">
-                            <i class="fa-solid fa-arrows-rotate text-slate-500"></i> Làm mới
+                        <button type="button" id="toxResetBtn" class="p-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg border border-slate-200 transition flex items-center gap-1.5" title="Xóa bộ lọc">
+                            <svg class="lucide lucide-rotate-cw text-slate-500" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg> Làm mới
                         </button>
                     </div>
                 </div>
@@ -105,7 +105,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                             </div>
                         </div>
                         <div class="w-9 h-9 bg-teal-200/70 rounded-full flex items-center justify-center text-teal-800 text-base">
-                            <i class="fa-solid fa-clipboard-check"></i>
+                            <svg class="lucide lucide-clipboard-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
                         </div>
                     </div>
 
@@ -118,7 +118,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                             </div>
                         </div>
                         <div class="w-9 h-9 bg-sky-200/70 rounded-full flex items-center justify-center text-sky-800 text-base">
-                            <i class="fa-solid fa-bolt"></i>
+                            <svg class="lucide lucide-zap" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                         </div>
                     </div>
 
@@ -132,7 +132,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                             <span class="text-[10px] text-amber-700 font-semibold block">Tạm hoãn / giảm liều hóa trị</span>
                         </div>
                         <div class="w-9 h-9 bg-amber-200/80 rounded-full flex items-center justify-center text-amber-800 text-base">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <svg class="lucide lucide-alert-triangle" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         </div>
                     </div>
 
@@ -146,7 +146,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                             <span class="text-[10px] text-rose-700 font-semibold block">Cần dừng thuốc / cấp cứu</span>
                         </div>
                         <div class="w-9 h-9 bg-rose-200/80 rounded-full flex items-center justify-center text-rose-800 text-base">
-                            <i class="fa-solid fa-circle-radiation"></i>
+                            <svg class="lucide lucide-alert-octagon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         </div>
                     </div>
                 </div>
@@ -155,7 +155,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                 ${events.length === 0 ? `
                     <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center flex flex-col items-center justify-center my-4">
                         <div class="w-14 h-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-2xl mb-2">
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <svg class="lucide lucide-search text-slate-400" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                         </div>
                         <h4 class="font-bold text-slate-700 text-sm">Chưa có dữ liệu độc tính trong khoảng thời gian này</h4>
                         <p class="text-xs text-slate-500 max-w-sm mt-1 mb-3">Vui lòng thay đổi mốc thời gian hoặc chọn lại phác đồ để xem báo cáo.</p>
@@ -168,7 +168,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                         <div class="lg:col-span-7 bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[320px]">
                             <div class="flex items-center justify-between mb-2">
                                 <h4 class="font-bold text-xs uppercase text-slate-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-chart-bar text-teal-600"></i> Top Các Độc Tính CTCAE Thường Gặp Nhất
+                                    <svg class="lucide lucide-bar-chart-2 text-teal-600 inline-block mr-1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Top Các Độc Tính CTCAE Thường Gặp Nhất
                                 </h4>
                                 <span class="text-[10px] bg-teal-50 text-teal-800 font-bold px-2 py-0.5 rounded border border-teal-200">Cột ngang</span>
                             </div>
@@ -181,7 +181,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                         <div class="lg:col-span-5 bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[320px]">
                             <div class="flex items-center justify-between mb-2">
                                 <h4 class="font-bold text-xs uppercase text-slate-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-chart-pie text-amber-600"></i> Phân Bố Mức Độ Nặng CTCAE (Grade 1 - 5)
+                                    <svg class="lucide lucide-pie-chart text-amber-600 inline-block mr-1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg> Phân Bố Mức Độ Nặng CTCAE (Grade 1 - 5)
                                 </h4>
                                 <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded">Tỷ lệ %</span>
                             </div>
@@ -194,7 +194,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                         <div class="lg:col-span-12 bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[320px]">
                             <div class="flex items-center justify-between mb-2">
                                 <h4 class="font-bold text-xs uppercase text-slate-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-layer-group text-indigo-600"></i> So Sánh Độc Tính Theo Phác Đồ Hóa Trị
+                                    <svg class="lucide lucide-layers text-indigo-600 inline-block mr-1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> So Sánh Độc Tính Theo Phác Đồ Hóa Trị
                                 </h4>
                                 <span class="text-[10px] bg-indigo-50 text-indigo-800 font-bold px-2 py-0.5 rounded border border-indigo-200">Xếp chồng (Độ nhẹ vs Độ nặng)</span>
                             </div>
@@ -209,7 +209,7 @@ export function renderToxicityDashboard(container, patientsList = []) {
                         <div class="bg-white p-3.5 rounded-xl border border-rose-200/90 shadow-sm shrink-0">
                             <div class="flex items-center justify-between mb-2">
                                 <h4 class="font-bold text-xs uppercase text-rose-800 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-bell text-rose-600"></i> Các Ca Độc Tính Nặng Gần Đây Cần Bác Sĩ Lưu Ý (Grade ≥ 3)
+                                    <svg class="lucide lucide-bell-ring text-rose-600 inline-block mr-1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/><path d="M22 8c0-2.3-.8-4.3-2-6"/></svg> Các Ca Độc Tính Nặng Gần Đây Cần Bác Sĩ Lưu Ý (Grade ≥ 3)
                                 </h4>
                                 <span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded border border-rose-200">${recentSevere.length} ca</span>
                             </div>
