@@ -992,7 +992,7 @@
             #statsFilters > div:last-child { width: 100%; }
             #statsTabs { overflow-x: auto; }
             #statsTabs button { flex: 1 0 8rem; min-height: 44px; }
-            :is(#statsOverviewPanel, #statsPatientsPanel, #statsFollowUpPanel) { flex: 0 0 auto; overflow: visible; }
+            :is(#statsOverviewPanel, #statsPatientsPanel, #statsFollowUpPanel, #statsToxicityPanel) { flex: 0 0 auto; overflow: visible; }
             #statsOverviewPanel > .grid:not(.stats-distributions) { grid-template-columns: minmax(0, 1fr); }
             #statsOverviewPanel > .stats-distributions { grid-template-rows: auto; flex: none; overflow: visible; }
             #statsOverviewPanel .stats-distributions > .stats-card { min-height: 280px; }
@@ -2052,6 +2052,9 @@
                 <button type="button" id="btnStatsOverviewTab" onclick="window.switchStatsTab('overview')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition">
                     <i class="fa-solid fa-chart-pie mr-1.5"></i>Thống kê
                 </button>
+                <button type="button" id="btnStatsToxicityTab" onclick="window.switchStatsTab('toxicity')" class="flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>Độc tính CTCAE
+                </button>
             </div>
 
             <div id="statsOverviewPanel" class="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
@@ -2207,6 +2210,11 @@
                     </table>
                 </div>
                 <div id="statsFollowUpPagination" class="flex flex-wrap items-center justify-center gap-1 pt-1 shrink-0" aria-label="Phân trang danh sách tái khám"></div>
+            </div>
+
+            <!-- TAB 4: THỐNG KÊ ĐỘC TÍNH HÓA TRỊ (CTCAE) -->
+            <div id="statsToxicityPanel" class="hidden flex-1 min-h-0 flex-col space-y-2 overflow-hidden">
+                <!-- Nội dung được kết xuất tự động từ module toxicityAnalytics.js -->
             </div>
         </div>
 
@@ -3460,6 +3468,7 @@
             const overviewPanel = document.getElementById('statsOverviewPanel');
             const patientsPanel = document.getElementById('statsPatientsPanel');
             const followUpPanel = document.getElementById('statsFollowUpPanel');
+            const toxicityPanel = document.getElementById('statsToxicityPanel');
 
             overviewPanel.classList.toggle('hidden', tabName !== 'overview');
             patientsPanel.classList.toggle('hidden', tabName !== 'patients');
@@ -3468,8 +3477,12 @@
                 followUpPanel.classList.toggle('hidden', tabName !== 'followup');
                 followUpPanel.classList.toggle('flex', tabName === 'followup');
             }
+            if (toxicityPanel) {
+                toxicityPanel.classList.toggle('hidden', tabName !== 'toxicity');
+                toxicityPanel.classList.toggle('flex', tabName === 'toxicity');
+            }
 
-            const activePanel = tabName === 'overview' ? overviewPanel : (tabName === 'followup' ? followUpPanel : patientsPanel);
+            const activePanel = tabName === 'overview' ? overviewPanel : (tabName === 'followup' ? followUpPanel : (tabName === 'toxicity' ? toxicityPanel : patientsPanel));
             if (activePanel) {
                 activePanel.classList.remove('tab-panel-enter');
                 void activePanel.offsetWidth;
@@ -3479,6 +3492,7 @@
             const overviewButton = document.getElementById('btnStatsOverviewTab');
             const patientsButton = document.getElementById('btnStatsPatientsTab');
             const followUpButton = document.getElementById('btnStatsFollowUpTab');
+            const toxicityButton = document.getElementById('btnStatsToxicityTab');
 
             const activeClass = 'flex-1 py-2 px-3 rounded-lg bg-white text-teal-800 font-bold shadow-sm transition';
             const inactiveClass = 'flex-1 py-2 px-3 rounded-lg text-slate-600 font-semibold hover:text-teal-800 transition';
@@ -3488,10 +3502,18 @@
             if (followUpButton) {
                 followUpButton.className = (tabName === 'followup' ? activeClass : inactiveClass) + ' flex items-center justify-center gap-1.5';
             }
+            if (toxicityButton) {
+                toxicityButton.className = (tabName === 'toxicity' ? activeClass : inactiveClass) + ' flex items-center justify-center gap-1.5';
+            }
 
             if (tabName === 'patients') window.renderStatsPatientPage();
             if (tabName === 'followup') window.renderStatsFollowUpList();
             if (tabName === 'overview') setTimeout(() => window.statsPieChartInstance?.resize(), 0);
+            if (tabName === 'toxicity') {
+                if (typeof window.renderToxicityDashboardUI === 'function') {
+                    window.renderToxicityDashboardUI();
+                }
+            }
         };
 
         window.closeStatsModal = function() {
@@ -3563,6 +3585,12 @@
             runTransaction,
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { renderToxicityDashboard, resizeToxicityCharts } from './components/toxicity/toxicityAnalytics.js';
+
+        window.renderToxicityDashboardUI = function() {
+            renderToxicityDashboard('#statsToxicityPanel', cachedPatientsList);
+            setTimeout(() => resizeToxicityCharts(), 60);
+        };
 
         const ADMIN_EMAIL = "xuantuutv@gmail.com";
 
@@ -3823,8 +3851,14 @@
                     cachedPatientsList.push({ id: docSnap.id, ...docSnap.data() });
                 });
                 const statsModal = document.getElementById('statsModal');
-                if (statsModal && !statsModal.classList.contains('hidden') && typeof window.runChemoStatistics === 'function') {
-                    window.runChemoStatistics();
+                if (statsModal && !statsModal.classList.contains('hidden')) {
+                    if (typeof window.runChemoStatistics === 'function') {
+                        window.runChemoStatistics();
+                    }
+                    const toxPanel = document.getElementById('statsToxicityPanel');
+                    if (toxPanel && !toxPanel.classList.contains('hidden') && typeof window.renderToxicityDashboardUI === 'function') {
+                        window.renderToxicityDashboardUI();
+                    }
                 }
             }, (error) => {
                 console.error("Lỗi tải dữ liệu:", error);
@@ -6685,6 +6719,9 @@
             statsCurrentPage = 1;
             window.renderStatsPatientPage();
             window.renderStatsFollowUpList();
+            if (document.getElementById('statsToxicityPanel') && !document.getElementById('statsToxicityPanel').classList.contains('hidden') && typeof window.renderToxicityDashboardUI === 'function') {
+                window.renderToxicityDashboardUI();
+            }
 
             let icdCounts = { "C16": 0, "C18": 0, "C19": 0, "C20": 0, "C50": 0, "Khác": 0 };
             filtered.forEach(p => {
