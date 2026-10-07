@@ -566,9 +566,42 @@
             from { opacity: 0; transform: translateY(10px) scale(0.992); filter: blur(3px); }
             to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
+        /* ========================================== */
+        /* LOGO ANIMATIONS: SLIDE-UP FADE & BREATHING */
+        /* ========================================== */
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes breathing {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        .logo-container {
+            animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            will-change: transform, opacity;
+        }
+        .logo-leaf,
+        .logo-container .brand-leaf {
+            display: inline-block;
+            transform-origin: center center;
+            animation: breathing 4s ease-in-out 0.8s infinite;
+            will-change: transform;
+        }
         @media (prefers-reduced-motion: reduce) {
             .splash-slogan { animation: none; background-position: 50% 0; }
             .tab-panel-enter, .panel-opening, .panel-closing { animation: none; }
+            .logo-container, .logo-leaf { animation: none !important; opacity: 1 !important; transform: none !important; }
         }
         @media (max-width: 640px) {
             body { min-height: 100dvh; }
@@ -1038,7 +1071,7 @@
     <section id="loginSplash" class="fixed inset-0 z-[130] flex items-center justify-center px-6 py-12" aria-label="Đăng nhập OncoCare Pro">
         <div class="w-full max-w-lg text-center">
             <div class="mx-auto mb-6 flex items-center justify-center">
-                <i class="brand-leaf fa-solid fa-leaf text-6xl" aria-hidden="true"></i>
+                <i class="logo-leaf brand-leaf fa-solid fa-leaf text-6xl" aria-hidden="true"></i>
             </div>
             <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-100">OncoCare Pro</h1>
             <p class="splash-slogan mt-4 text-lg sm:text-xl font-medium tracking-wide">Luôn đồng hành cùng bạn</p>
@@ -1067,9 +1100,9 @@
     <!-- ========================================== -->
     <header class="bg-transparent backdrop-blur-xl text-slate-800 sticky top-0 z-40">
         <div class="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-6 2xl:px-10 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
+            <div class="logo-container flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
                 <div class="w-14 h-14 flex items-center justify-center">
-                    <i class="brand-leaf fa-solid fa-leaf text-4xl" aria-hidden="true"></i>
+                    <i class="logo-leaf brand-leaf fa-solid fa-leaf text-4xl" aria-hidden="true"></i>
                 </div>
                 <div class="flex flex-col justify-center">
                     <h1 class="font-bold text-xl sm:text-2xl tracking-tight leading-none text-slate-800">
