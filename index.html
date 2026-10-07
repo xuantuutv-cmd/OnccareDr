@@ -545,6 +545,15 @@
         html[data-theme="dark"] #responseHistorySection [aria-controls="existingResponseList"] { color: #d8b4fe !important; }
         html[data-theme="dark"] #responseHistorySection button[onclick*="editResponseAssessment"] { color: #a78bfa !important; }
         html[data-theme="dark"] #responseHistorySection button[onclick*="deleteResponseAssessment"] { color: #e2e8f0 !important; }
+        html[data-theme="dark"] #deleteCycleConfirmModal > div { background: #1e1e1e !important; border-color: #3c4043 !important; color: #e3e3e3 !important; }
+        html[data-theme="dark"] #deleteCycleConfirmModal .bg-slate-50 { background: #252526 !important; border-color: #3c4043 !important; }
+        html[data-theme="dark"] #deleteCycleConfirmModal .bg-rose-50 { background: rgba(159, 18, 57, 0.2) !important; border-color: rgba(244, 63, 94, 0.3) !important; color: #fecdd3 !important; }
+        html[data-theme="dark"] #deleteCycleConfirmModal .text-rose-950 { color: #fff !important; }
+        html[data-theme="dark"] #deleteCycleConfirmModal .text-rose-800 { color: #fecdd3 !important; }
+        html[data-theme="dark"] #deleteCycleConfirmModal .text-slate-900,
+        html[data-theme="dark"] #deleteCycleConfirmModal .text-slate-800 { color: #f3f4f6 !important; }
+        html[data-theme="dark"] #deleteCycleConfirmModal .text-slate-600 { color: #9ca3af !important; }
+        html[data-theme="dark"] #deleteCycleConfirmModal button[onclick*="closeDeleteCycleModal"] { background: #2d2d2d !important; border-color: #475569 !important; color: #e2e8f0 !important; }
         @keyframes panelOpening {
             from { opacity: 0; transform: translateY(12px) scale(0.985); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -978,8 +987,8 @@
             #patientDetailModal > div > div:first-child { padding: .75rem; gap: .75rem; flex-shrink: 0; }
             #patientDetailModal #tabContentChart > div:first-child { flex-wrap: wrap; }
             #detName, #detDiagnosis, #detProtocol { overflow-wrap: anywhere; }
-            :is(#editCycleModal, #followUpModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) { padding: .5rem; }
-            :is(#editCycleModal, #followUpModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) > div {
+            :is(#editCycleModal, #followUpModal, #deleteCycleConfirmModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) { padding: .5rem; }
+            :is(#editCycleModal, #followUpModal, #deleteCycleConfirmModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) > div {
                 max-height: calc(100dvh - 1rem); overflow-y: auto; overscroll-behavior-y: contain;
             }
             :is(#extendedResponsePanel, #extendedMrecistPanel, #extendedToxicityPanel) { max-height: none; overflow: visible; }
@@ -1392,6 +1401,66 @@
                 <button type="button" id="btnConfirmFollowUp" onclick="window.runSavingButton(this, () => window.confirmSaveFollowUp())"
                     class="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-2 transition shadow-sm">
                     <i class="fa-solid fa-check"></i> Xác nhận lịch hẹn
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL XÁC NHẬN XÓA CHU KỲ HÓA TRỊ -->
+    <div id="deleteCycleConfirmModal" class="fixed inset-0 z-[230] hidden flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 animate-fadeIn">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-fadeIn m-auto text-slate-800">
+            <!-- Header -->
+            <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-rose-500/20 rounded-lg flex items-center justify-center border border-rose-400/30">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm uppercase tracking-wide">Xác nhận xóa chu kỳ</h3>
+                        <p class="text-slate-400 text-[12px] mt-0.5">Xóa vĩnh viễn chu kỳ điều trị khỏi hồ sơ</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.closeDeleteCycleModal()" title="Đóng" aria-label="Đóng cửa sổ" class="mac-close">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="p-5 space-y-4 text-xs">
+                <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-900 text-xs font-medium flex items-start gap-3">
+                    <i class="fa-solid fa-circle-exclamation text-rose-600 mt-0.5 text-base shrink-0"></i>
+                    <div class="space-y-1">
+                        <p class="font-bold text-[13px] text-rose-950">Hành động này không thể hoàn tác!</p>
+                        <p class="text-rose-800 leading-relaxed">
+                            Bạn có chắc chắn muốn xóa chu kỳ này không? Dữ liệu liều dùng, phác đồ và ghi chú của chu kỳ sẽ bị xóa khỏi hồ sơ bệnh nhân.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Thông tin chu kỳ sẽ xóa -->
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+                    <div class="flex justify-between items-center text-slate-600">
+                        <span>Chu kỳ:</span>
+                        <strong id="delCycleBranchName" class="text-slate-900 font-bold">—</strong>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-600">
+                        <span>Ngày truyền:</span>
+                        <strong id="delCycleDate" class="text-slate-800 font-mono">—</strong>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-600">
+                        <span>Phác đồ:</span>
+                        <span id="delCycleProtocol" class="text-teal-800 font-semibold bg-teal-50 px-2 py-0.5 rounded border border-teal-200">—</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-end gap-2.5 bg-slate-50 shrink-0">
+                <button type="button" onclick="window.closeDeleteCycleModal()"
+                    class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition text-xs shadow-sm">
+                    Hủy
+                </button>
+                <button type="button" id="btnConfirmDeleteCycle" onclick="window.executeDeleteCycle()"
+                    class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-trash"></i> Xóa chu kỳ
                 </button>
             </div>
         </div>
@@ -5665,13 +5734,46 @@
             }
         })();
 
-        window.deleteTempCycle = async function(idx) {
-            if (confirm("Bạn có chắc chắn muốn xóa chu kỳ này không?")) {
+        window._pendingDeleteCycleIdx = null;
+        window.deleteTempCycle = function(idx) {
+            window._pendingDeleteCycleIdx = idx;
+            const cycle = (window.tempCurrentCycles || [])[idx];
+            if (cycle) {
+                document.getElementById('delCycleBranchName').textContent = cycle.branchName || `Chu kỳ ${idx + 1}`;
+                document.getElementById('delCycleDate').textContent = cycle.date ? formatDisplayDate(cycle.date) : 'N/A';
+                document.getElementById('delCycleProtocol').textContent = cycle.protocolUsed || 'Chưa cập nhật';
+            }
+            window.setPanelVisibility(document.getElementById('deleteCycleConfirmModal'), true);
+        };
+
+        window.closeDeleteCycleModal = function() {
+            window._pendingDeleteCycleIdx = null;
+            window.setPanelVisibility(document.getElementById('deleteCycleConfirmModal'), false);
+        };
+
+        window.executeDeleteCycle = async function() {
+            const idx = window._pendingDeleteCycleIdx;
+            if (idx === null || idx === undefined || idx < 0) {
+                window.closeDeleteCycleModal();
+                return;
+            }
+            const btn = document.getElementById('btnConfirmDeleteCycle');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xóa...';
+            try {
                 window.tempCurrentCycles.splice(idx, 1);
                 window.normalizeProtocolHistory(window.tempCurrentCycles);
                 window.renderTempCyclesList();
                 await window.autoSyncChangesToDatabase();
                 window.showToast("Đã xóa chu kỳ thành công.");
+            } catch (err) {
+                console.error("Lỗi khi xóa chu kỳ:", err);
+                window.showToast("Có lỗi xảy ra khi cập nhật dữ liệu.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                window.closeDeleteCycleModal();
             }
         };
 
