@@ -48,7 +48,8 @@ export const IhcManager: React.FC<IhcManagerProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSubtype) {
-      alert('Vui lòng chọn phân nhóm ung thư vú!');
+      const appWindow = window as Window & { showCustomAlert?: (message: string, title?: string) => Promise<void> };
+      void (appWindow.showCustomAlert?.('Vui lòng chọn phân nhóm ung thư vú!') ?? Promise.resolve());
       return;
     }
 
