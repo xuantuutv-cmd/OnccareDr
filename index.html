@@ -1871,6 +1871,30 @@
                         <p class="text-[12px] text-slate-500">Loại marker và ngày xét nghiệm có thể để trống; giá trị vẫn được lưu vào nhóm “Chưa phân loại”.</p>
                     </div>
 
+                    <!-- NHẬP HÓA MÔ MIỄN DỊCH (IHC / HMMD) -->
+                    <div class="bg-purple-900/5 p-3.5 rounded-xl border border-purple-800/20 space-y-2.5 shadow-sm">
+                        <h4 class="font-bold text-purple-900 uppercase text-[13px] tracking-wider flex items-center gap-1.5">
+                            <svg class="lucide lucide-dna text-purple-700 shrink-0" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="m17 6-2.5-2.5"/><path d="m14 8-1.5-1.5"/><path d="m7 18 2.5 2.5"/><path d="m10 16 1.5 1.5"/><path d="M2 9c6.667 6 13.333 0 20 6"/></svg> HÓA MÔ MIỄN DỊCH (IHC / HMMD)
+                        </h4>
+                        <div>
+                            <label for="npIhcSubtype" class="block font-semibold text-slate-700 mb-1">Phân nhóm ung thư vú:</label>
+                            <select id="npIhcSubtype" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-semibold text-purple-900 focus:outline-none text-xs">
+                                <option value="">-- Chọn phân nhóm HMMD --</option>
+                                <option value="Luminal A">Luminal A (ER+/PR+, HER2-, Ki-67 thấp &lt;20%)</option>
+                                <option value="Luminal B (HER2-)">Luminal B (HER2-) (ER+/PR+ kém, HER2-, Ki-67 cao ≥20%)</option>
+                                <option value="Luminal B (HER2+)">Luminal B (HER2+) (ER+/PR+, HER2+, Ki-67 bất kỳ)</option>
+                                <option value="Tam âm / Triple Negative (TNBC)">Tam âm / Triple Negative (TNBC) (ER-, PR-, HER2-)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="npIhcNotes" class="block font-semibold text-slate-700 mb-1">Ghi chú HMMD (ER, PR, HER2, Ki-67):</label>
+                            <input type="text" id="npIhcNotes" placeholder="VD: ER(+ 90%), PR(+ 80%), HER2 (3+)..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                        </div>
+                        <button type="button" onclick="window.runSavingButton(this, () => window.saveIhcFromForm())" class="w-full py-2 px-3 rounded-lg bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5">
+                            <svg class="lucide lucide-save" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Lưu thông tin HMMD
+                        </button>
+                    </div>
+
                     <!-- MỤC THÔNG TIN ĐIỀU TRỊ & QUẢN LÝ CHU KỲ -->
                     <div class="bg-teal-900/5 p-4 rounded-xl border border-teal-800/20 space-y-3 shadow-sm">
                         <h4 class="font-bold text-teal-900 uppercase text-[13px] tracking-wider flex items-center gap-2 pb-1 border-b border-teal-800/10">
@@ -3512,6 +3536,10 @@
 
             window.tempCurrentCycles = [];
             window.tempCurrentMarkers = [];
+            window.tempIhc = null;
+            window.tempHistoryLogs = [];
+            if (document.getElementById('npIhcSubtype')) document.getElementById('npIhcSubtype').value = '';
+            if (document.getElementById('npIhcNotes')) document.getElementById('npIhcNotes').value = '';
             window._editingMarkerIdx = null;
             window.tempResponseAssessments = [];
             window.tempToxicityAssessments = [];
@@ -4048,6 +4076,63 @@
                 console.error('Lỗi khi lưu thông tin HMMD:', err);
                 alert('Có lỗi xảy ra khi lưu thông tin HMMD.');
             }
+        };
+
+        /**
+         * Lưu thông tin IHC trực tiếp từ Form nhập bệnh nhân chính (#patientInputPanel)
+         */
+        window.saveIhcFromForm = async function() {
+            const subtypeSelect = document.getElementById('npIhcSubtype');
+            const notesInput = document.getElementById('npIhcNotes');
+            const subtype = subtypeSelect ? subtypeSelect.value : '';
+            const notes = notesInput ? notesInput.value.trim() : '';
+
+            if (!subtype) {
+                alert('Vui lòng chọn phân nhóm ung thư vú!');
+                if (subtypeSelect) subtypeSelect.focus();
+                return false;
+            }
+
+            const ihcData = {
+                subtype: subtype,
+                notes: notes,
+                updatedAt: new Date().toISOString(),
+                updatedBy: window.getCurrentEditorName?.() || (typeof currentUser !== 'undefined' && currentUser?.email) || 'Bác sĩ điều trị'
+            };
+
+            window.tempIhc = ihcData;
+            const docId = document.getElementById('editDocId')?.value;
+            const logDesc = `Cập nhật phân nhóm HMMD: ${subtype}${notes ? ` (${notes})` : ''}`;
+
+            if (docId) {
+                try {
+                    await updateDoc(doc(db, 'patients', docId), {
+                        ihc: ihcData,
+                        updatedAt: serverTimestamp()
+                    });
+                    const cacheIdx = cachedPatientsList.findIndex(item => item.id === docId);
+                    if (cacheIdx >= 0) cachedPatientsList[cacheIdx].ihc = ihcData;
+                    if (window.currentViewingPatient && window.currentViewingPatient.id === docId) {
+                        window.currentViewingPatient.ihc = ihcData;
+                    }
+                    await window.recordPatientHistoryLog(docId, 'IHC_UPDATE', logDesc);
+                    window.showToast(`Đã lưu thông tin HMMD: ${subtype}`);
+                } catch (err) {
+                    console.error('Lỗi khi lưu HMMD từ form:', err);
+                    alert('Không thể lưu HMMD vào cơ sở dữ liệu.');
+                }
+            } else {
+                if (!window.tempHistoryLogs) window.tempHistoryLogs = [];
+                window.tempHistoryLogs.push({
+                    id: 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+                    timestamp: new Date().toISOString(),
+                    type: 'IHC_UPDATE',
+                    description: logDesc,
+                    performedBy: (typeof currentUser !== 'undefined' && currentUser?.email) || 'Bác sĩ'
+                });
+                window.showToast(`Đã lưu tạm HMMD: ${subtype}. Bấm "Lưu hồ sơ bệnh nhân" để hoàn tất.`);
+            }
+            return true;
         };
 
         /**
@@ -5415,6 +5500,10 @@
             
             window.tempCurrentCycles = window.normalizeProtocolHistory(JSON.parse(JSON.stringify(p.cycles || [])));
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
+            window.tempIhc = p.ihc || null;
+            window.tempHistoryLogs = p.historyLogs || [];
+            if (document.getElementById('npIhcSubtype')) document.getElementById('npIhcSubtype').value = p.ihc?.subtype || '';
+            if (document.getElementById('npIhcNotes')) document.getElementById('npIhcNotes').value = p.ihc?.notes || '';
             window._editingMarkerIdx = null;
             window.tempResponseAssessments = JSON.parse(JSON.stringify(p.responseAssessments || []));
             window.tempToxicityAssessments = window.mergeAssessmentDays(JSON.parse(JSON.stringify(p.toxicityAssessments || [])), 'items');
@@ -6420,6 +6509,10 @@
                 document.getElementById('currentActiveProtoLabel').innerText = effectiveProtocol;
             }
             const latestFollowUp = window.getPatientLatestFollowUp({ cycles: window.tempCurrentCycles, protocol: effectiveProtocol });
+            const existingPData = docId ? cachedPatientsList.find(p => p.id === docId) || {} : {};
+            const effectiveIhc = window.tempIhc || existingPData.ihc || null;
+            const effectiveLogs = [...(existingPData.historyLogs || []), ...(window.tempHistoryLogs || [])];
+
             const payload = {
                 patientId: patientIdVal,
                 name: nameVal,
@@ -6435,6 +6528,8 @@
                 protocolKey: effectiveProtocolKey,
                 cycles: window.tempCurrentCycles,
                 markers: window.tempCurrentMarkers,
+                ihc: effectiveIhc,
+                historyLogs: effectiveLogs,
                 latestFollowUp: latestFollowUp || null,
                 responseAssessments: window.tempResponseAssessments || [],
                 toxicityAssessments: window.tempToxicityAssessments || [],
