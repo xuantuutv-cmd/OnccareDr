@@ -829,20 +829,55 @@
         }
         #patientInputPanel { display: flex; flex-direction: column; gap: 1rem; }
         #patientHistoryPanel { display: flex; flex-direction: column; gap: .85rem; }
-        #patientInputPanel > .bg-slate-50,
-        #patientInputPanel > .bg-teal-900\/5,
-        #patientInputPanel > .bg-amber-900\/5,
-        #patientInputPanel > .bg-indigo-900\/5 {
+        #patientInputTabs {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: .35rem;
+            padding: .35rem;
+            border: 1px solid #cbd5e1;
+            border-radius: .9rem;
+            background: #e2e8f0;
+            box-shadow: 0 5px 16px rgba(15, 23, 42, .08);
+        }
+        #patientInputTabs [role="tab"] {
+            min-width: 0;
+            padding: .55rem .4rem;
+            border: 1px solid transparent;
+            border-radius: .65rem;
+            color: #475569;
+            font-size: .68rem;
+            font-weight: 700;
+            line-height: 1.25;
+            text-align: center;
+        }
+        #patientInputTabs [role="tab"][aria-selected="true"] {
+            background: #0f766e;
+            border-color: #0f766e;
+            color: #fff;
+            box-shadow: 0 3px 9px rgba(15, 118, 110, .24);
+        }
+        #patientInputTabs [role="tab"]:focus-visible {
+            outline: 3px solid rgba(20, 184, 166, .38);
+            outline-offset: 2px;
+        }
+        .patient-form-tab-panel { min-width: 0; }
+        #patientInputPanel .patient-form-tab-panel > .bg-slate-50,
+        #patientInputPanel .patient-form-tab-panel > .bg-teal-900\/5,
+        #patientInputPanel .patient-form-tab-panel > .bg-amber-900\/5,
+        #patientInputPanel .patient-form-tab-panel > .bg-indigo-900\/5 {
             border-radius: 1rem;
             border-color: #dbe4ee;
             box-shadow: 0 5px 18px rgba(15, 23, 42, .045);
         }
-        #patientInputPanel > .bg-slate-50 { padding: 1.1rem; }
-        #patientInputPanel > .bg-teal-900\/5,
-        #patientInputPanel > .bg-amber-900\/5,
-        #patientInputPanel > .bg-indigo-900\/5 { padding: 1rem; }
+        #patientInputPanel .patient-form-tab-panel > .bg-slate-50 { padding: 1.1rem; }
+        #patientInputPanel .patient-form-tab-panel > .bg-teal-900\/5,
+        #patientInputPanel .patient-form-tab-panel > .bg-amber-900\/5,
+        #patientInputPanel .patient-form-tab-panel > .bg-indigo-900\/5 { padding: 1rem; }
         #patientInputPanel h4,
-        #patientInputPanel > .bg-slate-50 > div:first-child > span {
+        #patientInputPanel .patient-form-tab-panel > .bg-slate-50 > div:first-child > span {
             letter-spacing: .045em;
         }
         #patientInputPanel input:not([type="radio"]),
@@ -882,10 +917,20 @@
             box-shadow: 0 5px 18px rgba(15, 23, 42, .045);
         }
         html[data-theme="dark"] #patientForm { background: #080e1a; }
-        html[data-theme="dark"] #patientInputPanel > .bg-slate-50,
-        html[data-theme="dark"] #patientInputPanel > .bg-teal-900\/5,
-        html[data-theme="dark"] #patientInputPanel > .bg-amber-900\/5,
-        html[data-theme="dark"] #patientInputPanel > .bg-indigo-900\/5,
+        html[data-theme="dark"] #patientInputTabs {
+            background: #102642;
+            border-color: #294969;
+        }
+        html[data-theme="dark"] #patientInputTabs [role="tab"] { color: #b7c9df; }
+        html[data-theme="dark"] #patientInputTabs [role="tab"][aria-selected="true"] {
+            background: #099b94;
+            border-color: #12bbb1;
+            color: #f0fffe;
+        }
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-slate-50,
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-teal-900\/5,
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-amber-900\/5,
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-indigo-900\/5,
         html[data-theme="dark"] #patientHistoryPanel #markerHistoryContent > .bg-white,
         html[data-theme="dark"] #patientHistoryPanel #responseHistorySection,
         html[data-theme="dark"] #patientHistoryPanel > section:last-child {
@@ -904,10 +949,10 @@
             background: linear-gradient(135deg, #071629 0%, #0a1c32 55%, #071629 100%);
             color: #d7e5f6;
         }
-        html[data-theme="dark"] #patientInputPanel > .bg-slate-50,
-        html[data-theme="dark"] #patientInputPanel > .bg-teal-900\/5,
-        html[data-theme="dark"] #patientInputPanel > .bg-amber-900\/5,
-        html[data-theme="dark"] #patientInputPanel > .bg-indigo-900\/5,
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-slate-50,
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-teal-900\/5,
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-amber-900\/5,
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-indigo-900\/5,
         html[data-theme="dark"] #patientHistoryPanel #markerHistoryContent > .bg-white,
         html[data-theme="dark"] #patientHistoryPanel #responseHistorySection,
         html[data-theme="dark"] #patientHistoryPanel > section:last-child {
@@ -916,7 +961,7 @@
             border-radius: .85rem;
             box-shadow: inset 0 1px rgba(148, 191, 237, .035), 0 8px 22px rgba(0, 0, 0, .12);
         }
-        html[data-theme="dark"] #patientInputPanel > .bg-slate-50 > div:first-child,
+        html[data-theme="dark"] #patientInputPanel .patient-form-tab-panel > .bg-slate-50 > div:first-child,
         html[data-theme="dark"] #patientInputPanel h4 {
             color: #d9e9fb !important;
         }
@@ -1653,6 +1698,14 @@
 
                 <div id="patientInputPanel" class="lg:col-span-5 space-y-4 overflow-y-auto max-h-[calc(85vh-120px)] pr-2 custom-scrollbar">
 
+                    <div id="patientInputTabs" role="tablist" aria-label="Các phần cập nhật hồ sơ bệnh nhân">
+                        <button type="button" id="patientInputTabAdmin" role="tab" aria-selected="true" aria-controls="patientInputPanelAdmin" data-patient-input-tab="admin" onclick="window.switchPatientInputTab('admin')">1. Hành chính &amp; ICD</button>
+                        <button type="button" id="patientInputTabMarker" role="tab" aria-selected="false" aria-controls="patientInputPanelMarker" data-patient-input-tab="marker" onclick="window.switchPatientInputTab('marker')">2. Marker &amp; IHC</button>
+                        <button type="button" id="patientInputTabProtocol" role="tab" aria-selected="false" aria-controls="patientInputPanelProtocol" data-patient-input-tab="protocol" onclick="window.switchPatientInputTab('protocol')">3. Phác đồ điều trị</button>
+                    </div>
+
+                    <div id="patientInputPanelAdmin" role="tabpanel" aria-labelledby="patientInputTabAdmin" aria-hidden="false" data-patient-input-tab-panel="admin" class="patient-form-tab-panel space-y-4">
+
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3 shadow-sm">
                         <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                             <span class="font-bold text-slate-700 flex items-center gap-1.5 uppercase">
@@ -1893,6 +1946,10 @@
                         </div>
                     </div>
 
+                    </div>
+
+                    <div id="patientInputPanelMarker" role="tabpanel" aria-labelledby="patientInputTabMarker" aria-hidden="true" data-patient-input-tab-panel="marker" class="patient-form-tab-panel space-y-4 hidden">
+
                     <!-- NHẬP CHỈ SỐ MARKER UNG THƯ -->
                     <div class="bg-indigo-900/5 p-3.5 rounded-xl border border-indigo-800/20 space-y-2.5 shadow-sm">
                         <h4 class="font-bold text-indigo-900 uppercase text-[13px] tracking-wider flex items-center gap-1.5">
@@ -1949,6 +2006,10 @@
                             <svg class="lucide lucide-save" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Lưu thông tin HMMD
                         </button>
                     </div>
+
+                    </div>
+
+                    <div id="patientInputPanelProtocol" role="tabpanel" aria-labelledby="patientInputTabProtocol" aria-hidden="true" data-patient-input-tab-panel="protocol" class="patient-form-tab-panel space-y-4 hidden">
 
                     <!-- MỤC THÔNG TIN ĐIỀU TRỊ & QUẢN LÝ CHU KỲ -->
                     <div class="bg-teal-900/5 p-4 rounded-xl border border-teal-800/20 space-y-3 shadow-sm">
@@ -2072,6 +2133,8 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+
                     </div>
 
                 </div>
@@ -3521,6 +3584,27 @@
             document.getElementById('saveBtn').classList.remove('hidden');
         };
 
+        window.switchPatientInputTab = function(tabName) {
+            const tabList = document.getElementById('patientInputTabs');
+            const inputPanel = document.getElementById('patientInputPanel');
+            if (!tabList || !inputPanel) return;
+
+            const tabs = [...tabList.querySelectorAll('[data-patient-input-tab]')];
+            const panels = [...inputPanel.querySelectorAll('[data-patient-input-tab-panel]')];
+            if (!tabs.some(tab => tab.dataset.patientInputTab === tabName)) return;
+
+            tabs.forEach(tab => {
+                const isActive = tab.dataset.patientInputTab === tabName;
+                tab.setAttribute('aria-selected', String(isActive));
+                tab.tabIndex = isActive ? 0 : -1;
+            });
+            panels.forEach(panel => {
+                const isActive = panel.dataset.patientInputTabPanel === tabName;
+                panel.classList.toggle('hidden', !isActive);
+                panel.setAttribute('aria-hidden', String(!isActive));
+            });
+        };
+
         window.openNewPatientModal = function() {
             if (!window.currentUserSignedIn) {
                 alert('Vui lòng đăng nhập trước khi thêm hồ sơ bệnh nhân.');
@@ -3535,6 +3619,7 @@
             }
             document.getElementById('editDocId').value = "";
             window.resetFormToAddNewMode();
+            window.switchPatientInputTab('admin');
             document.getElementById('npMarkerValue').onkeydown = (event) => {
                 if (event.key === 'Enter') {
                     event.preventDefault();
@@ -5489,6 +5574,7 @@
 
             document.getElementById('editDocId').value = p.id;
             window.resetFormToAddNewMode();
+            window.switchPatientInputTab('admin');
             document.getElementById('patientInputPanel').classList.remove('lg:col-span-12'); document.getElementById('patientInputPanel').classList.add('lg:col-span-5'); document.getElementById('patientHistoryPanel').classList.remove('hidden'); document.getElementById('dispModalDoc').innerText = getCurrentProfessionalDisplayName();
 
             const adminFields = document.getElementById('adminInputFields');
