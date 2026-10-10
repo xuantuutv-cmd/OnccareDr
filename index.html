@@ -7502,9 +7502,19 @@
                 if (topProtocols.length === 0) {
                     statProtocolContainer.innerHTML = '<span class="text-slate-400">Không có dữ liệu trong khoảng này</span>';
                 } else {
-                    statProtocolContainer.innerHTML = topProtocols.map(([proto, count]) => 
-                        `<div class="flex items-start justify-between gap-3 p-3 rounded-lg bg-white border border-teal-200 text-teal-900 text-[13px]"><span class="font-semibold min-w-0 break-words">${escapeHtml(proto)}</span><strong class="shrink-0 rounded-full bg-teal-100 px-2 py-1">${count} BN</strong></div>`
-                    ).join(' ');
+                    const totalPatientsForProtocolShare = filtered.length || 1;
+                    statProtocolContainer.innerHTML = topProtocols.map(([proto, count]) => {
+                        const percentage = ((Number(count) / totalPatientsForProtocolShare) * 100).toFixed(1);
+                        return `
+                            <div class="relative overflow-hidden rounded-lg border border-teal-200 bg-white p-3 text-[13px] text-teal-900">
+                                <div class="absolute inset-y-0 left-0 bg-teal-100/70 transition-all duration-300" style="width: ${percentage}%"></div>
+                                <div class="relative flex items-start justify-between gap-3">
+                                    <span class="min-w-0 break-words font-semibold">${escapeHtml(proto)}</span>
+                                    <strong class="shrink-0 rounded-full border border-teal-200 bg-white/90 px-2 py-1 text-teal-900">${count} BN (${percentage}%)</strong>
+                                </div>
+                            </div>
+                        `;
+                    }).join(' ');
                 }
             }
 
