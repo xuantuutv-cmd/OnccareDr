@@ -50,6 +50,10 @@ service cloud.firestore {
       allow read: if canUseOncoCare();
       allow create, update: if canUseOncoCare();
       allow delete: if canUseOncoCare() && (isAdmin() || isVip());
+
+      match /historyLogs/{logId} {
+        allow read, write: if canUseOncoCare();
+      }
     }
 
     match /users/{userId} {
