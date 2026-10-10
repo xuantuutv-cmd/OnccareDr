@@ -5224,9 +5224,11 @@
             }
 
             window.setPanelVisibility(document.getElementById('patientListSection'), true);
-            const matched = /^\d+$/.test(code)
-                ? cachedPatientsList.filter(p => p.patientId && p.patientId === code)
-                : cachedPatientsList.filter(p => { const name = String(p.name || '').trim().toLocaleLowerCase('vi'); const query = code.toLocaleLowerCase('vi').replace(/\s+/g, ' '); const givenName = name.split(/\s+/).at(-1); return name === query || givenName === query; });
+            const normalizedCode = code.toLocaleLowerCase('vi');
+            const patientsById = cachedPatientsList.filter(p => String(p.patientId || '').toLocaleLowerCase('vi') === normalizedCode);
+            const matched = patientsById.length
+                ? patientsById
+                : cachedPatientsList.filter(p => { const name = String(p.name || '').trim().toLocaleLowerCase('vi'); const query = normalizedCode.replace(/\s+/g, ' '); const givenName = name.split(/\s+/).at(-1); return name === query || givenName === query; });
             if (matched.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500 font-semibold"><svg class="lucide lucide-alert-triangle inline-block mb-1 text-rose-500" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span class="block">Không tìm thấy hồ sơ cho mã BN: ${escapeHtml(code)}</span></td></tr>`;
                 countBadge.innerText = "0 kết quả";
@@ -5242,6 +5244,7 @@
                 const fullDiag = window.getFullDiagnosisDisplay ? window.getFullDiagnosisDisplay(p) : (p.diagnosis || '-');
                 const subDiag = p.subDiagnosis || (p.subDiagnosesList && p.subDiagnosesList.length ? p.subDiagnosesList.join(', ') : 'Không có');
                 const treatmentSummary = window.getLatestTreatmentSummary ? window.getLatestTreatmentSummary(p) : { protocol: p.protocol || 'Chưa cập nhật', cycle: 'Chưa cập nhật' };
+                const ihcSubtype = p.ihc?.subtype || '';
                 tr.innerHTML = `
                     <td class="px-3 py-2.5 font-bold text-blue-700 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
                     <td class="px-3 py-2.5 font-semibold text-slate-900 whitespace-normal break-words leading-snug" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
@@ -5249,6 +5252,7 @@
                     <td class="px-3 py-2.5 text-center font-bold text-slate-700 whitespace-nowrap">${escapeHtml(p.birthYear || '-')}</td>
                     <td class="px-3 py-2.5 font-medium text-slate-800 text-[13px] leading-snug">
                         <div class="line-clamp-2" title="${escapeHtml(fullDiag)}"><strong class="text-blue-700">Chính:</strong> ${escapeHtml(fullDiag)}</div>
+                        ${ihcSubtype ? `<div class="line-clamp-1 text-[12px] text-purple-800 font-bold mt-0.5" title="HMMD: ${escapeHtml(ihcSubtype)}"><strong class="text-purple-900">HMMD:</strong> <span class="bg-purple-100 text-purple-900 px-1.5 py-0.5 rounded border border-purple-300 text-[11px] font-bold inline-block">${escapeHtml(ihcSubtype)}</span></div>` : ''}
                         <div class="line-clamp-1 text-[12px] text-slate-500 mt-0.5" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
                     </td>
                     <td class="px-3 py-2.5 font-bold text-amber-800 text-[13px] leading-snug" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
@@ -7106,6 +7110,7 @@
                     const fullDiag = window.getFullDiagnosisDisplay(p);
                     const subDiag = p.subDiagnosis || (p.subDiagnosesList && p.subDiagnosesList.length ? p.subDiagnosesList.join(', ') : 'Không có');
                     const treatmentSummary = window.getLatestTreatmentSummary(p);
+                    const ihcSubtype = p.ihc?.subtype || '';
                     tr.innerHTML = `
                         <td class="p-2.5 font-bold text-blue-700 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
                         <td class="p-2.5 font-semibold text-slate-900 whitespace-normal break-words leading-tight" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
@@ -7113,6 +7118,7 @@
                         <td class="p-2.5 text-center font-bold text-slate-700 truncate">${escapeHtml(p.birthYear || '-')}</td>
                         <td class="p-2.5 font-medium text-slate-800 text-[13px] leading-tight">
                             <div class="truncate" title="${escapeHtml(fullDiag)}"><strong class="text-blue-700">Chính:</strong> ${escapeHtml(fullDiag)}</div>
+                            ${ihcSubtype ? `<div class="truncate text-[12px] text-purple-800 font-bold mt-0.5" title="HMMD: ${escapeHtml(ihcSubtype)}"><strong class="text-purple-900">HMMD:</strong> <span class="bg-purple-100 text-purple-900 px-1.5 py-0.5 rounded border border-purple-300 text-[11px] font-bold inline-block">${escapeHtml(ihcSubtype)}</span></div>` : ''}
                             <div class="truncate text-[12px] text-slate-500" title="${escapeHtml(subDiag)}"><strong class="text-amber-800">Phụ:</strong> ${escapeHtml(subDiag)}</div>
                         </td>
                         <td class="p-2.5 font-bold text-amber-800 truncate" title="${escapeHtml(treatmentSummary.protocol)}">${escapeHtml(treatmentSummary.protocol)}</td>
