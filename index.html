@@ -1101,6 +1101,22 @@
         html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) thead th:last-child { background: #1e293b !important; box-shadow: -2px 0 0 #475569; }
         html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) tbody tr > td:last-child:not([colspan]) { background: #172033 !important; box-shadow: -2px 0 0 #475569; }
         html[data-theme="dark"] :is(#statsTableViewport, #statsFollowUpTableViewport) tbody tr:hover > td:last-child:not([colspan]) { background: #334155 !important; }
+        /* Dashboard nhân khẩu học: chữ sáng trên nền thẻ tối để giữ tương phản dễ đọc. */
+        html[data-theme="dark"] #statsOverviewPanel .stats-card.bg-indigo-50 > div:first-child > p,
+        html[data-theme="dark"] #statsOverviewPanel .stats-card.bg-amber-50 > div:first-child > p { color: #cbd5e1 !important; }
+        html[data-theme="dark"] :is(#statGenderSummary, #statAgeSummary) { color: #f8fafc !important; }
+        html[data-theme="dark"] :is(#statGenderSummary, #statAgeSummary) .text-slate-300 { color: #cbd5e1 !important; }
+
+        /* Nền hàng sáng phải luôn đi cùng chữ tối; hỗ trợ cả trạng thái hover và selected. */
+        html[data-theme="light"] #statsFollowUpTableViewport tbody tr:is(:hover, .selected, [aria-selected="true"]) > td {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] #statsFollowUpTableViewport tbody tr:is(:hover, .selected, [aria-selected="true"]) > td:last-child:not([colspan]) { background: #f8fafc !important; }
+        html[data-theme="dark"] #statsFollowUpTableViewport tbody tr:is(:hover, .selected, [aria-selected="true"]) > td {
+            background: #334155 !important;
+            color: #f8fafc !important;
+        }
 
         /* Mobile layout overrides: keep form handlers and desktop layout intact. */
         @media (max-width: 640px) {
