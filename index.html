@@ -199,9 +199,48 @@
             document.documentElement.dataset.theme = savedTheme;
             window.updateAppThemeColor(savedTheme);
         })();
-        window.loginWithGoogle = window.loginWithGoogle || function() {
-            alert("Hệ thống đang tải thư viện đăng nhập, vui lòng bấm lại sau 1-2 giây...");
-        };
+        // Nút đăng nhập xuất hiện trước mô-đun Firebase ở cuối tài liệu. Đừng bắt
+        // người dùng phải bấm lần hai: tải riêng phần Auth ngay khi họ bấm lần đầu.
+        // Mô-đun chính sẽ thay thế hàm này sau khi tải xong.
+        window.loginWithGoogle = window.loginWithGoogle || (() => {
+            let pendingLogin;
+            const firebaseConfig = {
+                apiKey: "AIzaSyAlk3yxgof_-pIus5ojcQwsb2z8NnntFmM",
+                authDomain: "oncocaer.firebaseapp.com",
+                projectId: "oncocaer",
+                storageBucket: "oncocaer.firebasestorage.app",
+                messagingSenderId: "831474032997",
+                appId: "1:831474032997:web:90615da3cc65aa54c2018c",
+                measurementId: "G-JRLX54RFQ6"
+            };
+
+            return function loginWhileAppLoads() {
+                if (pendingLogin) return pendingLogin;
+
+                pendingLogin = Promise.all([
+                    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"),
+                    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js")
+                ]).then(([firebaseApp, firebaseAuth]) => {
+                    const app = firebaseApp.getApps().length
+                        ? firebaseApp.getApp()
+                        : firebaseApp.initializeApp(firebaseConfig);
+                    const provider = new firebaseAuth.GoogleAuthProvider();
+                    provider.setCustomParameters({ prompt: 'select_account' });
+                    return firebaseAuth.signInWithPopup(firebaseAuth.getAuth(app), provider);
+                }).catch((error) => {
+                    console.error('Lỗi tải hoặc đăng nhập Google:', error);
+                    const code = error?.code || 'unknown';
+                    const message = code === 'auth/unauthorized-domain'
+                        ? `Tên miền "${window.location.hostname}" chưa được cấp quyền trong Firebase Authentication.`
+                        : (error?.message || 'Không thể tải dịch vụ đăng nhập. Vui lòng kiểm tra kết nối và thử lại.');
+                    alert(`Đăng nhập thất bại (${code}):\n${message}`);
+                }).finally(() => {
+                    pendingLogin = null;
+                });
+
+                return pendingLogin;
+            };
+        })();
     </script>
     <script>
         if ('serviceWorker' in navigator) {
@@ -3891,7 +3930,7 @@
     <!-- MODUN 9: FIREBASE SDK & ĐỒNG BỘ DỮ LIỆU -->
     <!-- ========================================== -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
             getAuth, 
             GoogleAuthProvider, 
@@ -4242,7 +4281,8 @@
             measurementId: "G-JRLX54RFQ6"
         };
 
-        const app = initializeApp(firebaseConfig);
+        // Auth có thể đã được khởi tạo bởi lần bấm đăng nhập rất sớm.
+        const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
