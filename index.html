@@ -2066,6 +2066,7 @@
                                 <div><strong class="text-teal-800">Chính:</strong> <span id="detDiagMain">-</span></div>
                                 <div><strong class="text-indigo-800">TNM / Giai đoạn:</strong> <span id="detTNM">-</span></div>
                                 <div><strong class="text-amber-800">Phụ:</strong> <span id="detDiagSub">-</span></div>
+                                <div><strong class="text-purple-800">Hóa mô miễn dịch (IHC):</strong> <span id="detIhcSubtype" class="font-bold text-purple-700">Chưa ghi nhận</span></div>
                             </div>
                         </div>
                         <div>
@@ -2086,6 +2087,12 @@
                     </button>
                     <button onclick="window.switchDetailTab('chart')" id="btnTabChart" class="flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2">
                         <svg class="lucide lucide-trending-up" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Biểu Đồ & Bảng Marker
+                    </button>
+                    <button onclick="window.switchDetailTab('ihc')" id="btnTabIhc" class="flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2">
+                        <svg class="lucide lucide-dna" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="m17 6-2.5-2.5"/><path d="m14 8-1.5-1.5"/><path d="m7 18 2.5 2.5"/><path d="m10 16 1.5 1.5"/><path d="M2 9c6.667 6 13.333 0 20 6"/></svg> Hóa Mô Miễn Dịch (IHC)
+                    </button>
+                    <button onclick="window.switchDetailTab('historyLogs')" id="btnTabHistoryLogs" class="flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2">
+                        <svg class="lucide lucide-history" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> Nhật Ký Diễn Tiến
                     </button>
                 </div>
 
@@ -2147,6 +2154,92 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- TAB CONTENT 3: HÓA MÔ MIỄN DỊCH (IHC / HMMD) -->
+                <div id="tabContentIhc" class="hidden space-y-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700">
+                                <svg class="lucide lucide-dna" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="m17 6-2.5-2.5"/><path d="m14 8-1.5-1.5"/><path d="m7 18 2.5 2.5"/><path d="m10 16 1.5 1.5"/><path d="M2 9c6.667 6 13.333 0 20 6"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm uppercase">HÓA MÔ MIỄN DỊCH (IHC / HMMD)</h4>
+                                <p class="text-[11px] text-slate-500">Phân nhóm ung thư vú và định hướng điều trị chuyên sâu</p>
+                            </div>
+                        </div>
+                        <span id="ihcStatusBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            Chưa ghi nhận
+                        </span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="detIhcSubtypeSelect" class="block font-bold text-slate-700 mb-1.5 uppercase text-[11px]">
+                                Chọn phân nhóm ung thư vú <span class="text-rose-500">*</span>
+                            </label>
+                            <select id="detIhcSubtypeSelect" onchange="window.updateIhcSubtypeCardPreview()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 text-xs focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition">
+                                <option value="">-- Chọn phân nhóm HMMD --</option>
+                                <option value="Luminal A">Luminal A (ER+/PR+, HER2-, Ki-67 thấp &lt;20%)</option>
+                                <option value="Luminal B (HER2-)">Luminal B (HER2-) (ER+/PR+ kém, HER2-, Ki-67 cao ≥20%)</option>
+                                <option value="Luminal B (HER2+)">Luminal B (HER2+) (ER+/PR+, HER2+, Ki-67 bất kỳ)</option>
+                                <option value="Tam âm / Triple Negative (TNBC)">Tam âm / Triple Negative (TNBC) (ER-, PR-, HER2-)</option>
+                            </select>
+                        </div>
+
+                        <!-- Card preview thông tin phân nhóm HMMD -->
+                        <div id="ihcSubtypePreviewCard" class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50 space-y-1 text-xs">
+                            <div class="font-bold text-slate-900 text-xs flex items-center justify-between">
+                                <span id="ihcPreviewTitle">Thông tin đặc điểm sinh học</span>
+                                <span id="ihcPreviewBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-900 border border-indigo-300">Luminal A / B / TNBC</span>
+                            </div>
+                            <p id="ihcPreviewHint" class="text-[11px] text-slate-700">
+                                Chọn phân nhóm phía trên để xem đặc điểm và định hướng điều trị lâm sàng.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label for="detIhcNotes" class="block font-semibold text-slate-600 mb-1">
+                                Ghi chú kết quả xét nghiệm HMMD (ER, PR, HER2, Ki-67):
+                            </label>
+                            <textarea id="detIhcNotes" rows="2" placeholder="Ví dụ: ER(+ 95%), PR(+ 80%), HER2 (3+), Ki-67: 15%..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-2">
+                            <button type="button" onclick="window.switchDetailTab('historyLogs')" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900 underline flex items-center gap-1">
+                                <svg class="lucide lucide-history" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> Xem toàn bộ nhật ký diễn tiến →
+                            </button>
+                            <button type="button" id="btnSaveIhc" onclick="window.runSavingButton(this, () => window.savePatientIhcData())" class="px-5 py-2.5 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow-sm transition flex items-center gap-2">
+                                <svg class="lucide lucide-save" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Lưu thông tin HMMD
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB CONTENT 4: NHẬT KÝ DIỄN TIẾN & THAO TÁC (TIMELINE) -->
+                <div id="tabContentHistoryLogs" class="hidden space-y-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700">
+                                <svg class="lucide lucide-history" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm uppercase">NHẬT KÝ DIỄN TIẾN & THAO TÁC</h4>
+                                <p class="text-[11px] text-slate-500">Lịch sử tự động khi thêm Marker & cập nhật Hóa mô miễn dịch</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px]">
+                            <button type="button" onclick="window.filterHistoryLogsTimeline('ALL', this)" class="history-log-filter-btn px-2.5 py-1 rounded-md font-bold bg-white text-slate-900 shadow-sm transition">Tất cả</button>
+                            <button type="button" onclick="window.filterHistoryLogsTimeline('IHC_UPDATE', this)" class="history-log-filter-btn px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-slate-900 transition">HMMD</button>
+                            <button type="button" onclick="window.filterHistoryLogsTimeline('MARKER_ADD', this)" class="history-log-filter-btn px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-slate-900 transition">Marker</button>
+                        </div>
+                    </div>
+
+                    <div id="historyLogsTimelineContainer" class="space-y-4 pt-1">
+                        <!-- Timeline items render dynamically -->
                     </div>
                 </div>
 
@@ -3465,37 +3558,60 @@
         window.switchDetailTab = function(tabName) {
             const btnTimeline = document.getElementById('btnTabTimeline');
             const btnChart = document.getElementById('btnTabChart');
+            const btnIhc = document.getElementById('btnTabIhc');
+            const btnHistoryLogs = document.getElementById('btnTabHistoryLogs');
+
             const contentTimeline = document.getElementById('tabContentTimeline');
             const contentChart = document.getElementById('tabContentChart');
+            const contentIhc = document.getElementById('tabContentIhc');
+            const contentHistoryLogs = document.getElementById('tabContentHistoryLogs');
 
-            btnTimeline.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
-            btnChart.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
+            const inactiveClass = "flex-1 py-2 px-3 rounded-lg font-semibold text-xs transition text-slate-600 hover:text-teal-800 flex items-center justify-center gap-2";
+            const activeClass = "flex-1 py-2 px-3 rounded-lg font-bold text-xs transition bg-white text-teal-800 shadow-sm flex items-center justify-center gap-2";
 
-            contentTimeline.classList.add('hidden');
-            contentChart.classList.add('hidden');
+            if (btnTimeline) btnTimeline.className = inactiveClass;
+            if (btnChart) btnChart.className = inactiveClass;
+            if (btnIhc) btnIhc.className = inactiveClass;
+            if (btnHistoryLogs) btnHistoryLogs.className = inactiveClass;
+
+            if (contentTimeline) contentTimeline.classList.add('hidden');
+            if (contentChart) contentChart.classList.add('hidden');
+            if (contentIhc) contentIhc.classList.add('hidden');
+            if (contentHistoryLogs) contentHistoryLogs.classList.add('hidden');
 
             const animatePanel = (panel) => {
+                if (!panel) return;
                 panel.classList.remove('tab-panel-enter');
                 void panel.offsetWidth;
                 panel.classList.add('tab-panel-enter');
             };
 
             if (tabName === 'timeline') {
-                btnTimeline.className = "flex-1 py-2 px-3 rounded-lg font-bold text-xs transition bg-white text-teal-800 shadow-sm flex items-center justify-center gap-2";
-                contentTimeline.classList.remove('hidden');
-                animatePanel(contentTimeline);
+                if (btnTimeline) btnTimeline.className = activeClass;
+                if (contentTimeline) { contentTimeline.classList.remove('hidden'); animatePanel(contentTimeline); }
             } else if (tabName === 'chart') {
-                btnChart.className = "flex-1 py-2 px-3 rounded-lg font-bold text-xs transition bg-white text-teal-800 shadow-sm flex items-center justify-center gap-2";
-                contentChart.classList.remove('hidden');
-                animatePanel(contentChart);
+                if (btnChart) btnChart.className = activeClass;
+                if (contentChart) { contentChart.classList.remove('hidden'); animatePanel(contentChart); }
                 const select = document.getElementById('chartMarkerSelect');
                 const types = [...new Set((window.currentViewingPatient?.markers || []).map(marker => marker.type || ''))];
-                if (types.length === 1) {
+                if (types.length === 1 && select) {
                     const value = types[0] || '__UNSPECIFIED__';
                     if (![...select.options].some(option => option.value === value)) select.add(new Option(types[0] || 'Chưa phân loại', value));
                     select.value = value;
                 }
                 window.renderMarkerChart();
+            } else if (tabName === 'ihc') {
+                if (btnIhc) btnIhc.className = activeClass;
+                if (contentIhc) { contentIhc.classList.remove('hidden'); animatePanel(contentIhc); }
+                if (typeof window.renderIhcTab === 'function') {
+                    window.renderIhcTab(window.currentViewingPatient);
+                }
+            } else if (tabName === 'historyLogs') {
+                if (btnHistoryLogs) btnHistoryLogs.className = activeClass;
+                if (contentHistoryLogs) { contentHistoryLogs.classList.remove('hidden'); animatePanel(contentHistoryLogs); }
+                if (typeof window.renderHistoryTimeline === 'function') {
+                    window.renderHistoryTimeline(window.currentViewingPatient);
+                }
             }
         };
 
@@ -3777,6 +3893,256 @@
         window.renderToxicityDashboardUI = function() {
             renderToxicityDashboard('#statsToxicityPanel', cachedPatientsList);
             setTimeout(() => resizeToxicityCharts(), 60);
+        };
+
+        // ============================================================
+        // MODULE HÓA MÔ MIỄN DỊCH (IHC / HMMD) & LỊCH SỬ DIỄN TIẾN (historyLogs)
+        // ============================================================
+
+        const IHC_SUBTYPE_CONFIGS = {
+            'Luminal A': {
+                label: 'Luminal A',
+                desc: 'ER(+) và/hoặc PR(+), HER2(-), Ki-67 thấp (<20%)',
+                hint: 'Tiên lượng tốt nhất, đáp ứng cao với liệu pháp nội tiết đơn trị hoặc phối hợp.',
+                badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300'
+            },
+            'Luminal B (HER2-)': {
+                label: 'Luminal B (HER2-)',
+                desc: 'ER(+) và/hoặc PR(+) kém, HER2(-), Ki-67 cao (≥20%)',
+                hint: 'Nhạy nội tiết, cân nhắc hóa trị bổ trợ do độ ác tính sinh học cao hơn Luminal A.',
+                badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-300'
+            },
+            'Luminal B (HER2+)': {
+                label: 'Luminal B (HER2+)',
+                desc: 'ER(+) và/hoặc PR(+), HER2(+), Ki-67 bất kỳ',
+                hint: 'Điều trị phối hợp: Hóa trị + Liệu pháp nhắm trúng đích (Trastuzumab/Pertuzumab) + Nội tiết.',
+                badgeClass: 'bg-amber-100 text-amber-900 border-amber-300'
+            },
+            'Tam âm / Triple Negative (TNBC)': {
+                label: 'Tam âm / Triple Negative (TNBC)',
+                desc: 'ER(-), PR(-), HER2(-)',
+                hint: 'Không đáp ứng nội tiết & kháng HER2; ưu tiên điều trị Hóa trị / Miễn dịch (Pembrolizumab).',
+                badgeClass: 'bg-rose-100 text-rose-800 border-rose-300'
+            }
+        };
+
+        /**
+         * Ghi nhận một bản ghi log vào lịch sử diễn tiến (historyLogs) trên Firestore
+         */
+        window.recordPatientHistoryLog = async function(patientDocId, type, description) {
+            if (!patientDocId || !window.canUseOncoCare) return null;
+            const logEntry = {
+                id: 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+                timestamp: new Date().toISOString(),
+                type: type, // 'IHC_UPDATE' hoặc 'MARKER_ADD'
+                description: description,
+                performedBy: window.getCurrentEditorName?.() || currentUser?.email || 'Bác sĩ điều trị'
+            };
+
+            try {
+                const patientRef = doc(db, 'patients', patientDocId);
+                await updateDoc(patientRef, {
+                    historyLogs: arrayUnion(logEntry),
+                    updatedAt: serverTimestamp()
+                });
+
+                // Cập nhật cache cục bộ
+                const pInCache = cachedPatientsList.find(p => p.id === patientDocId);
+                if (pInCache) {
+                    if (!pInCache.historyLogs) pInCache.historyLogs = [];
+                    pInCache.historyLogs.push(logEntry);
+                }
+                if (window.currentViewingPatient && window.currentViewingPatient.id === patientDocId) {
+                    if (!window.currentViewingPatient.historyLogs) window.currentViewingPatient.historyLogs = [];
+                    window.currentViewingPatient.historyLogs.push(logEntry);
+                    window.renderHistoryTimeline(window.currentViewingPatient);
+                }
+
+                // Ghi đồng thời vào subcollection historyLogs (nếu được hỗ trợ)
+                try {
+                    await addDoc(collection(db, 'patients', patientDocId, 'historyLogs'), logEntry);
+                } catch (subErr) {
+                    console.debug('Ghi subcollection historyLogs:', subErr);
+                }
+
+                return logEntry;
+            } catch (err) {
+                console.error('Lỗi khi ghi history log:', err);
+                return null;
+            }
+        };
+
+        /**
+         * Cập nhật thẻ xem trước đặc điểm phân nhóm HMMD khi thay đổi dropdown
+         */
+        window.updateIhcSubtypeCardPreview = function() {
+            const select = document.getElementById('detIhcSubtypeSelect');
+            const previewTitle = document.getElementById('ihcPreviewTitle');
+            const previewBadge = document.getElementById('ihcPreviewBadge');
+            const previewHint = document.getElementById('ihcPreviewHint');
+            if (!select || !previewTitle || !previewBadge || !previewHint) return;
+
+            const val = select.value;
+            const cfg = IHC_SUBTYPE_CONFIGS[val];
+            if (cfg) {
+                previewTitle.innerText = `Đặc điểm: ${cfg.desc}`;
+                previewBadge.innerText = cfg.label;
+                previewBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold border ${cfg.badgeClass}`;
+                previewHint.innerText = `Hướng điều trị: ${cfg.hint}`;
+            } else {
+                previewTitle.innerText = 'Thông tin đặc điểm sinh học';
+                previewBadge.innerText = 'Luminal A / B / TNBC';
+                previewBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-900 border border-indigo-300';
+                previewHint.innerText = 'Chọn phân nhóm phía trên để xem đặc điểm và định hướng điều trị lâm sàng.';
+            }
+        };
+
+        /**
+         * Lưu kết quả Hóa mô miễn dịch (IHC) cho bệnh nhân đang xem
+         */
+        window.savePatientIhcData = async function() {
+            if (!window.canUseOncoCare) return;
+            const p = window.currentViewingPatient;
+            if (!p || !p.id) {
+                alert('Không xác định được hồ sơ bệnh nhân.');
+                return;
+            }
+
+            const subtypeSelect = document.getElementById('detIhcSubtypeSelect');
+            const notesInput = document.getElementById('detIhcNotes');
+            const subtype = subtypeSelect ? subtypeSelect.value : '';
+            const notes = notesInput ? notesInput.value.trim() : '';
+
+            if (!subtype) {
+                alert('Vui lòng chọn phân nhóm ung thư vú!');
+                if (subtypeSelect) subtypeSelect.focus();
+                return;
+            }
+
+            const ihcData = {
+                subtype: subtype,
+                notes: notes,
+                updatedAt: new Date().toISOString(),
+                updatedBy: window.getCurrentEditorName?.() || currentUser?.email || 'Bác sĩ điều trị'
+            };
+
+            try {
+                await updateDoc(doc(db, 'patients', p.id), {
+                    ihc: ihcData,
+                    updatedAt: serverTimestamp()
+                });
+
+                // Cập nhật state & cache
+                p.ihc = ihcData;
+                const cacheIdx = cachedPatientsList.findIndex(item => item.id === p.id);
+                if (cacheIdx >= 0) cachedPatientsList[cacheIdx].ihc = ihcData;
+
+                // Tự động ghi nhận log IHC_UPDATE
+                const logDesc = `Cập nhật phân nhóm HMMD: ${subtype}${notes ? ` (${notes})` : ''}`;
+                await window.recordPatientHistoryLog(p.id, 'IHC_UPDATE', logDesc);
+
+                // Cập nhật lại giao diện IHC tab & summary badge
+                window.renderIhcTab(p);
+                window.showToast(`Đã lưu thông tin HMMD: ${subtype}`);
+            } catch (err) {
+                console.error('Lỗi khi lưu thông tin HMMD:', err);
+                alert('Có lỗi xảy ra khi lưu thông tin HMMD.');
+            }
+        };
+
+        /**
+         * Hiển thị tab Hóa mô miễn dịch (IHC)
+         */
+        window.renderIhcTab = function(patient) {
+            if (!patient) return;
+            const ihc = patient.ihc || {};
+            const subtypeSelect = document.getElementById('detIhcSubtypeSelect');
+            const notesInput = document.getElementById('detIhcNotes');
+            const summaryBadge = document.getElementById('detIhcSubtype');
+            const statusBadge = document.getElementById('ihcStatusBadge');
+
+            if (subtypeSelect) subtypeSelect.value = ihc.subtype || '';
+            if (notesInput) notesInput.value = ihc.notes || '';
+
+            const cfg = IHC_SUBTYPE_CONFIGS[ihc.subtype];
+            if (summaryBadge) {
+                summaryBadge.innerText = ihc.subtype || 'Chưa ghi nhận';
+                summaryBadge.className = `font-bold px-2 py-0.5 rounded text-[11px] border inline-block ${cfg ? cfg.badgeClass : 'text-purple-700 bg-purple-50 border-purple-200'}`;
+            }
+            if (statusBadge) {
+                statusBadge.innerText = ihc.subtype ? `Đã ghi nhận: ${ihc.subtype}` : 'Chưa ghi nhận';
+                statusBadge.className = `px-2.5 py-1 rounded-full text-[11px] font-bold border ${cfg ? cfg.badgeClass : 'bg-slate-100 text-slate-700 border-slate-200'}`;
+            }
+
+            window.updateIhcSubtypeCardPreview();
+        };
+
+        let currentHistoryLogFilter = 'ALL';
+
+        /**
+         * Chặn chọn bộ lọc history log timeline
+         */
+        window.filterHistoryLogsTimeline = function(filterType, buttonEl) {
+            currentHistoryLogFilter = filterType;
+            document.querySelectorAll('.history-log-filter-btn').forEach(btn => {
+                btn.className = 'history-log-filter-btn px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-slate-900 transition';
+            });
+            if (buttonEl) {
+                buttonEl.className = 'history-log-filter-btn px-2.5 py-1 rounded-md font-bold bg-white text-slate-900 shadow-sm transition';
+            }
+            if (window.currentViewingPatient) {
+                window.renderHistoryTimeline(window.currentViewingPatient);
+            }
+        };
+
+        /**
+         * Hiển thị danh sách historyLogs dạng timeline trực quan
+         */
+        window.renderHistoryTimeline = function(patient) {
+            const container = document.getElementById('historyLogsTimelineContainer');
+            if (!container) return;
+
+            const logs = [...(patient?.historyLogs || [])].filter(log => {
+                if (currentHistoryLogFilter === 'ALL') return true;
+                return log.type === currentHistoryLogFilter;
+            }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+            if (logs.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-1">
+                        <svg class="lucide lucide-history mx-auto text-slate-300 block mb-1" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                        <p class="font-medium text-xs text-slate-500">Chưa có bản ghi nhật ký diễn tiến nào.</p>
+                        <p class="text-[11px] text-slate-400">Khi bác sĩ cập nhật HMMD hoặc thêm marker mới, dữ liệu sẽ tự động ghi nhận tại đây.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+                    ${logs.map(log => {
+                        const isIhc = log.type === 'IHC_UPDATE';
+                        const timeStr = formatHistoryTimestamp(log.timestamp);
+                        return `
+                            <div class="relative group">
+                                <div class="absolute -left-6 top-1 w-5 h-5 rounded-full border-2 bg-white flex items-center justify-center shrink-0 ${isIhc ? 'border-indigo-600' : 'border-teal-600'}">
+                                    <span class="w-1.5 h-1.5 rounded-full ${isIhc ? 'bg-indigo-600' : 'bg-teal-600'}"></span>
+                                </div>
+                                <div class="p-3 rounded-xl border transition ${isIhc ? 'bg-indigo-50/40 border-indigo-200/70 hover:border-indigo-300' : 'bg-teal-50/40 border-teal-200/70 hover:border-teal-300'}">
+                                    <div class="flex items-center justify-between gap-2 mb-1">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${isIhc ? 'bg-indigo-100 text-indigo-900 border-indigo-300' : 'bg-teal-100 text-teal-900 border-teal-300'}">
+                                            ${isIhc ? 'CẬP NHẬT HMMD' : 'THÊM MARKER'}
+                                        </span>
+                                        <span class="text-[11px] font-medium text-slate-500">${escapeHtml(timeStr)}</span>
+                                    </div>
+                                    <p class="font-semibold text-slate-800 text-xs leading-relaxed">${escapeHtml(log.description || '')}</p>
+                                    ${log.performedBy ? `<p class="text-[10px] text-slate-400 mt-1">Thực hiện bởi: <span class="font-medium text-slate-600">${escapeHtml(log.performedBy)}</span></p>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
         };
 
         const ADMIN_EMAIL = "xuantuutv@gmail.com";
@@ -4883,6 +5249,10 @@
             window.refreshExtendedAssessment();
             const toxicityList = document.getElementById('existingToxicityList');
             toxicityList.innerHTML = toxicityHistory.length ? [...toxicityHistory].reverse().map(item => item.items.map(x => `<p class="${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-700' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(formatDisplayDate(item.date))} · ${escapeHtml(x.organ)} · Độ ${x.grade}</p>`).join('')).join('') : '<p class="text-slate-400">Chưa ghi nhận.</p>';
+
+            if (typeof window.renderIhcTab === 'function') window.renderIhcTab(p);
+            if (typeof window.renderHistoryTimeline === 'function') window.renderHistoryTimeline(p);
+
             window.setPanelVisibility(document.getElementById('patientDetailModal'), true);
             window.switchDetailTab('timeline');
         };
@@ -5343,6 +5713,22 @@
                     type: type,
                     value: Number(val).toFixed(2),
                     date: date
+                });
+            }
+
+            const docId = document.getElementById('editDocId')?.value || window.currentViewingPatient?.id;
+            const logDesc = `Thêm chỉ số ${type || 'Chưa phân loại'}: ${Number(val).toFixed(2)}${date ? ` (Ngày xét nghiệm: ${formatDisplayDate(date)})` : ''}`;
+
+            if (docId && typeof window.recordPatientHistoryLog === 'function') {
+                window.recordPatientHistoryLog(docId, 'MARKER_ADD', logDesc);
+            } else {
+                if (!window.tempHistoryLogs) window.tempHistoryLogs = [];
+                window.tempHistoryLogs.push({
+                    id: 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+                    timestamp: new Date().toISOString(),
+                    type: 'MARKER_ADD',
+                    description: logDesc,
+                    performedBy: (typeof currentUser !== 'undefined' && currentUser?.email) || 'Bác sĩ'
                 });
             }
 
