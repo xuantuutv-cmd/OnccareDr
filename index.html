@@ -1757,11 +1757,15 @@
     <script>
         (() => {
             let resolveDialog = null;
+            let removeAlertDismissListeners = null;
+            let dialogSession = 0;
             const nativeAlert = window.alert.bind(window);
 
             function openDialog({ message, title = 'THÔNG BÁO', confirm = false, destructive = false }) {
                 const modal = document.getElementById('globalDialogModal');
                 if (!modal) return Promise.resolve(confirm ? false : undefined);
+                removeAlertDismissListeners?.();
+                const session = ++dialogSession;
                 const isDestructive = confirm && destructive;
                 document.getElementById('globalDialogTitle').textContent = title;
                 document.getElementById('globalDialogMessage').textContent = String(message ?? '');
@@ -1776,10 +1780,26 @@
                 document.getElementById('globalDialogIcon').className = `flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${isDestructive ? 'border-rose-400/30 bg-rose-500/20 text-rose-300' : 'border-teal-400/30 bg-teal-500/20 text-teal-300'}`;
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
+                if (!confirm) {
+                    const dismissAlert = () => window.resolveCustomDialog(true);
+                    const attachDismissListeners = () => {
+                        if (session !== dialogSession || !resolveDialog) return;
+                        document.addEventListener('keydown', dismissAlert);
+                        document.addEventListener('click', dismissAlert);
+                        removeAlertDismissListeners = () => {
+                            document.removeEventListener('keydown', dismissAlert);
+                            document.removeEventListener('click', dismissAlert);
+                            removeAlertDismissListeners = null;
+                        };
+                    };
+                    window.setTimeout(attachDismissListeners, 0);
+                }
                 return new Promise(resolve => { resolveDialog = resolve; });
             }
 
             window.resolveCustomDialog = function(result) {
+                removeAlertDismissListeners?.();
+                dialogSession += 1;
                 const modal = document.getElementById('globalDialogModal');
                 modal?.classList.add('hidden');
                 modal?.classList.remove('flex');
