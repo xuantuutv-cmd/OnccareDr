@@ -595,6 +595,15 @@
         html[data-theme="dark"] #deleteCycleConfirmModal .text-slate-800 { color: #f3f4f6 !important; }
         html[data-theme="dark"] #deleteCycleConfirmModal .text-slate-600 { color: #9ca3af !important; }
         html[data-theme="dark"] #deleteCycleConfirmModal button[onclick*="closeDeleteCycleModal"] { background: #2d2d2d !important; border-color: #475569 !important; color: #e2e8f0 !important; }
+        html[data-theme="dark"] #deletePatientConfirmModal > div { background: #1e1e1e !important; border-color: #3c4043 !important; color: #e3e3e3 !important; }
+        html[data-theme="dark"] #deletePatientConfirmModal .bg-slate-50 { background: #252526 !important; border-color: #3c4043 !important; }
+        html[data-theme="dark"] #deletePatientConfirmModal .bg-rose-50 { background: rgba(159, 18, 57, 0.2) !important; border-color: rgba(244, 63, 94, 0.3) !important; color: #fecdd3 !important; }
+        html[data-theme="dark"] #deletePatientConfirmModal .text-rose-950 { color: #fff !important; }
+        html[data-theme="dark"] #deletePatientConfirmModal .text-rose-800 { color: #fecdd3 !important; }
+        html[data-theme="dark"] #deletePatientConfirmModal .text-slate-900,
+        html[data-theme="dark"] #deletePatientConfirmModal .text-slate-800 { color: #f3f4f6 !important; }
+        html[data-theme="dark"] #deletePatientConfirmModal .text-slate-600 { color: #9ca3af !important; }
+        html[data-theme="dark"] #deletePatientConfirmModal button[onclick*="closeDeletePatientModal"] { background: #2d2d2d !important; border-color: #475569 !important; color: #e2e8f0 !important; }
         @keyframes panelOpening {
             from { opacity: 0; transform: translateY(12px) scale(0.985); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -1671,6 +1680,51 @@
                 <button type="button" id="btnConfirmDeleteCycle" onclick="window.executeDeleteCycle()"
                     class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-2 transition shadow-sm">
                     <svg class="lucide lucide-trash-2 shrink-0" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Xóa chu kỳ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL XÁC NHẬN XÓA HỒ SƠ BỆNH NHÂN -->
+    <div id="deletePatientConfirmModal" class="fixed inset-0 z-[230] hidden flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="deletePatientConfirmTitle">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-fadeIn m-auto text-slate-800">
+            <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-rose-500/20 rounded-lg flex items-center justify-center border border-rose-400/30">
+                        <svg class="lucide lucide-alert-triangle text-rose-400 shrink-0" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    </div>
+                    <div>
+                        <h3 id="deletePatientConfirmTitle" class="font-bold text-sm uppercase tracking-wide">XÁC NHẬN XÓA HỒ SƠ BỆNH NHÂN</h3>
+                        <p class="text-slate-400 text-[12px] mt-0.5">Xóa vĩnh viễn hồ sơ bệnh nhân khỏi hệ thống</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.closeDeletePatientModal()" title="Đóng" aria-label="Đóng cửa sổ xác nhận xóa hồ sơ" class="mac-close">
+                    <svg class="lucide lucide-x" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-5 space-y-4 text-xs">
+                <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-900 text-xs font-medium flex items-start gap-3">
+                    <svg class="lucide lucide-alert-circle text-rose-600 mt-0.5 shrink-0" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                    <div class="space-y-1">
+                        <p class="font-bold text-[13px] text-rose-950">Hành động này không thể hoàn tác!</p>
+                        <p class="text-rose-800 leading-relaxed">Hồ sơ bệnh nhân và toàn bộ dữ liệu liên quan sẽ bị xóa vĩnh viễn khỏi hệ thống.</p>
+                    </div>
+                </div>
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+                    <div class="flex justify-between items-center gap-3 text-slate-600">
+                        <span>Họ và tên:</span>
+                        <strong id="deletePatientName" class="text-slate-900 font-bold text-right break-words">—</strong>
+                    </div>
+                    <div class="flex justify-between items-center gap-3 text-slate-600">
+                        <span>Mã bệnh nhân:</span>
+                        <strong id="deletePatientId" class="text-slate-800 font-mono text-right">—</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-end gap-2.5 bg-slate-50 shrink-0">
+                <button type="button" onclick="window.closeDeletePatientModal()" class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition text-xs shadow-sm">Hủy</button>
+                <button type="button" id="btnConfirmDeletePatient" onclick="window.executePatientDocDelete()" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-2 transition shadow-sm">
+                    <svg class="lucide lucide-trash-2 shrink-0" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Xóa vĩnh viễn
                 </button>
             </div>
         </div>
@@ -7101,25 +7155,45 @@
             }
         };
 
+        window._pendingPatientDeleteDocId = null;
         window.deletePatientDoc = async function(docId) {
             if (!window.canUseOncoCare || !(isAdmin || isVip)) {
                 alert("Chỉ tài khoản Admin hoặc VIP mới có quyền xóa hồ sơ bệnh nhân!");
                 return;
             }
-            if (confirm("CẢNH BÁO: Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ bệnh nhân này khỏi hệ thống không?")) {
-                try {
-                    await deleteDoc(doc(db, "patients", docId));
-                    cachedPatientsList = cachedPatientsList.filter((patient) => patient.id !== docId);
-                    window.showToast("Đã xóa hồ sơ bệnh nhân thành công!");
-                    const searchInput = document.getElementById('searchInput');
-                    if (searchInput.value.trim()) window.searchPatientByCode();
-                    else window.clearSearchResult();
-                    const statsModal = document.getElementById('statsModal');
-                    if (statsModal && !statsModal.classList.contains('hidden')) window.runChemoStatistics();
-                } catch (err) {
-                    console.error("Lỗi xóa hồ sơ:", err);
-                    alert("Không thể xóa hồ sơ: " + err.message);
-                }
+
+            const patient = cachedPatientsList.find(item => item.id === docId);
+            document.getElementById('deletePatientName').textContent = patient?.name || 'Chưa cập nhật';
+            document.getElementById('deletePatientId').textContent = patient?.patientId || docId;
+            window._pendingPatientDeleteDocId = docId;
+            window.setPanelVisibility(document.getElementById('deletePatientConfirmModal'), true);
+        };
+
+        window.closeDeletePatientModal = function() {
+            window._pendingPatientDeleteDocId = null;
+            window.setPanelVisibility(document.getElementById('deletePatientConfirmModal'), false);
+        };
+
+        window.executePatientDocDelete = async function() {
+            const docId = window._pendingPatientDeleteDocId;
+            if (!docId) {
+                window.closeDeletePatientModal();
+                return;
+            }
+
+            window.closeDeletePatientModal();
+            try {
+                await deleteDoc(doc(db, "patients", docId));
+                cachedPatientsList = cachedPatientsList.filter((patient) => patient.id !== docId);
+                window.showToast("Đã xóa hồ sơ bệnh nhân thành công!");
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput.value.trim()) window.searchPatientByCode();
+                else window.clearSearchResult();
+                const statsModal = document.getElementById('statsModal');
+                if (statsModal && !statsModal.classList.contains('hidden')) window.runChemoStatistics();
+            } catch (err) {
+                console.error("Lỗi xóa hồ sơ:", err);
+                alert("Không thể xóa hồ sơ: " + err.message);
             }
         };
 
