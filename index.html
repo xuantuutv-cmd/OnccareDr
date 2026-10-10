@@ -5300,6 +5300,18 @@
             if (!p) return;
             window.currentViewingPatient = p;
 
+            // A newly created record may not yet include every optional history
+            // collection. Open the dialog first so a later optional renderer
+            // cannot make the "view" action appear unresponsive.
+            window.setPanelVisibility(document.getElementById('patientDetailModal'), true);
+            window.switchDetailTab('timeline');
+
+            const markers = Array.isArray(p.markers) ? p.markers : [];
+            const patientCycles = Array.isArray(p.cycles) ? p.cycles : [];
+            const responseHistory = Array.isArray(p.responseAssessments) ? p.responseAssessments : [];
+            const toxicityHistory = Array.isArray(p.toxicityAssessments) ? p.toxicityAssessments : [];
+            const subDiagnoses = Array.isArray(p.subDiagnosesList) ? p.subDiagnosesList : [];
+
             document.getElementById('detName').innerText = `${p.name} (Năm sinh: ${p.birthYear || '-'})`;
             document.getElementById('detPatientId').innerText = `Mã BN: ${p.patientId} | Giới tính: ${p.gender || '-'}`;
             document.getElementById('detDiagMain').innerText = p.diagnosis || '-';
@@ -5307,18 +5319,18 @@
             document.getElementById('detTNM').innerText = tnm.T && tnm.N && tnm.M
                 ? `${tnm.prefix || 'c'}${tnm.T}${tnm.N}${tnm.M} — Giai đoạn ${tnm.stage || '—'}`
                 : '-';
-            document.getElementById('detDiagSub').innerText = p.subDiagnosis || (p.subDiagnosesList ? p.subDiagnosesList.join(' | ') : 'Không có');
+            document.getElementById('detDiagSub').innerText = p.subDiagnosis || (subDiagnoses.length ? subDiagnoses.join(' | ') : 'Không có');
             document.getElementById('detProtocol').querySelector('span').innerText = p.protocol || 'Chưa cập nhật';
             document.getElementById('detCreatedBy').innerText = p.createdByEmail || 'Thạch Xuân Tựu';
             const markerSummary = document.getElementById('summaryMarkerList');
             const latestMarkers = new Map();
-            [...(p.markers || [])].sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0)).forEach(marker => latestMarkers.set(marker.type || 'Chưa phân loại', marker));
+            [...markers].sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (Number(a.recordedAt) || 0) - (Number(b.recordedAt) || 0)).forEach(marker => latestMarkers.set(marker.type || 'Chưa phân loại', marker));
             markerSummary.innerHTML = latestMarkers.size ? [...latestMarkers.values()].map(marker => `<p class="flex justify-between gap-2"><span>${escapeHtml(marker.type || 'Chưa phân loại')}</span><strong>${escapeHtml(marker.value)} <span class="font-normal text-slate-500">· ${escapeHtml(formatDisplayDate(marker.date))}</span></strong></p>`).join('') : '<p class="text-slate-400">Chưa ghi nhận</p>';
             window.renderSummaryResponse(p);
 
             const cyclesContainer = document.getElementById('detCyclesTimeline');
             cyclesContainer.innerHTML = "";
-            const cycles = window.normalizeProtocolHistory((p.cycles || []).map(cycle => ({ ...cycle })));
+            const cycles = window.normalizeProtocolHistory(patientCycles.map(cycle => ({ ...cycle })));
             if (cycles.length === 0) {
                 cyclesContainer.innerHTML = `<p class="text-slate-400 italic text-xs">Chưa có lịch sử chu kỳ.</p>`;
             } else {
@@ -5366,8 +5378,6 @@
                 });
             }
 
-            const responseHistory = p.responseAssessments || [];
-            const toxicityHistory = p.toxicityAssessments || [];
             cyclesContainer.insertAdjacentHTML('beforeend', `<div class="mt-6 border-b-2 border-rose-500 pb-1 font-bold text-rose-900">ĐỘC TÍNH HÓA TRỊ</div>${toxicityHistory.length ? toxicityHistory.map(item => `<div class="ml-3 my-2 rounded-lg border p-3 ${item.items?.some(x => x.grade >= 4) ? 'border-rose-300 bg-rose-50 text-rose-800' : item.items?.some(x => x.grade === 3) ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-slate-200 bg-slate-50'}"><div class="font-bold">${item.items?.some(x => x.grade >= 4) ? '❗ ' : item.items?.some(x => x.grade === 3) ? '⚠ ' : ''}${escapeHtml(formatDisplayDate(item.date))}</div>${(item.items || []).map(x => `<div class="mt-1 ${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-800' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(x.organ)} — Độ ${x.grade}: ${escapeHtml(x.description)}${x.grade === 3 ? ' (Tạm hoãn chu kỳ, cân nhắc giảm liều)' : ''}${x.grade >= 4 ? ' (Ngừng thuốc/đổi phác đồ; cảnh báo)' : ''}</div>`).join('')}</div>`).join('') : '<p class="p-2 text-slate-400">Chưa ghi nhận độc tính.</p>'}`);
             window.tempResponseAssessments = JSON.parse(JSON.stringify(responseHistory));
             window.tempToxicityAssessments = JSON.parse(JSON.stringify(toxicityHistory));
