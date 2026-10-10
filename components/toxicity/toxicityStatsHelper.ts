@@ -26,6 +26,7 @@ export interface ToxicityAssessment {
 
 export interface ChemotherapyCycle {
   date?: string;
+  startDate?: string;
   protocolUsed?: string;
   cycleNumber?: number;
   [key: string]: any;
@@ -36,6 +37,7 @@ export interface PatientRecord {
   patientId?: string;             // Mã hồ sơ BN (VD: "BN001")
   name?: string;                  // Tên bệnh nhân
   protocol?: string;              // Phác đồ hóa trị chính
+  defaultProtocol?: string;
   protocolKey?: string;
   diagnosis?: string;             // Chẩn đoán & ICD
   gender?: string;                // Nam / Nữ
@@ -159,21 +161,25 @@ export function calculateDateRange(period: TimeFilterPeriod): { startDate: strin
  * Xác định phác đồ của bệnh nhân tại thời điểm đánh giá độc tính
  */
 export function resolveProtocolForAssessment(patient: PatientRecord, assessmentDate: string): string {
-  if (Array.isArray(patient.cycles) && patient.cycles.length > 0) {
-    // Sắp xếp các chu kỳ theo ngày tăng dần
-    const sortedCycles = [...patient.cycles].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-    // Tìm cycle gần nhất trước hoặc đúng ngày assessment
-    const matchedCycle = [...sortedCycles].reverse().find(c => c.date && c.date <= assessmentDate);
-    if (matchedCycle && matchedCycle.protocolUsed) {
-      return matchedCycle.protocolUsed;
-    }
-    // Nếu không khớp, lấy chu kỳ đầu tiên có protocol
-    const firstWithProto = sortedCycles.find(c => c.protocolUsed);
-    if (firstWithProto?.protocolUsed) {
-      return firstWithProto.protocolUsed;
-    }
+  const fallbackProtocol = patient.protocol || patient.defaultProtocol || 'Chưa cập nhật';
+  const assessmentTime = new Date(assessmentDate).getTime();
+  const validCycles = (Array.isArray(patient.cycles) ? patient.cycles : [])
+    .map(cycle => {
+      const cycleDate = cycle.startDate || cycle.date;
+      const normalizedDate = typeof cycleDate === 'string' ? cycleDate.trim() : '';
+      return { cycle, cycleTime: normalizedDate ? new Date(normalizedDate).getTime() : Number.NaN };
+    })
+    .filter(({ cycleTime }) => Number.isFinite(cycleTime))
+    .sort((a, b) => a.cycleTime - b.cycleTime);
+
+  if (!Number.isFinite(assessmentTime)) return fallbackProtocol;
+
+  for (let index = validCycles.length - 1; index >= 0; index--) {
+    const { cycle, cycleTime } = validCycles[index];
+    if (cycleTime <= assessmentTime && cycle.protocolUsed) return cycle.protocolUsed;
   }
-  return patient.protocol || 'Chưa cập nhật';
+
+  return fallbackProtocol;
 }
 
 /**

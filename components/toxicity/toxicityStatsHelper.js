@@ -58,14 +58,30 @@ export function calculateDateRange(period) {
  * @returns {string}
  */
 export function resolveProtocolForAssessment(patient, assessmentDate) {
-    if (Array.isArray(patient?.cycles) && patient.cycles.length > 0) {
-        const sorted = [...patient.cycles].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-        const matched = [...sorted].reverse().find(c => c && c.date && c.date <= assessmentDate);
-        if (matched && matched.protocolUsed) return matched.protocolUsed;
-        const first = sorted.find(c => c && c.protocolUsed);
-        if (first?.protocolUsed) return first.protocolUsed;
+    const fallbackProtocol = patient?.protocol || patient?.defaultProtocol || 'Chưa cập nhật';
+    const assessmentTime = new Date(assessmentDate).getTime();
+
+    // Dữ liệu chu kỳ cũ dùng `date`; một số nguồn dùng `startDate`.
+    // Chỉ giữ ngày hợp lệ để việc sắp xếp/so sánh không bị sai lệch bởi dữ liệu thiếu.
+    const validCycles = (Array.isArray(patient?.cycles) ? patient.cycles : [])
+        .map(cycle => {
+            const cycleDate = cycle?.startDate || cycle?.date;
+            const normalizedDate = typeof cycleDate === 'string' ? cycleDate.trim() : '';
+            const cycleTime = normalizedDate ? new Date(normalizedDate).getTime() : Number.NaN;
+            return { cycle, cycleTime };
+        })
+        .filter(({ cycle, cycleTime }) => Boolean(cycle) && Number.isFinite(cycleTime))
+        .sort((a, b) => a.cycleTime - b.cycleTime);
+
+    // Khi ngày đánh giá không hợp lệ, không suy đoán chu kỳ; dùng phác đồ hồ sơ.
+    if (!Number.isFinite(assessmentTime)) return fallbackProtocol;
+
+    for (let index = validCycles.length - 1; index >= 0; index--) {
+        const { cycle, cycleTime } = validCycles[index];
+        if (cycleTime <= assessmentTime && cycle.protocolUsed) return cycle.protocolUsed;
     }
-    return patient?.protocol || 'Chưa cập nhật';
+
+    return fallbackProtocol;
 }
 
 /**
