@@ -112,7 +112,7 @@ export const ToxicityAnalytics: React.FC<ToxicityAnalyticsProps> = ({
   }, [patients]);
 
   // Lọc và tính toán số liệu
-  const { filteredEvents, assessmentsCount, patientsCount } = useMemo(() => {
+  const { events: filteredEvents, assessmentsCount, patientsCount } = useMemo(() => {
     return extractFilteredToxicityEvents(patients, filterCriteria);
   }, [patients, filterCriteria]);
 
