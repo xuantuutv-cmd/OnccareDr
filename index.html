@@ -2405,18 +2405,18 @@
                     </div>
                 </div>
                 <div class="stats-card bg-indigo-50 border border-indigo-200 p-3 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="min-w-0 flex-1">
                         <p class="text-indigo-700 font-semibold uppercase text-[12px]">Phân bố Giới Tính</p>
-                        <div id="statGenderSummary" class="text-xs font-bold text-indigo-900 mt-1 space-x-2">Nam: 0 | Nữ: 0</div>
+                        <div id="statGenderSummary" class="text-xs font-bold text-indigo-900 mt-1">Nam: 0 (0.0%) | Nữ: 0 (0.0%) | Chưa rõ: 0 (0.0%)</div>
                     </div>
                     <div class="w-10 h-10 bg-indigo-200/60 rounded-full flex items-center justify-center text-indigo-800 text-lg">
                         <svg class="lucide lucide-users" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     </div>
                 </div>
                 <div class="stats-card bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="min-w-0 flex-1">
                         <p class="text-amber-700 font-semibold uppercase text-[12px]">Phân bố Nhóm Tuổi</p>
-                        <div id="statAgeSummary" class="text-[13px] font-bold text-amber-900 mt-1">Trẻ: 0 | Trung niên: 0 | Già: 0</div>
+                        <div id="statAgeSummary" class="text-xs font-bold text-amber-900 mt-1">Trẻ: 0 (0.0%) | Trung niên: 0 (0.0%) | Già: 0 (0.0%) | Chưa rõ: 0 (0.0%)</div>
                     </div>
                     <div class="w-10 h-10 bg-amber-200/60 rounded-full flex items-center justify-center text-amber-800 text-lg">
                         <svg class="lucide lucide-clock" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -7441,21 +7441,52 @@
             // COUNT DISTINCT patientId (mỗi bệnh nhân duy nhất trong danh sách thỏa mãn)
             document.getElementById('statTotalPatients').innerText = filtered.length;
 
-            let maleCount = filtered.filter(p => p.gender === 'Nam').length;
-            let femaleCount = filtered.filter(p => p.gender === 'Nữ').length;
-            document.getElementById('statGenderSummary').innerText = `Nam: ${maleCount} | Nữ: ${femaleCount}`;
+            // Mỗi hồ sơ đã lọc phải thuộc đúng một nhóm giới tính và một nhóm tuổi.
+            // Vì vậy hai phân bố luôn có tổng bằng số BN trong kỳ, kể cả dữ liệu thiếu.
+            const demographicTotal = filtered.length;
+            const genderCounts = { male: 0, female: 0, unknown: 0 };
+            const ageCounts = { young: 0, middle: 0, senior: 0, unknown: 0 };
+            const currentYear = new Date().getFullYear();
 
-            let youngCount = 0, midCount = 0, seniorCount = 0;
-            let currentYear = new Date().getFullYear();
             filtered.forEach(p => {
-                if (p.birthYear) {
-                    let age = currentYear - parseInt(p.birthYear);
-                    if (age < 40) youngCount++;
-                    else if (age <= 60) midCount++;
-                    else seniorCount++;
-                }
+                if (p.gender === 'Nam') genderCounts.male++;
+                else if (p.gender === 'Nữ') genderCounts.female++;
+                else genderCounts.unknown++;
+
+                const birthYearText = String(p.birthYear ?? '').trim();
+                const birthYear = /^\d{4}$/.test(birthYearText) ? Number(birthYearText) : Number.NaN;
+                const age = currentYear - birthYear;
+                if (!Number.isFinite(age) || age < 0 || age > 130) ageCounts.unknown++;
+                else if (age < 40) ageCounts.young++;
+                else if (age <= 60) ageCounts.middle++;
+                else ageCounts.senior++;
             });
-            document.getElementById('statAgeSummary').innerText = `Trẻ (<40): ${youngCount} | Trung niên (40-60): ${midCount} | Già (>60): ${seniorCount}`;
+
+            const percentage = count => demographicTotal ? ((count / demographicTotal) * 100).toFixed(1) : '0.0';
+            const renderDemographicSummary = (elementId, items) => {
+                const element = document.getElementById(elementId);
+                if (!element) return;
+                element.innerHTML = `
+                    <div class="flex flex-wrap gap-x-2 gap-y-0.5 leading-relaxed">
+                        ${items.map(item => `<span>${item.label}: ${item.count} (${percentage(item.count)}%)</span>`).join('<span class="text-slate-300">|</span>')}
+                    </div>
+                    <div class="mt-1.5 flex h-1.5 w-full overflow-hidden rounded-full bg-white/70" aria-label="Phân bố ${elementId === 'statGenderSummary' ? 'giới tính' : 'nhóm tuổi'}">
+                        ${items.filter(item => item.count > 0).map(item => `<span class="${item.barClass}" style="width: ${percentage(item.count)}%"></span>`).join('')}
+                    </div>
+                `;
+            };
+
+            renderDemographicSummary('statGenderSummary', [
+                { label: 'Nam', count: genderCounts.male, barClass: 'bg-sky-500' },
+                { label: 'Nữ', count: genderCounts.female, barClass: 'bg-fuchsia-500' },
+                { label: 'Chưa rõ / Chưa cập nhật', count: genderCounts.unknown, barClass: 'bg-slate-400' }
+            ]);
+            renderDemographicSummary('statAgeSummary', [
+                { label: 'Trẻ (<40)', count: ageCounts.young, barClass: 'bg-emerald-500' },
+                { label: 'Trung niên (40–60)', count: ageCounts.middle, barClass: 'bg-amber-500' },
+                { label: 'Già (>60)', count: ageCounts.senior, barClass: 'bg-rose-500' },
+                { label: 'Chưa rõ / Chưa cập nhật', count: ageCounts.unknown, barClass: 'bg-slate-400' }
+            ]);
 
             // Thống kê phân bố theo phác đồ (COUNT DISTINCT per protocol)
             const protocolCounts = {};
