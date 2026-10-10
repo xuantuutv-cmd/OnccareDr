@@ -2668,29 +2668,35 @@
             );
             const todayVN = referenceDateVN || window.getSystemDateVN(0);
 
-            // Tìm chu kỳ gần nhất có đặt lịch hẹn tái khám
+            // Ưu tiên duy nhất lịch hẹn gắn với chu kỳ điều trị mới nhất.
+            // Chỉ khi chu kỳ này không có lịch hẹn mới dùng latestFollowUp của hồ sơ.
+            const latestCycleIndex = cycles.length - 1;
+            const latestCycle = latestCycleIndex >= 0 ? cycles[latestCycleIndex] : null;
             let scheduledCycleIndex = -1;
             let followUpInfo = null;
 
-            for (let i = cycles.length - 1; i >= 0; i--) {
-                const c = cycles[i];
-                if (c && c.followUpDate) {
-                    scheduledCycleIndex = i;
-                    followUpInfo = {
-                        date: c.followUpDate,
-                        days: c.followUpDays || 0,
-                        cycleNum: c.cycleNum || (i + 1),
-                        branchName: c.branchName || `Chu kỳ ${c.cycleNum || (i + 1)}`,
-                        protocol: c.protocolUsed || patient.protocol || 'Chưa cập nhật',
-                        required: true,
-                        createdAt: c.followUpCreatedAt || ''
-                    };
-                    break;
-                }
-            }
-
-            if (!followUpInfo && patient.latestFollowUp && patient.latestFollowUp.date) {
+            if (latestCycle?.followUpDate) {
+                scheduledCycleIndex = latestCycleIndex;
+                followUpInfo = {
+                    date: latestCycle.followUpDate,
+                    days: latestCycle.followUpDays || 0,
+                    cycleNum: latestCycle.cycleNum || (latestCycleIndex + 1),
+                    branchName: latestCycle.branchName || `Chu kỳ ${latestCycle.cycleNum || (latestCycleIndex + 1)}`,
+                    protocol: latestCycle.protocolUsed || patient.protocol || 'Chưa cập nhật',
+                    required: true,
+                    createdAt: latestCycle.followUpCreatedAt || ''
+                };
+            } else if (patient.latestFollowUp?.date) {
                 followUpInfo = { ...patient.latestFollowUp };
+
+                // Liên kết lịch hồ sơ với chu kỳ đã tạo nó khi dữ liệu lịch sử còn giữ
+                // followUpDate. Điều này cho phép nhận diện chính xác chu kỳ mới hơn.
+                for (let i = cycles.length - 1; i >= 0; i--) {
+                    if (cycles[i]?.followUpDate === followUpInfo.date) {
+                        scheduledCycleIndex = i;
+                        break;
+                    }
+                }
             }
 
             if (!followUpInfo || !followUpInfo.date) return null;
@@ -2698,11 +2704,11 @@
             const dueDate = followUpInfo.date;
             const diffDays = window.getCalendarDayDiff(dueDate, todayVN);
 
-            // 1. Kiểm tra thông tin chu kỳ mới (trong vòng 7 ngày kể từ ngày đến hẹn)
+            // Chu kỳ mới là chu kỳ nằm sau chu kỳ đặt hẹn. Với lịch hẹn cấp hồ sơ
+            // không xác định được chu kỳ gốc, dùng ngày điều trị sau ngày hẹn làm mốc.
             let hasNewCycle = false;
             let newCycle = null;
 
-            // Kiểm tra các chu kỳ được ghi nhận sau chu kỳ đã đặt hẹn
             if (scheduledCycleIndex >= 0) {
                 for (let j = scheduledCycleIndex + 1; j < cycles.length; j++) {
                     const nextCycle = cycles[j];
@@ -2714,13 +2720,13 @@
                 }
             }
 
-            // Hoặc kiểm tra xem có chu kỳ nào có ngày rơi vào khoảng từ đúng ngày hẹn đến 7 ngày tiếp theo (diffFromDue: 0 -> 7)
+            // Không suy diễn từ marker, IHC, độc tính, ghi chú hoặc thông tin hành chính.
             if (!hasNewCycle && cycles.length > 0) {
                 for (let i = 0; i < cycles.length; i++) {
                     const c = cycles[i];
                     if (c && c.date && (scheduledCycleIndex < 0 || i !== scheduledCycleIndex)) {
                         const diffFromDue = window.getCalendarDayDiff(c.date, dueDate);
-                        if (diffFromDue >= 0 && diffFromDue <= 7) {
+                        if (diffFromDue >= 0) {
                             hasNewCycle = true;
                             newCycle = c;
                             break;
@@ -7323,7 +7329,8 @@
                     statusBadge = `<span class="px-2.5 py-1 bg-rose-50 text-rose-800 border border-rose-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><svg class="lucide lucide-flag text-rose-600 inline-block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Kết thúc ĐT (Quá ${Math.abs(diffDays)} ngày)</span>`;
                 } else if (fu.hasNewCycle) {
                     const newCycleLabel = fu.newCycle?.branchName || (fu.newCycle?.cycleNum ? `Chu kỳ ${fu.newCycle.cycleNum}` : 'Mới');
-                    statusBadge = `<span class="px-2.5 py-1 bg-blue-100 text-blue-900 border border-blue-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><svg class="lucide lucide-check-circle-2 text-blue-600 inline-block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Đã có CK mới (${escapeHtml(newCycleLabel)})</span>`;
+                    const newCycleProtocol = fu.newCycle?.protocolUsed || fu.protocol || p.protocol || 'Chưa cập nhật';
+                    statusBadge = `<span class="px-2.5 py-1 bg-blue-100 text-blue-900 border border-blue-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><svg class="lucide lucide-check-circle-2 text-blue-600 inline-block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Đã có CK mới (${escapeHtml(newCycleProtocol)} · ${escapeHtml(newCycleLabel)})</span>`;
                 } else if (diffDays === 1) {
                     statusBadge = `<span class="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><svg class="lucide lucide-bell text-amber-600 inline-block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Ngày mai (1 ngày)</span>`;
                 } else if (diffDays === 0) {
