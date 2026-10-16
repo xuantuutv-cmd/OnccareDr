@@ -1225,7 +1225,7 @@
             #patientForm { min-height: 0; scroll-padding-block: 1rem; }
             #patientHistoryPanel { margin-top: 1.25rem; }
             #patientInputPanel :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea),
-            :is(#editCycleModal, #followUpModal, #responseEditorModal, #extendedAssessmentModal, #statsFilters) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+            :is(#editCycleModal, #followUpModal, #delayedTreatmentModal, #endTreatmentModal, #responseEditorModal, #extendedAssessmentModal, #statsFilters) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
                 min-width: 0; max-width: 100%; min-height: 44px; font-size: 16px;
             }
             #patientInputPanel .grid > * { min-width: 0; }
@@ -1234,8 +1234,8 @@
             #patientDetailModal > div > div:first-child { padding: .75rem; gap: .75rem; flex-shrink: 0; }
             #patientDetailModal #tabContentChart > div:first-child { flex-wrap: wrap; }
             #detName, #detDiagnosis, #detProtocol { overflow-wrap: anywhere; }
-            :is(#editCycleModal, #followUpModal, #deleteCycleConfirmModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) { padding: .5rem; }
-            :is(#editCycleModal, #followUpModal, #deleteCycleConfirmModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) > div {
+            :is(#editCycleModal, #followUpModal, #delayedTreatmentModal, #endTreatmentModal, #deleteCycleConfirmModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) { padding: .5rem; }
+            :is(#editCycleModal, #followUpModal, #delayedTreatmentModal, #endTreatmentModal, #deleteCycleConfirmModal, #extendedAssessmentModal, #responseEditorModal, #responseDetailsModal, #userManagementModal) > div {
                 max-height: calc(100dvh - 1rem); overflow-y: auto; overscroll-behavior-y: contain;
             }
             :is(#extendedResponsePanel, #extendedMrecistPanel, #extendedToxicityPanel) { max-height: none; overflow: visible; }
@@ -1817,6 +1817,218 @@
                 <button type="button" id="btnConfirmDeleteCycle" onclick="window.executeDeleteCycle()"
                     class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-2 transition shadow-sm">
                     <svg class="lucide lucide-trash-2 shrink-0" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Xóa chu kỳ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GHI NHẬN HOÃN ĐIỀU TRỊ (ĐÃ KHÁM - HOÃN THUỐC) -->
+    <div id="delayedTreatmentModal" class="fixed inset-0 z-[230] hidden flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="delayedTreatmentTitle">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-fadeIn m-auto text-slate-800">
+            <!-- Header -->
+            <div class="bg-amber-600 text-white px-5 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-amber-500/40 rounded-lg flex items-center justify-center border border-amber-300/40">
+                        <svg class="lucide lucide-pause-circle text-white shrink-0" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>
+                    </div>
+                    <div>
+                        <h3 id="delayedTreatmentTitle" class="font-bold text-sm uppercase tracking-wide">ĐÃ KHÁM LÂM SÀNG - HOÃN ĐIỀU TRỊ</h3>
+                        <p class="text-amber-100 text-[12px] mt-0.5">Tạm hoãn chu kỳ mới (không tính quá hẹn / kết thúc điều trị)</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.closeDelayedTreatmentModal()" title="Đóng" aria-label="Đóng cửa sổ" class="mac-close text-white hover:text-slate-200">
+                    <svg class="lucide lucide-x" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="p-5 space-y-4 text-xs overflow-y-auto max-h-[75vh]">
+                <!-- Info banner -->
+                <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl space-y-1.5 text-xs">
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>Bệnh nhân:</span>
+                        <strong id="delayPatientName" class="text-slate-900 font-bold">—</strong>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>Mã BN:</span>
+                        <span id="delayPatientId" class="font-mono font-bold text-blue-700">—</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>Phác đồ hiện tại:</span>
+                        <span id="delayProtocol" class="font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">—</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>Ngày hẹn tái khám:</span>
+                        <span id="delayFollowUpDate" class="font-semibold text-slate-800">—</span>
+                    </div>
+                </div>
+
+                <!-- Input form -->
+                <div class="space-y-3">
+                    <div>
+                        <label for="delayExamDateInput" class="block font-bold text-slate-700 mb-1">Ngày đến khám lâm sàng:</label>
+                        <input type="date" id="delayExamDateInput" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label for="delayReasonSelect" class="block font-bold text-slate-700 mb-1">Lý do chính hoãn điều trị:</label>
+                        <select id="delayReasonSelect" onchange="window.handleDelayReasonChange(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                            <option value="Bạch cầu / Bạch cầu hạt giảm (Neutropenia)">Bạch cầu / Bạch cầu hạt giảm (Neutropenia)</option>
+                            <option value="Giảm tiểu cầu / Thiếu máu">Giảm tiểu cầu / Thiếu máu</option>
+                            <option value="Tăng men gan / Rối loạn chức năng gan">Tăng men gan / Rối loạn chức năng gan</option>
+                            <option value="Độc tính thận / Tăng Creatinine">Độc tính thận / Tăng Creatinine</option>
+                            <option value="Nhiễm trùng / Sốt hạ bạch cầu">Nhiễm trùng / Sốt hạ bạch cầu</option>
+                            <option value="Thể trạng suy kiệt / Điểm toàn trạng (PS) kém">Thể trạng suy kiệt / Điểm toàn trạng (PS) kém</option>
+                            <option value="Độc tính tiêu hóa nặng (Nôn, tiêu chảy, viêm niêm mạc)">Độc tính tiêu hóa nặng (Nôn, tiêu chảy, viêm niêm mạc)</option>
+                            <option value="Bệnh nhân xin hoãn vì việc cá nhân / Gia đình">Bệnh nhân xin hoãn vì việc cá nhân / Gia đình</option>
+                            <option value="Khác">Lý do khác...</option>
+                        </select>
+                    </div>
+                    <div id="delayReasonCustomContainer" class="hidden">
+                        <label for="delayReasonCustomInput" class="block font-bold text-slate-700 mb-1">Nhập lý do khác:</label>
+                        <input type="text" id="delayReasonCustomInput" placeholder="Nhập lý do hoãn điều trị cụ thể..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label for="delayNoteInput" class="block font-bold text-slate-700 mb-1">Ghi chú lâm sàng / Hướng xử trí (xét nghiệm lại, nâng đỡ, G-CSF...):</label>
+                        <textarea id="delayNoteInput" rows="2" placeholder="Ví dụ: BCĐNT 0.8 G/L, chỉ định Filgrastim 300mcg x 3 ngày, hẹn tái khám kiểm tra lại..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Dự kiến hẹn tái khám kiểm tra lại sau:</label>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="document.getElementById('delayNextDaysInput').value = 3" class="px-2.5 py-1 bg-slate-100 hover:bg-amber-100 text-slate-700 font-semibold rounded-lg border border-slate-200 text-xs transition">3 ngày</button>
+                            <button type="button" onclick="document.getElementById('delayNextDaysInput').value = 7" class="px-2.5 py-1 bg-slate-100 hover:bg-amber-100 text-slate-700 font-semibold rounded-lg border border-slate-200 text-xs transition">7 ngày</button>
+                            <button type="button" onclick="document.getElementById('delayNextDaysInput').value = 14" class="px-2.5 py-1 bg-slate-100 hover:bg-amber-100 text-slate-700 font-semibold rounded-lg border border-slate-200 text-xs transition">14 ngày</button>
+                            <input type="number" id="delayNextDaysInput" min="1" max="60" value="7" class="w-20 px-2 py-1 border border-slate-300 rounded-lg text-xs font-bold text-center">
+                            <span class="text-slate-600 font-semibold">ngày</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
+                <button type="button" id="btnRemoveDelayedStatus" onclick="window.removeDelayedTreatmentStatus()"
+                    class="hidden px-3.5 py-2 rounded-xl border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold transition text-xs flex items-center gap-1.5">
+                    <svg class="lucide lucide-rotate-ccw" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Hủy hoãn thuốc
+                </button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button type="button" onclick="window.closeDelayedTreatmentModal()"
+                        class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition text-xs shadow-sm">
+                        Đóng
+                    </button>
+                    <button type="button" id="btnSaveDelayedTreatment" onclick="window.saveDelayedTreatmentStatus()"
+                        class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+                        <svg class="lucide lucide-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Lưu trạng thái hoãn
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GHI NHẬN LÝ DO KẾT THÚC ĐIỀU TRỊ / XÓA THEO DÕI -->
+    <div id="endTreatmentModal" class="fixed inset-0 z-[230] hidden flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="endTreatmentTitle">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-fadeIn m-auto text-slate-800">
+            <!-- Header -->
+            <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-rose-500/20 rounded-lg flex items-center justify-center border border-rose-400/30">
+                        <svg class="lucide lucide-flag text-rose-400 shrink-0" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                    </div>
+                    <div>
+                        <h3 id="endTreatmentTitle" class="font-bold text-sm uppercase tracking-wide">GHI NHẬN LÝ DO KẾT THÚC ĐIỀU TRỊ</h3>
+                        <p class="text-slate-400 text-[12px] mt-0.5">Lưu trữ lý do vào cơ sở dữ liệu phục vụ thống kê, báo cáo khoa</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.closeEndTreatmentModal()" title="Đóng" aria-label="Đóng cửa sổ" class="mac-close">
+                    <svg class="lucide lucide-x" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="p-5 space-y-4 text-xs overflow-y-auto max-h-[75vh]">
+                <!-- Info banner -->
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs">
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>Bệnh nhân:</span>
+                        <strong id="endPatientName" class="text-slate-900 font-bold">—</strong>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>Mã BN:</span>
+                        <span id="endPatientId" class="font-mono font-bold text-blue-700">—</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>Phác đồ:</span>
+                        <span id="endProtocol" class="font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">—</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>Tình trạng quá hạn:</span>
+                        <span id="endOverdueDays" class="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">—</span>
+                    </div>
+                </div>
+
+                <!-- 5 lý do kết thúc chuẩn -->
+                <div class="space-y-2">
+                    <label class="block font-bold text-slate-800 text-[13px]">Vui lòng chọn 1 lý do kết thúc điều trị / ngừng theo dõi:</label>
+                    <div class="space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-200" id="endReasonOptionsContainer">
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition cursor-pointer border border-transparent hover:border-slate-200">
+                            <input type="radio" name="endReasonRadio" value="Hoàn thành lộ trình điều trị" class="w-4 h-4 text-teal-700 focus:ring-teal-500">
+                            <div class="font-semibold text-slate-800">
+                                <span>1. Hoàn thành lộ trình điều trị</span>
+                                <p class="text-[11px] text-slate-500 font-normal">Đã hoàn tất đủ số chu kỳ theo phác đồ quy định</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition cursor-pointer border border-transparent hover:border-slate-200">
+                            <input type="radio" name="endReasonRadio" value="Bỏ điều trị (Kinh tế / Tâm lý)" class="w-4 h-4 text-teal-700 focus:ring-teal-500">
+                            <div class="font-semibold text-slate-800">
+                                <span>2. Bỏ điều trị (Kinh tế / Tâm lý)</span>
+                                <p class="text-[11px] text-slate-500 font-normal">Tự ý ngưng, khó khăn tài chính hoặc từ chối tiếp tục điều trị</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition cursor-pointer border border-transparent hover:border-slate-200">
+                            <input type="radio" name="endReasonRadio" value="Chuyển viện / Điều trị nơi khác" class="w-4 h-4 text-teal-700 focus:ring-teal-500">
+                            <div class="font-semibold text-slate-800">
+                                <span>3. Chuyển viện / Điều trị nơi khác</span>
+                                <p class="text-[11px] text-slate-500 font-normal">Chuyển cơ sở y tế tuyến trên/dưới hoặc về địa phương</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition cursor-pointer border border-transparent hover:border-slate-200">
+                            <input type="radio" name="endReasonRadio" value="Diễn tiến nặng / Chăm sóc giảm nhẹ" class="w-4 h-4 text-teal-700 focus:ring-teal-500">
+                            <div class="font-semibold text-slate-800">
+                                <span>4. Diễn tiến nặng / Chăm sóc giảm nhẹ</span>
+                                <p class="text-[11px] text-slate-500 font-normal">Bệnh tiến triển nhanh, thể trạng suy kiệt, chuyển BSCGN</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition cursor-pointer border border-transparent hover:border-slate-200">
+                            <input type="radio" name="endReasonRadio" value="Tử vong" class="w-4 h-4 text-teal-700 focus:ring-teal-500">
+                            <div class="font-semibold text-slate-800">
+                                <span>5. Tử vong</span>
+                                <p class="text-[11px] text-slate-500 font-normal">Bệnh nhân đã tử vong trong hoặc ngoài viện</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Ghi chú bổ sung -->
+                <div>
+                    <label for="endReasonNoteInput" class="block font-bold text-slate-700 mb-1">Ghi chú bổ sung (tùy chọn):</label>
+                    <textarea id="endReasonNoteInput" rows="2" placeholder="Ghi chú chi tiết thêm: cơ sở chuyển viện, tình trạng lâm sàng, lý do người nhà xin về..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none"></textarea>
+                </div>
+
+                <!-- Tuỳ chọn xóa theo dõi -->
+                <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-1">
+                    <label class="flex items-start gap-2.5 cursor-pointer">
+                        <input type="checkbox" id="endReasonClearFollowUpCheck" checked class="mt-0.5 rounded text-rose-600 focus:ring-rose-500 w-4 h-4">
+                        <span class="text-xs text-rose-950 font-semibold leading-relaxed">
+                            Đóng / xóa mục theo dõi tái khám khỏi danh sách đang hoạt động (Lý do kết thúc điều trị sẽ được lưu vĩnh viễn trong hồ sơ bệnh nhân).
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-end gap-2.5 bg-slate-50 shrink-0">
+                <button type="button" onclick="window.closeEndTreatmentModal()"
+                    class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition text-xs shadow-sm">
+                    Hủy
+                </button>
+                <button type="button" id="btnConfirmSaveEndTreatment" onclick="window.confirmSaveEndTreatment()"
+                    class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+                    <svg class="lucide lucide-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Xác nhận & Lưu lý do
                 </button>
             </div>
         </div>
@@ -2863,7 +3075,10 @@
                             Hôm nay
                         </button>
                         <button type="button" id="btnFuFilterOverdue" onclick="window.setFollowUpFilter('overdue')" class="px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-blue-800 transition">
-                            Quá hẹn (&lt;21 ngày)
+                            Quá hẹn
+                        </button>
+                        <button type="button" id="btnFuFilterDelayed" onclick="window.setFollowUpFilter('delayed')" class="px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-amber-800 transition flex items-center gap-1">
+                            <svg class="lucide lucide-pause-circle text-amber-500" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg> Hoãn thuốc
                         </button>
                         <button type="button" id="btnFuFilterEnded" onclick="window.setFollowUpFilter('ended')" class="px-2.5 py-1 rounded-md font-semibold text-slate-600 hover:text-rose-700 transition flex items-center gap-1">
                             <svg class="lucide lucide-flag text-rose-500" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Kết thúc điều trị
@@ -2874,15 +3089,15 @@
                     </div>
                 </div>
                 <div id="statsFollowUpTableViewport" class="flex-1 min-h-0 overflow-x-auto overflow-y-auto rounded-xl border border-slate-200 bg-white">
-                    <table class="w-full min-w-[850px] table-fixed text-left text-xs text-slate-700">
+                    <table class="w-full min-w-[880px] table-fixed text-left text-xs text-slate-700">
                         <colgroup>
-                            <col style="width: 10%;">
-                            <col style="width: 18%;">
-                            <col style="width: 14%;">
-                            <col style="width: 18%;">
-                            <col style="width: 18%;">
+                            <col style="width: 9%;">
+                            <col style="width: 17%;">
                             <col style="width: 12%;">
-                            <col style="width: 10%;">
+                            <col style="width: 22%;">
+                            <col style="width: 17%;">
+                            <col style="width: 11%;">
+                            <col style="width: 12%;">
                         </colgroup>
                         <thead class="bg-slate-100 text-slate-600 uppercase text-[12px] font-bold sticky top-0 z-10 shadow-sm">
                             <tr>
@@ -3095,52 +3310,67 @@
                 }
             }
 
-            // 2. Kiểm tra điều kiện "Kết thúc điều trị":
-            // Nếu bệnh nhân quá hạn hẹn tái khám từ 21 ngày trở lên (diffDays <= -21)
-            // mà vẫn KHÔNG cập nhật thông tin hoá trị chu kỳ mới
-            const isEndedTreatment = (diffDays <= -21) && !hasNewCycle;
+            // 1. TÍNH TOÁN NGƯỠNG ĐỘNG THEO PHÁC ĐỒ (DYNAMIC THRESHOLD)
+            // Lấy số ngày của chu kỳ hiện tại (cycleDays):
+            // Ưu tiên ngày chu kỳ được thiết lập trong followUpInfo.days,
+            // hoặc suy luận từ tên/dữ liệu phác đồ, mặc định 21 ngày.
+            let cycleDays = 21;
+            if (followUpInfo.days && Number(followUpInfo.days) > 0) {
+                cycleDays = Number(followUpInfo.days);
+            } else {
+                const protoStr = String(followUpInfo.protocol || patient.protocol || '').toLowerCase();
+                if (protoStr.includes('hàng tuần') || protoStr.includes('weekly') || protoStr.includes('q1w') || protoStr.includes('mỗi tuần') || protoStr.includes('7 ngày')) {
+                    cycleDays = 7;
+                } else if (protoStr.includes('14 ngày') || protoStr.includes('2 tuần') || protoStr.includes('q2w') || protoStr.includes('dosedense') || protoStr.includes('dose-dense') || protoStr.includes('liều dày')) {
+                    cycleDays = 14;
+                } else if (protoStr.includes('28 ngày') || protoStr.includes('4 tuần') || protoStr.includes('q4w')) {
+                    cycleDays = 28;
+                } else if (patient.protocolKey && window.chemoProtocolsData?.[patient.protocolKey]?.is14Days) {
+                    cycleDays = 14;
+                } else {
+                    cycleDays = 21;
+                }
+            }
+            // Ngưỡng kết thúc điều trị: (cycleDays * 1.5) hoặc tối thiểu 21 ngày
+            const endThresholdDays = Math.max(21, Math.round(cycleDays * 1.5));
+
+            // 2. TRẠNG THÁI TRUNG GIAN "ĐÃ KHÁM - HOÃN THUỐC" (EXAMINED / DELAYED)
+            // Bệnh nhân đã đến tái khám lâm sàng nhưng hoãn vào chu kỳ điều trị mới.
+            // Khi ở trạng thái này, hệ thống KHÔNG tính là Quá hẹn hay Kết thúc điều trị.
+            const isDelayed = Boolean(patient.treatmentDelayed?.isDelayed && !hasNewCycle);
+
+            // 3. ĐIỀU KIỆN "KẾT THÚC ĐIỀU TRỊ":
+            // - Bệnh nhân quá hạn vượt quá ngưỡng động (diffDays <= -endThresholdDays) và chưa có chu kỳ mới
+            // - Hoặc bệnh nhân đã được ghi nhận lý do kết thúc điều trị (endReason)
+            // - Tuyệt đối loại trừ nếu đang ở trạng thái Hoãn thuốc (isDelayed)
+            const hasExplicitEndReason = Boolean(patient.endReason && !hasNewCycle);
+            const isEndedTreatment = !isDelayed && (((diffDays <= -endThresholdDays) && !hasNewCycle) || hasExplicitEndReason);
+            const isOverdue = !isDelayed && !isEndedTreatment && !hasNewCycle && (diffDays < 0);
 
             return {
                 ...followUpInfo,
                 diffDays,
                 hasNewCycle,
                 newCycle,
-                isEndedTreatment
+                cycleDays,
+                endThresholdDays,
+                isDelayed,
+                delayedInfo: isDelayed ? (patient.treatmentDelayed || null) : null,
+                isEndedTreatment,
+                isOverdue,
+                endReason: patient.endReason || null,
+                endReasonNote: patient.endReasonNote || '',
+                endReasonDate: patient.endReasonDate || ''
             };
         };
 
         /**
-         * Xóa mục ghi nhận lịch hẹn trong danh sách Kết thúc điều trị
+         * Xử lý kết thúc theo dõi / xóa mục ghi nhận lịch hẹn trong danh sách tái khám
+         * Hiển thị popup yêu cầu chọn 1 trong 5 lý do chuẩn và lưu vào Firestore
          */
-        window.deleteEndedFollowUpRecord = async function(patientDocId) {
-            if (!window.canUseOncoCare) return;
-            const patient = (cachedPatientsList || []).find(p => p.id === patientDocId);
-            if (!patient) return;
-
-            const confirmed = await window.showCustomConfirm(`Bạn có chắc chắn muốn xóa mục ghi nhận lịch hẹn của bệnh nhân "${patient.name || patient.patientId}" khỏi danh sách Kết thúc điều trị không?`);
-            if (!confirmed) return;
-
-            try {
-                const cycles = (patient.cycles || []).map(c => {
-                    const copy = { ...c };
-                    delete copy.followUpDate;
-                    delete copy.followUpDays;
-                    delete copy.followUpRequired;
-                    return copy;
-                });
-                await updateDoc(doc(db, "patients", patientDocId), {
-                    cycles: cycles,
-                    latestFollowUp: null,
-                    updatedAt: serverTimestamp(),
-                    updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
-                });
-                patient.cycles = cycles;
-                patient.latestFollowUp = null;
-                window.showToast("Đã xóa mục ghi nhận khỏi danh sách Kết thúc điều trị!");
-                window.renderStatsFollowUpList();
-            } catch (err) {
-                console.error("Lỗi khi xóa ghi nhận tái khám:", err);
-                alert("Lỗi khi xóa ghi nhận: " + err.message);
+        window.deleteEndedFollowUpRecord = function(patientDocId) {
+            if (typeof window.openEndTreatmentModal === 'function') {
+                window.openEndTreatmentModal(patientDocId);
             }
         };
 
@@ -7630,13 +7860,308 @@
             }
         };
 
+        // ==========================================
+        // QUẢN LÝ HOÃN ĐIỀU TRỊ (ĐÃ KHÁM - HOÃN THUỐC) & KẾT THÚC ĐIỀU TRỊ (endReason)
+        // ==========================================
+        window._currentDelayedPatientId = null;
+        window._currentEndPatientId = null;
+
+        window.openDelayedTreatmentModal = function(patientId) {
+            if (!window.canUseOncoCare) return;
+            const patient = (cachedPatientsList || []).find(p => p.id === patientId);
+            if (!patient) return;
+            window._currentDelayedPatientId = patientId;
+
+            const nameEl = document.getElementById('delayPatientName');
+            const idEl = document.getElementById('delayPatientId');
+            const protoEl = document.getElementById('delayProtocol');
+            const fuDateEl = document.getElementById('delayFollowUpDate');
+            const examDateInput = document.getElementById('delayExamDateInput');
+            const reasonSelect = document.getElementById('delayReasonSelect');
+            const customInput = document.getElementById('delayReasonCustomInput');
+            const customContainer = document.getElementById('delayReasonCustomContainer');
+            const noteInput = document.getElementById('delayNoteInput');
+            const nextDaysInput = document.getElementById('delayNextDaysInput');
+            const btnRemove = document.getElementById('btnRemoveDelayedStatus');
+
+            if (nameEl) nameEl.textContent = patient.name || '—';
+            if (idEl) idEl.textContent = patient.patientId || '—';
+            if (protoEl) protoEl.textContent = patient.protocol || 'Chưa cập nhật';
+
+            const fu = window.getPatientLatestFollowUp(patient);
+            if (fuDateEl) fuDateEl.textContent = fu?.date ? formatDisplayDate(fu.date) : 'Không rõ';
+
+            const delayed = patient.treatmentDelayed || {};
+            const isCurrentlyDelayed = Boolean(delayed.isDelayed);
+
+            if (examDateInput) examDateInput.value = delayed.date || window.getSystemDateVN(0);
+
+            // Populate reason
+            const existingReason = delayed.reason || 'Bạch cầu / Bạch cầu hạt giảm (Neutropenia)';
+            let foundOption = false;
+            if (reasonSelect) {
+                for (let i = 0; i < reasonSelect.options.length; i++) {
+                    if (reasonSelect.options[i].value === existingReason) {
+                        reasonSelect.selectedIndex = i;
+                        foundOption = true;
+                        break;
+                    }
+                }
+                if (!foundOption) {
+                    reasonSelect.value = 'Khác';
+                    if (customContainer) customContainer.classList.remove('hidden');
+                    if (customInput) customInput.value = existingReason;
+                } else {
+                    if (customContainer) customContainer.classList.add('hidden');
+                    if (customInput) customInput.value = '';
+                }
+            }
+
+            if (noteInput) noteInput.value = delayed.note || '';
+            if (nextDaysInput) nextDaysInput.value = delayed.nextDays || 7;
+
+            if (btnRemove) {
+                if (isCurrentlyDelayed) {
+                    btnRemove.classList.remove('hidden');
+                } else {
+                    btnRemove.classList.add('hidden');
+                }
+            }
+
+            window.setPanelVisibility(document.getElementById('delayedTreatmentModal'), true);
+        };
+
+        window.closeDelayedTreatmentModal = function() {
+            window.setPanelVisibility(document.getElementById('delayedTreatmentModal'), false);
+            window._currentDelayedPatientId = null;
+        };
+
+        window.handleDelayReasonChange = function(val) {
+            const customContainer = document.getElementById('delayReasonCustomContainer');
+            if (!customContainer) return;
+            if (val === 'Khác') {
+                customContainer.classList.remove('hidden');
+                document.getElementById('delayReasonCustomInput')?.focus();
+            } else {
+                customContainer.classList.add('hidden');
+            }
+        };
+
+        window.saveDelayedTreatmentStatus = async function() {
+            if (!window.canUseOncoCare || !window._currentDelayedPatientId) return;
+            const patientId = window._currentDelayedPatientId;
+            const patient = (cachedPatientsList || []).find(p => p.id === patientId);
+            if (!patient) return;
+
+            const examDate = document.getElementById('delayExamDateInput')?.value || window.getSystemDateVN(0);
+            const reasonVal = document.getElementById('delayReasonSelect')?.value || 'Bạch cầu / Bạch cầu hạt giảm (Neutropenia)';
+            const finalReason = reasonVal === 'Khác' 
+                ? (document.getElementById('delayReasonCustomInput')?.value.trim() || 'Lý do khác')
+                : reasonVal;
+            const note = document.getElementById('delayNoteInput')?.value.trim() || '';
+            const nextDays = parseInt(document.getElementById('delayNextDaysInput')?.value, 10) || 7;
+
+            const delayedData = {
+                isDelayed: true,
+                date: examDate,
+                reason: finalReason,
+                note: note,
+                nextDays: nextDays,
+                updatedAt: new Date().toISOString(),
+                updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
+            };
+
+            const btnSave = document.getElementById('btnSaveDelayedTreatment');
+            const originalHtml = btnSave ? btnSave.innerHTML : '';
+            if (btnSave) {
+                btnSave.disabled = true;
+                btnSave.innerHTML = '<span class="inline-block animate-spin mr-1">⌛</span> Đang lưu...';
+            }
+
+            try {
+                await updateDoc(doc(db, "patients", patientId), {
+                    treatmentDelayed: delayedData,
+                    updatedAt: serverTimestamp(),
+                    updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
+                });
+                patient.treatmentDelayed = delayedData;
+
+                window.showToast(`⏸ Đã ghi nhận hoãn điều trị cho BN ${patient.name || patient.patientId}: ${finalReason}`);
+                window.closeDelayedTreatmentModal();
+                window.renderStatsFollowUpList();
+            } catch (err) {
+                console.error("Lỗi khi lưu trạng thái hoãn điều trị:", err);
+                alert("Lỗi khi lưu trạng thái hoãn điều trị: " + err.message);
+            } finally {
+                if (btnSave) {
+                    btnSave.disabled = false;
+                    btnSave.innerHTML = originalHtml;
+                }
+            }
+        };
+
+        window.removeDelayedTreatmentStatus = async function() {
+            if (!window.canUseOncoCare || !window._currentDelayedPatientId) return;
+            const patientId = window._currentDelayedPatientId;
+            const patient = (cachedPatientsList || []).find(p => p.id === patientId);
+            if (!patient) return;
+
+            const confirmed = await window.showCustomConfirm(`Hủy trạng thái hoãn thuốc và đưa bệnh nhân "${patient.name || patient.patientId}" trở lại lịch theo dõi bình thường?`);
+            if (!confirmed) return;
+
+            try {
+                await updateDoc(doc(db, "patients", patientId), {
+                    treatmentDelayed: null,
+                    updatedAt: serverTimestamp(),
+                    updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
+                });
+                patient.treatmentDelayed = null;
+
+                window.showToast(`▶ Đã hủy hoãn thuốc. Bệnh nhân trở lại danh sách theo dõi bình thường.`);
+                window.closeDelayedTreatmentModal();
+                window.renderStatsFollowUpList();
+            } catch (err) {
+                console.error("Lỗi khi hủy trạng thái hoãn thuốc:", err);
+                alert("Lỗi khi hủy trạng thái hoãn thuốc: " + err.message);
+            }
+        };
+
+        // --- GHI NHẬN LÝ DO KẾT THÚC ĐIỀU TRỊ (endReason) ---
+        window.openEndTreatmentModal = function(patientId) {
+            if (!window.canUseOncoCare) return;
+            const patient = (cachedPatientsList || []).find(p => p.id === patientId);
+            if (!patient) return;
+            window._currentEndPatientId = patientId;
+
+            const nameEl = document.getElementById('endPatientName');
+            const idEl = document.getElementById('endPatientId');
+            const protoEl = document.getElementById('endProtocol');
+            const overdueEl = document.getElementById('endOverdueDays');
+            const noteInput = document.getElementById('endReasonNoteInput');
+            const clearCheck = document.getElementById('endReasonClearFollowUpCheck');
+
+            if (nameEl) nameEl.textContent = patient.name || '—';
+            if (idEl) idEl.textContent = patient.patientId || '—';
+            if (protoEl) protoEl.textContent = patient.protocol || 'Chưa cập nhật';
+
+            const fu = window.getPatientLatestFollowUp(patient);
+            if (overdueEl) {
+                if (fu && fu.diffDays < 0) {
+                    overdueEl.textContent = `Quá hạn ${Math.abs(fu.diffDays)} ngày (Ngưỡng KTT: ${fu.endThresholdDays} ngày)`;
+                } else {
+                    overdueEl.textContent = `Không quá hạn`;
+                }
+            }
+
+            // Pre-select radio button
+            const existingReason = patient.endReason || 'Hoàn thành lộ trình điều trị';
+            const radios = document.getElementsByName('endReasonRadio');
+            let found = false;
+            for (const radio of radios) {
+                if (radio.value === existingReason) {
+                    radio.checked = true;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found && radios[0]) radios[0].checked = true;
+
+            if (noteInput) noteInput.value = patient.endReasonNote || '';
+            if (clearCheck) clearCheck.checked = true;
+
+            window.setPanelVisibility(document.getElementById('endTreatmentModal'), true);
+        };
+
+        window.closeEndTreatmentModal = function() {
+            window.setPanelVisibility(document.getElementById('endTreatmentModal'), false);
+            window._currentEndPatientId = null;
+        };
+
+        window.confirmSaveEndTreatment = async function() {
+            if (!window.canUseOncoCare || !window._currentEndPatientId) return;
+            const patientId = window._currentEndPatientId;
+            const patient = (cachedPatientsList || []).find(p => p.id === patientId);
+            if (!patient) return;
+
+            let selectedReason = '';
+            const radios = document.getElementsByName('endReasonRadio');
+            for (const radio of radios) {
+                if (radio.checked) {
+                    selectedReason = radio.value;
+                    break;
+                }
+            }
+
+            if (!selectedReason) {
+                alert("Vui lòng chọn 1 trong 5 lý do kết thúc điều trị.");
+                return;
+            }
+
+            const noteText = document.getElementById('endReasonNoteInput')?.value.trim() || '';
+            const shouldClear = Boolean(document.getElementById('endReasonClearFollowUpCheck')?.checked);
+
+            const btnConfirm = document.getElementById('btnConfirmSaveEndTreatment');
+            const originalHtml = btnConfirm ? btnConfirm.innerHTML : '';
+            if (btnConfirm) {
+                btnConfirm.disabled = true;
+                btnConfirm.innerHTML = '<span class="inline-block animate-spin mr-1">⌛</span> Đang lưu...';
+            }
+
+            try {
+                const todayVN = window.getSystemDateVN(0);
+                const updatePayload = {
+                    endReason: selectedReason,
+                    endReasonNote: noteText,
+                    endReasonDate: todayVN,
+                    endReasonRecordedAt: new Date().toISOString(),
+                    endReasonRecordedBy: currentUser ? currentUser.email : "xuantuutv@gmail.com",
+                    updatedAt: serverTimestamp(),
+                    updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
+                };
+
+                if (shouldClear) {
+                    const cycles = (patient.cycles || []).map(c => {
+                        const copy = { ...c };
+                        delete copy.followUpDate;
+                        delete copy.followUpDays;
+                        delete copy.followUpRequired;
+                        return copy;
+                    });
+                    updatePayload.cycles = cycles;
+                    updatePayload.latestFollowUp = null;
+                    patient.cycles = cycles;
+                    patient.latestFollowUp = null;
+                }
+
+                await updateDoc(doc(db, "patients", patientId), updatePayload);
+
+                patient.endReason = selectedReason;
+                patient.endReasonNote = noteText;
+                patient.endReasonDate = todayVN;
+                patient.endReasonRecordedAt = updatePayload.endReasonRecordedAt;
+                patient.endReasonRecordedBy = updatePayload.endReasonRecordedBy;
+
+                window.showToast(`🏁 Đã ghi nhận lý do kết thúc điều trị: "${selectedReason}"!`);
+                window.closeEndTreatmentModal();
+                window.renderStatsFollowUpList();
+            } catch (err) {
+                console.error("Lỗi khi ghi nhận lý do kết thúc điều trị:", err);
+                alert("Lỗi khi ghi nhận lý do kết thúc điều trị: " + err.message);
+            } finally {
+                if (btnConfirm) {
+                    btnConfirm.disabled = false;
+                    btnConfirm.innerHTML = originalHtml;
+                }
+            }
+        };
+
         window.statsFollowUpFilter = 'tomorrow';
         window.statsFollowUpPage = 1;
         window.statsFollowUpList = [];
 
         window.setFollowUpFilter = function(filterMode) {
             window.statsFollowUpFilter = filterMode;
-            ['tomorrow', 'today', 'overdue', 'ended', 'all'].forEach(mode => {
+            ['tomorrow', 'today', 'overdue', 'delayed', 'ended', 'all'].forEach(mode => {
                 const btn = document.getElementById(`btnFuFilter${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
                 if (!btn) return;
                 const isActive = mode === filterMode;
@@ -7669,8 +8194,8 @@
                 }
             });
 
-            // Update badge for tomorrow in the tab (chỉ đếm các hẹn đang hoạt động)
-            const tomorrowCount = allFollowUpPatients.filter(item => item.diffDays === 1 && !item.followUp.isEndedTreatment).length;
+            // Update badge for tomorrow in the tab (chỉ đếm các hẹn đang hoạt động, loại trừ hoãn hoặc kết thúc)
+            const tomorrowCount = allFollowUpPatients.filter(item => item.diffDays === 1 && !item.followUp.isEndedTreatment && !item.followUp.isDelayed).length;
             const badgeEl = document.getElementById('statsFollowUpBadge');
             if (badgeEl) {
                 if (tomorrowCount > 0) {
@@ -7683,11 +8208,13 @@
 
             let filtered = [];
             if (window.statsFollowUpFilter === 'tomorrow') {
-                filtered = allFollowUpPatients.filter(item => item.diffDays === 1 && !item.followUp.isEndedTreatment);
+                filtered = allFollowUpPatients.filter(item => item.diffDays === 1 && !item.followUp.isEndedTreatment && !item.followUp.isDelayed);
             } else if (window.statsFollowUpFilter === 'today') {
-                filtered = allFollowUpPatients.filter(item => item.diffDays === 0 && !item.followUp.isEndedTreatment);
+                filtered = allFollowUpPatients.filter(item => item.diffDays === 0 && !item.followUp.isEndedTreatment && !item.followUp.isDelayed);
             } else if (window.statsFollowUpFilter === 'overdue') {
-                filtered = allFollowUpPatients.filter(item => item.diffDays < 0 && !item.followUp.isEndedTreatment);
+                filtered = allFollowUpPatients.filter(item => item.diffDays < 0 && !item.followUp.isEndedTreatment && !item.followUp.isDelayed);
+            } else if (window.statsFollowUpFilter === 'delayed') {
+                filtered = allFollowUpPatients.filter(item => item.followUp.isDelayed);
             } else if (window.statsFollowUpFilter === 'ended') {
                 filtered = allFollowUpPatients.filter(item => item.followUp.isEndedTreatment);
             } else {
@@ -7714,9 +8241,11 @@
                     : window.statsFollowUpFilter === 'today'
                     ? 'Không có bệnh nhân nào đến hẹn tái khám trong ngày hôm nay.'
                     : window.statsFollowUpFilter === 'overdue'
-                    ? 'Không có bệnh nhân nào bị quá hẹn tái khám (< 21 ngày).'
+                    ? 'Không có bệnh nhân nào bị quá hẹn tái khám.'
+                    : window.statsFollowUpFilter === 'delayed'
+                    ? 'Chưa có bệnh nhân nào ở trạng thái hoãn điều trị.'
                     : window.statsFollowUpFilter === 'ended'
-                    ? 'Chưa có bệnh nhân nào trong danh sách kết thúc điều trị (quá hạn >= 21 ngày).'
+                    ? 'Chưa có bệnh nhân nào trong danh sách kết thúc điều trị.'
                     : 'Chưa có lịch hẹn tái khám nào được ghi nhận.';
                 tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">${emptyMsg}</td></tr>`;
                 if (pagination) pagination.innerHTML = '';
@@ -7729,8 +8258,12 @@
                 const treatmentSummary = window.getLatestTreatmentSummary(p);
 
                 let statusBadge = '';
-                if (fu.isEndedTreatment) {
-                    statusBadge = `<span class="px-2.5 py-1 bg-rose-50 text-rose-800 border border-rose-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><svg class="lucide lucide-flag text-rose-600 inline-block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Kết thúc ĐT (Quá ${Math.abs(diffDays)} ngày)</span>`;
+                if (fu.isDelayed) {
+                    const delayReasonStr = fu.delayedInfo?.reason ? ` (${escapeHtml(fu.delayedInfo.reason)})` : '';
+                    statusBadge = `<span class="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><svg class="lucide lucide-pause-circle text-amber-600 inline-block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg> Đã khám - Hoãn thuốc${delayReasonStr}</span>`;
+                } else if (fu.isEndedTreatment) {
+                    const reasonText = fu.endReason ? `: ${escapeHtml(fu.endReason)}` : ` (Quá ${Math.abs(diffDays)} ngày, ngưỡng ${fu.endThresholdDays}d)`;
+                    statusBadge = `<span class="px-2.5 py-1 bg-rose-50 text-rose-800 border border-rose-300 rounded-full font-bold text-[13px] inline-flex items-center gap-1"><svg class="lucide lucide-flag text-rose-600 inline-block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Kết thúc ĐT${reasonText}</span>`;
                 } else if (fu.hasNewCycle) {
                     const newCycleLabel = fu.newCycle?.branchName || (fu.newCycle?.cycleNum ? `Chu kỳ ${fu.newCycle.cycleNum}` : 'Mới');
                     const newCycleProtocol = fu.newCycle?.protocolUsed || fu.protocol || p.protocol || 'Chưa cập nhật';
@@ -7756,6 +8289,9 @@
                     displayCycle = `${newCycleName}${newCycleDate}`;
                 }
 
+                const isDelayedPatient = Boolean(fu.isDelayed);
+                const isEndedPatient = Boolean(fu.isEndedTreatment);
+
                 tr.innerHTML = `
                     <td class="p-2.5 font-bold text-blue-700 truncate" title="${escapeHtml(p.patientId || '')}">${escapeHtml(p.patientId || '-')}</td>
                     <td class="p-2.5 font-semibold text-slate-900 whitespace-normal break-words leading-tight" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name || '-')}</td>
@@ -7767,7 +8303,8 @@
                         <div class="flex items-center justify-center gap-1">
                             <button type="button" data-fu-action="view" title="Xem chi tiết" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition"><svg class="lucide lucide-eye" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
                             <button type="button" data-fu-action="edit" title="Sửa hồ sơ" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg transition"><svg class="lucide lucide-edit" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                            ${fu.isEndedTreatment ? `<button type="button" data-fu-action="delete" title="Xóa mục ghi nhận" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg transition"><svg class="lucide lucide-trash-2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : ''}
+                            <button type="button" data-fu-action="delay" title="${isDelayedPatient ? 'Đang hoãn thuốc: Xem / Hủy hoãn' : 'Đã khám - Hoãn thuốc'}" class="p-1.5 ${isDelayedPatient ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-50 hover:bg-amber-50 text-slate-700 hover:text-amber-800'} rounded-lg transition"><svg class="lucide lucide-pause-circle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg></button>
+                            <button type="button" data-fu-action="end" title="${isEndedPatient ? 'Lý do kết thúc / Xóa theo dõi' : 'Ghi nhận kết thúc điều trị'}" class="p-1.5 ${isEndedPatient ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200' : 'bg-slate-50 hover:bg-rose-50 text-slate-700 hover:text-rose-700'} rounded-lg transition"><svg class="lucide lucide-flag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></button>
                         </div>
                     </td>
                 `;
@@ -7777,8 +8314,11 @@
                     window.closeStatsModal();
                     window.openEditPatientModal(p.id);
                 });
-                tr.querySelector('[data-fu-action="delete"]')?.addEventListener('click', () => {
-                    window.deleteEndedFollowUpRecord(p.id);
+                tr.querySelector('[data-fu-action="delay"]')?.addEventListener('click', () => {
+                    window.openDelayedTreatmentModal(p.id);
+                });
+                tr.querySelector('[data-fu-action="end"]')?.addEventListener('click', () => {
+                    window.openEndTreatmentModal(p.id);
                 });
 
                 tbody.appendChild(tr);
