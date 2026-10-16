@@ -421,6 +421,33 @@
         }
         .item-suggestion:hover span,
         .item-suggestion.suggestion-active span { color: #ffffff !important; }
+        html[data-theme="dark"] #icdDropdownMain,
+        html[data-theme="dark"] #icdDropdownSub {
+            background-color: #0b1528 !important;
+            border-color: #273b5a !important;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+        }
+        html[data-theme="dark"] .item-suggestion {
+            border-bottom-color: #1e293b !important;
+        }
+        html[data-theme="dark"] .item-suggestion:hover,
+        html[data-theme="dark"] .item-suggestion.suggestion-active {
+            background-color: #1d4ed8 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="dark"] .item-suggestion span:first-child {
+            color: #38bdf8 !important;
+        }
+        html[data-theme="dark"] .item-suggestion span:last-child {
+            color: #cbd5e1 !important;
+        }
+        html[data-theme="dark"] .item-suggestion:hover span,
+        html[data-theme="dark"] .item-suggestion.suggestion-active span {
+            color: #ffffff !important;
+        }
+        html[data-theme="dark"] #subDiagTableBody tr:hover {
+            background-color: #132238 !important;
+        }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
@@ -1174,6 +1201,7 @@
 
         /* Mobile layout overrides: keep form handlers and desktop layout intact. */
         @media (max-width: 640px) {
+            html, body { overflow-x: hidden; }
             main, main > *, #patientForm > * { min-width: 0; }
             header > div { gap: .5rem; padding-inline: .75rem; }
             header > div > div:first-child { min-width: 0; gap: .4rem; }
@@ -1181,7 +1209,7 @@
             header h1 { font-size: 1.05rem; white-space: nowrap; }
             #authHeaderSection { flex-shrink: 0; }
             #googleSignInBtn { min-height: 44px; padding-inline: .65rem; }
-            main { padding-inline: .75rem; }
+            main { padding-inline: .75rem; max-width: 100vw; overflow-x: hidden; }
             #patientSearchForm { flex-wrap: wrap; border-radius: 1.5rem; padding: .5rem; gap: .25rem; }
             #searchInput { flex-basis: 100%; width: 100%; padding: .6rem; font-size: 16px; }
             #patientSearchForm > div { margin-left: auto; }
@@ -1189,7 +1217,7 @@
             #patientListSection { padding: .85rem; border-radius: 1.25rem; }
             #patientListSection > div:first-child { flex-wrap: wrap; gap: .65rem; }
             #patientListSection table { min-width: 800px; }
-            #patientListSection .overflow-x-auto { overscroll-behavior-x: contain; }
+            #patientListSection .overflow-x-auto { width: 100%; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
             #patientListSection th, #patientListSection td { padding: .65rem; }
             #patientListSection td button { min-width: 44px; min-height: 44px; }
 
@@ -1241,9 +1269,118 @@
             #toastMessage { min-width: 0; overflow-wrap: anywhere; }
             footer { padding-bottom: 4.5rem; }
             #loginSplash { overflow-y: auto; padding: 1.5rem; }
+
+            /* ICD Dropdown Autocomplete & Item Suggestions */
+            #icdDropdownMain, #icdDropdownSub {
+                max-height: min(50vh, 260px) !important;
+                border-radius: 1rem !important;
+                box-shadow: 0 14px 32px rgba(15, 23, 42, 0.22) !important;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+                z-index: 60 !important;
+            }
+            .item-suggestion {
+                min-height: 46px !important;
+                padding: 0.65rem 0.85rem !important;
+                justify-content: center;
+                gap: 0.15rem;
+            }
+            .item-suggestion span:first-child {
+                font-size: 13.5px !important;
+                line-height: 1.25;
+            }
+            .item-suggestion span:last-child {
+                font-size: 12.5px !important;
+                line-height: 1.35;
+                word-break: break-word;
+            }
+
+            /* Patient Input Tabs: responsive single-row / horizontal fit */
+            #patientInputTabs {
+                display: flex !important;
+                gap: 0.25rem !important;
+                padding: 0.25rem !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            #patientInputTabs [role="tab"] {
+                flex: 1 1 0 !important;
+                min-width: 0 !important;
+                padding: 0.55rem 0.3rem !important;
+                font-size: 0.78rem !important;
+                line-height: 1.25 !important;
+                white-space: normal !important;
+            }
+
+            /* Admin Info Section Inputs & Buttons */
+            #adminInputFields .grid:first-child {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
+            }
+            #npId {
+                max-width: 100% !important;
+            }
+            #adminInfoActionBtns button,
+            #diagnosisActionBtns button {
+                min-height: 38px !important;
+                min-width: 38px !important;
+                padding: 0.4rem 0.75rem !important;
+                font-size: 13px !important;
+            }
+            #patientInputPanelAdmin .flex.items-center.justify-between {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            /* Sub-Diagnosis Table (Bảng mã ICD phụ) */
+            #subDiagTableBody td {
+                padding: 0.65rem 0.5rem !important;
+                font-size: 13px !important;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+            }
+            #subDiagTableBody button {
+                min-width: 42px !important;
+                min-height: 42px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 0.5rem !important;
+            }
+
+            /* Patient Detail Modal Tabs (4 tabs into 2x2 responsive grid) */
+            #patientDetailModal .bg-slate-100.p-1\.5.rounded-xl.flex {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 0.35rem !important;
+                padding: 0.35rem !important;
+            }
+            #patientDetailModal .bg-slate-100.p-1\.5.rounded-xl.flex button {
+                margin: 0 !important;
+                min-height: 42px !important;
+                padding: 0.5rem 0.35rem !important;
+                font-size: 12px !important;
+                white-space: normal !important;
+                text-align: center !important;
+                line-height: 1.25 !important;
+            }
+
+            /* Bottom action buttons in Patient Input Panel */
+            #btnAddCycleBtn, #saveBtn {
+                min-height: 46px !important;
+                font-size: 14px !important;
+            }
+        }
+        @media (max-width: 480px) {
+            #adminInputFields .grid:first-child {
+                grid-template-columns: 1fr !important;
+            }
+            #statsFilters > div, #statsFilters > div:nth-child(3) {
+                width: 100% !important;
+            }
         }
         @media (max-width: 374px) {
             #patientInputPanel .grid-cols-3 { grid-template-columns: minmax(0, 1fr); }
+            #patientInputTabs [role="tab"] { font-size: 0.72rem !important; padding: 0.45rem 0.2rem !important; }
             #statsModalHeader { padding-inline: .65rem; }
         }
         </style>
@@ -3105,6 +3242,7 @@
             { code: "C22.1", desc: "Ung thư đường mật trong gan (Intrahepatic cholangiocarcinoma)" },
             { code: "C22.7", desc: "Các ung thư biểu mô nguyên phát khác của gan" },
             { code: "C22.9", desc: "U ác tính gan nguyên phát, không xác định" },
+            { code: "C50.0", desc: "Ác tính núm vú và quầng vú" },
             { code: "C50.1", desc: "U ác tính vùng trung tâm vú" },
             { code: "C50.2", desc: "U ác tính phần trên - trong vú" },
             { code: "C50.3", desc: "U ác tính phần dưới - trong vú" },
