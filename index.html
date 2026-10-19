@@ -4109,7 +4109,6 @@
         };
         window.prepareAssessmentSave = function() {
             if (!document.getElementById('editDocId').value) return;
-            window.hasPendingPatientChanges = true;
             document.getElementById('editCycleIndex').value = '';
             document.getElementById('btnAddCycleBtn').classList.add('hidden');
             document.getElementById('saveBtn').classList.remove('hidden');
@@ -4263,7 +4262,6 @@
         };
 
         window.closePatientFormModal = function() {
-            if (window.hasPendingPatientChanges && !window.confirm('Các đánh giá hoặc marker mới chỉ đang lưu tạm. Bạn có muốn đóng mà không lưu hồ sơ?')) return;
             window.hasPendingPatientChanges = false;
             window.setPanelVisibility(document.getElementById('patientFormModal'), false);
         };
@@ -5509,7 +5507,7 @@
             const toxicityList = document.getElementById('existingToxicityList');
             if (toxicityList) toxicityList.innerHTML = window.tempToxicityAssessments.length ? window.tempToxicityAssessments.map((item,index) => `<div class="rounded-lg border bg-white p-2"><div class="flex items-center justify-between gap-2"><strong>${escapeHtml(window.assessmentDateTime(item))}</strong><span class="flex gap-1"><button type="button" onclick="window.editToxicityAssessment(${index})" class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 py-1 font-semibold text-indigo-700 hover:bg-slate-200"><svg class="lucide lucide-edit text-amber-600 inline-block mr-0.5" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Sửa</button><button type="button" onclick="window.deleteToxicityAssessment(${index})" class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 px-2 py-1 font-semibold text-rose-700 hover:bg-slate-200"><svg class="lucide lucide-trash-2 text-rose-600 inline-block mr-0.5" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>Xóa</button></span></div>${item.items.map(x => `<p class="${x.grade >= 4 ? 'font-bold text-rose-700' : x.grade === 3 ? 'font-bold text-amber-700' : ''}">${x.grade >= 4 ? '❗ ' : x.grade === 3 ? '⚠ ' : ''}${escapeHtml(x.organ)} · Độ ${x.grade}</p>`).join('')}</div>`).join('') : '<p class="text-slate-400">Chưa ghi nhận.</p>';
         };
-        window.deleteResponseAssessment = async function(index) { if (window.tempResponseAssessments[index]?.recistVersion !== '1.1') { alert('Dữ liệu đánh giá cũ được giữ nguyên.'); return; } if (!await window.showCustomConfirm('Xóa lần đánh giá RECIST này? Các kết quả sau sẽ được tính lại.')) return; window.tempResponseAssessments.splice(index,1); window.recalculateRecistHistory(); window.prepareAssessmentSave(); window.refreshExtendedAssessment(); window.renderResponseInputs(); };
+        window.deleteResponseAssessment = async function(index) { if (window.tempResponseAssessments[index]?.recistVersion !== '1.1') { alert('Dữ liệu đánh giá cũ được giữ nguyên.'); return; } if (!await window.showCustomConfirm('Xóa lần đánh giá RECIST này? Các kết quả sau sẽ được tính lại.')) return; window.tempResponseAssessments.splice(index,1); window.recalculateRecistHistory(); window.prepareAssessmentSave(); await window.autoSyncChangesToDatabase(); window.refreshExtendedAssessment(); window.renderResponseInputs(); };
         window.editResponseAssessment = function(index) {
             const item = window.tempResponseAssessments[index]; if (!item) return;
             if (item.recistVersion !== '1.1') { alert('Đánh giá cũ không thể chuyển đổi chính xác sang RECIST 1.1. Hãy tạo đánh giá RECIST mới; dữ liệu cũ vẫn được giữ.'); return; }
@@ -5530,7 +5528,7 @@
             window.updateResponseConclusion();
             document.getElementById('responseHistoryPreview').classList.add('hidden');
         };
-        window.deleteToxicityAssessment = async function(index) { if (!await window.showCustomConfirm('Xóa lần ghi nhận độc tính này?')) return; window.tempToxicityAssessments.splice(index,1); window.prepareAssessmentSave(); window.refreshExtendedAssessment(); };
+        window.deleteToxicityAssessment = async function(index) { if (!await window.showCustomConfirm('Xóa lần ghi nhận độc tính này?')) return; window.tempToxicityAssessments.splice(index,1); window.prepareAssessmentSave(); await window.autoSyncChangesToDatabase(); window.refreshExtendedAssessment(); };
         window.editToxicityAssessment = function(index) {
             const item = window.tempToxicityAssessments[index]; if (!item) return;
             window.prepareAssessmentSave();
@@ -5547,7 +5545,7 @@
             window.updateToxicityAlert();
             const root = document.getElementById('extendedAssessmentModal'); root.classList.remove('hidden'); root.classList.add('flex'); window.switchExtendedTab('toxicity');
         };
-        window.recordResponseAssessment = function() {
+        window.recordResponseAssessment = async function() {
             const lesions = window.getResponseLesions();
             const date = document.getElementById('responseAssessmentDate').value;
             const editingIndex = Number.isInteger(window.editingResponseAssessmentIndex) ? window.editingResponseAssessmentIndex : null;
@@ -5578,7 +5576,6 @@
                 else window.tempResponseAssessments.push(assessment);
             }
             window.prepareAssessmentSave();
-            window.hasPendingPatientChanges = true;
             window.editingResponseAssessmentIndex = null;
             window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || (a.recordedAt || 0) - (b.recordedAt || 0));
             window.recalculateRecistHistory();
@@ -5587,7 +5584,8 @@
             document.getElementById('responseNewLesionStatus').value = 'no';
             document.getElementById('responseNewLesionOrgan').value = ''; document.getElementById('responseNewLesionDescription').value = ''; document.getElementById('responseNewLesionSize').value = '';
 
-            window.toggleNewLesionFields(); window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã cập nhật đánh giá. Bấm Lưu hồ sơ để lưu thay đổi.'); window.closeResponseEditor();
+            await window.autoSyncChangesToDatabase();
+            window.toggleNewLesionFields(); window.renderResponseInputs(); window.refreshExtendedAssessment(); window.updateResponseConclusion(); window.showToast('Đã đồng bộ đánh giá đáp ứng lên hệ thống.'); window.closeResponseEditor();
         };
 
         /* =============================================
@@ -5813,17 +5811,18 @@
             window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || ((a.recordedAt||0)-(b.recordedAt||0)));
             window.recalculateMrecistHistory();
             window.prepareAssessmentSave();
-            window.hasPendingPatientChanges = true;
             document.getElementById('mrecistRecordButton').textContent = 'Ghi nhận đánh giá mRECIST';
             document.getElementById('mrecistNonTargetStatus').value = 'not_assessed';
             document.getElementById('mrecistNewLesionStatus').value = 'no';
-            window.renderMrecistInputs(); window.refreshMrecistHistory(); window.showToast('Đã cập nhật đánh giá. Bấm Lưu hồ sơ để lưu thay đổi.'); window.refreshExtendedAssessment(); window.closeResponseEditor();
+            await window.autoSyncChangesToDatabase();
+            window.renderMrecistInputs(); window.refreshMrecistHistory(); window.showToast('Đã đồng bộ đánh giá mRECIST lên hệ thống.'); window.refreshExtendedAssessment(); window.closeResponseEditor();
         };
         window.deleteMrecistAssessment = async function(globalIdx) {
             if (!await window.showCustomConfirm('Xóa lần đánh giá mRECIST này? Kết quả sau sẽ được tính lại.')) return;
             window.tempResponseAssessments.splice(globalIdx, 1);
             window.recalculateMrecistHistory();
             window.prepareAssessmentSave();
+            await window.autoSyncChangesToDatabase();
             window.renderMrecistInputs(); window.refreshMrecistHistory(); window.refreshExtendedAssessment();
         };
         window.editMrecistAssessment = function(globalIdx) {
@@ -5841,7 +5840,7 @@
             document.getElementById('mrecistHistoryPreview').classList.add('hidden');
         };
         window.editingMrecistAssessmentIndex = null;
-        window.recordToxicityAssessment = function() {
+        window.recordToxicityAssessment = async function() {
             const items = [...document.querySelectorAll('[data-toxicity-index]')].filter(s=>s.value).map(s=>({organ:toxicityCriteria[Number(s.dataset.toxicityIndex)][0], grade:Number(s.value), description:toxicityCriteria[Number(s.dataset.toxicityIndex)][Number(s.value)-1]}));
             if (!items.length) { alert('Chọn ít nhất một độc tính để ghi nhận.'); return; }
             const date = document.getElementById('toxicityAssessmentDate').value || new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
@@ -5858,12 +5857,12 @@
                 } else window.tempToxicityAssessments.push(assessment);
             }
             window.prepareAssessmentSave();
-            window.hasPendingPatientChanges = true;
             window.editingToxicityAssessmentIndex = null;
             document.getElementById('toxicityRecordButton').textContent = 'Ghi nhận độc tính';
             document.querySelectorAll('[data-toxicity-index]').forEach(select => { select.value = ''; });
             document.getElementById('toxicityAssessmentDate').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
-            window.refreshExtendedAssessment(); window.updateToxicityAlert(); window.showToast('Đã ghi nhận độc tính tạm thời. Bấm Lưu hồ sơ để đồng bộ lên hệ thống.');
+            await window.autoSyncChangesToDatabase();
+            window.refreshExtendedAssessment(); window.updateToxicityAlert(); window.showToast('Đã đồng bộ ghi nhận độc tính lên hệ thống.');
         };
 
         window.searchPatientByCode = function(e) {
@@ -6493,7 +6492,7 @@
             window.renderTempCyclesList();
         };
 
-        window.addNewMarkerFromForm = function() {
+        window.addNewMarkerFromForm = async function() {
             const type = document.getElementById('npMarkerType').value;
             const val = document.getElementById('npMarkerValue').value;
             const date = document.getElementById('npMarkerDate').value;
@@ -6524,11 +6523,14 @@
                 description: logDesc,
                 performedBy: (typeof currentUser !== 'undefined' && currentUser?.email) || 'Bác sĩ'
             });
-            window.hasPendingPatientChanges = true;
-
             document.getElementById('npMarkerValue').value = "";
             window.renderTempMarkersList();
-            window.showToast(`Đã thêm ${type || 'marker chưa phân loại'} vào hồ sơ tạm. Bấm Lưu hồ sơ để đồng bộ.`);
+            if (document.getElementById('editDocId').value) {
+                await window.autoSyncChangesToDatabase();
+                window.showToast(`Đã đồng bộ ${type || 'marker chưa phân loại'} lên hệ thống.`);
+            } else {
+                window.showToast(`Đã thêm ${type || 'marker chưa phân loại'} vào hồ sơ mới.`);
+            }
             return true;
         };
 
@@ -7131,7 +7133,7 @@
             const saveButton = document.getElementById('saveBtn');
             saveButton.disabled = true;
             // Link giá trị marker đang nhập vào lịch sử trước khi tạo payload lưu.
-            if (!window.addNewMarkerFromForm()) {
+            if (!await window.addNewMarkerFromForm()) {
                 isSavingPatientForm = false;
                 saveButton.disabled = false;
                 return;
@@ -7353,9 +7355,13 @@
                 const cachedPatient = cachedPatientsList.find(patient => patient.id === docId) || {};
                 const effectiveProto = latestCycle?.protocolUsed || cachedPatient.protocol || '';
                 const latestFollowUp = window.getPatientLatestFollowUp({ cycles: window.tempCurrentCycles, protocol: effectiveProto });
+                const effectiveLogs = [...(cachedPatient.historyLogs || []), ...(window.tempHistoryLogs || [])];
                 const update = window.cleanPayload({
                     cycles: window.tempCurrentCycles,
                     markers: window.tempCurrentMarkers,
+                    responseAssessments: window.tempResponseAssessments || [],
+                    toxicityAssessments: window.tempToxicityAssessments || [],
+                    historyLogs: effectiveLogs,
                     protocol: effectiveProto,
                     protocolKey: latestCycle?.protocolKeyUsed || cachedPatient.protocolKey || '',
                     latestFollowUp: latestFollowUp || null,
@@ -7367,6 +7373,8 @@
                 const updatedPatient = { ...cachedPatient, ...update, id: docId };
                 if (cacheIndex >= 0) cachedPatientsList[cacheIndex] = updatedPatient;
                 else cachedPatientsList.push(updatedPatient);
+                window.tempHistoryLogs = [];
+                window.hasPendingPatientChanges = false;
                 window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
             } catch (err) {
                 console.error("Lỗi đồng bộ tự động:", err);
@@ -8669,7 +8677,7 @@
     <div id="responseEditorModal" role="dialog" aria-modal="true" aria-labelledby="responseEditorTitle" class="fixed inset-0 z-[180] hidden items-center justify-center bg-slate-900/60 p-3">
         <div class="w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 shadow-2xl">
             <div class="flex items-start justify-between gap-3 mb-3"><h3 id="responseEditorTitle" class="font-bold text-teal-900"></h3><button type="button" onclick="window.closeResponseEditor()" title="Đóng" aria-label="Hủy thay đổi và đóng" class="mac-close"><svg class="lucide lucide-x" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
-            <p class="mb-3 text-sm text-slate-600">Dữ liệu của lần đánh giá được chọn đã được điền sẵn. Sau khi cập nhật, bấm Lưu hồ sơ để lưu thay đổi.</p>
+            <p class="mb-3 text-sm text-slate-600">Dữ liệu của lần đánh giá được chọn đã được điền sẵn. Khi xác nhận cập nhật, dữ liệu sẽ tự động đồng bộ lên hệ thống.</p>
             <div id="responseEditorBody"></div>
         </div>
     </div>
