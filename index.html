@@ -6092,18 +6092,29 @@
 
                     group.items.forEach((c) => {
                         let cDiv = document.createElement('div');
-                        cDiv.className = "p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs ml-3 my-2 space-y-1";
-                        cDiv.innerHTML = `
-                            <div class="font-bold text-teal-800 text-xs flex justify-between items-center">
-                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} - Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}</span>
-                                ${c.week && !c.isPostponed ? `<span class="bg-amber-100 text-amber-900 text-[12px] font-bold px-2 py-0.5 rounded border border-amber-300">${escapeHtml(c.week)}</span>` : ''}
-                            </div>
-                            ${c.isPostponed ? `<span class="inline-flex rounded border border-rose-300 bg-rose-50 px-2 py-1 text-[12px] font-bold text-rose-800">Hoãn hóa trị (${escapeHtml(c.postponeReason || 'Chưa cập nhật lý do')}) · ${escapeHtml(c.postponeDays || 0)} ngày</span>` : ''}
-                            <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${escapeHtml(c.drugNames || 'N/A')} - <strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'N/A')}</p>
-                            <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${escapeHtml(c.note || 'Không có')}</p>
-                            ${c.isPostponed ? `<p class="rounded-md border border-rose-300 bg-rose-50 p-2 font-bold text-rose-800">Hoãn hóa trị (${escapeHtml(c.postponeReason || 'Chưa cập nhật lý do')}) · ${escapeHtml(c.postponeDays || 0)} ngày · Ngày hẹn truyền mới: ${escapeHtml(c.nextScheduleDate ? formatDisplayDate(c.nextScheduleDate) : 'Chưa xác định')}</p>` : ''}
-                            ${c.followUpDate ? `<p class="text-amber-800 font-semibold text-[13px] pt-1 border-t border-slate-200/60 flex items-center gap-1.5"><svg class="lucide lucide-calendar-check text-amber-600" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg><strong>Hẹn tái khám:</strong> ${escapeHtml(formatDisplayDate(c.followUpDate))} ${c.followUpDays ? `<span class="font-normal text-slate-500">(sau ${c.followUpDays} ngày)</span>` : ''}</p>` : ''}
-                        `;
+                        if (c.isPostponed) {
+                            cDiv.className = "p-3 rounded-lg border border-rose-300 bg-rose-50 text-xs ml-3 my-2 space-y-1.5";
+                            cDiv.innerHTML = `
+                                <div class="font-bold text-rose-900 flex items-center justify-between gap-2">
+                                    <span>🔴 Hoãn hóa trị · ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'Chưa cập nhật ngày')}</span>
+                                    ${c.branchName ? `<span class="text-rose-700 font-semibold">${escapeHtml(c.branchName)}</span>` : ''}
+                                </div>
+                                <p class="text-rose-900"><strong>Lý do hoãn:</strong> ${escapeHtml(c.postponeReason || 'Chưa cập nhật lý do')} · <strong>Số ngày hoãn:</strong> ${escapeHtml(c.postponeDays || 'Chưa cập nhật')} ngày</p>
+                                ${c.nextScheduleDate ? `<p class="text-rose-800"><strong>Hẹn truyền mới:</strong> ${escapeHtml(formatDisplayDate(c.nextScheduleDate))}</p>` : ''}
+                                ${c.note ? `<p class="text-rose-800"><strong>Ghi chú:</strong> ${escapeHtml(c.note)}</p>` : ''}
+                            `;
+                        } else {
+                            cDiv.className = "p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs ml-3 my-2 space-y-1";
+                            cDiv.innerHTML = `
+                                <div class="font-bold text-teal-800 text-xs flex justify-between items-center">
+                                    <span>${escapeHtml(c.branchName || 'Chu kỳ')} - Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}</span>
+                                    ${c.week ? `<span class="bg-amber-100 text-amber-900 text-[12px] font-bold px-2 py-0.5 rounded border border-amber-300">${escapeHtml(c.week)}</span>` : ''}
+                                </div>
+                                <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${escapeHtml(c.drugNames || 'N/A')} - <strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'N/A')}</p>
+                                <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${escapeHtml(c.note || 'Không có')}</p>
+                                ${c.followUpDate ? `<p class="text-amber-800 font-semibold text-[13px] pt-1 border-t border-slate-200/60 flex items-center gap-1.5"><svg class="lucide lucide-calendar-check text-amber-600" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg><strong>Hẹn tái khám:</strong> ${escapeHtml(formatDisplayDate(c.followUpDate))} ${c.followUpDays ? `<span class="font-normal text-slate-500">(sau ${c.followUpDays} ngày)</span>` : ''}</p>` : ''}
+                            `;
+                        }
                         cyclesContainer.appendChild(cDiv);
                     });
                 });
@@ -6381,8 +6392,9 @@
                 protocolUsed: proto,
                 protocolKeyUsed: document.getElementById('protocolSelectList').value,
                 isChangedProtocol: isChangedProtocol,
-                drugNames: isPostponed ? '' : drugNames,
-                doseInput: isPostponed ? '' : doseInput,
+                // cleanPayload sẽ loại bỏ undefined, tránh lưu thuốc/liều rỗng cho bản ghi hoãn.
+                drugNames: isPostponed ? undefined : drugNames,
+                doseInput: isPostponed ? undefined : doseInput,
                 note: note,
                 isPostponed,
                 postponeReason: isPostponed ? postponeReason : undefined,
@@ -7136,8 +7148,9 @@
                     protocolUsed,
                     protocolKeyUsed,
                     isChangedProtocol: oldCycle.isChangedProtocol || protocolUsed !== oldCycle.protocolUsed,
-                    drugNames: document.getElementById('ecm_drugNames').value.trim(),
-                    doseInput: document.getElementById('ecm_doseInput').value.trim(),
+                    // Bản ghi hoãn không mang thuốc/liều từ chu kỳ trước vào payload.
+                    drugNames: isPostponed ? undefined : document.getElementById('ecm_drugNames').value.trim(),
+                    doseInput: isPostponed ? undefined : document.getElementById('ecm_doseInput').value.trim(),
                     note: document.getElementById('ecm_note').value.trim(),
                     isPostponed,
                     postponeReason: isPostponed ? postponeReason : undefined,
@@ -7918,7 +7931,9 @@
             const latestCycle = cycles.length > 0 ? cycles[cycles.length - 1] : null;
             const protocol = (latestCycle && latestCycle.protocolUsed) || p.protocol || 'Chưa cập nhật';
             const cycle = latestCycle
-                ? `${latestCycle.branchName || ('Chu kỳ ' + (latestCycle.cycleNum || cycles.length))}`
+                ? (latestCycle.isPostponed
+                    ? '🔴 Hoãn hóa trị'
+                    : `${latestCycle.branchName || ('Chu kỳ ' + (latestCycle.cycleNum || cycles.length))}`)
                 : (cycles.length > 0 ? `${cycles.length} chu kỳ` : 'Chưa có chu kỳ');
             return { protocol, cycle };
         };
