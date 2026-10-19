@@ -6265,7 +6265,7 @@
             else if (!document.getElementById('responseDetailsModal').classList.contains('hidden')) { event.stopImmediatePropagation(); window.closeResponseDetails(); }
         }, true);
 
-        window.openEditPatientModal = async function(docId) {
+        window._openEditPatientModal = async function(docId) {
             if (!window.canUseOncoCare) return;
             let p = cachedPatientsList.find(item => item.id === docId);
             try {
@@ -6360,9 +6360,16 @@
             
             window.tempCurrentCycles = window.normalizeProtocolHistory(JSON.parse(JSON.stringify(p.cycles || [])));
             const cycleMeasurements = window.resolveCycleMeasurements(p, window.tempCurrentCycles);
-            document.getElementById('npCycleHeight').value = cycleMeasurements.height ?? '';
-            document.getElementById('npCycleWeight').value = cycleMeasurements.weight ?? '';
-            window.syncCycleMeasurements('form');
+            const cycleHeightInput = document.getElementById('npCycleHeight');
+            const cycleWeightInput = document.getElementById('npCycleWeight');
+            if (cycleHeightInput) cycleHeightInput.value = cycleMeasurements.height ?? '';
+            if (cycleWeightInput) cycleWeightInput.value = cycleMeasurements.weight ?? '';
+            // Số đo là dữ liệu bổ sung; không để dữ liệu cũ thiếu trường làm hỏng luồng mở form sửa.
+            try {
+                window.syncCycleMeasurements('form');
+            } catch (measurementError) {
+                console.warn('Không thể đồng bộ số đo chu kỳ khi mở form:', measurementError);
+            }
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
             window.tempIhc = p.ihc || null;
             window.tempHistoryLogs = [];
@@ -6416,6 +6423,14 @@
 
             window.setPanelVisibility(document.getElementById('patientFormModal'), true);
             window.renderTempMarkersList();
+        };
+        window.openEditPatientModal = async function(docId) {
+            try {
+                await window._openEditPatientModal(docId);
+            } catch (error) {
+                console.error('Lỗi mở form cập nhật hồ sơ:', error);
+                window.showToast('Không thể mở form cập nhật. Vui lòng thử lại.');
+            }
         };
 
         window.addNewCycleFromForm = async function() {
