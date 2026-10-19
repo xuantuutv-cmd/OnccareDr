@@ -6096,8 +6096,9 @@
                         cDiv.innerHTML = `
                             <div class="font-bold text-teal-800 text-xs flex justify-between items-center">
                                 <span>${escapeHtml(c.branchName || 'Chu kỳ')} - Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}</span>
-                                ${c.week ? `<span class="bg-amber-100 text-amber-900 text-[12px] font-bold px-2 py-0.5 rounded border border-amber-300">${escapeHtml(c.week)}</span>` : ''}
+                                ${c.week && !c.isPostponed ? `<span class="bg-amber-100 text-amber-900 text-[12px] font-bold px-2 py-0.5 rounded border border-amber-300">${escapeHtml(c.week)}</span>` : ''}
                             </div>
+                            ${c.isPostponed ? `<span class="inline-flex rounded border border-rose-300 bg-rose-50 px-2 py-1 text-[12px] font-bold text-rose-800">Hoãn hóa trị (${escapeHtml(c.postponeReason || 'Chưa cập nhật lý do')}) · ${escapeHtml(c.postponeDays || 0)} ngày</span>` : ''}
                             <p class="text-slate-700"><strong class="text-slate-900">Thuốc:</strong> ${escapeHtml(c.drugNames || 'N/A')} - <strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'N/A')}</p>
                             <p class="text-slate-500"><strong class="text-slate-700">Ghi chú / Tác dụng phụ:</strong> ${escapeHtml(c.note || 'Không có')}</p>
                             ${c.isPostponed ? `<p class="rounded-md border border-rose-300 bg-rose-50 p-2 font-bold text-rose-800">Hoãn hóa trị (${escapeHtml(c.postponeReason || 'Chưa cập nhật lý do')}) · ${escapeHtml(c.postponeDays || 0)} ngày · Ngày hẹn truyền mới: ${escapeHtml(c.nextScheduleDate ? formatDisplayDate(c.nextScheduleDate) : 'Chưa xác định')}</p>` : ''}
@@ -6670,8 +6671,8 @@
                                         <svg class="lucide lucide-chevron-down shrink-0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                                     </span>
                                 </button>
-                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
-                                ${c.isPostponed ? `<span class="ml-1 text-[12px] text-rose-800 bg-rose-50 border border-rose-300 px-1.5 py-0.5 rounded font-bold inline-flex items-center gap-1">Hoãn hóa trị (${escapeHtml(c.postponeReason || 'Chưa cập nhật lý do')}) · ${escapeHtml(c.postponeDays || 0)} ngày · Hẹn ${escapeHtml(c.nextScheduleDate ? formatDisplayDate(c.nextScheduleDate) : 'Chưa xác định')}</span>` : ''}
+                                <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày dự kiến: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}) ${c.week && !c.isPostponed ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
+                                ${c.isPostponed ? `<span class="ml-1 text-[12px] text-rose-800 bg-rose-50 border border-rose-300 px-1.5 py-0.5 rounded font-bold inline-flex items-center gap-1">Hoãn hóa trị (${escapeHtml(c.postponeReason || 'Chưa cập nhật lý do')}) · ${escapeHtml(c.postponeDays || 0)} ngày</span>` : ''}
                                 ${c.followUpDate ? `<span class="ml-1 text-[12px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold inline-flex items-center gap-1"><svg class="lucide lucide-calendar-check text-amber-700" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg> ${escapeHtml(formatDisplayDate(c.followUpDate))}</span>` : ''}
                             </div>
                             <div class="flex items-center space-x-1">
