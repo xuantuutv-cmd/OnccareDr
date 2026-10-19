@@ -6785,8 +6785,8 @@
                                 ${c.followUpDate ? `<span class="ml-1 text-[12px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold inline-flex items-center gap-1"><svg class="lucide lucide-calendar-check text-amber-700" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg> ${escapeHtml(formatDisplayDate(c.followUpDate))}</span>` : ''}
                             </div>
                             <div class="flex items-center space-x-1">
-                                <button type="button" onclick="window.editTempCycle(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[12px] border border-amber-200 inline-flex items-center gap-1"><svg class="lucide lucide-edit text-amber-700" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Sửa</button>
-                                <button type="button" onclick="window.deleteTempCycle(${idx})" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[12px] border border-rose-200 inline-flex items-center gap-1"><svg class="lucide lucide-trash-2 text-rose-700" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Xóa</button>
+                                <button type="button" data-cycle-action="edit" data-cycle-index="${idx}" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded font-semibold text-[12px] border border-amber-200 inline-flex items-center gap-1"><svg class="lucide lucide-edit text-amber-700" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Sửa</button>
+                                <button type="button" data-cycle-action="delete" data-cycle-index="${idx}" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-semibold text-[12px] border border-rose-200 inline-flex items-center gap-1"><svg class="lucide lucide-trash-2 text-rose-700" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Xóa</button>
                             </div>
                         </div>
                         
@@ -6800,6 +6800,16 @@
                             <div class="text-[12px] text-slate-400 pt-1">Cập nhật bởi: ${escapeHtml(c.updatedBy || 'Thạch Xuân Tựu')}</div>
                         </div>
                     `;
+                    const editButton = div.querySelector('[data-cycle-action="edit"]');
+                    editButton?.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        window.editTempCycle(Number(event.currentTarget.dataset.cycleIndex));
+                    });
+                    const deleteButton = div.querySelector('[data-cycle-action="delete"]');
+                    deleteButton?.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        window.deleteTempCycle(Number(event.currentTarget.dataset.cycleIndex));
+                    });
                     listDiv.appendChild(div);
                 });
             });
@@ -7023,10 +7033,21 @@
          * Mở modal popup chỉnh sửa chu kỳ hóa trị
          */
         window.editTempCycle = function(idx) {
-            const c = window.tempCurrentCycles[idx];
-            if (!c) return;
-            window._editingCycleModalIdx = idx;
-            window.openEditCycleModal(c, idx);
+            const cycleIndex = Number(idx);
+            const c = Array.isArray(window.tempCurrentCycles) ? window.tempCurrentCycles[cycleIndex] : null;
+            if (!Number.isInteger(cycleIndex) || cycleIndex < 0 || !c) {
+                console.warn('Không tìm thấy chu kỳ để chỉnh sửa:', idx);
+                window.showToast('Không tìm thấy chu kỳ cần chỉnh sửa.');
+                return;
+            }
+            try {
+                window._editingCycleModalIdx = cycleIndex;
+                window.openEditCycleModal(c, cycleIndex);
+            } catch (error) {
+                window._editingCycleModalIdx = -1;
+                console.error('Lỗi mở form chỉnh sửa chu kỳ:', error);
+                window.showToast('Không thể mở form chỉnh sửa chu kỳ. Vui lòng thử lại.');
+            }
         };
 
         window.openEditCycleModal = function(c, idx) {
@@ -7088,9 +7109,15 @@
             document.getElementById('ecm_cycleNum').value = c.cycleNum || (idx + 1);
             const patient = cachedPatientsList.find(item => item.id === document.getElementById('editDocId')?.value) || {};
             const measurements = window.resolveCycleMeasurements(patient, window.tempCurrentCycles, c);
-            document.getElementById('ecm_height').value = measurements.height ?? '';
-            document.getElementById('ecm_weight').value = measurements.weight ?? '';
-            window.syncCycleMeasurements('modal');
+            const modalHeightInput = document.getElementById('ecm_height');
+            const modalWeightInput = document.getElementById('ecm_weight');
+            if (modalHeightInput) modalHeightInput.value = measurements.height ?? '';
+            if (modalWeightInput) modalWeightInput.value = measurements.weight ?? '';
+            try {
+                window.syncCycleMeasurements('modal');
+            } catch (measurementError) {
+                console.warn('Không thể đồng bộ chỉ số cơ thể khi mở form chu kỳ:', measurementError);
+            }
             document.getElementById('ecm_drugNames').value = c.drugNames || '';
             document.getElementById('ecm_doseInput').value = c.doseInput || '';
             document.getElementById('ecm_note').value = c.note || '';
