@@ -110,7 +110,7 @@ export function extractFilteredToxicityEvents(patients, criteria = {}) {
             if (!Array.isArray(assessments) || assessments.length === 0) continue;
 
             for (const assessment of assessments) {
-                const date = assessment.date || '';
+                const date = assessment.date || assessment.assessmentDate || '';
 
                 if (startDate && date < startDate) continue;
                 if (endDate && date > endDate) continue;
@@ -127,6 +127,7 @@ export function extractFilteredToxicityEvents(patients, criteria = {}) {
                 if (!Array.isArray(items) || items.length === 0) continue;
 
                 let hasItem = false;
+                const patientDocId = patient.id || patient.patientDocId || '';
                 for (const item of items) {
                     const grade = Number(item.grade) || 0;
                     if (grade < 1) continue;
@@ -136,23 +137,23 @@ export function extractFilteredToxicityEvents(patients, criteria = {}) {
 
                     hasItem = true;
                     events.push({
-                        patientDocId: patient.id,
-                        patientCode: patient.patientId || (patient.id ? patient.id.slice(0, 6) : ''),
-                        patientName: patient.name || 'Không có tên',
+                        patientDocId,
+                        patientCode: patient.patientId || patient.patientCode || patient.code || patient.medicalRecordNumber || patientDocId || 'Chưa cập nhật',
+                        patientName: patient.name || patient.fullName || patient.patientName || 'Chưa cập nhật tên',
                         protocol,
-                        assessmentDate: date,
+                        assessmentDate: date || 'Chưa cập nhật',
                         recordedAt: assessment.recordedAt,
-                        organ: item.organ || 'Độc tính khác',
+                        organ: item.organ || item.toxicity || item.type || 'Độc tính chưa phân loại',
                         grade,
-                        description: item.description || '',
+                        description: item.description || item.clinicalDescription || item.note || 'Chưa ghi nhận mô tả lâm sàng',
                         isSevere: grade >= 3,
                         isCritical: grade >= 4
                     });
                 }
 
                 if (hasItem) {
-                    matchedAssessments.add(`${patient.id}_${date}_${assessment.recordedAt || ''}`);
-                    matchedPatients.add(patient.id);
+                    matchedAssessments.add(`${patientDocId || patient.patientId || 'unknown'}_${date}_${assessment.recordedAt || ''}`);
+                    matchedPatients.add(patientDocId || patient.patientId || 'unknown');
                 }
             }
         }

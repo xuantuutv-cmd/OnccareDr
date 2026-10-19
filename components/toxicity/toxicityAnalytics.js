@@ -30,6 +30,12 @@ const currentFilters = {
     gradeFilter: 'all'
 };
 
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[char]));
+}
+
 /**
  * Hàm khởi tạo và render Dashboard Độc tính vào một container DOM
  * @param {HTMLElement|string} container - Element hoặc selector của container
@@ -206,16 +212,16 @@ export function renderToxicityDashboard(container, patientsList = []) {
 
                     <!-- 4. DANH SÁCH CÁC CA ĐỘC TÍNH NẶNG GẦN ĐÂY -->
                     ${recentSevere.length > 0 ? `
-                        <div class="bg-white p-3.5 rounded-xl border border-rose-200/90 shadow-sm shrink-0">
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-rose-700 shadow-lg shadow-rose-950/20 shrink-0">
                             <div class="flex items-center justify-between mb-2">
-                                <h4 class="font-bold text-xs uppercase text-rose-800 flex items-center gap-1.5">
-                                    <svg class="lucide lucide-bell-ring text-rose-600 inline-block mr-1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/><path d="M22 8c0-2.3-.8-4.3-2-6"/></svg> Các Ca Độc Tính Nặng Gần Đây Cần Bác Sĩ Lưu Ý (Grade ≥ 3)
+                                <h4 class="font-bold text-xs uppercase text-white flex items-center gap-1.5">
+                                    <svg class="lucide lucide-bell-ring text-rose-400 inline-block mr-1" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/><path d="M22 8c0-2.3-.8-4.3-2-6"/></svg> Các Ca Độc Tính Nặng Gần Đây Cần Bác Sĩ Lưu Ý (Grade ≥ 3)
                                 </h4>
-                                <span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded border border-rose-200">${recentSevere.length} ca</span>
+                                <span class="text-[10px] bg-rose-600 text-white font-bold px-2 py-0.5 rounded border border-rose-400">${recentSevere.length} ca</span>
                             </div>
-                            <div class="overflow-x-auto rounded-lg border border-slate-200">
-                                <table class="w-full text-left text-xs text-slate-700">
-                                    <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-[11px]">
+                            <div class="overflow-x-auto rounded-lg border border-slate-700">
+                                <table class="w-full min-w-[850px] text-left text-xs text-slate-800 bg-white">
+                                    <thead class="bg-slate-800 text-white font-bold uppercase text-[11px]">
                                         <tr>
                                             <th class="p-2 text-center w-24">Ngày</th>
                                             <th class="p-2 w-48">Bệnh nhân</th>
@@ -227,22 +233,22 @@ export function renderToxicityDashboard(container, patientsList = []) {
                                     </thead>
                                     <tbody class="divide-y divide-slate-200">
                                         ${recentSevere.map(item => `
-                                            <tr class="hover:bg-slate-50 transition">
-                                                <td class="p-2 text-center font-mono font-medium">${item.assessmentDate}</td>
+                                            <tr class="${item.grade >= 4 ? 'bg-rose-50 hover:bg-rose-100 border-l-4 border-rose-700' : 'bg-amber-50 hover:bg-amber-100 border-l-4 border-amber-600'} transition">
+                                                <td class="p-2.5 text-center font-mono font-bold whitespace-nowrap">${escapeHtml(item.assessmentDate || 'Chưa cập nhật')}</td>
                                                 <td class="p-2">
-                                                    <span class="font-bold text-slate-900 block">${item.patientName}</span>
-                                                    <span class="text-[11px] text-teal-800 font-mono">${item.patientCode}</span>
+                                                    <span class="font-bold text-slate-950 block">${escapeHtml(item.patientName || 'Chưa cập nhật tên')}</span>
+                                                    <span class="text-[11px] text-teal-900 font-mono font-bold">${escapeHtml(item.patientCode || 'Chưa cập nhật mã BN')}</span>
                                                 </td>
-                                                <td class="p-2 font-semibold text-slate-700">${item.protocol}</td>
+                                                <td class="p-2 font-semibold text-slate-800">${escapeHtml(item.protocol || 'Chưa cập nhật')}</td>
                                                 <td class="p-2">
-                                                    <span class="font-bold text-slate-900 block">${item.organ}</span>
-                                                    <span class="inline-block px-1.5 py-0.2 rounded font-bold text-[10px] ${item.grade >= 4 ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">
+                                                    <span class="font-bold text-slate-950 block">${escapeHtml(item.organ || 'Độc tính chưa phân loại')}</span>
+                                                    <span class="inline-block px-1.5 py-0.5 rounded font-bold text-[10px] ${item.grade >= 4 ? 'bg-rose-700 text-white ring-2 ring-rose-300' : 'bg-amber-700 text-white'}">
                                                         Độ ${item.grade} ${item.grade >= 4 ? '(Nguy kịch)' : '(Nặng)'}
                                                     </span>
                                                 </td>
-                                                <td class="p-2 text-slate-600 truncate max-w-xs" title="${item.description}">${item.description || '—'}</td>
+                                                <td class="p-2 text-slate-700 max-w-xs break-words" title="${escapeHtml(item.description || '')}">${escapeHtml(item.description || 'Chưa ghi nhận mô tả lâm sàng')}</td>
                                                 <td class="p-2 text-center">
-                                                    <button type="button" onclick="window.viewPatientDetailById && window.viewPatientDetailById('${item.patientDocId}')" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold rounded text-[11px] border border-teal-200 transition">
+                                                    <button type="button" data-toxicity-view-patient data-patient-doc-id="${escapeHtml(item.patientDocId || '')}" ${item.patientDocId ? '' : 'disabled'} class="px-2.5 py-1 ${item.patientDocId ? 'bg-teal-700 hover:bg-teal-800 text-white border-teal-500' : 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'} font-bold rounded text-[11px] border transition">
                                                         Xem
                                                     </button>
                                                 </td>
@@ -320,6 +326,18 @@ export function renderToxicityDashboard(container, patientsList = []) {
                 renderToxicityDashboard(container, patientsList);
             });
         }
+
+        // Mở đúng hồ sơ nguồn của biến cố, không phụ thuộc vào inline onclick.
+        root.querySelectorAll('[data-toxicity-view-patient]').forEach(button => {
+            button.addEventListener('click', () => {
+                const patientDocId = button.dataset.patientDocId;
+                if (!patientDocId || typeof window.viewPatientDetail !== 'function') {
+                    console.warn('[ToxicityAnalytics] Không thể mở hồ sơ bệnh nhân cho biến cố độc tính.', { patientDocId });
+                    return;
+                }
+                window.viewPatientDetail(patientDocId);
+            });
+        });
 
         // --------------------------------------------------------------------
         // VẼ CÁC BIỂU ĐỒ VỚI CHART.JS (NẾU CÓ DỮ LIỆU VÀ CHART ĐƯỢC LOAD)

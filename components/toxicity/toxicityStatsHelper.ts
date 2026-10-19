@@ -212,7 +212,7 @@ export function extractFilteredToxicityEvents(
       if (!Array.isArray(assessments) || assessments.length === 0) continue;
 
       for (const assessment of assessments) {
-        const assessDate = assessment.date || '';
+        const assessDate = assessment.date || (assessment as any).assessmentDate || '';
 
         // 1. Lọc theo thời gian
         if (effectiveStartDate && assessDate < effectiveStartDate) continue;
@@ -232,6 +232,7 @@ export function extractFilteredToxicityEvents(
         if (!Array.isArray(items) || items.length === 0) continue;
 
         let hasMatchingItemInAssessment = false;
+        const patientDocId = patient.id || patient.patientDocId || '';
 
         for (const item of items) {
           const grade = Number(item.grade) || 0;
@@ -243,24 +244,24 @@ export function extractFilteredToxicityEvents(
 
           hasMatchingItemInAssessment = true;
           events.push({
-            patientDocId: patient.id,
-            patientCode: patient.patientId || patient.id.slice(0, 6),
-            patientName: patient.name || 'Không có tên',
+            patientDocId,
+            patientCode: patient.patientId || patient.patientCode || patient.code || patient.medicalRecordNumber || patientDocId || 'Chưa cập nhật',
+            patientName: patient.name || patient.fullName || patient.patientName || 'Chưa cập nhật tên',
             protocol,
-            assessmentDate: assessDate,
+            assessmentDate: assessDate || 'Chưa cập nhật',
             recordedAt: assessment.recordedAt,
-            organ: item.organ || 'Độc tính khác',
+            organ: item.organ || (item as any).toxicity || (item as any).type || 'Độc tính chưa phân loại',
             grade,
-            description: item.description || '',
+            description: item.description || (item as any).clinicalDescription || (item as any).note || 'Chưa ghi nhận mô tả lâm sàng',
             isSevere: grade >= 3,
             isCritical: grade >= 4
           });
         }
 
         if (hasMatchingItemInAssessment) {
-          const assessKey = `${patient.id}_${assessDate}_${assessment.recordedAt || ''}`;
+          const assessKey = `${patient.id || patient.patientId || 'unknown'}_${assessDate}_${assessment.recordedAt || ''}`;
           matchedAssessmentKeys.add(assessKey);
-          matchedPatientIds.add(patient.id);
+          matchedPatientIds.add(patient.id || patient.patientId || 'unknown');
         }
       }
     }
