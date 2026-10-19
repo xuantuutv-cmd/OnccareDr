@@ -3786,9 +3786,24 @@
                 String(a.date || '').localeCompare(String(b.date || '')) ||
                 (Number(a.cycleNum) || 0) - (Number(b.cycleNum) || 0)
             );
+            const referenceCycle = values.referenceCycle || null;
+            const referenceDate = String(values.referenceDate || referenceCycle?.date || '');
+            const referenceCycleNum = Number(values.referenceCycleNum ?? referenceCycle?.cycleNum);
+            const hasReference = Boolean(referenceCycle || referenceDate);
+            const priorCycles = hasReference
+                ? orderedCycles.filter(cycle => {
+                    if (referenceCycle && cycle === referenceCycle) return false;
+                    const cycleDate = String(cycle?.date || '');
+                    if (referenceDate && cycleDate !== referenceDate) return cycleDate < referenceDate;
+                    if (referenceDate && cycleDate === referenceDate && Number.isFinite(referenceCycleNum)) {
+                        return (Number(cycle?.cycleNum) || 0) < referenceCycleNum;
+                    }
+                    return !referenceDate;
+                })
+                : orderedCycles;
             const latestValue = field => {
-                for (let index = orderedCycles.length - 1; index >= 0; index--) {
-                    const value = validNumber(orderedCycles[index]?.[field]);
+                for (let index = priorCycles.length - 1; index >= 0; index--) {
+                    const value = validNumber(priorCycles[index]?.[field]);
                     if (value !== undefined) return value;
                 }
                 return validNumber(patient?.[field]);
@@ -3798,6 +3813,25 @@
                 weight: validNumber(values.weight) ?? latestValue('weight')
             };
         };
+        window.getActiveTreatmentDelayFromCycles = function(cycles, previousDelay = null) {
+            const orderedCycles = [...(cycles || [])].sort((a, b) =>
+                String(a.date || '').localeCompare(String(b.date || '')) ||
+                (Number(a.cycleNum) || 0) - (Number(b.cycleNum) || 0)
+            );
+            const latestCycle = orderedCycles[orderedCycles.length - 1];
+            if (!latestCycle?.isPostponed || latestCycle.delayResolved) return null;
+            const postponeDays = Number.parseInt(latestCycle.postponeDays, 10);
+            return window.cleanPayload({
+                isDelayed: true,
+                date: latestCycle.date || previousDelay?.date,
+                reason: latestCycle.postponeReason || previousDelay?.reason || 'Chưa cập nhật lý do',
+                note: latestCycle.note || previousDelay?.note || '',
+                nextDays: Number.isInteger(postponeDays) && postponeDays > 0 ? postponeDays : previousDelay?.nextDays,
+                nextScheduleDate: latestCycle.nextScheduleDate || previousDelay?.nextScheduleDate,
+                cycleNum: latestCycle.cycleNum,
+                source: 'cycle'
+            });
+        };
         window.syncCycleMeasurements = function(source) {
             const ids = source === 'modal'
                 ? { height: 'ecm_height', weight: 'ecm_weight', hint: 'ecm_measurementHint' }
@@ -3805,7 +3839,14 @@
             const height = document.getElementById(ids.height)?.value;
             const weight = document.getElementById(ids.weight)?.value;
             const patient = cachedPatientsList.find(item => item.id === document.getElementById('editDocId')?.value) || {};
-            const measurements = window.resolveCycleMeasurements(patient, window.tempCurrentCycles || [], { height, weight });
+            const activeCycle = source === 'modal'
+                ? window.tempCurrentCycles?.[window._editingCycleModalIdx]
+                : null;
+            const measurements = window.resolveCycleMeasurements(patient, window.tempCurrentCycles || [], {
+                height,
+                weight,
+                referenceCycle: activeCycle
+            });
             const heightInput = document.getElementById('npHeight');
             const weightInput = document.getElementById('npWeight');
             if (measurements.height !== undefined && heightInput) heightInput.value = measurements.height;
@@ -6477,7 +6518,11 @@
             const isChangedProtocol = mode === 'change';
             const nextScheduleDate = isPostponed ? window.calculatePostponeScheduleDate(cycleDate, postponeDays) : '';
 
-            const existingIndex = window.tempCurrentCycles.findIndex(c => c.date === cycleDate);
+            const existingIndex = window.tempCurrentCycles.findIndex(c =>
+                c.date === cycleDate
+                && Number(c.cycleNum) === cycleNum
+                && Boolean(c.isPostponed) === isPostponed
+            );
 
             const cycleData = {
                 branchName: `Chu kỳ ${cycleNum}`,
@@ -6518,6 +6563,11 @@
             }
 
             window.normalizeProtocolHistory(window.tempCurrentCycles);
+            targetIndex = window.tempCurrentCycles.findIndex(c =>
+                c.date === cycleDate
+                && Number(c.cycleNum) === cycleNum
+                && Boolean(c.isPostponed) === isPostponed
+            );
             window.renderTempCyclesList();
             if (document.getElementById('editDocId').value) await window.autoSyncChangesToDatabase();
             if (!modeContainer.classList.contains('hidden')) {
@@ -7108,7 +7158,11 @@
             document.getElementById('ecm_date').value = c.date || '';
             document.getElementById('ecm_cycleNum').value = c.cycleNum || (idx + 1);
             const patient = cachedPatientsList.find(item => item.id === document.getElementById('editDocId')?.value) || {};
-            const measurements = window.resolveCycleMeasurements(patient, window.tempCurrentCycles, c);
+            const measurements = window.resolveCycleMeasurements(patient, window.tempCurrentCycles, {
+                height: c.height,
+                weight: c.weight,
+                referenceCycle: c
+            });
             const modalHeightInput = document.getElementById('ecm_height');
             const modalWeightInput = document.getElementById('ecm_weight');
             if (modalHeightInput) modalHeightInput.value = measurements.height ?? '';
@@ -7243,7 +7297,10 @@
             const patient = cachedPatientsList.find(item => item.id === document.getElementById('editDocId')?.value) || {};
             const measurements = window.resolveCycleMeasurements(patient, window.tempCurrentCycles, {
                 height: document.getElementById('ecm_height')?.value,
-                weight: document.getElementById('ecm_weight')?.value
+                weight: document.getElementById('ecm_weight')?.value,
+                referenceCycle: window.tempCurrentCycles[idx],
+                referenceDate: cycleDate,
+                referenceCycleNum: cycleNum
             });
             if (measurements.height !== undefined) document.getElementById('npHeight').value = measurements.height;
             if (measurements.weight !== undefined) document.getElementById('npWeight').value = measurements.weight;
@@ -7274,6 +7331,7 @@
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<svg class="lucide lucide-loader-2 animate-spin inline-block mr-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Đang lưu...';
 
+            const cyclesBeforeSave = JSON.parse(JSON.stringify(window.tempCurrentCycles));
             try {
                 const oldCycle = window.tempCurrentCycles[idx];
                 window.tempCurrentCycles[idx] = window.cleanPayload({
@@ -7304,8 +7362,10 @@
                 window.showToast(`✅ Đã cập nhật chu kỳ ${cycleNum} thành công!`);
                 window.closeEditCycleModal();
             } catch (err) {
+                window.tempCurrentCycles.splice(0, window.tempCurrentCycles.length, ...cyclesBeforeSave);
+                window.renderTempCyclesList();
                 console.error('Lỗi lưu chu kỳ:', err);
-                alert('Lỗi khi lưu chu kỳ: ' + err.message);
+                alert('Lỗi khi lưu chu kỳ; dữ liệu trên giao diện đã được hoàn tác: ' + err.message);
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<svg class="lucide lucide-save inline-block mr-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Lưu chu kỳ';
@@ -7417,8 +7477,17 @@
             const tnmStage = document.getElementById('npTNMStage').textContent;
             const protocolVal = document.getElementById('npProtocol').value.trim();
             const protocolKeyVal = document.getElementById('protocolSelectList').value;
-            const heightVal = parseFloat(document.getElementById('npHeight').value) || 0;
-            const weightVal = parseFloat(document.getElementById('npWeight').value) || 0;
+            const patientForMeasurements = docId
+                ? (cachedPatientsList.find(patient => patient.id === docId) || {})
+                : {};
+            const submittedMeasurements = window.resolveCycleMeasurements(patientForMeasurements, window.tempCurrentCycles, {
+                height: document.getElementById('npHeight')?.value,
+                weight: document.getElementById('npWeight')?.value
+            });
+            const heightVal = submittedMeasurements.height;
+            const weightVal = submittedMeasurements.weight;
+            if (heightVal !== undefined) document.getElementById('npHeight').value = heightVal;
+            if (weightVal !== undefined) document.getElementById('npWeight').value = weightVal;
 
             if (!/^\d{8}$/.test(patientIdVal || '')) {
                 alert("Mã bệnh nhân phải gồm đúng 8 chữ số.");
@@ -7484,6 +7553,8 @@
                     drugNames: document.getElementById('npDrugNamesInput').value,
                     doseInput: document.getElementById('npDoseInput').value,
                     note: document.getElementById('npCycleNote').value,
+                    height: heightVal,
+                    weight: weightVal,
                     updatedBy: window.getCurrentEditorName()
                 };
 
@@ -7491,9 +7562,9 @@
                     cycle => cycle.date === cycleDate && Number(cycle.cycleNum) === cycleNum
                 );
                 if (existingCycleIndex >= 0) {
-                    window.tempCurrentCycles[existingCycleIndex] = cycleEntry;
+                    window.tempCurrentCycles[existingCycleIndex] = window.cleanPayload(cycleEntry);
                 } else {
-                    window.tempCurrentCycles.push(cycleEntry);
+                    window.tempCurrentCycles.push(window.cleanPayload(cycleEntry));
                 }
                 window.renderTempCyclesList();
             }
@@ -7532,6 +7603,7 @@
                 latestFollowUp: latestFollowUp || null,
                 responseAssessments: window.tempResponseAssessments || [],
                 toxicityAssessments: window.tempToxicityAssessments || [],
+                treatmentDelayed: window.getActiveTreatmentDelayFromCycles(window.tempCurrentCycles, existingPData.treatmentDelayed),
                 updatedAt: serverTimestamp(),
                 updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
             });
@@ -7608,6 +7680,7 @@
                     markers: window.tempCurrentMarkers,
                     responseAssessments: window.tempResponseAssessments || [],
                     toxicityAssessments: window.tempToxicityAssessments || [],
+                    treatmentDelayed: window.getActiveTreatmentDelayFromCycles(window.tempCurrentCycles, cachedPatient.treatmentDelayed),
                     historyLogs: effectiveLogs,
                     protocol: effectiveProto,
                     protocolKey: latestCycle?.protocolKeyUsed || cachedPatient.protocolKey || '',
@@ -8313,6 +8386,38 @@
                 updatedAt: new Date().toISOString(),
                 updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
             };
+            const delayedCycles = JSON.parse(JSON.stringify(patient.cycles || []));
+            const latestCycle = [...delayedCycles].sort((a, b) =>
+                String(a.date || '').localeCompare(String(b.date || '')) ||
+                (Number(a.cycleNum) || 0) - (Number(b.cycleNum) || 0)
+            ).at(-1);
+            const cycleNum = Number(latestCycle?.cycleNum) || 1;
+            const measurements = window.resolveCycleMeasurements(patient, delayedCycles);
+            const delayCycle = window.cleanPayload({
+                branchName: `Hoãn hóa trị · Chu kỳ ${cycleNum}`,
+                cycleNum,
+                date: examDate,
+                protocolUsed: latestCycle?.protocolUsed || patient.protocol || '',
+                protocolKeyUsed: latestCycle?.protocolKeyUsed || patient.protocolKey || '',
+                isChangedProtocol: false,
+                isPostponed: true,
+                postponeReason: finalReason,
+                postponeDays: nextDays,
+                nextScheduleDate: window.calculatePostponeScheduleDate(examDate, nextDays),
+                note,
+                height: measurements.height,
+                weight: measurements.weight,
+                delaySource: 'treatmentDelayed',
+                delayResolved: false,
+                updatedBy: window.getCurrentEditorName()
+            });
+            const matchingDelayIndex = delayedCycles.findIndex(cycle =>
+                cycle.delaySource === 'treatmentDelayed' && cycle.isPostponed && !cycle.delayResolved
+            );
+            if (matchingDelayIndex >= 0) delayedCycles[matchingDelayIndex] = delayCycle;
+            else delayedCycles.push(delayCycle);
+            window.normalizeProtocolHistory(delayedCycles);
+            const synchronizedDelay = window.getActiveTreatmentDelayFromCycles(delayedCycles, delayedData);
 
             const btnSave = document.getElementById('btnSaveDelayedTreatment');
             const originalHtml = btnSave ? btnSave.innerHTML : '';
@@ -8323,11 +8428,17 @@
 
             try {
                 await updateDoc(doc(db, "patients", patientId), {
-                    treatmentDelayed: delayedData,
+                    cycles: delayedCycles,
+                    treatmentDelayed: synchronizedDelay,
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
-                patient.treatmentDelayed = delayedData;
+                patient.cycles = delayedCycles;
+                patient.treatmentDelayed = synchronizedDelay;
+                if (document.getElementById('editDocId')?.value === patientId) {
+                    window.tempCurrentCycles = JSON.parse(JSON.stringify(delayedCycles));
+                    window.renderTempCyclesList();
+                }
 
                 window.showToast(`⏸ Đã ghi nhận hoãn điều trị cho BN ${patient.name || patient.patientId}: ${finalReason}`);
                 window.closeDelayedTreatmentModal();
@@ -8353,12 +8464,35 @@
             if (!confirmed) return;
 
             try {
+                const cycles = JSON.parse(JSON.stringify(patient.cycles || []));
+                const activePostponements = cycles
+                    .map((cycle, index) => ({ cycle, index }))
+                    .filter(({ cycle }) => cycle.isPostponed && !cycle.delayResolved)
+                    .sort((a, b) =>
+                        String(a.cycle.date || '').localeCompare(String(b.cycle.date || '')) ||
+                        (Number(a.cycle.cycleNum) || 0) - (Number(b.cycle.cycleNum) || 0)
+                    );
+                const activePostponement = activePostponements.at(-1);
+                if (activePostponement) {
+                    cycles[activePostponement.index] = {
+                        ...cycles[activePostponement.index],
+                        delayResolved: true,
+                        delayResolvedAt: new Date().toISOString(),
+                        delayResolvedBy: window.getCurrentEditorName()
+                    };
+                }
                 await updateDoc(doc(db, "patients", patientId), {
+                    cycles,
                     treatmentDelayed: null,
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
+                patient.cycles = cycles;
                 patient.treatmentDelayed = null;
+                if (document.getElementById('editDocId')?.value === patientId) {
+                    window.tempCurrentCycles = JSON.parse(JSON.stringify(cycles));
+                    window.renderTempCyclesList();
+                }
 
                 window.showToast(`▶ Đã hủy hoãn thuốc. Bệnh nhân trở lại danh sách theo dõi bình thường.`);
                 window.closeDelayedTreatmentModal();
