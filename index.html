@@ -1643,6 +1643,24 @@
                             class="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-center">
                     </div>
                 </div>
+                <div class="rounded-xl border border-amber-200 bg-amber-50/60 p-3 space-y-2">
+                    <label class="flex items-center gap-2 font-bold text-amber-900 cursor-pointer">
+                        <input id="ecm_isPostponed" type="checkbox" onchange="window.ecmTogglePostponeFields()" class="rounded border-amber-400 text-amber-700 focus:ring-amber-500">
+                        Hoãn hóa trị
+                    </label>
+                    <div id="ecm_postponeFields" class="hidden grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <select id="ecm_postponeReason" onchange="window.ecmTogglePostponeReasonCustom()" class="w-full p-2 bg-white border border-amber-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                            <option value="">-- Chọn lý do hoãn --</option>
+                            <option value="Giảm bạch cầu hạt / Neutropenia">Giảm bạch cầu hạt / Neutropenia</option>
+                            <option value="Độc tính thần kinh">Độc tính thần kinh</option>
+                            <option value="Bệnh nhân có việc cá nhân">Bệnh nhân có việc cá nhân</option>
+                            <option value="Khác">Lý do khác</option>
+                        </select>
+                        <input id="ecm_postponeReasonCustom" type="text" maxlength="200" placeholder="Nhập lý do khác" class="hidden w-full p-2 bg-white border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input id="ecm_postponeDays" type="number" min="1" max="365" placeholder="Số ngày hoãn dự kiến" class="w-full p-2 bg-white border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input id="ecm_nextScheduleDate" type="text" data-date-format="dmy" inputmode="numeric" placeholder="Ngày hẹn truyền mới (dd/mm/yyyy)" class="w-full p-2 bg-white border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    </div>
+                </div>
                 <!-- Thuốc -->
                 <div class="space-y-1.5">
                     <label class="block font-bold text-slate-700 uppercase text-[12px] tracking-wider">Thuốc hóa trị</label>
@@ -3685,6 +3703,19 @@
             const preset = document.getElementById('npProtocolWeek').value;
             return preset === '__CUSTOM__' ? document.getElementById('npProtocolWeekCustom').value.trim() : preset;
         }
+        window.cleanPayload = function cleanPayload(value) {
+            if (value === undefined) return undefined;
+            if (Array.isArray(value)) {
+                return value.map(cleanPayload).filter(item => item !== undefined);
+            }
+            if (!value || Object.getPrototypeOf(value) !== Object.prototype) return value;
+
+            return Object.entries(value).reduce((cleaned, [key, item]) => {
+                const sanitized = cleanPayload(item);
+                if (sanitized !== undefined) cleaned[key] = sanitized;
+                return cleaned;
+            }, {});
+        };
         window.normalizeProtocolHistory = function(cycles) {
             const ordered = [...(cycles || [])].sort((a, b) =>
                 String(a.date || '').localeCompare(String(b.date || '')) ||
@@ -4078,6 +4109,7 @@
         };
         window.prepareAssessmentSave = function() {
             if (!document.getElementById('editDocId').value) return;
+            window.hasPendingPatientChanges = true;
             document.getElementById('editCycleIndex').value = '';
             document.getElementById('btnAddCycleBtn').classList.add('hidden');
             document.getElementById('saveBtn').classList.remove('hidden');
@@ -4130,6 +4162,7 @@
                 return;
             }
             document.getElementById('editDocId').value = "";
+            window.hasPendingPatientChanges = false;
             window.resetFormToAddNewMode();
             window.switchPatientInputTab('admin');
             document.getElementById('npMarkerValue').onkeydown = (event) => {
@@ -4230,6 +4263,8 @@
         };
 
         window.closePatientFormModal = function() {
+            if (window.hasPendingPatientChanges && !window.confirm('Các đánh giá hoặc marker mới chỉ đang lưu tạm. Bạn có muốn đóng mà không lưu hồ sơ?')) return;
+            window.hasPendingPatientChanges = false;
             window.setPanelVisibility(document.getElementById('patientFormModal'), false);
         };
 
@@ -4921,6 +4956,7 @@
         let statsPageSize = Math.max(1, Math.floor((window.innerHeight - 430) / 48));
         window.tempCurrentCycles = []; 
         window.tempCurrentMarkers = [];
+        window.hasPendingPatientChanges = false;
         window.activeMarkerChart = null;
         window.statsPieChartInstance = null;
         window.currentViewingPatient = null;
@@ -5542,6 +5578,7 @@
                 else window.tempResponseAssessments.push(assessment);
             }
             window.prepareAssessmentSave();
+            window.hasPendingPatientChanges = true;
             window.editingResponseAssessmentIndex = null;
             window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || (a.recordedAt || 0) - (b.recordedAt || 0));
             window.recalculateRecistHistory();
@@ -5776,6 +5813,7 @@
             window.tempResponseAssessments.sort((a,b) => String(a.date).localeCompare(String(b.date)) || ((a.recordedAt||0)-(b.recordedAt||0)));
             window.recalculateMrecistHistory();
             window.prepareAssessmentSave();
+            window.hasPendingPatientChanges = true;
             document.getElementById('mrecistRecordButton').textContent = 'Ghi nhận đánh giá mRECIST';
             document.getElementById('mrecistNonTargetStatus').value = 'not_assessed';
             document.getElementById('mrecistNewLesionStatus').value = 'no';
@@ -5820,11 +5858,12 @@
                 } else window.tempToxicityAssessments.push(assessment);
             }
             window.prepareAssessmentSave();
+            window.hasPendingPatientChanges = true;
             window.editingToxicityAssessmentIndex = null;
             document.getElementById('toxicityRecordButton').textContent = 'Ghi nhận độc tính';
             document.querySelectorAll('[data-toxicity-index]').forEach(select => { select.value = ''; });
             document.getElementById('toxicityAssessmentDate').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,10);
-            window.refreshExtendedAssessment(); window.updateToxicityAlert(); window.showToast('Đã lưu đánh giá độc tính.');
+            window.refreshExtendedAssessment(); window.updateToxicityAlert(); window.showToast('Đã ghi nhận độc tính tạm thời. Bấm Lưu hồ sơ để đồng bộ lên hệ thống.');
         };
 
         window.searchPatientByCode = function(e) {
@@ -6171,7 +6210,8 @@
             window.tempCurrentCycles = window.normalizeProtocolHistory(JSON.parse(JSON.stringify(p.cycles || [])));
             window.tempCurrentMarkers = JSON.parse(JSON.stringify(p.markers || []));
             window.tempIhc = p.ihc || null;
-            window.tempHistoryLogs = p.historyLogs || [];
+            window.tempHistoryLogs = [];
+            window.hasPendingPatientChanges = false;
             if (document.getElementById('npIhcSubtype')) document.getElementById('npIhcSubtype').value = p.ihc?.subtype || '';
             if (document.getElementById('npIhcNotes')) document.getElementById('npIhcNotes').value = p.ihc?.notes || '';
             window._editingMarkerIdx = null;
@@ -6267,10 +6307,10 @@
             let targetIndex = 0;
             if (existingIndex !== -1) {
                 if (window.tempCurrentCycles[existingIndex].followUpDate) {
-                    cycleData.followUpRequired = window.tempCurrentCycles[existingIndex].followUpRequired;
-                    cycleData.followUpDays = window.tempCurrentCycles[existingIndex].followUpDays;
-                    cycleData.followUpDate = window.tempCurrentCycles[existingIndex].followUpDate;
-                    cycleData.followUpCreatedAt = window.tempCurrentCycles[existingIndex].followUpCreatedAt;
+                    const existingCycle = window.tempCurrentCycles[existingIndex];
+                    ['followUpRequired', 'followUpDays', 'followUpDate', 'followUpCreatedAt'].forEach(key => {
+                        if (existingCycle[key] !== undefined) cycleData[key] = existingCycle[key];
+                    });
                 }
                 window.tempCurrentCycles[existingIndex] = cycleData;
                 targetIndex = existingIndex;
@@ -6475,25 +6515,20 @@
                 });
             }
 
-            const docId = document.getElementById('editDocId')?.value || window.currentViewingPatient?.id;
             const logDesc = `Thêm chỉ số ${type || 'Chưa phân loại'}: ${Number(val).toFixed(2)}${date ? ` (Ngày xét nghiệm: ${formatDisplayDate(date)})` : ''}`;
-
-            if (docId && typeof window.recordPatientHistoryLog === 'function') {
-                window.recordPatientHistoryLog(docId, 'MARKER_ADD', logDesc);
-            } else {
-                if (!window.tempHistoryLogs) window.tempHistoryLogs = [];
-                window.tempHistoryLogs.push({
-                    id: 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
-                    timestamp: new Date().toISOString(),
-                    type: 'MARKER_ADD',
-                    description: logDesc,
-                    performedBy: (typeof currentUser !== 'undefined' && currentUser?.email) || 'Bác sĩ'
-                });
-            }
+            if (!window.tempHistoryLogs) window.tempHistoryLogs = [];
+            window.tempHistoryLogs.push({
+                id: 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+                timestamp: new Date().toISOString(),
+                type: 'MARKER_ADD',
+                description: logDesc,
+                performedBy: (typeof currentUser !== 'undefined' && currentUser?.email) || 'Bác sĩ'
+            });
+            window.hasPendingPatientChanges = true;
 
             document.getElementById('npMarkerValue').value = "";
             window.renderTempMarkersList();
-            window.showToast(`Đã lưu ${type || 'marker chưa phân loại'}: ${val}`);
+            window.showToast(`Đã thêm ${type || 'marker chưa phân loại'} vào hồ sơ tạm. Bấm Lưu hồ sơ để đồng bộ.`);
             return true;
         };
 
@@ -6547,6 +6582,7 @@
                                     </span>
                                 </button>
                                 <span>${escapeHtml(c.branchName || 'Chu kỳ')} (Ngày: ${escapeHtml(c.date ? formatDisplayDate(c.date) : 'N/A')}) ${c.week ? `<span class="text-amber-800 font-bold ml-1">[${escapeHtml(c.week)}]</span>` : ''}</span>
+                                ${c.isPostponed ? `<span class="ml-1 text-[12px] text-rose-800 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded font-bold inline-flex items-center gap-1">Hoãn hóa trị${c.nextScheduleDate ? ` · hẹn ${escapeHtml(formatDisplayDate(c.nextScheduleDate))}` : c.postponeDays ? ` · ${escapeHtml(c.postponeDays)} ngày` : ''}</span>` : ''}
                                 ${c.followUpDate ? `<span class="ml-1 text-[12px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold inline-flex items-center gap-1"><svg class="lucide lucide-calendar-check text-amber-700" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg> ${escapeHtml(formatDisplayDate(c.followUpDate))}</span>` : ''}
                             </div>
                             <div class="flex items-center space-x-1">
@@ -6560,6 +6596,7 @@
                             <div><strong class="text-slate-900">Thuốc hóa trị:</strong> ${escapeHtml(c.drugNames || 'Chưa cập nhật')}</div>
                             <div><strong class="text-slate-900">Liều dùng:</strong> ${escapeHtml(c.doseInput || 'Chưa cập nhật')}</div>
                             <div><strong class="text-slate-900">Tác dụng phụ / Ghi chú:</strong> ${escapeHtml(c.note || 'Không ghi nhận')}</div>
+                            ${c.isPostponed ? `<div class="rounded-md border border-rose-200 bg-rose-50 p-2 text-rose-900"><strong>Hoãn hóa trị:</strong> ${escapeHtml(c.postponeReason || 'Chưa cập nhật lý do')}${c.postponeDays ? ` · ${escapeHtml(c.postponeDays)} ngày` : ''}${c.nextScheduleDate ? ` · Hẹn truyền mới: <strong>${escapeHtml(formatDisplayDate(c.nextScheduleDate))}</strong>` : ''}</div>` : ''}
                             ${c.followUpDate ? `<div><strong class="text-slate-900">Hẹn tái khám:</strong> <span class="text-amber-800 font-bold">${escapeHtml(formatDisplayDate(c.followUpDate))}</span> ${c.followUpDays ? `<span class="text-slate-500">(sau ${c.followUpDays} ngày)</span>` : ''}</div>` : ''}
                             <div class="text-[12px] text-slate-400 pt-1">Cập nhật bởi: ${escapeHtml(c.updatedBy || 'Thạch Xuân Tựu')}</div>
                         </div>
@@ -6853,6 +6890,12 @@
             document.getElementById('ecm_drugNames').value = c.drugNames || '';
             document.getElementById('ecm_doseInput').value = c.doseInput || '';
             document.getElementById('ecm_note').value = c.note || '';
+            document.getElementById('ecm_isPostponed').checked = c.isPostponed === true;
+            document.getElementById('ecm_postponeReason').value = ['Giảm bạch cầu hạt / Neutropenia', 'Độc tính thần kinh', 'Bệnh nhân có việc cá nhân'].includes(c.postponeReason) ? c.postponeReason : (c.isPostponed ? 'Khác' : '');
+            document.getElementById('ecm_postponeReasonCustom').value = document.getElementById('ecm_postponeReason').value === 'Khác' ? (c.postponeReason || '') : '';
+            document.getElementById('ecm_postponeDays').value = c.postponeDays || '';
+            document.getElementById('ecm_nextScheduleDate').value = c.nextScheduleDate || '';
+            window.ecmTogglePostponeFields();
 
             // Hiện modal
             const modal = document.getElementById('editCycleModal');
@@ -6908,6 +6951,20 @@
             }
         };
 
+        window.ecmTogglePostponeReasonCustom = function() {
+            const reason = document.getElementById('ecm_postponeReason');
+            const custom = document.getElementById('ecm_postponeReasonCustom');
+            const isCustom = reason.value === 'Khác';
+            custom.classList.toggle('hidden', !isCustom);
+            if (isCustom) custom.focus();
+        };
+
+        window.ecmTogglePostponeFields = function() {
+            const isPostponed = document.getElementById('ecm_isPostponed').checked;
+            document.getElementById('ecm_postponeFields').classList.toggle('hidden', !isPostponed);
+            if (isPostponed) window.ecmTogglePostponeReasonCustom();
+        };
+
         /**
          * Lưu chu kỳ từ modal về tempCurrentCycles và sync DB
          */
@@ -6938,6 +6995,14 @@
 
             const cycleDate = document.getElementById('ecm_date').value;
             const cycleNum = parseInt(document.getElementById('ecm_cycleNum').value) || (idx + 1);
+            const isPostponed = document.getElementById('ecm_isPostponed').checked;
+            const selectedPostponeReason = document.getElementById('ecm_postponeReason').value;
+            const postponeReason = (selectedPostponeReason === 'Khác'
+                ? document.getElementById('ecm_postponeReasonCustom').value.trim()
+                : selectedPostponeReason).trim();
+            const postponeDaysValue = document.getElementById('ecm_postponeDays').value;
+            const postponeDays = postponeDaysValue ? parseInt(postponeDaysValue, 10) : undefined;
+            const nextScheduleDate = document.getElementById('ecm_nextScheduleDate').value.trim();
 
             if (!cycleDate) {
                 alert('Vui lòng chọn ngày truyền!');
@@ -6947,6 +7012,18 @@
                 alert('Vui lòng chọn hoặc nhập tên phác đồ!');
                 return;
             }
+            if (isPostponed && !postponeReason) {
+                alert('Vui lòng chọn hoặc nhập lý do hoãn hóa trị!');
+                return;
+            }
+            if (isPostponed && !nextScheduleDate && (!Number.isInteger(postponeDays) || postponeDays < 1)) {
+                alert('Vui lòng nhập số ngày hoãn dự kiến hoặc ngày hẹn truyền mới!');
+                return;
+            }
+            if (isPostponed && postponeDays !== undefined && (postponeDays < 1 || postponeDays > 365)) {
+                alert('Số ngày hoãn dự kiến phải từ 1 đến 365 ngày!');
+                return;
+            }
 
             const saveBtn = document.getElementById('ecm_saveBtn');
             saveBtn.disabled = true;
@@ -6954,7 +7031,7 @@
 
             try {
                 const oldCycle = window.tempCurrentCycles[idx];
-                window.tempCurrentCycles[idx] = {
+                window.tempCurrentCycles[idx] = window.cleanPayload({
                     ...oldCycle,
                     branchName: `Chu kỳ ${cycleNum}`,
                     cycleNum,
@@ -6966,8 +7043,12 @@
                     drugNames: document.getElementById('ecm_drugNames').value.trim(),
                     doseInput: document.getElementById('ecm_doseInput').value.trim(),
                     note: document.getElementById('ecm_note').value.trim(),
+                    isPostponed,
+                    postponeReason: isPostponed ? postponeReason : undefined,
+                    postponeDays: isPostponed ? postponeDays : undefined,
+                    nextScheduleDate: isPostponed ? nextScheduleDate : undefined,
                     updatedBy: window.getCurrentEditorName()
-                };
+                });
 
                 window.normalizeProtocolHistory(window.tempCurrentCycles);
                 window.renderTempCyclesList();
@@ -7183,7 +7264,7 @@
             const effectiveIhc = window.tempIhc || existingPData.ihc || null;
             const effectiveLogs = [...(existingPData.historyLogs || []), ...(window.tempHistoryLogs || [])];
 
-            const payload = {
+            const payload = window.cleanPayload({
                 patientId: patientIdVal,
                 name: nameVal,
                 gender: genderVal,
@@ -7205,7 +7286,7 @@
                 toxicityAssessments: window.tempToxicityAssessments || [],
                 updatedAt: serverTimestamp(),
                 updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
-            };
+            });
 
             let newlyCreatedPatientId = null;
             try {
@@ -7242,6 +7323,7 @@
                     newlyCreatedPatientId = createdPatientRef.id;
                     window.showToast("Đã thêm mới hồ sơ bệnh nhân thành công!");
                 }
+                window.hasPendingPatientChanges = false;
                 window.closePatientFormModal();
                 if (patientIdVal) {
                     document.getElementById('searchInput').value = patientIdVal;
@@ -7271,7 +7353,7 @@
                 const cachedPatient = cachedPatientsList.find(patient => patient.id === docId) || {};
                 const effectiveProto = latestCycle?.protocolUsed || cachedPatient.protocol || '';
                 const latestFollowUp = window.getPatientLatestFollowUp({ cycles: window.tempCurrentCycles, protocol: effectiveProto });
-                const update = {
+                const update = window.cleanPayload({
                     cycles: window.tempCurrentCycles,
                     markers: window.tempCurrentMarkers,
                     protocol: effectiveProto,
@@ -7279,7 +7361,7 @@
                     latestFollowUp: latestFollowUp || null,
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
-                };
+                });
                 await updateDoc(doc(db, "patients", docId), update);
                 const cacheIndex = cachedPatientsList.findIndex(patient => patient.id === docId);
                 const updatedPatient = { ...cachedPatient, ...update, id: docId };
@@ -7288,6 +7370,8 @@
                 window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
             } catch (err) {
                 console.error("Lỗi đồng bộ tự động:", err);
+                window.showToast("Không thể đồng bộ dữ liệu lên hệ thống. Vui lòng kiểm tra kết nối và thử lại.");
+                throw err;
             }
         };
 
