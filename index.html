@@ -3020,6 +3020,14 @@
                         <option value="ALL">Tất cả phác đồ</option>
                     </select>
                 </div>
+                <div class="w-full sm:w-52">
+                    <label for="statsDelayFilter" class="sr-only">Lọc theo trạng thái hoãn hóa trị</label>
+                    <select id="statsDelayFilter" onchange="window.handleStatsDateRangeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold text-teal-800 text-center">
+                        <option value="ALL">Tất cả bệnh nhân</option>
+                        <option value="ACTIVE_DELAYED">Đang hoãn hóa trị</option>
+                        <option value="HISTORY_DELAYED">Có lịch sử hoãn hóa trị</option>
+                    </select>
+                </div>
                 <div>
                     <button type="button" onclick="window.resetStatsDateRange()" class="w-full sm:w-auto p-2.5 px-4 bg-white hover:bg-teal-50 text-teal-800 font-bold border border-slate-200 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5" title="Xem tất cả (Xóa lọc ngày)">
                         <svg class="lucide lucide-rotate-cw text-teal-600" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg> Tất cả
@@ -4635,6 +4643,9 @@
             if (document.getElementById('statsProtocolFilter')) {
                 document.getElementById('statsProtocolFilter').value = 'ALL';
             }
+            if (document.getElementById('statsDelayFilter')) {
+                document.getElementById('statsDelayFilter').value = 'ALL';
+            }
             if (!window.statsModalIsMaximized) window.toggleStatsModalSize();
             document.getElementById('statsMinimizedRestore').classList.add('hidden');
             document.getElementById('statsMinimizedRestore').classList.remove('flex');
@@ -4649,6 +4660,9 @@
             document.getElementById('statsIcdFilter').value = 'ALL';
             if (document.getElementById('statsProtocolFilter')) {
                 document.getElementById('statsProtocolFilter').value = 'ALL';
+            }
+            if (document.getElementById('statsDelayFilter')) {
+                document.getElementById('statsDelayFilter').value = 'ALL';
             }
             window.runChemoStatistics();
             window.switchStatsTab('patients');
@@ -8926,6 +8940,7 @@
             const endDate = document.getElementById('statsEndDate').value;
             const icdFilter = document.getElementById('statsIcdFilter').value;
             const protocolFilter = document.getElementById('statsProtocolFilter')?.value || 'ALL';
+            const delayFilter = document.getElementById('statsDelayFilter')?.value || 'ALL';
 
             let filtered = cachedPatientsList.filter(p => {
                 if (!window.isPatientInDateRange(p, startDate, endDate)) {
@@ -8946,6 +8961,12 @@
                     } else {
                         if (p.protocol !== protocolFilter && p.protocolKey !== protocolFilter) return false;
                     }
+                }
+                if (delayFilter === 'ACTIVE_DELAYED' && p.treatmentDelayed?.isDelayed !== true) {
+                    return false;
+                }
+                if (delayFilter === 'HISTORY_DELAYED' && !(p.cycles || []).some(cycle => cycle?.isPostponed === true)) {
+                    return false;
                 }
                 return true;
             });
