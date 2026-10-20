@@ -3316,10 +3316,14 @@
          */
         window.getPatientLatestFollowUp = function(patient, referenceDateVN) {
             if (!patient) return null;
-            const cycles = [...(patient.cycles || [])].sort((a, b) =>
+            // Bản ghi hoãn chỉ mô tả một lần khám/đánh giá, không phải chu kỳ điều trị
+            // thực tế. Vì vậy không được dùng nó để kết luận bệnh nhân đã vào chu kỳ mới.
+            const cycles = [...(patient.cycles || [])]
+                .filter(cycle => cycle && cycle.isPostponed !== true)
+                .sort((a, b) =>
                 String(a.date || '').localeCompare(String(b.date || '')) ||
                 (Number(a.cycleNum) || 0) - (Number(b.cycleNum) || 0)
-            );
+                );
             const todayVN = referenceDateVN || window.getSystemDateVN(0);
 
             // Ưu tiên duy nhất lịch hẹn gắn với chu kỳ điều trị mới nhất.
@@ -5138,6 +5142,92 @@
         window.statsPieChartInstance = null;
         window.currentViewingPatient = null;
 
+        const PATIENT_ARRAY_FIELDS = ['cycles', 'markers', 'responseAssessments', 'toxicityAssessments', 'historyLogs'];
+        window._patientArrayBaseline = { docId: null, values: {} };
+        const cloneJsonValue = value => JSON.parse(JSON.stringify(value || []));
+        const stableArrayItem = value => JSON.stringify(value || {});
+        const patientArrayItemKey = (field, item, index) => {
+            if (field === 'cycles') return `cycle:${item?.date || ''}:${item?.cycleNum || ''}:${Boolean(item?.isPostponed)}:${item?.delaySource || ''}`;
+            if (field === 'markers') return `marker:${item?.type || ''}:${item?.date || ''}`;
+            if (field === 'responseAssessments') return `response:${item?.assessmentId || `${item?.recistVersion || ''}:${item?.date || ''}`}`;
+            if (field === 'toxicityAssessments') return `toxicity:${item?.date || ''}`;
+            if (field === 'historyLogs') return `history:${item?.id || `${item?.timestamp || ''}:${index}`}`;
+            return `${field}:${index}`;
+        };
+        const indexedArray = (field, values) => new Map((values || []).map((item, index) => [patientArrayItemKey(field, item, index), item]));
+        window.capturePatientArrayBaseline = function(patient) {
+            window._patientArrayBaseline = {
+                docId: patient?.id || null,
+                values: Object.fromEntries(PATIENT_ARRAY_FIELDS.map(field => [field, cloneJsonValue(patient?.[field])]))
+            };
+        };
+        window.mergePatientArrayChanges = function(field, remoteValues, baselineValues, localValues) {
+            const remote = cloneJsonValue(remoteValues);
+            const baseline = cloneJsonValue(baselineValues);
+            const local = cloneJsonValue(localValues);
+            const baseByKey = indexedArray(field, baseline);
+            const remoteByKey = indexedArray(field, remote);
+            const localByKey = indexedArray(field, local);
+            const result = [...remote];
+            const conflicts = [];
+
+            for (const [key, baseItem] of baseByKey) {
+                const localItem = localByKey.get(key);
+                const remoteItem = remoteByKey.get(key);
+                if (localItem === undefined) {
+                    if (remoteItem !== undefined && stableArrayItem(remoteItem) === stableArrayItem(baseItem)) {
+                        const resultIndex = result.findIndex((item, index) => patientArrayItemKey(field, item, index) === key);
+                        if (resultIndex >= 0) result.splice(resultIndex, 1);
+                    } else if (remoteItem !== undefined) {
+                        conflicts.push(key);
+                    }
+                } else if (stableArrayItem(localItem) !== stableArrayItem(baseItem)) {
+                    if (remoteItem !== undefined && stableArrayItem(remoteItem) !== stableArrayItem(baseItem) && stableArrayItem(remoteItem) !== stableArrayItem(localItem)) {
+                        conflicts.push(key);
+                        continue;
+                    }
+                    const resultIndex = result.findIndex((item, index) => patientArrayItemKey(field, item, index) === key);
+                    if (resultIndex >= 0) result[resultIndex] = localItem;
+                    else result.push(localItem);
+                }
+            }
+            for (const [key, localItem] of localByKey) {
+                if (baseByKey.has(key)) continue;
+                if (!remoteByKey.has(key)) result.push(localItem);
+                else if (stableArrayItem(remoteByKey.get(key)) !== stableArrayItem(localItem)) conflicts.push(key);
+            }
+            return { values: result, conflicts };
+        };
+        window.commitPatientArraysSafely = async function(docId, payload) {
+            const baseline = window._patientArrayBaseline.docId === docId
+                ? window._patientArrayBaseline.values
+                : null;
+            const result = await runTransaction(db, async transaction => {
+                const patientRef = doc(db, 'patients', docId);
+                const snapshot = await transaction.get(patientRef);
+                if (!snapshot.exists()) throw new Error('PATIENT_NOT_FOUND');
+                const remotePatient = snapshot.data();
+                const update = { ...payload };
+                const conflicts = [];
+                PATIENT_ARRAY_FIELDS.forEach(field => {
+                    if (!Array.isArray(payload[field])) return;
+                    const merged = window.mergePatientArrayChanges(
+                        field,
+                        remotePatient[field] || [],
+                        baseline?.[field] || remotePatient[field] || [],
+                        payload[field]
+                    );
+                    update[field] = merged.values;
+                    conflicts.push(...merged.conflicts.map(key => `${field}:${key}`));
+                });
+                const cleanUpdate = window.cleanPayload(update);
+                transaction.update(patientRef, cleanUpdate);
+                return { patient: { id: docId, ...remotePatient, ...cleanUpdate }, conflicts };
+            });
+            window.capturePatientArrayBaseline(result.patient);
+            return result;
+        };
+
         function getCurrentEditorName() {
             return currentProfessionalTitle || currentUser?.displayName || 'Bác sĩ';
         }
@@ -6419,6 +6509,7 @@
             window._editingMarkerIdx = null;
             window.tempResponseAssessments = JSON.parse(JSON.stringify(p.responseAssessments || []));
             window.tempToxicityAssessments = window.mergeAssessmentDays(JSON.parse(JSON.stringify(p.toxicityAssessments || [])), 'items');
+            window.capturePatientArrayBaseline(p);
             window.editingResponseAssessmentIndex = null;
             window.editingToxicityAssessmentIndex = null;
             document.getElementById('responseRecordButton').textContent = 'Ghi nhận đánh giá đáp ứng';
@@ -7621,11 +7712,12 @@
                 }
 
                 if (docId) {
-                    await updateDoc(doc(db, "patients", docId), payload);
+                    const commitResult = await window.commitPatientArraysSafely(docId, payload);
                     const cacheIndex = cachedPatientsList.findIndex(patient => patient.id === docId);
-                    const updatedPatient = { ...(cacheIndex >= 0 ? cachedPatientsList[cacheIndex] : {}), id: docId, ...payload };
+                    const updatedPatient = commitResult.patient;
                     if (cacheIndex >= 0) cachedPatientsList[cacheIndex] = updatedPatient;
                     else cachedPatientsList.push(updatedPatient);
+                    if (commitResult.conflicts.length) window.showToast('Đã giữ lại thay đổi mới hơn từ người dùng khác ở một số bản ghi.');
                     window.showToast("Đã lưu và cập nhật hồ sơ bệnh nhân thành công!");
                 } else {
                     payload.createdAt = serverTimestamp();
@@ -7690,11 +7782,12 @@
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
-                await updateDoc(doc(db, "patients", docId), update);
+                const commitResult = await window.commitPatientArraysSafely(docId, update);
                 const cacheIndex = cachedPatientsList.findIndex(patient => patient.id === docId);
-                const updatedPatient = { ...cachedPatient, ...update, id: docId };
+                const updatedPatient = commitResult.patient;
                 if (cacheIndex >= 0) cachedPatientsList[cacheIndex] = updatedPatient;
                 else cachedPatientsList.push(updatedPatient);
+                if (commitResult.conflicts.length) window.showToast('Đã giữ lại thay đổi mới hơn từ người dùng khác ở một số bản ghi.');
                 window.tempHistoryLogs = [];
                 window.hasPendingPatientChanges = false;
                 window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
@@ -8386,6 +8479,7 @@
                 updatedAt: new Date().toISOString(),
                 updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
             };
+            window.capturePatientArrayBaseline(patient);
             const delayedCycles = JSON.parse(JSON.stringify(patient.cycles || []));
             const latestCycle = [...delayedCycles].sort((a, b) =>
                 String(a.date || '').localeCompare(String(b.date || '')) ||
@@ -8427,16 +8521,17 @@
             }
 
             try {
-                await updateDoc(doc(db, "patients", patientId), {
+                const commitResult = await window.commitPatientArraysSafely(patientId, {
                     cycles: delayedCycles,
                     treatmentDelayed: synchronizedDelay,
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
-                patient.cycles = delayedCycles;
-                patient.treatmentDelayed = synchronizedDelay;
+                patient.cycles = commitResult.patient.cycles;
+                patient.treatmentDelayed = commitResult.patient.treatmentDelayed;
+                if (commitResult.conflicts.length) window.showToast('Đã giữ lại thay đổi chu kỳ mới hơn từ người dùng khác.');
                 if (document.getElementById('editDocId')?.value === patientId) {
-                    window.tempCurrentCycles = JSON.parse(JSON.stringify(delayedCycles));
+                    window.tempCurrentCycles = JSON.parse(JSON.stringify(patient.cycles || []));
                     window.renderTempCyclesList();
                 }
 
@@ -8464,6 +8559,7 @@
             if (!confirmed) return;
 
             try {
+                window.capturePatientArrayBaseline(patient);
                 const cycles = JSON.parse(JSON.stringify(patient.cycles || []));
                 const activePostponements = cycles
                     .map((cycle, index) => ({ cycle, index }))
@@ -8481,16 +8577,17 @@
                         delayResolvedBy: window.getCurrentEditorName()
                     };
                 }
-                await updateDoc(doc(db, "patients", patientId), {
+                const commitResult = await window.commitPatientArraysSafely(patientId, {
                     cycles,
                     treatmentDelayed: null,
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
-                patient.cycles = cycles;
-                patient.treatmentDelayed = null;
+                patient.cycles = commitResult.patient.cycles;
+                patient.treatmentDelayed = commitResult.patient.treatmentDelayed;
+                if (commitResult.conflicts.length) window.showToast('Đã giữ lại thay đổi chu kỳ mới hơn từ người dùng khác.');
                 if (document.getElementById('editDocId')?.value === patientId) {
-                    window.tempCurrentCycles = JSON.parse(JSON.stringify(cycles));
+                    window.tempCurrentCycles = JSON.parse(JSON.stringify(patient.cycles || []));
                     window.renderTempCyclesList();
                 }
 
@@ -8585,6 +8682,7 @@
             }
 
             try {
+                window.capturePatientArrayBaseline(patient);
                 const todayVN = window.getSystemDateVN(0);
                 const updatePayload = {
                     endReason: selectedReason,
@@ -8606,17 +8704,18 @@
                     });
                     updatePayload.cycles = cycles;
                     updatePayload.latestFollowUp = null;
-                    patient.cycles = cycles;
-                    patient.latestFollowUp = null;
                 }
 
-                await updateDoc(doc(db, "patients", patientId), updatePayload);
+                const commitResult = await window.commitPatientArraysSafely(patientId, updatePayload);
 
                 patient.endReason = selectedReason;
                 patient.endReasonNote = noteText;
                 patient.endReasonDate = todayVN;
                 patient.endReasonRecordedAt = updatePayload.endReasonRecordedAt;
                 patient.endReasonRecordedBy = updatePayload.endReasonRecordedBy;
+                patient.cycles = commitResult.patient.cycles || patient.cycles;
+                patient.latestFollowUp = commitResult.patient.latestFollowUp;
+                if (commitResult.conflicts.length) window.showToast('Đã giữ lại thay đổi chu kỳ mới hơn từ người dùng khác.');
 
                 window.showToast(`🏁 Đã ghi nhận lý do kết thúc điều trị: "${selectedReason}"!`);
                 window.closeEndTreatmentModal();
