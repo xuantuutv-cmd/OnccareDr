@@ -5228,7 +5228,7 @@
             });
         };
 
-        window.commitPatientArraysSafely = async function(docId, payload) {
+        window.commitPatientArraysSafely = async function(docId, payload, options = {}) {
             const baseline = window._patientArrayBaseline.docId === docId
                 ? window._patientArrayBaseline.values
                 : null;
@@ -5250,7 +5250,26 @@
                     update[field] = merged.values;
                     conflicts.push(...merged.conflicts.map(key => `${field}:${key}`));
                 });
-                if (Array.isArray(update.cycles)
+                if (options.deleteCycle) {
+                    const targetKey = options.deleteCycle.key;
+                    const remoteTarget = (remotePatient.cycles || []).find((cycle, index) =>
+                        patientArrayItemKey('cycles', cycle, index) === targetKey);
+                    const expected = (baseline?.cycles || []).find((cycle, index) =>
+                        patientArrayItemKey('cycles', cycle, index) === targetKey) || options.deleteCycle.value;
+                    if (remoteTarget && stableArrayItem(remoteTarget) !== stableArrayItem(expected)) {
+                        throw new Error('CYCLE_DELETE_CONFLICT');
+                    }
+                    // Xóa theo định danh đã xác nhận, không phụ thuộc index hoặc baseline thiếu.
+                    update.cycles = (update.cycles || remotePatient.cycles || []).filter((cycle, index) =>
+                        patientArrayItemKey('cycles', cycle, index) !== targetKey);
+                    window.normalizeProtocolHistory(update.cycles);
+                    const latestCycle = update.cycles.at(-1);
+                    update.protocol = latestCycle?.protocolUsed || remotePatient.protocol || '';
+                    update.protocolKey = latestCycle?.protocolKeyUsed || remotePatient.protocolKey || '';
+                    update.latestFollowUp = window.getPatientLatestFollowUp({ cycles: update.cycles, protocol: update.protocol });
+                    update.treatmentDelayed = window.getActiveTreatmentDelayFromCycles(update.cycles, remotePatient.treatmentDelayed);
+                }
+                if (!options.deleteCycle && Array.isArray(update.cycles)
                     && window.hasConfirmedTreatmentCycleChange(remotePatient.cycles || [], update.cycles)) {
                     // Reset cùng transaction với cycles; không thay đổi cấu trúc/lịch sử chu kỳ.
                     update.isEndedTreatment = false;
@@ -7527,8 +7546,10 @@
 
         window._pendingDeleteCycleIdx = null;
         window.deleteTempCycle = function(idx) {
-            window._pendingDeleteCycleIdx = idx;
             const cycle = (window.tempCurrentCycles || [])[idx];
+            if (!cycle) return;
+            window._pendingDeleteCycleIdx = idx;
+            window._pendingDeleteCycle = { key: patientArrayItemKey('cycles', cycle, idx), value: JSON.parse(JSON.stringify(cycle)) };
             if (cycle) {
                 document.getElementById('delCycleBranchName').textContent = cycle.branchName || `Chu kỳ ${idx + 1}`;
                 document.getElementById('delCycleDate').textContent = cycle.date ? formatDisplayDate(cycle.date) : 'N/A';
@@ -7539,12 +7560,15 @@
 
         window.closeDeleteCycleModal = function() {
             window._pendingDeleteCycleIdx = null;
+            window._pendingDeleteCycle = null;
             window.setPanelVisibility(document.getElementById('deleteCycleConfirmModal'), false);
         };
 
         window.executeDeleteCycle = async function() {
-            const idx = window._pendingDeleteCycleIdx;
-            if (idx === null || idx === undefined || idx < 0) {
+            const target = window._pendingDeleteCycle;
+            const idx = target ? window.tempCurrentCycles.findIndex((cycle, index) =>
+                patientArrayItemKey('cycles', cycle, index) === target.key) : -1;
+            if (idx < 0) {
                 window.closeDeleteCycleModal();
                 return;
             }
@@ -7552,15 +7576,23 @@
             const originalHtml = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<svg class="lucide lucide-loader-2 animate-spin inline-block mr-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Đang xóa...';
+            const cyclesBeforeDelete = JSON.parse(JSON.stringify(window.tempCurrentCycles));
             try {
+                if (document.getElementById('editDocId').value && !window.canUseOncoCare) throw new Error('Không có quyền lưu hồ sơ.');
                 window.tempCurrentCycles.splice(idx, 1);
                 window.normalizeProtocolHistory(window.tempCurrentCycles);
                 window.renderTempCyclesList();
-                await window.autoSyncChangesToDatabase();
-                window.showToast("Đã xóa chu kỳ thành công.");
+                const docId = document.getElementById('editDocId').value;
+                if (docId) await window.autoSyncChangesToDatabase({ deleteCycle: target });
+                window.renderTempCyclesList();
+                window.showToast(docId ? "Đã xóa chu kỳ và lưu lên hệ thống." : "Đã xóa chu kỳ khỏi hồ sơ đang tạo.");
             } catch (err) {
+                window.tempCurrentCycles = cyclesBeforeDelete;
+                window.renderTempCyclesList();
                 console.error("Lỗi khi xóa chu kỳ:", err);
-                window.showToast("Có lỗi xảy ra khi cập nhật dữ liệu.");
+                window.showToast(err.message === 'CYCLE_DELETE_CONFLICT'
+                    ? 'Chu kỳ đã được người khác cập nhật. Vui lòng mở lại hồ sơ trước khi xóa.'
+                    : 'Chưa xóa được chu kỳ. Dữ liệu đã được khôi phục, vui lòng thử lại.');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -7801,7 +7833,7 @@
             }
         };
 
-        window.autoSyncChangesToDatabase = async function() {
+        window.autoSyncChangesToDatabase = async function(options = {}) {
             if (!window.canUseOncoCare) return;
             const docId = document.getElementById('editDocId').value;
             if (!docId) return;
@@ -7828,11 +7860,28 @@
                     updatedAt: serverTimestamp(),
                     updatedByEmail: currentUser ? currentUser.email : "xuantuutv@gmail.com"
                 });
-                const commitResult = await window.commitPatientArraysSafely(docId, update);
+                const commitResult = await window.commitPatientArraysSafely(docId, update, options);
                 const cacheIndex = cachedPatientsList.findIndex(patient => patient.id === docId);
                 const updatedPatient = commitResult.patient;
                 if (cacheIndex >= 0) cachedPatientsList[cacheIndex] = updatedPatient;
                 else cachedPatientsList.push(updatedPatient);
+                // Baseline đã tiến lên: local cycles cũng phải phản ánh đúng dữ liệu đã commit.
+                window.tempCurrentCycles = JSON.parse(JSON.stringify(updatedPatient.cycles || []));
+                window.renderTempCyclesList();
+                if (options.deleteCycle) {
+                    try {
+                        if (window.currentViewingPatient?.id === docId) {
+                            window.currentViewingPatient = updatedPatient;
+                            const detailModal = document.getElementById('patientDetailModal');
+                            if (detailModal && !detailModal.classList.contains('hidden')) {
+                                await window.viewPatientDetail(docId);
+                            }
+                        }
+                        window.renderStatsFollowUpList();
+                    } catch (refreshError) {
+                        console.warn('Đã lưu xóa chu kỳ; chưa làm mới được panel phụ:', refreshError);
+                    }
+                }
                 if (commitResult.conflicts.length) window.showToast('Đã giữ lại thay đổi mới hơn từ người dùng khác ở một số bản ghi.');
                 window.tempHistoryLogs = [];
                 window.hasPendingPatientChanges = false;
