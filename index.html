@@ -5228,7 +5228,59 @@
             });
         };
 
+        // Định danh dành riêng cho xóa; không thay đổi schema cycles cũ.
+        const cycleDeleteIdentity = cycle => cycle.id != null ? `id:${cycle.id}`
+            : cycle.cycleId != null ? `cycleId:${cycle.cycleId}`
+            : patientArrayItemKey('cycles', cycle, 0);
+        const cycleDeleteFingerprint = cycle => {
+            const canonical = value => {
+                if (Array.isArray(value)) return value.map(canonical);
+                if (value && typeof value === 'object') return Object.fromEntries(
+                    Object.keys(value).sort().map(key => [key, canonical(value[key])]));
+                return value;
+            };
+            const copy = { ...cycle };
+            // Thuộc tính này được tính lại khi mở form, không phải sửa dữ liệu điều trị.
+            delete copy.isChangedProtocol;
+            return JSON.stringify(canonical(copy));
+        };
+        window.deletePatientCycleSafely = async function(docId, target) {
+            if (!window.canUseOncoCare || !docId || target.docId !== docId) throw new Error('CYCLE_DELETE_CONTEXT_CHANGED');
+            const result = await runTransaction(db, async transaction => {
+                const patientRef = doc(db, 'patients', docId);
+                const snapshot = await transaction.get(patientRef);
+                if (!snapshot.exists()) throw new Error('PATIENT_NOT_FOUND');
+                const patient = snapshot.data();
+                const cycles = JSON.parse(JSON.stringify(patient.cycles || []));
+                const candidates = cycles.map((cycle, index) => ({ cycle, index }))
+                    .filter(item => cycleDeleteIdentity(item.cycle) === target.identity);
+                const matches = candidates.filter(item => cycleDeleteFingerprint(item.cycle) === target.fingerprint);
+                const match = matches[target.occurrence];
+                if (!match && candidates.length) throw new Error('CYCLE_DELETE_CONFLICT');
+                if (match) cycles.splice(match.index, 1); // Chỉ bỏ đúng một phần tử.
+                window.normalizeProtocolHistory(cycles);
+                const latestCycle = cycles.at(-1);
+                const protocol = latestCycle?.protocolUsed || patient.protocol || '';
+                const update = window.cleanPayload({
+                    cycles,
+                    latestFollowUp: window.getPatientLatestFollowUp({ cycles, protocol }),
+                    treatmentDelayed: window.getActiveTreatmentDelayFromCycles(cycles, patient.treatmentDelayed),
+                    protocol,
+                    protocolKey: latestCycle?.protocolKeyUsed || patient.protocolKey || '',
+                    updatedAt: serverTimestamp()
+                });
+                transaction.update(patientRef, update);
+                return { patient: { ...patient, ...update, id: docId }, conflicts: [] };
+            });
+            // Không tiến baseline của marker/đánh giá chưa được lưu trong thao tác xóa này.
+            if (window._patientArrayBaseline.docId === docId) {
+                window._patientArrayBaseline.values.cycles = cloneJsonValue(result.patient.cycles);
+            }
+            return result;
+        };
+
         window.commitPatientArraysSafely = async function(docId, payload, options = {}) {
+            if (options.deleteCycle) return window.deletePatientCycleSafely(docId, options.deleteCycle);
             const baseline = window._patientArrayBaseline.docId === docId
                 ? window._patientArrayBaseline.values
                 : null;
@@ -5250,26 +5302,7 @@
                     update[field] = merged.values;
                     conflicts.push(...merged.conflicts.map(key => `${field}:${key}`));
                 });
-                if (options.deleteCycle) {
-                    const targetKey = options.deleteCycle.key;
-                    const remoteTarget = (remotePatient.cycles || []).find((cycle, index) =>
-                        patientArrayItemKey('cycles', cycle, index) === targetKey);
-                    const expected = (baseline?.cycles || []).find((cycle, index) =>
-                        patientArrayItemKey('cycles', cycle, index) === targetKey) || options.deleteCycle.value;
-                    if (remoteTarget && stableArrayItem(remoteTarget) !== stableArrayItem(expected)) {
-                        throw new Error('CYCLE_DELETE_CONFLICT');
-                    }
-                    // Xóa theo định danh đã xác nhận, không phụ thuộc index hoặc baseline thiếu.
-                    update.cycles = (update.cycles || remotePatient.cycles || []).filter((cycle, index) =>
-                        patientArrayItemKey('cycles', cycle, index) !== targetKey);
-                    window.normalizeProtocolHistory(update.cycles);
-                    const latestCycle = update.cycles.at(-1);
-                    update.protocol = latestCycle?.protocolUsed || remotePatient.protocol || '';
-                    update.protocolKey = latestCycle?.protocolKeyUsed || remotePatient.protocolKey || '';
-                    update.latestFollowUp = window.getPatientLatestFollowUp({ cycles: update.cycles, protocol: update.protocol });
-                    update.treatmentDelayed = window.getActiveTreatmentDelayFromCycles(update.cycles, remotePatient.treatmentDelayed);
-                }
-                if (!options.deleteCycle && Array.isArray(update.cycles)
+                if (Array.isArray(update.cycles)
                     && window.hasConfirmedTreatmentCycleChange(remotePatient.cycles || [], update.cycles)) {
                     // Reset cùng transaction với cycles; không thay đổi cấu trúc/lịch sử chu kỳ.
                     update.isEndedTreatment = false;
@@ -7545,55 +7578,100 @@
         })();
 
         window._pendingDeleteCycleIdx = null;
+        window._deletingCycle = false;
         window.deleteTempCycle = function(idx) {
+            if (window._deletingCycle || !Number.isInteger(idx)) return;
             const cycle = (window.tempCurrentCycles || [])[idx];
             if (!cycle) return;
+            const identity = cycleDeleteIdentity(cycle);
+            const fingerprint = cycleDeleteFingerprint(cycle);
+            const occurrence = window.tempCurrentCycles.slice(0, idx).filter(item =>
+                cycleDeleteIdentity(item) === identity && cycleDeleteFingerprint(item) === fingerprint).length;
             window._pendingDeleteCycleIdx = idx;
-            window._pendingDeleteCycle = { key: patientArrayItemKey('cycles', cycle, idx), value: JSON.parse(JSON.stringify(cycle)) };
-            if (cycle) {
-                document.getElementById('delCycleBranchName').textContent = cycle.branchName || `Chu kỳ ${idx + 1}`;
-                document.getElementById('delCycleDate').textContent = cycle.date ? formatDisplayDate(cycle.date) : 'N/A';
-                document.getElementById('delCycleProtocol').textContent = cycle.protocolUsed || 'Chưa cập nhật';
-            }
+            window._pendingDeleteCycle = {
+                docId: document.getElementById('editDocId').value, identity, fingerprint, occurrence
+            };
+            document.getElementById('delCycleBranchName').textContent = cycle.branchName || `Chu kỳ ${idx + 1}`;
+            document.getElementById('delCycleDate').textContent = cycle.date ? formatDisplayDate(cycle.date) : 'N/A';
+            document.getElementById('delCycleProtocol').textContent = cycle.protocolUsed || 'Chưa cập nhật';
             window.setPanelVisibility(document.getElementById('deleteCycleConfirmModal'), true);
         };
 
         window.closeDeleteCycleModal = function() {
+            if (window._deletingCycle) return;
             window._pendingDeleteCycleIdx = null;
             window._pendingDeleteCycle = null;
             window.setPanelVisibility(document.getElementById('deleteCycleConfirmModal'), false);
         };
 
         window.executeDeleteCycle = async function() {
+            if (window._deletingCycle) return;
             const target = window._pendingDeleteCycle;
-            const idx = target ? window.tempCurrentCycles.findIndex((cycle, index) =>
-                patientArrayItemKey('cycles', cycle, index) === target.key) : -1;
-            if (idx < 0) {
+            const docId = document.getElementById('editDocId').value;
+            if (!target || target.docId !== docId) {
                 window.closeDeleteCycleModal();
+                window.showToast('Hồ sơ đã thay đổi. Vui lòng chọn lại chu kỳ cần xóa.');
+                return;
+            }
+            const draft = window.tempCurrentCycles;
+            const matches = draft.map((cycle, index) => ({ cycle, index })).filter(item =>
+                cycleDeleteIdentity(item.cycle) === target.identity && cycleDeleteFingerprint(item.cycle) === target.fingerprint);
+            const match = matches[target.occurrence];
+            if (!match) {
+                window.closeDeleteCycleModal();
+                window.showToast('Chu kỳ đã thay đổi. Vui lòng chọn lại chu kỳ cần xóa.');
                 return;
             }
             const btn = document.getElementById('btnConfirmDeleteCycle');
             const originalHtml = btn.innerHTML;
+            const cyclesBeforeDelete = JSON.parse(JSON.stringify(draft));
+            const sameDraft = () => document.getElementById('editDocId').value === docId && window.tempCurrentCycles === draft;
+            window._deletingCycle = true;
             btn.disabled = true;
-            btn.innerHTML = '<svg class="lucide lucide-loader-2 animate-spin inline-block mr-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Đang xóa...';
-            const cyclesBeforeDelete = JSON.parse(JSON.stringify(window.tempCurrentCycles));
+            btn.textContent = 'Đang xóa...';
+            let committed = false;
             try {
-                if (document.getElementById('editDocId').value && !window.canUseOncoCare) throw new Error('Không có quyền lưu hồ sơ.');
-                window.tempCurrentCycles.splice(idx, 1);
-                window.normalizeProtocolHistory(window.tempCurrentCycles);
+                if (docId && !window.canUseOncoCare) throw new Error('CYCLE_DELETE_CONTEXT_CHANGED');
+                draft.splice(match.index, 1);
+                window.normalizeProtocolHistory(draft);
                 window.renderTempCyclesList();
-                const docId = document.getElementById('editDocId').value;
-                if (docId) await window.autoSyncChangesToDatabase({ deleteCycle: target });
-                window.renderTempCyclesList();
-                window.showToast(docId ? "Đã xóa chu kỳ và lưu lên hệ thống." : "Đã xóa chu kỳ khỏi hồ sơ đang tạo.");
+                if (docId) {
+                    // Ghi thẳng transaction chỉ dành cho xóa, không phụ thuộc marker/liều/đánh giá.
+                    const result = await window.deletePatientCycleSafely(docId, target);
+                    committed = true;
+                    const patient = result.patient;
+                    const cacheIndex = cachedPatientsList.findIndex(item => item.id === docId);
+                    if (cacheIndex >= 0) cachedPatientsList[cacheIndex] = patient;
+                    else cachedPatientsList.push(patient);
+                    if (sameDraft()) {
+                        window.tempCurrentCycles = JSON.parse(JSON.stringify(patient.cycles || []));
+                        // Index chỉnh sửa cũ có thể trỏ sai phần tử sau khi xóa.
+                        const editIndex = document.getElementById('editCycleIndex');
+                        if (editIndex) editIndex.value = '';
+                        window.renderTempCyclesList();
+                    }
+                    try {
+                        if (window.currentViewingPatient?.id === docId) {
+                            window.currentViewingPatient = patient;
+                            const modal = document.getElementById('patientDetailModal');
+                            if (modal && !modal.classList.contains('hidden')) await window.viewPatientDetail(docId);
+                        }
+                        window.renderStatsFollowUpList();
+                    } catch (refreshError) { console.warn('Đã xóa; chưa làm mới được panel phụ:', refreshError); }
+                }
+                window.showToast(docId ? 'Đã xóa chu kỳ và lưu lên hệ thống.' : 'Đã xóa chu kỳ khỏi hồ sơ đang tạo.');
             } catch (err) {
-                window.tempCurrentCycles = cyclesBeforeDelete;
-                window.renderTempCyclesList();
-                console.error("Lỗi khi xóa chu kỳ:", err);
-                window.showToast(err.message === 'CYCLE_DELETE_CONFLICT'
+                if (!committed && sameDraft()) {
+                    window.tempCurrentCycles = cyclesBeforeDelete;
+                    window.renderTempCyclesList();
+                }
+                console.error('Lỗi khi xóa chu kỳ:', err);
+                window.showToast(committed ? 'Đã lưu xóa chu kỳ. Vui lòng mở lại hồ sơ để làm mới giao diện.'
+                    : err.message === 'CYCLE_DELETE_CONFLICT'
                     ? 'Chu kỳ đã được người khác cập nhật. Vui lòng mở lại hồ sơ trước khi xóa.'
                     : 'Chưa xóa được chu kỳ. Dữ liệu đã được khôi phục, vui lòng thử lại.');
             } finally {
+                window._deletingCycle = false;
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
                 window.closeDeleteCycleModal();
