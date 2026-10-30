@@ -3390,7 +3390,7 @@
             if (!hasNewCycle && cycles.length > 0) {
                 for (let i = 0; i < cycles.length; i++) {
                     const c = cycles[i];
-                    if (c && c.date && (scheduledCycleIndex < 0 || i !== scheduledCycleIndex)) {
+                    if (c && c.date && (scheduledCycleIndex < 0 || i > scheduledCycleIndex)) {
                         const diffFromDue = window.getCalendarDayDiff(c.date, dueDate);
                         if (diffFromDue >= 0) {
                             hasNewCycle = true;
@@ -5212,6 +5212,22 @@
             }
             return { values: result, conflicts };
         };
+        // Chỉ chu kỳ điều trị được thêm/sửa và thực sự được chấp nhận sau merge
+        // mới mở lại điều trị. Đổi lịch hẹn, xóa chu kỳ hoặc ghi nhận hoãn không reset.
+        window.hasConfirmedTreatmentCycleChange = function(previousCycles, nextCycles) {
+            const treatmentData = cycle => {
+                const copy = { ...cycle };
+                ['followUpRequired', 'followUpDays', 'followUpDate', 'followUpCreatedAt', 'updatedBy'].forEach(key => delete copy[key]);
+                return Object.fromEntries(Object.entries(copy).sort(([a], [b]) => a.localeCompare(b)));
+            };
+            const previous = indexedArray('cycles', previousCycles);
+            return (nextCycles || []).some((cycle, index) => {
+                if (!cycle || cycle.isPostponed === true) return false;
+                const oldCycle = previous.get(patientArrayItemKey('cycles', cycle, index));
+                return !oldCycle || stableArrayItem(treatmentData(oldCycle)) !== stableArrayItem(treatmentData(cycle));
+            });
+        };
+
         window.commitPatientArraysSafely = async function(docId, payload) {
             const baseline = window._patientArrayBaseline.docId === docId
                 ? window._patientArrayBaseline.values
@@ -5234,6 +5250,22 @@
                     update[field] = merged.values;
                     conflicts.push(...merged.conflicts.map(key => `${field}:${key}`));
                 });
+                if (Array.isArray(update.cycles)
+                    && window.hasConfirmedTreatmentCycleChange(remotePatient.cycles || [], update.cycles)) {
+                    // Reset cùng transaction với cycles; không thay đổi cấu trúc/lịch sử chu kỳ.
+                    update.isEndedTreatment = false;
+                    update.endTreatmentDate = null;
+                    update.endReason = null;
+                    update.endReasonNote = null;
+                    update.endReasonDate = null;
+                    update.endReasonRecordedAt = null;
+                    update.endReasonRecordedBy = null;
+                    // Tính lại từ dữ liệu đã merge, tránh dùng lịch hẹn/trạng thái kết thúc cũ.
+                    update.latestFollowUp = window.getPatientLatestFollowUp({
+                        cycles: update.cycles,
+                        protocol: update.protocol || remotePatient.protocol
+                    });
+                }
                 const cleanUpdate = window.cleanPayload(update);
                 transaction.update(patientRef, cleanUpdate);
                 return { patient: { id: docId, ...remotePatient, ...cleanUpdate }, conflicts };
@@ -8785,7 +8817,7 @@
             });
 
             // Update badge for tomorrow in the tab (chỉ đếm các hẹn đang hoạt động, loại trừ hoãn hoặc kết thúc)
-            const tomorrowCount = allFollowUpPatients.filter(item => item.diffDays === 1 && !item.followUp.isEndedTreatment && !item.followUp.isDelayed).length;
+            const tomorrowCount = allFollowUpPatients.filter(item => item.diffDays === 1 && !item.followUp.hasNewCycle && !item.followUp.isEndedTreatment && !item.followUp.isDelayed).length;
             const badgeEl = document.getElementById('statsFollowUpBadge');
             if (badgeEl) {
                 if (tomorrowCount > 0) {
@@ -8798,11 +8830,11 @@
 
             let filtered = [];
             if (window.statsFollowUpFilter === 'tomorrow') {
-                filtered = allFollowUpPatients.filter(item => item.diffDays === 1 && !item.followUp.isEndedTreatment && !item.followUp.isDelayed);
+                filtered = allFollowUpPatients.filter(item => item.diffDays === 1 && !item.followUp.hasNewCycle && !item.followUp.isEndedTreatment && !item.followUp.isDelayed);
             } else if (window.statsFollowUpFilter === 'today') {
-                filtered = allFollowUpPatients.filter(item => item.diffDays === 0 && !item.followUp.isEndedTreatment && !item.followUp.isDelayed);
+                filtered = allFollowUpPatients.filter(item => item.diffDays === 0 && !item.followUp.hasNewCycle && !item.followUp.isEndedTreatment && !item.followUp.isDelayed);
             } else if (window.statsFollowUpFilter === 'overdue') {
-                filtered = allFollowUpPatients.filter(item => item.diffDays < 0 && !item.followUp.isEndedTreatment && !item.followUp.isDelayed);
+                filtered = allFollowUpPatients.filter(item => item.followUp.isOverdue);
             } else if (window.statsFollowUpFilter === 'delayed') {
                 filtered = allFollowUpPatients.filter(item => item.followUp.isDelayed);
             } else if (window.statsFollowUpFilter === 'ended') {
