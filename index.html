@@ -5161,14 +5161,26 @@
         const cloneJsonValue = value => JSON.parse(JSON.stringify(value || []));
         const stableArrayItem = value => JSON.stringify(value || {});
         const patientArrayItemKey = (field, item, index) => {
-            if (field === 'cycles') return `cycle:${item?.date || ''}:${item?.cycleNum || ''}:${Boolean(item?.isPostponed)}:${item?.delaySource || ''}`;
+            if (field === 'cycles') {
+                if (item?.id != null) return `cycle:id:${item.id}`;
+                if (item?.cycleId != null) return `cycle:cycleId:${item.cycleId}`;
+                return `cycle:${item?.date || ''}:${item?.cycleNum || ''}:${Boolean(item?.isPostponed)}:${item?.delaySource || ''}:${item?.week || ''}`;
+            }
             if (field === 'markers') return `marker:${item?.type || ''}:${item?.date || ''}`;
             if (field === 'responseAssessments') return `response:${item?.assessmentId || `${item?.recistVersion || ''}:${item?.date || ''}`}`;
             if (field === 'toxicityAssessments') return `toxicity:${item?.date || ''}`;
             if (field === 'historyLogs') return `history:${item?.id || `${item?.timestamp || ''}:${index}`}`;
             return `${field}:${index}`;
         };
-        const indexedArray = (field, values) => new Map((values || []).map((item, index) => [patientArrayItemKey(field, item, index), item]));
+        const indexedArray = (field, values) => {
+            const occurrences = new Map();
+            return new Map((values || []).map((item, index) => {
+                const key = patientArrayItemKey(field, item, index);
+                const occurrence = occurrences.get(key) || 0;
+                occurrences.set(key, occurrence + 1);
+                return [field === 'cycles' ? `${key}:occurrence:${occurrence}` : key, item];
+            }));
+        };
         window.capturePatientArrayBaseline = function(patient) {
             window._patientArrayBaseline = {
                 docId: patient?.id || null,
@@ -5182,7 +5194,7 @@
             const baseByKey = indexedArray(field, baseline);
             const remoteByKey = indexedArray(field, remote);
             const localByKey = indexedArray(field, local);
-            const result = [...remote];
+            const result = new Map(remoteByKey);
             const conflicts = [];
 
             for (const [key, baseItem] of baseByKey) {
@@ -5190,27 +5202,25 @@
                 const remoteItem = remoteByKey.get(key);
                 if (localItem === undefined) {
                     if (remoteItem !== undefined && stableArrayItem(remoteItem) === stableArrayItem(baseItem)) {
-                        const resultIndex = result.findIndex((item, index) => patientArrayItemKey(field, item, index) === key);
-                        if (resultIndex >= 0) result.splice(resultIndex, 1);
+                        result.delete(key);
                     } else if (remoteItem !== undefined) {
                         conflicts.push(key);
                     }
                 } else if (stableArrayItem(localItem) !== stableArrayItem(baseItem)) {
-                    if (remoteItem !== undefined && stableArrayItem(remoteItem) !== stableArrayItem(baseItem) && stableArrayItem(remoteItem) !== stableArrayItem(localItem)) {
+                    if ((field === 'cycles' && remoteItem === undefined)
+                        || (remoteItem !== undefined && stableArrayItem(remoteItem) !== stableArrayItem(baseItem) && stableArrayItem(remoteItem) !== stableArrayItem(localItem))) {
                         conflicts.push(key);
                         continue;
                     }
-                    const resultIndex = result.findIndex((item, index) => patientArrayItemKey(field, item, index) === key);
-                    if (resultIndex >= 0) result[resultIndex] = localItem;
-                    else result.push(localItem);
+                    result.set(key, localItem);
                 }
             }
             for (const [key, localItem] of localByKey) {
                 if (baseByKey.has(key)) continue;
-                if (!remoteByKey.has(key)) result.push(localItem);
+                if (!remoteByKey.has(key)) result.set(key, localItem);
                 else if (stableArrayItem(remoteByKey.get(key)) !== stableArrayItem(localItem)) conflicts.push(key);
             }
-            return { values: result, conflicts };
+            return { values: field === 'cycles' && conflicts.length ? remote : [...result.values()], conflicts };
         };
         // Chỉ chu kỳ điều trị được thêm/sửa và thực sự được chấp nhận sau merge
         // mới mở lại điều trị. Đổi lịch hẹn, xóa chu kỳ hoặc ghi nhận hoãn không reset.
@@ -5221,9 +5231,9 @@
                 return Object.fromEntries(Object.entries(copy).sort(([a], [b]) => a.localeCompare(b)));
             };
             const previous = indexedArray('cycles', previousCycles);
-            return (nextCycles || []).some((cycle, index) => {
+            return [...indexedArray('cycles', nextCycles)].some(([key, cycle]) => {
                 if (!cycle || cycle.isPostponed === true) return false;
-                const oldCycle = previous.get(patientArrayItemKey('cycles', cycle, index));
+                const oldCycle = previous.get(key);
                 return !oldCycle || stableArrayItem(treatmentData(oldCycle)) !== stableArrayItem(treatmentData(cycle));
             });
         };
@@ -5293,6 +5303,21 @@
                 const conflicts = [];
                 PATIENT_ARRAY_FIELDS.forEach(field => {
                     if (!Array.isArray(payload[field])) return;
+                    if (field === 'cycles' && options.editCycle) {
+                        const { target, replacement } = options.editCycle;
+                        const cycles = cloneJsonValue(remotePatient.cycles);
+                        const matches = cycles.map((cycle, index) => ({ cycle, index })).filter(item =>
+                            cycleDeleteIdentity(item.cycle) === target.identity
+                            && cycleDeleteFingerprint(item.cycle) === target.fingerprint);
+                        if (matches.length !== target.count || !matches[target.occurrence]) {
+                            conflicts.push(`cycles:${target.identity}`);
+                        } else {
+                            cycles[matches[target.occurrence].index] = replacement;
+                            window.normalizeProtocolHistory(cycles);
+                        }
+                        update.cycles = cycles;
+                        return;
+                    }
                     const merged = window.mergePatientArrayChanges(
                         field,
                         remotePatient[field] || [],
@@ -5302,6 +5327,9 @@
                     update[field] = merged.values;
                     conflicts.push(...merged.conflicts.map(key => `${field}:${key}`));
                 });
+                if (options.editCycle && conflicts.length) {
+                    return { patient: { ...remotePatient, id: docId }, conflicts };
+                }
                 if (Array.isArray(update.cycles)
                     && window.hasConfirmedTreatmentCycleChange(remotePatient.cycles || [], update.cycles)) {
                     // Reset cùng transaction với cycles; không thay đổi cấu trúc/lịch sử chu kỳ.
@@ -7545,9 +7573,26 @@
                     updatedBy: window.getCurrentEditorName()
                 });
 
+                const target = {
+                    identity: cycleDeleteIdentity(oldCycle),
+                    fingerprint: cycleDeleteFingerprint(oldCycle)
+                };
+                const sameTarget = cycle => cycleDeleteIdentity(cycle) === target.identity
+                    && cycleDeleteFingerprint(cycle) === target.fingerprint;
+                target.occurrence = cyclesBeforeSave.slice(0, idx).filter(sameTarget).length;
+                target.count = cyclesBeforeSave.filter(sameTarget).length;
+                const replacement = window.tempCurrentCycles[idx];
                 window.normalizeProtocolHistory(window.tempCurrentCycles);
                 window.renderTempCyclesList();
-                await window.autoSyncChangesToDatabase();
+                const result = await window.autoSyncChangesToDatabase({ editCycle: { target, replacement } });
+                if (!result || result.conflicts.length) {
+                    // Không giữ index cũ sau khi danh sách đã được nạp lại từ máy chủ.
+                    window._editingCycleModalIdx = -1;
+                    alert(result
+                        ? 'Dữ liệu đã được cập nhật từ máy chủ do xung đột phiên bản. Nội dung sửa chưa được lưu. Hãy đóng cửa sổ và chọn lại chu kỳ để sửa.'
+                        : 'Chưa lưu được chu kỳ. Vui lòng kiểm tra đăng nhập và mở lại hồ sơ.');
+                    return;
+                }
                 window.showToast(`✅ Đã cập nhật chu kỳ ${cycleNum} thành công!`);
                 window.closeEditCycleModal();
             } catch (err) {
@@ -7946,7 +7991,7 @@
                 // Baseline đã tiến lên: local cycles cũng phải phản ánh đúng dữ liệu đã commit.
                 window.tempCurrentCycles = JSON.parse(JSON.stringify(updatedPatient.cycles || []));
                 window.renderTempCyclesList();
-                if (options.deleteCycle) {
+                if (options.deleteCycle || options.editCycle) {
                     try {
                         if (window.currentViewingPatient?.id === docId) {
                             window.currentViewingPatient = updatedPatient;
@@ -7957,13 +8002,16 @@
                         }
                         window.renderStatsFollowUpList();
                     } catch (refreshError) {
-                        console.warn('Đã lưu xóa chu kỳ; chưa làm mới được panel phụ:', refreshError);
+                        console.warn('Đã đồng bộ chu kỳ; chưa làm mới được panel phụ:', refreshError);
                     }
                 }
                 if (commitResult.conflicts.length) window.showToast('Đã giữ lại thay đổi mới hơn từ người dùng khác ở một số bản ghi.');
+                // Transaction sửa bị từ chối: giữ lại các thay đổi khác chưa được ghi.
+                if (options.editCycle && commitResult.conflicts.length) return commitResult;
                 window.tempHistoryLogs = [];
                 window.hasPendingPatientChanges = false;
-                window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
+                if (!commitResult.conflicts.length) window.showToast("Đã đồng bộ hóa dữ liệu tự động!");
+                return commitResult;
             } catch (err) {
                 console.error("Lỗi đồng bộ tự động:", err);
                 window.showToast("Không thể đồng bộ dữ liệu lên hệ thống. Vui lòng kiểm tra kết nối và thử lại.");
