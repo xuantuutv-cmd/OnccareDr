@@ -4307,6 +4307,16 @@
             document.getElementById('saveBtn').classList.remove('hidden');
         };
 
+        window.resetPatientCycleDraft = function() {
+            document.getElementById('editCycleIndex').value = '';
+            document.getElementById('npDrugNamesInput').value = '';
+            document.getElementById('npDoseInput').value = '';
+            document.getElementById('npCycleNote').value = '';
+            document.getElementById('npPostponeReason').value = '';
+            document.getElementById('npPostponeReasonCustom').value = '';
+            document.getElementById('npPostponeDays').value = '';
+        };
+
         window.switchPatientInputTab = function(tabName) {
             const tabList = document.getElementById('patientInputTabs');
             const inputPanel = document.getElementById('patientInputPanel');
@@ -4340,6 +4350,7 @@
                 alert(message);
                 return;
             }
+            window._patientFormLoadSequence = (window._patientFormLoadSequence || 0) + 1;
             document.getElementById('editDocId').value = "";
             window.hasPendingPatientChanges = false;
             window.resetFormToAddNewMode();
@@ -4453,11 +4464,13 @@
         };
 
         window.closePatientFormModal = function() {
+            window._patientFormLoadSequence = (window._patientFormLoadSequence || 0) + 1;
             window.hasPendingPatientChanges = false;
             window.setPanelVisibility(document.getElementById('patientFormModal'), false);
         };
 
         window.closePatientDetailModal = function() {
+            window._patientDetailLoadSequence = (window._patientDetailLoadSequence || 0) + 1;
             window.setPanelVisibility(document.getElementById('patientDetailModal'), false);
             if (window.activeMarkerChart) {
                 window.activeMarkerChart.destroy();
@@ -6342,13 +6355,29 @@
             `;
         };
 
+        window._patientDetailLoadSequence = 0;
+        window.loadPatientForDetail = async function(docId, loadSequence) {
+            const freshSnapshot = await getDoc(doc(db, 'patients', docId));
+            if (loadSequence !== window._patientDetailLoadSequence) return null;
+            if (!freshSnapshot.exists()) throw new Error('PATIENT_NOT_FOUND');
+            return { id: freshSnapshot.id, ...freshSnapshot.data() };
+        };
+
         window.viewPatientDetail = async function(docId) {
-            if (!window.canUseOncoCare) return;
-            let p = cachedPatientsList.find(item => item.id === docId);
+            if (!window.canUseOncoCare || !docId) return;
+            const loadSequence = ++window._patientDetailLoadSequence;
+            let p;
             try {
-                const freshSnapshot = await getDoc(doc(db, 'patients', docId));
-                if (freshSnapshot.exists()) p = { id: freshSnapshot.id, ...freshSnapshot.data() };
-            } catch (error) { console.warn('Không tải được hồ sơ mới nhất, dùng dữ liệu cache:', error); }
+                p = await window.loadPatientForDetail(docId, loadSequence);
+            } catch (error) {
+                console.error('Lỗi tải chi tiết hồ sơ:', error);
+                if (loadSequence === window._patientDetailLoadSequence) {
+                    window.showToast(error.message === 'PATIENT_NOT_FOUND'
+                        ? 'Hồ sơ không còn tồn tại hoặc bạn không còn quyền truy cập.'
+                        : 'Không tải được chi tiết hồ sơ mới nhất. Vui lòng kiểm tra kết nối và thử lại.');
+                }
+                return;
+            }
             if (!p) return;
             window.currentViewingPatient = p;
 
@@ -6521,17 +6550,22 @@
             else if (!document.getElementById('responseDetailsModal').classList.contains('hidden')) { event.stopImmediatePropagation(); window.closeResponseDetails(); }
         }, true);
 
-        window._openEditPatientModal = async function(docId) {
+        window._patientFormLoadSequence = 0;
+        window.loadPatientForEdit = async function(docId, loadSequence) {
+            const freshSnapshot = await getDoc(doc(db, 'patients', docId));
+            if (loadSequence !== window._patientFormLoadSequence) return null;
+            if (!freshSnapshot.exists()) throw new Error('PATIENT_NOT_FOUND');
+            return { id: freshSnapshot.id, ...freshSnapshot.data() };
+        };
+
+        window._openEditPatientModal = async function(docId, loadSequence) {
             if (!window.canUseOncoCare) return;
-            let p = cachedPatientsList.find(item => item.id === docId);
-            try {
-                const freshSnapshot = await getDoc(doc(db, 'patients', docId));
-                if (freshSnapshot.exists()) p = { id: freshSnapshot.id, ...freshSnapshot.data() };
-            } catch (error) { console.warn('Không tải được hồ sơ mới nhất, dùng dữ liệu cache:', error); }
+            const p = await window.loadPatientForEdit(docId, loadSequence);
             if (!p) return;
 
             document.getElementById('editDocId').value = p.id;
             window.resetFormToAddNewMode();
+            window.resetPatientCycleDraft();
             window.switchPatientInputTab('admin');
             document.getElementById('patientInputPanel').classList.remove('lg:col-span-12'); document.getElementById('patientInputPanel').classList.add('lg:col-span-5'); document.getElementById('patientHistoryPanel').classList.remove('hidden'); document.getElementById('dispModalDoc').innerText = getCurrentProfessionalDisplayName();
 
@@ -6682,11 +6716,17 @@
             window.renderTempMarkersList();
         };
         window.openEditPatientModal = async function(docId) {
+            if (!window.canUseOncoCare || !docId) return;
+            const loadSequence = ++window._patientFormLoadSequence;
             try {
-                await window._openEditPatientModal(docId);
+                await window._openEditPatientModal(docId, loadSequence);
             } catch (error) {
                 console.error('Lỗi mở form cập nhật hồ sơ:', error);
-                window.showToast('Không thể mở form cập nhật. Vui lòng thử lại.');
+                if (loadSequence === window._patientFormLoadSequence) {
+                    window.showToast(error.message === 'PATIENT_NOT_FOUND'
+                        ? 'Hồ sơ không còn tồn tại hoặc bạn không còn quyền truy cập.'
+                        : 'Không tải được dữ liệu hồ sơ mới nhất. Vui lòng kiểm tra kết nối và thử lại.');
+                }
             }
         };
 
